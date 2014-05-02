@@ -3,7 +3,7 @@ import linecache
 import sys
 
 # Files which should exist:
-EventMatchingFile = file('EventNumberInformation.txt','r')
+EventMatchingFile = file('EventNumberInformation.lhco','r')
 
 GeneratorName = ['TTbarLHCO_PositiveMuon.lhco', 'TTbarLHCO_NegativeMuon.lhco','TTbarLHCO_PositiveElectron.lhco','TTbarLHCO_NegativeElectron.lhco']
 GeneratorFile = [file('TTbarLHCO_PositiveMuon.lhco','r'), file('TTbarLHCO_NegativeMuon.lhco','r'), file('TTbarLHCO_PositiveElectron.lhco','r'), file('TTbarLHCO_NegativeElectron.lhco','r')]

@@ -399,7 +399,7 @@ int main (int argc, char *argv[])
     //  LHCO Output files + GeneratorInfo  //
     /////////////////////////////////////////
     ofstream EventInfoFile;
-    EventInfoFile.open("EventNumberInformation.txt");
+    EventInfoFile.open("EventNumberInformation.lhco");
     EventInfoFile << " Event Number  MuPos  MuNeg  ElPos  ElNeg  ChannelNumber  selectedEvent  selectedChannelNumber " << endl;
 
     LHCOOutput lhcoOutput; //Initialize class
