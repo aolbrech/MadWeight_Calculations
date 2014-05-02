@@ -19,9 +19,9 @@ beta_QCD = 2.09
 <!-- Simulation samples : -->
 <!-- TTbarJets samples were created without HLT trigger HENCE can be used for both applied triggers !! -->
 
-<!--<d name="TTbarJets" title="t#bar{t}+jets" add="1" color="4" ls="1" lw="2" normf="1" xsection="23.333333" EqLumi="2350.3556" filenames="/user/aolbrech/AnomalousCouplings/GitTopTree/TopBrussels/TopTreeProducer/test/TopTree_Skimmed_*.root"/> -->
+<!-- <d name="TTbarJets" title="t#bar{t}+jets" add="1" color="4" ls="1" lw="2" normf="1" xsection="23.333333" EqLumi="2350.3556" filenames="TopTree_Skimmed_*.root"/> -->
 
-<d name="TTbarJets" title="t#bar{t}+jets" add="1" color="4" ls="1" lw="2" normf="1" xsection="23.333333" EqLumi="2350.3556" filenames="/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysis/macros/SamplesAnnik/TopTree_Skimmed_*.root"/>
+<d name="TTbarJets" title="t#bar{t}+jets" add="1" color="4" ls="1" lw="2" normf="1" xsection="23.333333" EqLumi="2350.3556" filenames="dcap://maite.iihe.ac.be//pnfs/iihe/cms/store/user/aolbrech/Skimmed-TopTrees/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7C-v1_ID3422_NoPreselection_14March2014/14032014_151053/TopTree_Skimmed_*.root"/>
 
 <!-- <d name="TTbarJets_SemiEl" title="t#bar{t}+jets semi-el" add="1" color="4" ls="1" lw="2" normf="1" xsection="23.333333" EqLumi="23504.3556" filenames="/user/aolbrech/Samples/Summer11_v2/TTJets-madgraph-Summer11_42X_v2_NoPreSel/TopTree_Skimmed_SemiEl.root"/>
 

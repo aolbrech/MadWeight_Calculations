@@ -134,7 +134,7 @@ int main (int argc, char *argv[])
   /////////////////////
 
   //xml file
-  string xmlFileName ="../config/myAnomCouplConfig.xml";
+  string xmlFileName ="config/myAnomCouplConfig.xml";
 
   if (argc > 3)
     xmlFileName = (string)argv[3];
@@ -340,9 +340,9 @@ int main (int argc, char *argv[])
 
   LumiReWeighting LumiWeights, LumiWeightsUp, LumiWeightsDown;
 
-  LumiWeights = LumiReWeighting("../../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
-  LumiWeightsUp = LumiReWeighting("../../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
-  LumiWeightsDown = LumiReWeighting("../../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
+  LumiWeights = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
+  LumiWeightsUp = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
+  LumiWeightsDown = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
 
   cout << " Initialized LumiReWeighting stuff" << endl;
   
@@ -376,9 +376,9 @@ int main (int argc, char *argv[])
    	    
     vector<JetCorrectorParameters> vCorrParam;
 
-    /*JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L3Absolute_AK5PFchs.txt");
-    JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L2Relative_AK5PFchs.txt");
-    JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L1FastJet_AK5PFchs.txt");
+    /*JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L3Absolute_AK5PFchs.txt");
+    JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L2Relative_AK5PFchs.txt");
+    JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L1FastJet_AK5PFchs.txt");
     
     //  Load the JetCorrectorParameter objects into a vector, IMPORTANT: THE ORDER MATTERS HERE !!!! 
     vCorrParam.push_back(*L1JetPar);
@@ -386,11 +386,11 @@ int main (int argc, char *argv[])
     vCorrParam.push_back(*L3JetPar);
 
     if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) { // DATA!
-      JetCorrectorParameters *ResJetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_DATA_L2L3Residual_AK5PFchs.txt");
+      JetCorrectorParameters *ResJetCorPar = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_DATA_L2L3Residual_AK5PFchs.txt");
       vCorrParam.push_back(*ResJetCorPar);
       }*/
     
-    JetCorrectionUncertainty *jecUnc =new JetCorrectionUncertainty(*(new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/Fall12_V6_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
+    JetCorrectionUncertainty *jecUnc =new JetCorrectionUncertainty(*(new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Fall12_V6_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
     
     // true means redo also the L1
     JetTools *jetTools = new JetTools(vCorrParam, jecUnc, true);
@@ -483,6 +483,7 @@ int main (int argc, char *argv[])
       if(dataSetName.find("TTbarJets") == 0)  {
 	//cout << "LOADING GenEvent" << endl;
 	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
+	//std::cout << "genEvt: " << genEvt << std::endl;
 	if( genEvt->isSemiLeptonic(TRootGenEvent::kMuon) ) {
 	  isSemiMu=true;
 	  isSemiE=false;
