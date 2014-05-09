@@ -27,12 +27,14 @@ Contains the config file which will be used for the analysis.
 °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 Command to run the analyzer:
 
-g++ -m64 -g -L /user/aolbrech/lib -I ../../ -l TopTreeAnaContent53 -l TopTreeAna53 -l MLP -l TreePlayer -l TMVA -l XMLIO -I `root-config --incdir` `root-config --libs` AnomalousCouplingsTreeCreator.cc -o AnomalousCouplingsTreeCreator
+g++ -m64 -g -L /user/aolbrech/lib -I ../ -l TopTreeAnaContent53 -l TopTreeAna53 -l MLP -l TreePlayer -l TMVA -l XMLIO -I `root-config --incdir` `root-config --libs` AnomalousCouplingsTreeCreator.cc -o AnomalousCouplingsTreeCreator
+
+source /jefmount_mnt/jefmount/cmss/slc5_amd64_gcc462/external/dcap/2.47.5.0-cms/etc/profile.d/init.sh
 
 ./AnomalousCouplingsTreeCreator
 
 ----------------
-Git Remark:
+Git Rsource /jefmount_mnt/jefmount/cmss/slc5_amd64_gcc462/external/dcap/2.47.5.0-cms/etc/profile.d/init.shemark:
 ----------------
 
 push command which need to be used: git push origin master
