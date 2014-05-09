@@ -639,11 +639,35 @@ int main (int argc, char *argv[])
 	  
       }
 
-      /////////////////////////////////////////////////////////////////////////////
-      // JES SYSTEMATICS && SMEAR JET RESOLUTION TO MIMIC THE RESOLUTION IN DATA //
-      /////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //   JES SYSTEMATICS && SMEAR JET RESOLUTION TO MIMIC THE RESOLUTION IN DATA         //
+      //     - JES Corrections: The nominal corrections are already applied at PAT level   //
+      //       so these tools should only be used for studies of the effect of systematics //
+      ///////////////////////////////////////////////////////////////////////////////////////
 
+      //JER Smearing:
       if( ! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) ) {
+
+	     /*    From file James (FourTop_EventSelection.cc)
+            //JER
+            doJERShift == 0;
+            if(doJERShift == 1)
+            	jetTools->correctJetJER(init_jets, genjets, mets[0], "minus");
+            else if(doJERShift == 2)
+                jetTools->correctJetJER(init_jets, genjets, mets[0], "plus");
+            else
+                jetTools->correctJetJER(init_jets, genjets, mets[0], "nominal");
+                                                                                                                        
+            //     coutObjectsFourVector(init_muons,init_electrons,init_jets,mets,"After JER correction:");
+                                                                                                                       	                
+            // JES sysematic!
+            if (doJESShift == 1)
+            	jetTools->correctJetJESUnc(init_jets, mets[0], "minus");
+            else if (doJESShift == 2)
+                jetTools->correctJetJESUnc(init_jets, mets[0], "plus");
+                                                                                                 	                                                                                                
+            //            coutObjectsFourVector(init_muons,init_electrons,init_jets,mets,"Before JES correction:");
+            */                                                         	                                                                                                	    
 
 	jetTools->correctJetJER(init_jets_corrected, genjets, mets[0], "nominal",false);
 
@@ -651,7 +675,6 @@ int main (int argc, char *argv[])
 	//jetTools->correctJetJER(init_jets_corrected, genjets, mets[0], "plus",false);
 
 	// Example how to apply JES systematics
-	
 	 
 	//jetTools->correctJetJESUnc(init_jets_corrected, "minus",1);
 	//jetTools->correctJetJESUnc(init_jets_corrected, "plus",1);
@@ -843,7 +866,7 @@ int main (int argc, char *argv[])
       
       //Declare selection instance    
       Selection selection(init_jets_corrected, init_muons, init_electrons, mets, event->kt6PFJets_rho());
-      selection.setJetCuts(40,2.5,0.01,1.,0.98,0.3,0.1);
+      selection.setJetCuts(40,2.5,0.01,1.,0.98,0.3,0.1);     
       selection.setMuonCuts(25,2.1,0.12,0.2,0.3,1,0.5,5,0); 
       selection.setElectronCuts(32,2.5,0.1,0.02,0.5,0.3,0); 
       selection.setLooseMuonCuts(10,2.5,0.2);
@@ -910,40 +933,43 @@ int main (int argc, char *argv[])
 	selectedElectrons = selection.GetSelectedElectrons(selectedJets);
       }
 
+      //Variables containing the right jet combination for TTJets
+      int CorrectQuark1=999;  //Needed for Monte Carlo
+      int CorrectQuark2=999;
+      int CorrectBHadronic=999;
+      int CorrectBLeptonic=999;
+      
       ///////////////////////////////////////
       //  Initialize variables ChiSquared  //
       //  Look for correct combination     //
       ///////////////////////////////////////
-      float ChiSquared[12];  //Needed for chi squared caclulation      
+      /*float ChiSquared[12];  //Needed for chi squared caclulation      
       int UsedCombination;
       int QuarkOneIndex[12];
       int QuarkTwoIndex[12];
       int BHadronicIndex[12];
       int BLeptIndex, BHadrIndex, QOneIndex, QTwoIndex;
       float ChiSquaredValue;
-
-      int CorrectQuark1=999;  //Needed for Monte Carlo
-      int CorrectQuark2=999;
-      int CorrectBHadronic=999;
-      int CorrectBLeptonic=999;
       	    
       float MassW=83.6103;
       float MassTop = 172.956;
       float SigmaW=11.1534;  //Obtained from gaussian fit on Top and W distribution with simulated information
       float SigmaTop=18.232;
+      */
 
       /////////////////////////////
       // Neutrino Reconstruction //
       /////////////////////////////
       float NeutrinoPx;
       float NeutrinoPy;
-      float NeutrinoPz=999;//with this value it can be distinguished in plot!
-      TLorentzVector NeutrinoOne, *TopOne, NeutrinoTwo, *TopTwo; 
-      float NeutrinoPzOne, NeutrinoEOne, NeutrinoPzTwo, NeutrinoETwo;
+      float NeutrinoPz=99.;//with this value it can be distinguished in plot!
+      //TLorentzVector NeutrinoOne, *TopOne, NeutrinoTwo, *TopTwo; 
+      //float NeutrinoPzOne, NeutrinoEOne, NeutrinoPzTwo, NeutrinoETwo;
       
-      TLorentzVector WLeptonic, TopLeptonic; //Are the sum of two TLorentzVectors
+      //TLorentzVector WLeptonic, TopLeptonic; //Are the sum of two TLorentzVectors
       TLorentzVector *Neutrino;
-      float CosTheta;
+      TLorentzVector *NeutrinoFixedMass;
+      //float CosTheta;
       
       //////////////////////
       // Event selection  //
@@ -1060,8 +1086,7 @@ int main (int argc, char *argv[])
       	    if(elPlusFromTop) cerr<<"elPlusFromTop was already true"<<endl;
       	    elPlusFromTop = true;
       	  }
-	  
-	  
+	    
       	  if( abs(mcParticles[i]->type()) < 6 || abs(mcParticles[i]->type()) == 21 ){
       	    mcParticlesTLV.push_back(*mcParticles[i]);
       	    mcParticlesMatching.push_back(*mcParticles[i]);
@@ -1180,40 +1205,50 @@ int main (int argc, char *argv[])
        
      }
 
-     //Ask for two M CSV b-tags in order to reduce the number of combinations in the LHCO file:
+     //////////////////////////////////////
+     //   B-Tag requirements (2 M CSV)   //
+     //////////////////////////////////////   
      //std::vector<float> CSVbTagValues;
      float CSVMediumWP = 0.679;
      int NumberBTaggedJets = 0;
      for(int ii = 0; ii<selectedJets.size();ii++){
-       //TCHEbTagValues.push_back(selectedJets[ii]->btag_trackCountingHighEffBJetTags());
-       //TCHPbTagValues.push_back(selectedJets[ii]->btag_trackCountingHighPurBJetTags());
-       //SSVHEbTagValues.push_back(selectedJets[ii]->btag_simpleSecondaryVertexHighEffBJetTags());
-       //SSVHPbTagValues.push_back(selectedJets[ii]->btag_simpleSecondaryVertexHighPurBJetTags());
        //CSVbTagValues.push_back(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags());
        if(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() > CSVMediumWP){
-	if(NumberBTaggedJets == 0) std::cout << " " << std::endl;
 	NumberBTaggedJets++;	
-	std::cout << " CSV b-tag value for jet " << ii << " with Pt-value " << selectedJets[ii]->Pt() << " is : " << selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() << std::endl;
+	if(verbosity > 3) std::cout << " CSV b-tag value for jet " << ii << " with Pt-value " << selectedJets[ii]->Pt() << " is : " << selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() << std::endl;
        }
      }
 
+     /////////////////////////////////////////////
+     //   Reconstructing Neutrino (partially)   //
+     //   Pt and M needs to be known for .lhco  //
+     /////////////////////////////////////////////   
+     NeutrinoPx = -(*selectedLepton+*selectedJets[0]+*selectedJets[1]+*selectedJets[2]+*selectedJets[3]).Px();
+     NeutrinoPy = -(*selectedLepton+*selectedJets[0]+*selectedJets[1]+*selectedJets[2]+*selectedJets[3]).Py();
+     Neutrino->SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
+     Neutrino->SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, Neutrino->Pt());
+
+     if(NumberBTaggedJets >=2){
+	if(verbosity > 3){
+		 std::cout << " Looking at an event with " << NumberBTaggedJets << " b-tagged jets! " << std::endl;
+	         std::cout << " Mass value for the neutrino : " << Neutrino->M() << " \n" << std::endl;
+	}
+	//Count the number of b-tagged events
+	if(eventselectedSemiMu) nSelectedMuBTag++;	
+	if(eventselectedSemiEl) nSelectedElBTag++;
+     }
+
+    /*
      /////////////////////////////////////////////
      //  Filling of LHCO files for reco events  //
      /////////////////////////////////////////////
      //vector<TLorentzVector*> LHCORecoVector(6);
      //vector<int> MadGraphRecoId(6,4);
-
-     if(NumberBTaggedJets >=2){
-	std::cout << " Looking at an event with " << NumberBTaggedJets << " b-tagged jets! " << std::endl;
-	nSelectedMuBTag++;//if(eventselectedSemiMu) nSelectedMuBTag++;	
-	nSelectedElBTag++;//if(eventselectedSemiEl) nSelectedElBTag++;
-	//std::cout << " Mass value for the neutrino : " << Neutrino->M() << " --> Will maybe need to be set manually to 0! " << std::endl;
-     }
-    /*
-       //Need to distinguish between charge and lepton type
-       if(verbosity>4) cout << " Eta of neutrino : " << Neutrino->Eta() << endl;
-       if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
-	 if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
+     //Need to distinguish between charge and lepton type
+       
+	if(verbosity>4) cout << " Eta of neutrino : " << Neutrino->Eta() << endl;
+        if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
+	if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
 	 LHCORecoVector[0] = selectedJets[BHadrIndex];
 	 LHCORecoVector[1] = selectedJets[QOneIndex];
 	 LHCORecoVector[2] = selectedJets[QTwoIndex];
@@ -1276,15 +1311,15 @@ int main (int argc, char *argv[])
     }			//loop on events
     
     //--------------------  Sigma for W Mass and Top Mass  --------------------
-    histo1D["WMass"]->Fit("gaus","Q");     
-    histo1D["TopMass"]->Fit("gaus","Q");
-    std::cout << " sigma values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(2) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
-    std::cout << " mass values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(1) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(1) << std::endl;
+    //histo1D["WMass"]->Fit("gaus","Q");     
+    //histo1D["TopMass"]->Fit("gaus","Q");
+    //std::cout << " sigma values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(2) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
+    //std::cout << " mass values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(1) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(1) << std::endl;
     
     cout<<endl;
 
     cout << "+> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuBTag << " have two or more Medium wp CSV b-tags "<< endl;
-    cout << "+> " << nSelectedEl << " e+jets events where selected " << nSelectedElBTag << " have two or more Medium wp CSV b-tags " << endl;
+    cout << "+> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElBTag << " have two or more Medium wp CSV b-tags " << endl;
 
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
