@@ -359,7 +359,9 @@ int main (int argc, char *argv[])
     string dataSetName = datasets[d]->Name();
 
     int nSelectedMu=0;
+    int nSelectedMuBTag=0;
     int nSelectedEl=0;
+    int nSelectedElBTag=0;
     if (verbose > 1)
       cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
     if (verbose > 1)
@@ -437,7 +439,7 @@ int main (int argc, char *argv[])
     TRootMCParticle *Top,*TopBar,*Bottom, *BottomBar,*Lepton,*NeutrinoMC,*WPlus,*WMinus,*Light,*LightBar;
 
     ////////////////////////////////////
-    //	Loop on events
+    //	loop on events
     ////////////////////////////////////
     
     nEvents[d] = 0;
@@ -445,8 +447,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++)
-    //for (unsigned int ievt = 0; ievt < 1000; ievt++)
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++)
+    for (unsigned int ievt = 0; ievt < 1000; ievt++)
     {
       vector < TRootVertex* > vertex;
       vector < TRootMuon* > init_muons;
@@ -1179,211 +1181,35 @@ int main (int argc, char *argv[])
      }
 
      //Ask for two M CSV b-tags in order to reduce the number of combinations in the LHCO file:
-     /*std::vector<float> CSVbTagValues;
+     //std::vector<float> CSVbTagValues;
+     float CSVMediumWP = 0.679;
+     int NumberBTaggedJets = 0;
      for(int ii = 0; ii<selectedJets.size();ii++){
-       TCHEbTagValues.push_back(selectedJets[ii]->btag_trackCountingHighEffBJetTags());
-       TCHPbTagValues.push_back(selectedJets[ii]->btag_trackCountingHighPurBJetTags());
-       SSVHEbTagValues.push_back(selectedJets[ii]->btag_simpleSecondaryVertexHighEffBJetTags());
-       SSVHPbTagValues.push_back(selectedJets[ii]->btag_simpleSecondaryVertexHighPurBJetTags());
-       CSVbTagValues.push_back(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags());
-       }*/
-
-     //////////////////////////////////////////////////
-     //     Calculating correct jet distribution     //
-     //////////////////////////////////////////////////
-     //std::cout << " Studied event : " << ievt << std::endl;
-     int NumberCombinations=0;	
-     for(int i=0;i<3;i++){
-       for(int j=i+1;j<4;j++){
-	 for(int k=0;k<4;k++){
-	   if(k!=i && k!=j){
-	     
-	     if(applyKinFit == true){
-	       /*TLorentzVector lightJet1 = *selectedJets[i];
-		 TLorentzVector lightJet2 = *selectedJets[j];
-		 TLorentzVector bJet = *selectedJets[k];
-		 
-		 // prepare everything for the Kinematic Fit
-		 TMatrixD Ml1(3,3), Ml2(3,3), Mb(3,3);
-		 Ml1.Zero(); Ml2.Zero(); Mb.Zero();
-		 Ml1(0,0) = pow(resFitLightJets_->EtResolution(&lightJet1), 2);
-		 Ml1(1,1) = pow(resFitLightJets_->ThetaResolution(&lightJet1), 2);
-		 Ml1(2,2) = pow(resFitLightJets_->PhiResolution(&lightJet1), 2);
-		 Ml2(0,0) = pow(resFitLightJets_->EtResolution(&lightJet2), 2);
-		 Ml2(1,1) = pow(resFitLightJets_->ThetaResolution(&lightJet2), 2);
-		 Ml2(2,2) = pow(resFitLightJets_->PhiResolution(&lightJet2), 2);
-		 Mb(0,0) = pow(resFitBJets_->EtResolution(&bJet), 2);
-		 Mb(1,1) = pow(resFitBJets_->ThetaResolution(&bJet), 2);
-		 Mb(2,2) = pow(resFitBJets_->PhiResolution(&bJet), 2);
-		 
-		 TKinFitter *theFitter = new TKinFitter("hadtopFit", "hadtopFit");
-		 theFitter->setVerbosity(0);
-		 
-		 TFitParticleEtThetaPhiEMomFix *fitLight1 = new TFitParticleEtThetaPhiEMomFix("lightJet1", "lightJet1", &lightJet1, &Ml1);
-		 TFitParticleEtThetaPhiEMomFix *fitLight2 = new TFitParticleEtThetaPhiEMomFix("lightJet2", "lightJet2", &lightJet2, &Ml2);
-		 TFitParticleEtThetaPhiEMomFix *fitB = new TFitParticleEtThetaPhiEMomFix("bJet", "bJet", &bJet, &Mb);
-		 theFitter->addMeasParticles(fitLight1,fitLight2,fitB);
-		 
-		 TFitConstraintM *consW = new TFitConstraintM("WBosonMass", "MassConstraint", 0, 0, WMassKinFit);
-		 TFitConstraintM *consTop = new TFitConstraintM("TopQuarkMass", "MassConstraint", 0, 0, TopMassKinFit );//Different mass for MC and Data!!
-		 consW->addParticles1(fitLight1,fitLight2);
-		 consTop->addParticles1(fitB,fitLight1,fitLight2);
-		 
-		 theFitter->addConstraint(consW);
-		 theFitter->addConstraint(consTop);
-		 theFitter->setMaxNbIter(30);
-		 theFitter->setMaxDeltaS(5e-5);
-		 theFitter->setMaxF(1e-4);
-		 
-		 //do the fit!
-		 theFitter->fit();
-		 if (theFitter->getStatus() == 0) // if the fitter converged
-		 ChiSquared[NumberCombinations]=theFitter->getS();
-		 //else
-		 //cout << "FIT NOT CONVERGED" << endl;
-		 
-		 delete theFitter;
-		 delete fitLight1;
-		 delete fitLight2;
-		 delete fitB;
-		 delete consW;
-		 delete consTop;*/
-	     }//Kinematic fit applied
-	     else{
-	       float recMassW = (*selectedJets[i]+*selectedJets[j]).M();
-	       float recMassTop=(*selectedJets[i]+*selectedJets[j]+*selectedJets[k]).M();
-	       
-	       ChiSquared[NumberCombinations]=pow(((recMassW-MassW)/SigmaW),2)+pow(((recMassTop-MassTop)/SigmaTop),2);
-	     }//No Kinematic Fit applied (minimal chi squared applied)
-	     QuarkOneIndex[NumberCombinations]=i;
-	     QuarkTwoIndex[NumberCombinations]=j;
-	     BHadronicIndex[NumberCombinations]=k;		
-	     
-	     NumberCombinations++;  //Always gives 12 as it should be!
-	   }
-	 }//end of k loop for jet combination selection
-       }//end of j loop for jet combination selection
-     }//end of i loop for jet combination selection		
-     
-     //Select lowest chi squared value:     
-     if(applyKinFit ==  false){
-       ChiSquaredValue=ChiSquared[0];
-       for(int ii=0;ii<12;ii++){
-	 if(ChiSquaredValue>ChiSquared[ii]){
-	   ChiSquaredValue=ChiSquared[ii];
-	   UsedCombination=ii;        
-	 } 
-       }
-       //
-       //Jet not in Chisquared combination is the Leptonic B jet
-       //
-       for(int ll=0;ll<4;ll++){
-	 if(ll!=QuarkOneIndex[UsedCombination] && ll!=QuarkTwoIndex[UsedCombination] && ll!=BHadronicIndex[UsedCombination]){
-	   BLeptIndex=ll;
-	   BHadrIndex=BHadronicIndex[UsedCombination];
-	   QOneIndex=QuarkOneIndex[UsedCombination];
-	   QTwoIndex=QuarkTwoIndex[UsedCombination];
-	 }
+       //TCHEbTagValues.push_back(selectedJets[ii]->btag_trackCountingHighEffBJetTags());
+       //TCHPbTagValues.push_back(selectedJets[ii]->btag_trackCountingHighPurBJetTags());
+       //SSVHEbTagValues.push_back(selectedJets[ii]->btag_simpleSecondaryVertexHighEffBJetTags());
+       //SSVHPbTagValues.push_back(selectedJets[ii]->btag_simpleSecondaryVertexHighPurBJetTags());
+       //CSVbTagValues.push_back(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags());
+       if(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() > CSVMediumWP){
+	if(NumberBTaggedJets == 0) std::cout << " " << std::endl;
+	NumberBTaggedJets++;	
+	std::cout << " CSV b-tag value for jet " << ii << " with Pt-value " << selectedJets[ii]->Pt() << " is : " << selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() << std::endl;
        }
      }
 
-     if(verbosity>1){
-       cout << " Combination obtained from Chi-squared: " << endl;
-       cout << "   BLept = " << BLeptIndex << ", BHadr = " << BHadrIndex << " , Quark1 = " << QOneIndex << " , Quark2 = " << QTwoIndex << endl;
-       cout << " Correct combination : " << endl;
-       cout << "   BLept = " << CorrectBLeptonic << ", BHadr = " << CorrectBHadronic << " , Quark1 = " << CorrectQuark1 << " , Quark2 = " << CorrectQuark2 << endl;
-       cout << " ---------------------------------------------------------------------------------------------------------------------------------------------- " << endl;
+     /////////////////////////////////////////////
+     //  Filling of LHCO files for reco events  //
+     /////////////////////////////////////////////
+     //vector<TLorentzVector*> LHCORecoVector(6);
+     //vector<int> MadGraphRecoId(6,4);
+
+     if(NumberBTaggedJets >=2){
+	std::cout << " Looking at an event with " << NumberBTaggedJets << " b-tagged jets! " << std::endl;
+	nSelectedMuBTag++;//if(eventselectedSemiMu) nSelectedMuBTag++;	
+	nSelectedElBTag++;//if(eventselectedSemiEl) nSelectedElBTag++;
+	//std::cout << " Mass value for the neutrino : " << Neutrino->M() << " --> Will maybe need to be set manually to 0! " << std::endl;
      }
-
-     ///////////////////////////////
-     //  Neutrino Reconstruction  //
-     ///////////////////////////////
-     //Calculating MET_Pz() (equation ax² + bx + c = 0 ):
-     NeutrinoPx = -(*selectedLepton+*selectedJets[0]+*selectedJets[1]+*selectedJets[2]+*selectedJets[3]).Px();
-     NeutrinoPy = -(*selectedLepton+*selectedJets[0]+*selectedJets[1]+*selectedJets[2]+*selectedJets[3]).Py();
-	
-     float aCoefficient = 4*pow(selectedLepton->E(),2)-4*pow(selectedLepton->Pz(),2);
-     float bCoefficient = 4*(selectedLepton->Pz())*(pow(selectedLepton->M(),2)-pow(MassW,2)-2*(selectedLepton->Px())*NeutrinoPx-2*(selectedLepton->Py())*NeutrinoPy);
-     float cCoefficient = -pow(selectedLepton->M(),4)-pow(MassW,4)-4*pow(selectedLepton->Px(),2)*pow(NeutrinoPx,2)-4*pow(selectedLepton->Py(),2)*pow(NeutrinoPy,2)+4*(pow(selectedLepton->M(),2)-pow(MassW,2))*((selectedLepton->Px())*NeutrinoPx+(selectedLepton->Py())*NeutrinoPy)-8*(selectedLepton->Px())*NeutrinoPx*(selectedLepton->Py())*NeutrinoPy+4*pow(selectedLepton->E(),2)*pow(NeutrinoPx,2)+4*pow(selectedLepton->E(),2)*pow(NeutrinoPy,2);
-     
-     float DCoefficient = pow(bCoefficient,2)-4*aCoefficient*cCoefficient;
-     
-     int NeutrinoFound =0;
-     if(DCoefficient>0){
-       NeutrinoFound =1;
-       NeutrinoPzOne = ((-bCoefficient + sqrt(DCoefficient))/(aCoefficient*2));
-       NeutrinoPzTwo = ((-bCoefficient - sqrt(DCoefficient))/(aCoefficient*2));
-       
-       //MSPlot["NeutrinoPzOne"]->Fill(NeutrinoPzOne, datasets[d], true, Luminosity);
-       //MSPlot["NeutrinoPzTwo"]->Fill(NeutrinoPzTwo, datasets[d], true, Luminosity);
-       
-       NeutrinoEOne = sqrt(pow(NeutrinoPx,2)+pow(NeutrinoPy,2)+pow(NeutrinoPzOne,2));
-       NeutrinoETwo = sqrt(pow(NeutrinoPx,2)+pow(NeutrinoPy,2)+pow(NeutrinoPzTwo,2));
-       NeutrinoOne.SetPxPyPzE(NeutrinoPx,NeutrinoPy,NeutrinoPzOne,NeutrinoEOne);
-       NeutrinoTwo.SetPxPyPzE(NeutrinoPx,NeutrinoPy,NeutrinoPzTwo,NeutrinoETwo);
-       //MSPlot["WMassNeutrinoOne"]->Fill((NeutrinoOne+selectedLepton).M(), datasets[d], true, Luminosity);
-       //MSPlot["WMassNeutrinoTwo"]->Fill((NeutrinoTwo+selectedLepton).M(), datasets[d], true, Luminosity);
-       //MSPlot["WMassNeutrinoMc"]->Fill((neutrino+selectedLepton).M(), datasets[d], true, Luminosity);
-       
-       //Selecting which neutrino solution is the most correct one (neutrino + muon + bottom should give top mass)
-       //MSPlot["TopMassNeutrinoOne"]->Fill((NeutrinoOne+selectedLepton+selectedJets[BLeptonicIndex]).M(), datasets[d], true, Luminosity);
-       //MSPlot["TopMassNeutrinoTwo"]->Fill((NeutrinoTwo+selectedLepton+selectedJets[BLeptonicIndex]).M(), datasets[d], true, Luminosity);
-       
-       float TopMassDiffOne = fabs(MassTop - (NeutrinoOne+*selectedLepton+*selectedJets[BLeptIndex]).M());
-       float TopMassDiffTwo = fabs(MassTop - (NeutrinoTwo+*selectedLepton+*selectedJets[BLeptIndex]).M());
-       if(TopMassDiffOne<TopMassDiffTwo){
-	 Neutrino = &NeutrinoOne;
-	 NeutrinoPz=Neutrino->Pz();
-	 //delete NeutrinoTwo;
-       }
-       else{
-	 Neutrino = &NeutrinoTwo;
-	 NeutrinoPz=Neutrino->Pz();
-	 //delete NeutrinoOne; 
-       }
-       if(verbosity>4) cout << " NeutrinoPz = " << NeutrinoPz << endl;
-
-       //MSPlot["NeutrinoPzSelected"]->Fill(NeutrinoPz, datasets[d], true, Luminosity);
-       
-       //Compare obtained Pz neutrino value with MC value:
-       //if(neutrinoFound==1 && NeutrinoPz!=999){
-       //float neutrinoPzDiff = (neutrino.Pz()-NeutrinoPz)/NeutrinoPz;
-	 //MSPlot["NeutrinoPzCompared"]->Fill(neutrinoPzDiff, datasets[d], true, Luminosity);
-       //}
-       //MSPlot["TopMassNeutrinoSelected"]->Fill((Neutrino+*selectedLepton+*selectedJets[BLeptIndex]).M(), datasets[d], true, Luminosity);
-     }//end of D>0 loop
- 
-     if(NeutrinoFound == 1)
-	h_NeutrinoEta.Fill(Neutrino->Eta());
-
-     if(NeutrinoFound==1 && FalseEventContent == 0 ){//&& (Neutrino->Eta() < 4 && Neutrino->Eta() > -4 )){ //Only look at events for which a neutrino Pz is reconstructed!!
-	//Why this neutrino Eta constraint?? --> Look at plot of neutrino Eta
-       
-       WLeptonic = (*Neutrino + *selectedLepton);
-       TopLeptonic = (*Neutrino+*selectedLepton+*selectedJets[BLeptIndex]);
-       
-       //Reboost the particles to rest frames 
-       TLorentzVector LeptonWZMF = *selectedLepton; // In W Zero Mass Frame (WZMF)
-       TLorentzVector WParticleTZMF = WLeptonic;  // In Top Zero Mass Frame (TZMF)
-       TLorentzVector TopLeptReco = TopLeptonic;
-       
-       LeptonWZMF.Boost(-WParticleTZMF.BoostVector());
-       WParticleTZMF.Boost(-TopLeptReco.BoostVector());     
-       
-       //MSPlot["TopAfterBoost"]->Fill(TopTZMF.M(), datasets[d], true, Luminosity);
-       //MSPlot["TopPzAfterBoost"]->Fill(TopTZMF.Pz(), datasets[d], true, Luminosity);    
-       
-       //Calculating cos:
-       CosTheta = ((WParticleTZMF.Vect()).Dot(LeptonWZMF.Vect()))/(((WParticleTZMF.Vect()).Mag())*((LeptonWZMF.Vect()).Mag()));
-       if(verbosity>4) cout << " Cos theta (reco): " << CosTheta << endl;
-       h_CosThetaReco.Fill(CosTheta);
-       
-       /////////////////////////////////////////////
-       //  Filling of LHCO files for reco events  //
-       /////////////////////////////////////////////
-       vector<TLorentzVector*> LHCORecoVector(6);
-       vector<int> MadGraphRecoId(6,4);
-    
+    /*
        //Need to distinguish between charge and lepton type
        if(verbosity>4) cout << " Eta of neutrino : " << Neutrino->Eta() << endl;
        if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
@@ -1410,7 +1236,7 @@ int main (int argc, char *argv[])
 	   lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
 	   EventInfoFile << "     " << NumberNegRecoMu << endl;
 	 }
-       }//End of negative lepton*/
+       }//End of negative lepton
        
        if(LeptonRecoCharge > 0.0 ){ //Positive lepton events
 	 if(verbosity>4) cout << " Looking at positive lepton events for Reco LHCO files " << endl;
@@ -1437,18 +1263,15 @@ int main (int argc, char *argv[])
 	   EventInfoFile << "     " << NumberPosRecoMu << endl;
 	 }
        }//End of positive lepton*/
-       if(verbosity>4) cout << " Output of LHCO Reco file obtained " << endl;
+       //if(verbosity>4) cout << " Output of LHCO Reco file obtained " << endl;
 
-     }//End of loop when NeutrinoPz is found
-     else{
-       if(FalseEventContent == 0) EventInfoFile << " No Neutrino reconstructed ! " << endl;
-     }
+    //}//End of loop when NeutrinoPz is found
+     //else{
+       //if(FalseEventContent == 0) EventInfoFile << " No Neutrino reconstructed ! " << endl;
+     //}
      
      //delete LHCORecoVector
      //delete LHCORecoVector;
-     ///////////////////////////////////////
-     // END OF EVENT REMOVING SOME STUFF //
-     //////////////////////////////////////
      
     }			//loop on events
     
@@ -1460,8 +1283,8 @@ int main (int argc, char *argv[])
     
     cout<<endl;
 
-    cout << "+> " << nSelectedMu << " mu+jets events where selected"<< endl;
-    cout << "+> " << nSelectedEl << " e+jets events where selected"<< endl;
+    cout << "+> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuBTag << " have two or more Medium wp CSV b-tags "<< endl;
+    cout << "+> " << nSelectedEl << " e+jets events where selected " << nSelectedElBTag << " have two or more Medium wp CSV b-tags " << endl;
 
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
