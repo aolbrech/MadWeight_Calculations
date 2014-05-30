@@ -357,13 +357,29 @@ int main (int argc, char *argv[])
     string dataSetName = datasets[d]->Name();
     
     int nSelectedMu=0;
+    int nSelectedMuLCSV=0;
     int nSelectedMuMCSV=0;
     int nSelectedMuTCSV=0;
     int nSelectedEl=0;
+    int nSelectedElLCSV=0;
     int nSelectedElMCSV=0;
     int nSelectedElTCSV=0;
     int nLargeMCSVEvents = 0;
     int nLargeTCSVEvents = 0;
+    
+    int allFourJetsCorrectlyMatched_LCSV = 0;
+    int allFourJetsCorrectlyMatched_MCSV = 0;
+    int allFourJetsCorrectlyMatched_MCSV_LightNotLCSV = 0;
+    int allFourJetsCorrectlyMatched_TCSV = 0;
+    int allFourJetsCorrectlyMatched_TCSV_LightNotMCSV = 0;
+    int allFourJetsCorrectlyMatched_TCSV_LightNotLCSV = 0;
+    int atLeastOneWronglyMatched_LCSV = 0;
+    int atLeastOneWronglyMatched_MCSV = 0;
+    int atLeastOneWronglyMatched_MCSV_LightNotLCSV = 0;
+    int atLeastOneWronglyMatched_TCSV = 0;
+    int atLeastOneWronglyMatched_TCSV_LightNotMCSV = 0;
+    int atLeastOneWronglyMatched_TCSV_LightNotLCSV = 0;
+
     if (verbose > 1)
       cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
     if (verbose > 1)
@@ -433,15 +449,25 @@ int main (int argc, char *argv[])
     //Cos Theta information
     TLorentzVector *sTop, *WLeptTRF, *leptonWRF;
     float standardCosTheta = 0;
-    TH1F h_StandardCosTheta("StCosTheta","StCosTheta",200,-1,1);
+    TH1F h_StandardCosThetaNoEvtSel("StCosTheta_BeforeEvtSel","StCosTheta_BeforeEvtSel",200,-1,1);
+    TH1F h_StandardCosThetaNoBTag("StCosThetaNoBTag","StCosThetaNoBTag",200,-1,1);
+    TH1F h_StandardCosThetaLCSV("StCosThetaLCSV","StCosThetaLCSV",200,-1,1);
+    TH1F h_StandardCosThetaAllLCSV("StCosThetaAllLCSV","StCosThetaAllLCSV",200,-1,1);
     TH1F h_StandardCosThetaMCSV("StCosThetaMCSV","StCosThetaMCSV",200,-1,1);
     TH1F h_StandardCosThetaTCSV("StCosThetaTCSV","StCosThetaTCSV",200,-1,1);
+    TH1F h_JetTypeLargeLCSVEvents("JetTypeLargeLCSVEvents","JetTypeLargeLCSVEvents",51,-25.5,25.5);
+    TH1F h_JetTypeLargeLCSVLeadingPtEvents("JetTypeLargeLCSVLeadingPtEvents","JetTypeLargeLCSVLeadingPtEvents",51,-25.5,25.5);
     TH1F h_JetTypeLargeMCSVEvents("JetTypeLargeMCSVEvents","JetTypeLargeMCSVEvents",51,-25.5,25.5);
+    TH1F h_JetTypeLargeMCSVLeadingPtEvents("JetTypeLargeMCSVLeadingPtEvents","JetTypeLargeMCSVLeadingPtEvents",51,-25.5,25.5);
     TH1F h_JetTypeLargeTCSVEvents("JetTypeLargeTCSVEvents","JetTypeLargeTCSVEvents",51,-25.5,25.5);
+    TH1F h_JetTypeLargeTCSVLeadingPtEvents("JetTypeLargeTCSVLeadingPtEvents","JetTypeLargeTCSVLeadingPtEvents",51,-25.5,25.5);
+    TH1F h_JetTypeLCSV("JetTypeLCSV","JetTypeLCSV",51,-25.5,25.5);
     TH1F h_JetTypeMCSV("JetTypeMCSV","JetTypeMCSV",51,-25.5,25.5);
     TH1F h_JetTypeTCSV("JetTypeTCSV","JetTypeTCSV",51,-25.5,25.5);
     TH1F h_CorrectBLeptCSVDiscr("CorrectBLeptCSVDiscr","CorrectBLeptCSVDiscr",400,-2.5,1.5);
     TH1F h_CorrectBHadrCSVDiscr("CorrectBHadrCSVDiscr","CorrectBHadrCSVDiscr",400,-2.5,1.5);
+    TH1F h_CorrectQuark1CSVDiscr("CorrectQuark1CSVDiscr","CorrectQuark1CSVDiscr",400,-2.5,1.5);
+    TH1F h_CorrectQuark2CSVDiscr("CorrectQuark2CSVDiscr","CorrectQuark2CSVDiscr",400,-2.5,1.5);
 
     TH1F h_CosThetaReco("CosThetaReco","CosThetaReco",200,-1,1);
     TH1F h_NeutrinoEta("NeutrinoEta","NeutrinoEta",200,-8,8);
@@ -853,7 +879,7 @@ int main (int argc, char *argv[])
 	//-----   Calculating cos theta:   -----
 	standardCosTheta = ((WLeptTRF->Vect()).Dot(leptonWRF->Vect()))/(((WLeptTRF->Vect()).Mag())*((leptonWRF->Vect()).Mag()));
 	if(verbosity>4) cout << " cos theta (gen): " << standardCosTheta << endl << endl;
-	h_StandardCosTheta.Fill(standardCosTheta);
+	h_StandardCosThetaNoEvtSel.Fill(standardCosTheta);
 	
 	//Delete LHCOVector
 	//delete LHCOVector;
@@ -1086,24 +1112,41 @@ int main (int argc, char *argv[])
 	  MSPlot["Selected_Events_pT_4leadingjets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       }
       
+      if(verbosity > 3 ) std::cout << " Size of selectedJets for this event : " << selectedJets.size() << std::endl;
       /////////////////////////////
       //   B-Tag requirements    //
       /////////////////////////////   
       //std::vector<float> CSVbTagValues;
       //
+      // 2 Loose CSV b-tags
+      float CSVLooseWP = 0.244;
+      int NrLCSVBTagJets = 0;
+      int LCSVbTagJetNr[6] = {99,99,99,99,99,99};
+      int LCSVLightJetNr[6] = {99,99,99,99,99,99};
+      int NrLCSVLightJets = 0;
+      for(int ii = 0; ii < selectedJets.size();ii++){
+	if(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() > CSVLooseWP){
+	  LCSVbTagJetNr[NrLCSVBTagJets] = ii;
+          NrLCSVBTagJets++;
+	  if(verbosity > 3) std::cout<<" CSV b-tag value for jet "<<ii<<" with Pt-value "<<selectedJets[ii]->Pt()<<" is : "<<selectedJets[ii]->btag_combinedSecondaryVertexBJetTags()<<std::endl;
+      }
+      else{
+	LCSVLightJetNr[NrLCSVLightJets] = ii;
+	NrLCSVLightJets++;
+      }
+
       // 2 Medium CSV
       float CSVMediumWP = 0.679;
       int NrMCSVBTagJets = 0;
       int MCSVbTagJetNr[6] = {99,99,99,99,99,99};
       int MCSVLightJetNr[6] = {99,99,99,99,99,99};
       int NrMCSVLightJets = 0;
-      if(verbosity > 3 ) std::cout << " Size of selectedJets for this event : " << selectedJets.size() << std::endl;
       for(int ii = 0; ii<selectedJets.size();ii++){
 	//CSVbTagValues.push_back(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags());
 	if(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() > CSVMediumWP){
 	  MCSVbTagJetNr[NrMCSVBTagJets] = ii;
 	  NrMCSVBTagJets++;	
-	  if(verbosity > 3) std::cout << " CSV b-tag value for jet " << ii << " with Pt-value " << selectedJets[ii]->Pt() << " is : " << selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() << std::endl;
+	  if(verbosity > 3) std::cout<<" CSV b-tag value for jet "<<ii<<" with Pt-value "<<selectedJets[ii]->Pt()<<" is : "<<selectedJets[ii]->btag_combinedSecondaryVertexBJetTags()<<std::endl;
 	}
 	else{
 	  MCSVLightJetNr[NrMCSVLightJets] = ii;
@@ -1121,7 +1164,7 @@ int main (int argc, char *argv[])
 	if(selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() > CSVTightWP){
 	  TCSVbTagJetNr[NrTCSVBTagJets] = ii;
 	  NrTCSVBTagJets++;
-	  if(verbosity > 3) std::cout << " CSV b-tag value for jet " << ii << " with Pt-value " << selectedJets[ii]->Pt() << " is : " << selectedJets[ii]->btag_combinedSecondaryVertexBJetTags() << std::endl;
+	  if(verbosity > 3) std::cout<<" CSV b-tag value for jet "<<ii<<" with Pt-value "<<selectedJets[ii]->Pt()<<" is : "<<selectedJets[ii]->btag_combinedSecondaryVertexBJetTags()<<std::endl;
 	}
 	else{ 
 	  TCSVLightJetNr[NrTCSVLightJets] = ii;
@@ -1258,6 +1301,10 @@ int main (int argc, char *argv[])
 	else h_CorrectBLeptCSVDiscr.Fill(-2);
         if(CorrectBHadronic != 9999) h_CorrectBHadrCSVDiscr.Fill(selectedJets[CorrectBHadronic]->btag_combinedSecondaryVertexBJetTags());
 	else h_CorrectBHadrCSVDiscr.Fill(-2);
+	if(CorrectQuark1 != 9999) h_CorrectQuark1CSVDiscr.Fill(selectedJets[CorrectQuark1]->btag_combinedSecondaryVertexBJetTags());
+	else h_CorrectQuark1CSVDiscr.Fill(-2);
+	if(CorrectQuark2 != 9999) h_CorrectQuark2CSVDiscr.Fill(selectedJets[CorrectQuark2]->btag_combinedSecondaryVertexBJetTags());
+	else h_CorrectQuark2CSVDiscr.Fill(-2);
  	
 	//Working on generator level (i.e. jets level):  
 	if(jetCombi[0]!=9999 && jetCombi[1]!=9999 && jetCombi[2]!=9999 && jetCombi[3]!=9999){    
@@ -1268,18 +1315,50 @@ int main (int argc, char *argv[])
 	  histo1D["TopMass"]->Fill(CorrectRecMassTop);
 	}	      	      	      	       	      
       }//if dataset Semi mu ttbar
-      
+     
+      ///////////////////////////////////////////////////////
+      //  Kinematic information for different b-tag cases  //
+      ///////////////////////////////////////////////////////
+
+
+ 
       //////////////////////////////////
       //   Finish b-tag requirement   //
-      //////////////////////////////////   
-      
-      //Only go on with events with more than 2 Medium CSV b-tags:
-      if(NrMCSVBTagJets < 2) continue;
-      
-      //Count the number of b-tagged events
-      if(eventselectedSemiMu) nSelectedMuMCSV++;	
-      if(eventselectedSemiEl) nSelectedElMCSV++;
-      
+      //////////////////////////////////
+      // 2 Loose CSV b-tags
+      if(NrLCSVBTagJets >= 2 && eventselectedSemiMu) nSelectedMuLCSV++;
+      if(NrLCSVBTagJets >= 2 && eventselectedSemiEl) nSelectedElLCSV++;
+      if(NrLCSVBTagJets > 2) nLargeTCSVEvents++;
+
+      //Kinematic information for the Light b-tag case!
+      if(dataSetName.find("TTbarJets") == 0){
+	if(NrLCSVBTagJets == 2){
+	  h_StandardCosThetaLCSV.Fill(standardCosTheta);
+	  h_StandardCosThetaAllLCSV.Fill(standardCosTheta);
+	  for(int ii = 0; ii < JetPartonPair.size(); ii++){
+	     for(int jj = 0; jj < NrLCSVBTagJets; jj ++){
+		if(LCSVbTagJetNr[jj] == JetPartonPair[ii].first){
+		   h_JetTypeLCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		}
+	     }
+	  }
+	}
+	else if(NrLCSVBTagJets > 2){
+	  for(int ii = 0; ii < JetPartonPair.size(); ii++){
+	     for(int jj = 0; jj < NrLCSVBTagJets; jj++){
+		if(LCSVbTagJetNr[jj] == JetPartonPair[ii].first){
+		   h_JetTypeLargeLCSVEvents.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		   if(jj == 0 | jj == 1){
+		     h_JetTypeLargeLCSVLeadingPtEvents.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		     h_StandardCosThetaAllLCSV.Fill(standardCosTheta);
+		   }
+		}
+	     }
+	  }
+	}
+      }
+
+      // 2 Tight CSV b-tags
       if(NrTCSVBTagJets >= 2 && eventselectedSemiMu) nSelectedMuTCSV++;
       if(NrTCSVBTagJets >= 2 && eventselectedSemiEl) nSelectedElTCSV++;
       if(NrTCSVBTagJets > 2) nLargeTCSVEvents++;
@@ -1301,12 +1380,102 @@ int main (int argc, char *argv[])
                 for(int jj = 0; jj < NrTCSVBTagJets; jj++){
                     if(TCSVbTagJetNr[jj] == JetPartonPair[ii].first){
                         h_JetTypeLargeTCSVEvents.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+			if(jj == 0 | jj == 1){
+			  h_JetTypeLargeTCSVLeadingPtEvents.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+			}
                     }
                 }
               }
          }
       }
+     
+      /////////////////////////////
+      // Compare event topology  //
+      /////////////////////////////
+      //
+      // 2 Loose b-tagged jets, no chi² for b-jet choice
+      if(NrLCSVBTagJets > 2){
+	if( (CorrectBLeptonic == LCSVbTagJetNr[0] || CorrectBLeptonic == LCSVbTagJetNr[1]) && 
+	    (CorrectBHadronic == LCSVbTagJetNr[0] || CorrectBHadronic == LCSVbTagJetNr[1]) &&
+ 	    (CorrectQuark1 == LCSVLightJetNr[0] || CorrectQuark1 == LCSVLightJetNr[1]) &&
+	    (CorrectQuark2 == LCSVLightJetNr[0] || CorrectQuark2 == LCSVLightJetNr[1])){
+		allFourJetsCorrectlyMatched_LCSV++;
+	}
+	//if( (CorrectBLeptonic != LCSVbTagJetNr[0] && CorrectBLeptonic ! = LCSVbTagJetNr[1]) ||
+        //    (CorrectBHadronic != LCSVbTagJetNr[0] && CorrectBHadronic != LCSVbTagJetNr[1]) ||
+        //    (CorrectQuark1 != LCSVLightJetNr[0] && CorrectQuark1 != LCSVLightJetNr[1]) ||
+        //    (CorrectQuark2 != LCSVLightJetNr[0] && CorrectQuark2 != LCSVLightJetNr[1])){
+	else{
+		atLeastOneWronglyMatched_LCSV++;
+	}
+      }
+
+      // 2 Medium b-tagged jets, no chi-sq for b-jet choice
+      if(NrMCSVBTagJets > 2){
+        if( (CorrectBLeptonic == MCSVbTagJetNr[0] || CorrectBLeptonic == MCSVbTagJetNr[1]) &&
+            (CorrectBHadronic == MCSVbTagJetNr[0] || CorrectBHadronic == MCSVbTagJetNr[1]) &&
+            (CorrectQuark1 == MCSVLightJetNr[0] || CorrectQuark1 == MCSVLightJetNr[1]) &&
+            (CorrectQuark2 == MCSVLightJetNr[0] || CorrectQuark2 == MCSVLightJetNr[1])){
+                allFourJetsCorrectlyMatched_MCSV++;	
+        }
+	else{
+		atLeastOneWronglyMatched_MCSV++;
+	}
+	// light jets are not loosely tagged!
+        if( (CorrectBLeptonic == MCSVbTagJetNr[0] || CorrectBLeptonic == MCSVbTagJetNr[1]) &&
+            (CorrectBHadronic == MCSVbTagJetNr[0] || CorrectBHadronic == MCSVbTagJetNr[1]) &&
+            (CorrectQuark1 == LCSVLightJetNr[0] || CorrectQuark1 == LCSVLightJetNr[1]) &&
+            (CorrectQuark2 == LCSVLightJetNr[0] || CorrectQuark2 == LCSVLightJetNr[1])){
+                allFourJetsCorrectlyMatched_MCSV_LightNotLCSV++;
+        }
+	else{
+		atLeastOneWronglyMatched_MCSV_LightNotLCSV++;
+	}
+      }
+
+      // 2 Tight b-tagged jets, no chi-sq for b-jet choice
+      if(NrTCSVBTagJets > 2){
+        if( (CorrectBLeptonic == TCSVbTagJetNr[0] || CorrectBLeptonic == TCSVbTagJetNr[1]) &&
+            (CorrectBHadronic == TCSVbTagJetNr[0] || CorrectBHadronic == TCSVbTagJetNr[1]) &&
+            (CorrectQuark1 == TCSVLightJetNr[0] || CorrectQuark1 == TCSVLightJetNr[1]) &&
+            (CorrectQuark2 == TCSVLightJetNr[0] || CorrectQuark2 == TCSVLightJetNr[1])){
+                allFourJetsCorrectlyMatched_TCSV++;
+        }
+	else{
+		atLeastOneWronglyMatched_TCSV++;
+	}
+	// light jets are not medium tagged
+        if( (CorrectBLeptonic == TCSVbTagJetNr[0] || CorrectBLeptonic == TCSVbTagJetNr[1]) &&
+            (CorrectBHadronic == TCSVbTagJetNr[0] || CorrectBHadronic == TCSVbTagJetNr[1]) &&
+            (CorrectQuark1 == MCSVLightJetNr[0] || CorrectQuark1 == MCSVLightJetNr[1]) &&
+            (CorrectQuark2 == MCSVLightJetNr[0] || CorrectQuark2 == MCSVLightJetNr[1])){
+                allFourJetsCorrectlyMatched_TCSV_LightNotMCSV++;
+        }
+	else{
+		atLeastOneWronglyMatched_TCSV_LightNotMCSV++;
+	}
+	// light jets are not loosely tagged
+        if( (CorrectBLeptonic == TCSVbTagJetNr[0] || CorrectBLeptonic == TCSVbTagJetNr[1]) &&
+            (CorrectBHadronic == TCSVbTagJetNr[0] || CorrectBHadronic == TCSVbTagJetNr[1]) &&
+            (CorrectQuark1 == LCSVLightJetNr[0] || CorrectQuark1 == LCSVLightJetNr[1]) &&
+            (CorrectQuark2 == LCSVLightJetNr[0] || CorrectQuark2 == LCSVLightJetNr[1])){
+                allFourJetsCorrectlyMatched_TCSV_LightNotLCSV++;
+        }
+	else{
+		atLeastOneWronglyMatched_TCSV_LightNotLCSV++;
+	}
+      }
+ 
+      //**************************************************************//   
+      //  Only go on with events with more than 2 Medium CSV b-tags:  //
+      //**************************************************************//
+      if(NrMCSVBTagJets < 2) continue;
       
+      //Count the number of b-tagged events
+      if(eventselectedSemiMu) nSelectedMuMCSV++;	
+      if(eventselectedSemiEl) nSelectedElMCSV++;
+      
+    
       //Need to choose the correct two b-tagged jets
       //Check the ordering since the additional b-tagged jets is maybe a light jet! 
       if(NrMCSVBTagJets > 2){
@@ -1463,14 +1632,18 @@ int main (int argc, char *argv[])
     //std::cout << " sigma values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(2) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
     //std::cout << " mass values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(1) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(1) << std::endl;
     
-    cout<<endl;
-    
-    cout << "-> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedMuTCSV << " have two or more Tight wp CSV b-tags " << endl;
-    cout << "-> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedElTCSV << " have two or more Tight wp CSV b-tags " << endl;
+    cout<<endl; 
+    cout << "-> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuLCSV << " have two or more Light wp CSV b-tags, " << nSelectedMuMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedMuTCSV << " have two or more Tight wp CSV b-tags " << endl;
+    cout << "-> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElLCSV << " have two or more Light wp CSV b-tags, " << nSelectedElMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedElTCSV << " have two or more Tight wp CSV b-tags " << endl;
     cout << "-> " << nLargeMCSVEvents << " events with more than 2 Medium CSV b-tags ( " << nLargeTCSVEvents << " with 2 Tight CSV b-tags) --> Reject these events! " << endl;
     
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
+
+    std::cout << " " << endl;
+    std::cout << " Option 1 : 2 L b-tags, no chi-sq -> " << allFourJetsCorrectlyMatched_LCSV << " (all four correct), " << atLeastOneWronglyMatched_LCSV << " (at least one wrong) " << std::endl;
+    std::cout << " Option 2 : 2 M b-tags, no chi-sq -> " << allFourJetsCorrectlyMatched_MCSV << " (all four correct), " << atLeastOneWronglyMatched_MCSV << " (at least one wrong) " << std::endl;
+    std::cout << " Option 3 : " << std::endl;
     
     //Close the LHCO Output files!
     for(int ii = 0; ii<16; ii++){
@@ -1481,15 +1654,24 @@ int main (int argc, char *argv[])
     
     //TFile* fout = new TFile("GeneratorOutput.root","RECREATE");
     fout->cd();
-    h_StandardCosTheta.Write();
+    h_StandardCosThetaNoEvtSel.Write();
+    h_StandardCosThetaNoBTag.Write();
+    h_StandardCosThetaLCSV.Write();
+    h_StandardCosThetaAllLCSV.Write();
     h_StandardCosThetaMCSV.Write();
     h_StandardCosThetaTCSV.Write();
+    h_JetTypeLargeLCSVEvents.Write();
+    h_JetTypeLargeLCSVLeadingPtEvents.Write();
     h_JetTypeLargeMCSVEvents.Write();
+    h_JetTypeLargeMCSVLeadingPtEvents.Write();
     h_JetTypeLargeTCSVEvents.Write();
+    h_JetTypeLargeTCSVLeadingPtEvents.Write();
     h_JetTypeMCSV.Write();
     h_JetTypeTCSV.Write();
     h_CorrectBLeptCSVDiscr.Write();
     h_CorrectBHadrCSVDiscr.Write();
+    h_CorrectQuark1CSVDiscr.Write();
+    h_CorrectQuark2CSVDiscr.Write();
 
     h_CosThetaReco.Write();
     h_NeutrinoEta.Write();
