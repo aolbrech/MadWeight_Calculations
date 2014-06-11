@@ -94,7 +94,24 @@ int main (int argc, char *argv[])
   bool RecoLHCOOutput = false;  
 
   const int NrConsideredOptions = 6;   //Make sure this number is also the same in the bTagStudy class!!
-
+  int CorrectEventMlbMqqb[NrConsideredOptions];
+  int WrongEventMlbMqqb[NrConsideredOptions];
+  for(int ii = 0; ii < NrConsideredOptions; ii++){
+     CorrectEventMlbMqqb[ii] = 0;
+     WrongEventMlbMqqb[ii] = 0;
+  }
+  std::string OptionName[NrConsideredOptions*2] = {"2 L b-tags, no chi-sq              ",//#1
+       					           "2 M b-tags, no chi-sq              ",//#2
+						   "2 M b-tags, no chi-sq, light not L ",//#3
+						   "2 T b-tags, no chi-sq              ",//#4
+						   "2 T b-tags, no chi-sq, light not M ",//#5
+						   "2 T b-tags, no chi-sq, light not L ",//#6
+						   "2 L b-tags, chi-sq                 ",//#7
+						   "2 M b-tags, chi-sq                 ",//#8
+						   "2 M b-tags, chi-sq, light not L    ",//#9
+						   "2 T b-tags, chi-sq                 ",//#10
+						   "2 T b-tags, chi-sq, light not M    ",//#11
+						   "2 T b-tags, chi-sq, light not L    "};//#12
   ////////////////////////////////////
   /// AnalysisEnvironment  
   ////////////////////////////////////
@@ -215,6 +232,8 @@ int main (int argc, char *argv[])
   //   --> Comment out after initializing most recent values ( also lines 1046 and 1356 )
   histo1D["WMass"]= new TH1F("WMass","WMass", 200,0,160);
   histo1D["TopMass"]= new TH1F("TopMass","TopMass", 200,0,350);
+  histo1D["MlbMass"]= new TH1F("MlbMass","MlbMass",200,0,300);
+  histo1D["MqqbMass"]= new TH1F("MqqbMass","MlbMass",400,0,500);
   
   ////////////////////////////////////
   /// MultiSamplePlot
@@ -396,6 +415,13 @@ int main (int argc, char *argv[])
 
     TH1F h_CosThetaReco("CosThetaReco","CosThetaReco",200,-1,1);
     TH1F h_NeutrinoEta("NeutrinoEta","NeutrinoEta",200,-8,8);
+
+    //Mlb and Mqqb information:
+    TH2F h_MlbMqqbCorrectChosen("MlbMqqbCorrectChosen","MlbMqqbCorrectChosen",200,0,500,200,0,300);
+    TH2F h_MlbMqqbCorrectAll("MlbMqqbCorrectAll","MlbMqqbCorrectAll",200,0,500,200,0,300);
+    TH2F h_MlbMqqbWrongOne("MlbMqqbWrongOne","MlbMqqbWrongOne",200,0,500,200,0,300);
+    TH2F h_MlbMqqbWrongTwo("MlbMqqbWrongTwo","MlbMqqbWrongTwo",200,0,500,200,0,300);
+
     bool FalseEventContent = false;
     cout << " FalseEventContent : " << FalseEventContent << endl;
     TRootMCParticle *Top,*TopBar,*Bottom, *BottomBar,*Lepton,*NeutrinoMC,*WPlus,*WMinus,*Light,*LightBar;
@@ -416,7 +442,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 50000; ievt++){
+    for (unsigned int ievt = 0; ievt < 5000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -922,10 +948,10 @@ int main (int argc, char *argv[])
       //float SigmaW=11.1534;  //Obtained from gaussian fit on Top and W distribution with simulated information
       //float SigmaTop=18.232;
 
-      float MassMlb = 0;
-      float MassMqqb = 0;
-      float SigmaMlb = 0;
-      float SigmaMqqb = 0;
+      float MassMlb = 103.2552;
+      float MassMqqb = 178.7309;
+      float SigmaMlb = 27.0706;
+      float SigmaMqqb = 18.2675;
       
       /////////////////////////////
       // Neutrino Reconstruction //
@@ -1014,6 +1040,18 @@ int main (int argc, char *argv[])
 	Luminosity = LuminosityEl;
       }
       
+      // Selecting correct lepton
+      TLorentzVector* selectedLepton;
+      float LeptonRecoCharge;
+      if (eventselectedSemiMu){
+	selectedLepton = (TLorentzVector*)selectedMuons[0];
+	LeptonRecoCharge = selectedMuons[0]->charge();
+      }
+      else if (eventselectedSemiEl){
+	selectedLepton = (TLorentzVector*)selectedElectrons[0];
+	LeptonRecoCharge = selectedElectrons[0]->charge();
+      }
+
       string leptonFlav="_other";
       
       if (eventselectedSemiMu) leptonFlav="_mu";
@@ -1045,6 +1083,8 @@ int main (int argc, char *argv[])
       ////////////////////////////////////////////////////////////////////    
       float CorrectRecMassW=0;      //? Still needed if no chi-squared is done?
       float CorrectRecMassTop=0;      
+      float CorrectRecMassMlb=0;
+      float CorrectRecMassMqqb=0;
       vector<int> jetCombi;
       vector<TRootMCParticle> mcParticlesMatching;      	
       vector< pair<unsigned int, unsigned int> > JetPartonPair, ISRJetPartonPair; // First one is jet number, second one is mcParticle number
@@ -1178,9 +1218,13 @@ int main (int argc, char *argv[])
 	if(jetCombi[0]!=9999 && jetCombi[1]!=9999 && jetCombi[2]!=9999 && jetCombi[3]!=9999){    
 	  CorrectRecMassW=(*selectedJets[jetCombi[0]]+*selectedJets[jetCombi[1]]).M();
 	  CorrectRecMassTop=(*selectedJets[jetCombi[0]]+*selectedJets[jetCombi[1]]+*selectedJets[jetCombi[2]]).M();
-	  
+	  CorrectRecMassMlb=(*selectedJets[CorrectBLeptonic]+*selectedLepton).M();
+	  CorrectRecMassMqqb=(*selectedJets[CorrectQuark1]+*selectedJets[CorrectQuark2]+*selectedJets[CorrectBHadronic]).M();
+
 	  histo1D["WMass"]->Fill(CorrectRecMassW);
 	  histo1D["TopMass"]->Fill(CorrectRecMassTop);
+	  histo1D["MlbMass"]->Fill(CorrectRecMassMlb);
+	  histo1D["MqqbMass"]->Fill(CorrectRecMassMqqb);
 	}	      	      	      	       	      
       }//if dataset Semi mu ttbar
 
@@ -1292,45 +1336,110 @@ int main (int argc, char *argv[])
       if((bTagStudy.getbTaggedJets(3)).size() >= 2 && eventselectedSemiEl) nSelectedElTCSV++;
       if((bTagStudy.getbTaggedJets(3)).size() > 2) nLargeTCSVEvents++;
       
-     
- 
+      
+      ////////////////////////////////
+      //  Mlb and Mqqb information  //
+      ////////////i////////////////////
+      //
+      vector<int> LeptonicB, HadronicB;
+      float MlbCorrect = 0;
+      if(CorrectBLeptonic != 9999) MlbCorrect = (*selectedLepton+*selectedJets[CorrectBLeptonic]).M();
+      float MqqbCorrect = 0;
+      if(CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999) MqqbCorrect = (*selectedJets[CorrectBHadronic] + *selectedJets[CorrectQuark1] + *selectedJets[CorrectQuark2]).M();
+      h_MlbMqqbCorrectAll.Fill(MqqbCorrect,MlbCorrect);
+      
+      for(int Option = 0; Option < NrConsideredOptions; Option++){
+	if(bTagStudy.getbTaggedJets(Option).size() >1 && bTagStudy.getLightJets(Option).size() > 1){
+	  float Mlb[2] = {(*selectedLepton+*selectedJets[(bTagStudy.getbTaggedJets(Option))[0]]).M(),(*selectedLepton+*selectedJets[(bTagStudy.getbTaggedJets(Option))[1]]).M()};
+	  float Mqqb[2] = {(*selectedJets[(bTagStudy.getbTaggedJets(Option))[1]] + *selectedJets[(bTagStudy.getLightJets(Option))[0]] + *selectedJets[(bTagStudy.getLightJets(Option))[1]]).M(),
+	  	           (*selectedJets[(bTagStudy.getbTaggedJets(Option))[0]] + *selectedJets[(bTagStudy.getLightJets(Option))[0]] + *selectedJets[(bTagStudy.getLightJets(Option))[1]]).M()};
+	  if(verbose > 3){
+	    std::cout << " Looking at option : " << Option << std::endl;
+	    std::cout << " Mlb value : " << Mlb[0] << " or " << Mlb[1] << std::endl;
+	    std::cout << " Correct Mlb value : " << MlbCorrect << std::endl;
+	    std::cout << " Mqqb value : " << Mqqb[0] << " or " << Mqqb[1] << std::endl;
+	    std::cout << " Correct Mqqb value : " << MqqbCorrect << std::endl;
+	    std::cout << " " << std::endl;
+	  }
+
+	  if( (CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[1]) &
+	      (CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[1] || CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[0]) &&
+	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
+	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
+		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
+	  }
+	  else{
+		h_MlbMqqbWrongOne.Fill(Mqqb[0], Mlb[0]);
+		h_MlbMqqbWrongTwo.Fill(Mqqb[1], Mlb[1]);
+	  }
+	  
+	  float ChiSquared[2] = {0,0};
+	  int LeptBCombi=0;           //This means that the hightest Pt jet is considered as the leptonic b-jet! 
+	  int HadrBCombi=1;
+	  for(int ii = 0; ii<2; ii++){
+	     ChiSquared[ii] = ((MassMlb-Mlb[ii])/SigmaMlb)*((MassMlb-Mlb[ii])/SigmaMlb) + ((MassMqqb - Mqqb[ii])/SigmaMqqb)*((MassMqqb - Mqqb[ii])/SigmaMqqb);
+	     if(ii == 1 && ChiSquared[0]>ChiSquared[1]){
+	 	LeptBCombi = 1;          //This means that the second highest Pt jet is considered as the leptonic b-jet!
+		HadrBCombi = 0;
+	     }
+	  }
+
+	  //std::cout << " Chosen leptonic combination : " << LeptBCombi << "    --> for option : " << Option << std::endl;
+	  //std::cout << " Chi-sq values : " << ChiSquared[0] << " , " << ChiSquared[1] << std::endl;
+	  //std::cout << " Correct jets (bLept, bHadr, q, q) : " << CorrectBLeptonic << ", " << CorrectBHadronic
+
+	  //Check the efficiency of the chi-squared method!
+	  if(CorrectBLeptonic != 9999 && CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999){ 
+	  if( CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[LeptBCombi] && CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[HadrBCombi] && 
+	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
+	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1]) ){
+		CorrectEventMlbMqqb[Option]++;
+	  }
+	  else{
+		WrongEventMlbMqqb[Option]++;
+	  }
+	  }
+
+	  // Match the jet number to the particles
+	  LeptonicB.push_back(bTagStudy.getbTaggedJets(Option)[LeptBCombi]);
+	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[HadrBCombi]);
+        }
+      }
+
       //************************************************************//   
       //  Only go on with events with exactly 2 Medium CSV b-tags:  //
       //************************************************************//
       //Only consider events with exactly two M CSV b-tags !
       if((bTagStudy.getbTaggedJets(1)).size() != 2) continue;
- 
+
       /////////////////////////////////////////////////////////
       //   Reconstructing Lepton & Neutrino (partially)      //
       //   -> Neutrino Pt and M needs to be known for .lhco  //
       /////////////////////////////////////////////////////////  
       //
-      // Selecting correct lepton
-      TLorentzVector* selectedLepton;
-      float LeptonRecoCharge;
-      if (eventselectedSemiMu){
-	selectedLepton = (TLorentzVector*)selectedMuons[0];
-	LeptonRecoCharge = selectedMuons[0]->charge();
-      }
-      else if (eventselectedSemiEl){
-	selectedLepton = (TLorentzVector*)selectedElectrons[0];
-	LeptonRecoCharge = selectedElectrons[0]->charge();
-      }
-      
-      //Reconstructing the neutrino kinematics
-      NeutrinoPx = -(*selectedLepton+*selectedJets[0]+*selectedJets[1]+*selectedJets[2]+*selectedJets[3]).Px();  //Need to use the jets which are actually used!
-      NeutrinoPy = -(*selectedLepton+*selectedJets[0]+*selectedJets[1]+*selectedJets[2]+*selectedJets[3]).Py();
+
+      ///////////////////////////////////////////////
+      //  Reconstructing the neutrino kinematics   //
+      ///////////////////////////////////////////////
+      //  --> Only do this part for the combination which is actually chosen!
+      float UsedLeptonicB = 0;
+      float UsedHadronicB = 1;
+      float UsedQuark1 = 2;   //--> Quarks need to be interchanged, but for the neutrino values this doesn't make any difference!
+      float UsedQuark2 = 3;
+      NeutrinoPx = -(*selectedLepton+*selectedJets[UsedLeptonicB]+*selectedJets[UsedHadronicB]+*selectedJets[UsedQuark1]+*selectedJets[UsedQuark2]).Px();  //Need to use the jets which are actually used!
+      NeutrinoPy = -(*selectedLepton+*selectedJets[UsedLeptonicB]+*selectedJets[UsedHadronicB]+*selectedJets[UsedQuark1]+*selectedJets[UsedQuark2]).Py();
       Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
       Neutrino.SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, Neutrino.Pt());  //Reset the Neutrino Energy to get the correct precision
       if(verbosity > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
-      
+
+
       //Array of b-tagged jets and light jets for the 4 possible configurations
-      const int NrCombi = 4;
+      const int NrCombi = 4;  //--> Is only 2 in the case of a chi-squared applied!
       TLorentzVector* LeptBArray[NrCombi] = {selectedJets[(bTagStudy.getbTaggedJets(1))[0]], selectedJets[(bTagStudy.getbTaggedJets(1))[0]], selectedJets[(bTagStudy.getbTaggedJets(1))[1]], selectedJets[(bTagStudy.getbTaggedJets(1))[1]]};
       TLorentzVector* HadrBArray[NrCombi] = {selectedJets[(bTagStudy.getbTaggedJets(1))[1]], selectedJets[(bTagStudy.getbTaggedJets(1))[1]], selectedJets[(bTagStudy.getbTaggedJets(1))[0]], selectedJets[(bTagStudy.getbTaggedJets(1))[0]]};
       TLorentzVector* Quark1Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(1))[0]], selectedJets[(bTagStudy.getLightJets(1))[1]], selectedJets[(bTagStudy.getLightJets(1))[0]], selectedJets[(bTagStudy.getLightJets(1))[1]]} ;
       TLorentzVector* Quark2Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(1))[1]], selectedJets[(bTagStudy.getLightJets(1))[0]], selectedJets[(bTagStudy.getLightJets(1))[1]], selectedJets[(bTagStudy.getLightJets(1))[0]]}; 	
-      
+
       /////////////////////////////////////////////
       //  Filling of LHCO files for reco events  //
       /////////////////////////////////////////////
@@ -1338,94 +1447,95 @@ int main (int argc, char *argv[])
       vector<int> MadGraphRecoId(6,4);
       //Need to distinguish between charge and lepton type
       for(int ConsideredCombi = 0; ConsideredCombi <NrCombi; ConsideredCombi++){  
-        string JetCombiString = static_cast<ostringstream*>( &(ostringstream() << ConsideredCombi) )->str();
-	
-        if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
-	  if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
-	  LHCORecoVector[0] = HadrBArray[ConsideredCombi]; 
-	  LHCORecoVector[1] = Quark1Array[ConsideredCombi];
-	  LHCORecoVector[2] = Quark2Array[ConsideredCombi];
-	  LHCORecoVector[3] = LeptBArray[ConsideredCombi];
-	  LHCORecoVector[4] = selectedLepton;
-	  LHCORecoVector[5] = &Neutrino;
-	  if(eventselectedSemiEl){//Negative electron
-	    MadGraphRecoId[1] = 1;
-	    MadGraphRecoId[2] = 6;
-	    if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
-	    if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
-	    if(NumberNegRecoEl == 1) outFileReco[3*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
-	    lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
-	    EventInfoFile << "     " << NumberNegRecoEl << endl;
-	  }
-	  if(eventselectedSemiMu){//Negative muon
-	    MadGraphRecoId[1] = 2;
-	    MadGraphRecoId[2] = 6;
-	    if(ConsideredCombi == 0) NumberNegRecoMu++;
-	    if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
-	    if(NumberNegRecoMu == 1) outFileReco[1*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
-	    lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
-	    EventInfoFile << "     " << NumberNegRecoMu << endl;
-	  }
-	}//End of negative lepton
-	
-	if(LeptonRecoCharge > 0.0 ){ //Positive lepton events
-	  if(verbosity>4) cout << " Looking at positive lepton events for Reco LHCO files " << endl;
-	  LHCORecoVector[0] = LeptBArray[ConsideredCombi];
-	  LHCORecoVector[1] = selectedLepton;
-	  LHCORecoVector[2] = &Neutrino;
-	  LHCORecoVector[3] = HadrBArray[ConsideredCombi];
-	  LHCORecoVector[4] = Quark1Array[ConsideredCombi];
-	  LHCORecoVector[5] = Quark2Array[ConsideredCombi];
-	  if(eventselectedSemiEl){//Positive electron
-	    MadGraphRecoId[1] = 1;
-	    MadGraphRecoId[2] = 6;
-	    if(ConsideredCombi == 0) NumberPosRecoEl++;
-	    if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
-	    if(NumberPosRecoEl == 1) outFileReco[2*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
-	    lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
-	    EventInfoFile << "     " << NumberPosRecoEl << endl;
-	  }
-	  if(eventselectedSemiMu){//Positive muon
-	    MadGraphRecoId[1] = 2;
-	    MadGraphRecoId[2] = 6;
-	    if(ConsideredCombi == 0) NumberPosRecoMu++;
-	    if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
-	    if(NumberPosRecoMu == 1) outFileReco[0*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
-	    lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
-	    EventInfoFile << "     " << NumberPosRecoMu << endl;
-	  }
-	}//End of positive lepton
-	
+	      string JetCombiString = static_cast<ostringstream*>( &(ostringstream() << ConsideredCombi) )->str();
+
+	      if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
+		      if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
+		      LHCORecoVector[0] = HadrBArray[ConsideredCombi]; 
+		      LHCORecoVector[1] = Quark1Array[ConsideredCombi];
+		      LHCORecoVector[2] = Quark2Array[ConsideredCombi];
+		      LHCORecoVector[3] = LeptBArray[ConsideredCombi];
+		      LHCORecoVector[4] = selectedLepton;
+		      LHCORecoVector[5] = &Neutrino;
+		      if(eventselectedSemiEl){//Negative electron
+			      MadGraphRecoId[1] = 1;
+			      MadGraphRecoId[2] = 6;
+			      if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
+			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
+			      if(NumberNegRecoEl == 1) outFileReco[3*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
+			      lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
+			      EventInfoFile << "     " << NumberNegRecoEl << endl;
+		      }
+		      if(eventselectedSemiMu){//Negative muon
+			      MadGraphRecoId[1] = 2;
+			      MadGraphRecoId[2] = 6;
+			      if(ConsideredCombi == 0) NumberNegRecoMu++;
+			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
+			      if(NumberNegRecoMu == 1) outFileReco[1*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
+			      lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
+			      EventInfoFile << "     " << NumberNegRecoMu << endl;
+		      }
+	      }//End of negative lepton
+
+	      if(LeptonRecoCharge > 0.0 ){ //Positive lepton events
+		      if(verbosity>4) cout << " Looking at positive lepton events for Reco LHCO files " << endl;
+		      LHCORecoVector[0] = LeptBArray[ConsideredCombi];
+		      LHCORecoVector[1] = selectedLepton;
+		      LHCORecoVector[2] = &Neutrino;
+		      LHCORecoVector[3] = HadrBArray[ConsideredCombi];
+		      LHCORecoVector[4] = Quark1Array[ConsideredCombi];
+		      LHCORecoVector[5] = Quark2Array[ConsideredCombi];
+		      if(eventselectedSemiEl){//Positive electron
+			      MadGraphRecoId[1] = 1;
+			      MadGraphRecoId[2] = 6;
+			      if(ConsideredCombi == 0) NumberPosRecoEl++;
+			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
+			      if(NumberPosRecoEl == 1) outFileReco[2*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
+			      lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
+			      EventInfoFile << "     " << NumberPosRecoEl << endl;
+		      }
+		      if(eventselectedSemiMu){//Positive muon
+			      MadGraphRecoId[1] = 2;
+			      MadGraphRecoId[2] = 6;
+			      if(ConsideredCombi == 0) NumberPosRecoMu++;
+			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
+			      if(NumberPosRecoMu == 1) outFileReco[0*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
+			      lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
+			      EventInfoFile << "     " << NumberPosRecoMu << endl;
+		      }
+	      }//End of positive lepton
+
       }//End of loop over the different jet combinations  
-      
+
     }			//loop on events
-    
+
     //--------------------  Sigma for W Mass and Top Mass  --------------------
     //histo1D["WMass"]->Fit("gaus","Q");     
     //histo1D["TopMass"]->Fit("gaus","Q");
     //std::cout << " sigma values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(2) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
     //std::cout << " mass values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(1) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(1) << std::endl;
-    
+    histo1D["MlbMass"]->Fit("gaus","Q");
+    histo1D["MqqbMass"]->Fit("gaus","Q");
+    std::cout << " values for Mlb :" << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
+    std::cout << " values for Mqqb :" << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
+
     cout<<endl; 
     cout << "-> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuLCSV << " have two or more Light wp CSV b-tags, " << nSelectedMuMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedMuTCSV << " have two or more Tight wp CSV b-tags " << endl;
     cout << "-> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElLCSV << " have two or more Light wp CSV b-tags, " << nSelectedElMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedElTCSV << " have two or more Tight wp CSV b-tags " << endl;
     cout << "-> " << nLargeMCSVEvents << " events with more than 2 Medium CSV b-tags ( " << nLargeTCSVEvents << " with 2 Tight CSV b-tags) --> Reject these events! " << endl;
-    
+
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
 
     //////////////////////////////
     //  Jet combination output  //
     //////////////////////////////
-    std::string OptionName[NrConsideredOptions] = {"2 L b-tags, no chi-sq              ",
-	    					   "2 M b-tags, no chi-sq              ",
-						   "2 M b-tags, no chi-sq, light not L ",
-						   "2 T b-tags, no chi-sq              ",
-						   "2 T b-tags, no chi-sq, light not M ",
-						   "2 T b-tags, no chi-sq, light not L "};
     std::cout << "           Option                   |  all 4 correct | at least 1 wrong | s/sqrt(b) | non-matched evts " << std::endl;
     for(int ii = 0; ii < NrConsideredOptions; ii++){
-	std::cout << OptionName[ii] << " |        " << bTagStudy.getNrCorrectMatchedEvts(ii) << "      |          " << bTagStudy.getNrWrongMatchedEvts(ii) << "      |   " << bTagStudy.getSignalOverBackground(ii) << " |       " << bTagStudy.getNrNotFoundEvts(ii) << std::endl;
+	    std::cout << OptionName[ii] << " |        " << bTagStudy.getNrCorrectMatchedEvts(ii) << "      |          " << bTagStudy.getNrWrongMatchedEvts(ii) << "      |   " << bTagStudy.getSignalOverBackground(ii) << " |       " << bTagStudy.getNrNotFoundEvts(ii) << std::endl;
+    }
+    for(int jj = 0; jj < NrConsideredOptions; jj++){
+	    std::cout << OptionName[NrConsideredOptions+jj] << " |        " << CorrectEventMlbMqqb[jj] << "      |          " << WrongEventMlbMqqb[jj] << "      |   " << CorrectEventMlbMqqb[jj]/(sqrt(WrongEventMlbMqqb[jj])) << " |       " << bTagStudy.getNrNotFoundEvts(jj) << std::endl;
     }
     std::cout << " " << std::endl;
    
@@ -1464,6 +1574,11 @@ int main (int argc, char *argv[])
     
     h_CosThetaReco.Write();
     h_NeutrinoEta.Write();
+
+    h_MlbMqqbCorrectAll.Write();
+    h_MlbMqqbCorrectChosen.Write();
+    h_MlbMqqbWrongOne.Write();
+    h_MlbMqqbWrongTwo.Write();
     //fout->Close();
     
     //////////////
