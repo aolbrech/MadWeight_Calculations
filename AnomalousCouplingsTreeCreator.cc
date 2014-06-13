@@ -36,6 +36,8 @@
 #include "TopTreeAnalysis/AnomCouplings/src/LHCOOutput.cc"
 #include "TopTreeAnalysis/AnomCouplings/interface/BTagStudy.h"
 #include "TopTreeAnalysis/AnomCouplings/src/BTagStudy.cc"       //--> Need to fix the makefile (don't include .cc files ...)
+#include "TopTreeAnalysis/AnomCouplings/src/MlbStudy.cc"
+#include "TopTreeAnalysis/AnomCouplings/interface/MlbStudy.h"
 #include "TLorentzVector.h"
 
 using namespace std;
@@ -100,18 +102,12 @@ int main (int argc, char *argv[])
      CorrectEventMlbMqqb[ii] = 0;
      WrongEventMlbMqqb[ii] = 0;
   }
-  std::string OptionName[NrConsideredOptions*2] = {"2 L b-tags, no chi-sq              ",//#1
-       					           "2 M b-tags, no chi-sq              ",//#2
-						   "2 M b-tags, no chi-sq, light not L ",//#3
-						   "2 T b-tags, no chi-sq              ",//#4
-						   "2 T b-tags, no chi-sq, light not M ",//#5
-						   "2 T b-tags, no chi-sq, light not L ",//#6
-						   "2 L b-tags, chi-sq                 ",//#7
-						   "2 M b-tags, chi-sq                 ",//#8
-						   "2 M b-tags, chi-sq, light not L    ",//#9
-						   "2 T b-tags, chi-sq                 ",//#10
-						   "2 T b-tags, chi-sq, light not M    ",//#11
-						   "2 T b-tags, chi-sq, light not L    "};//#12
+  std::string OptionName[NrConsideredOptions] = {"2 L b-tags,               ", //#1
+       					           "2 M b-tags,             ", //#2
+						   "2 M b-tags, light L-veto", //#3
+						   "2 T b-tags,             ", //#4
+						   "2 T b-tags, light M-veto", //#5
+						   "2 T b-tags, light L-veto"};//#6
   ////////////////////////////////////
   /// AnalysisEnvironment  
   ////////////////////////////////////
@@ -417,6 +413,12 @@ int main (int argc, char *argv[])
     TH1F h_NeutrinoEta("NeutrinoEta","NeutrinoEta",200,-8,8);
 
     //Mlb and Mqqb information:
+    //
+    TH1F h_WMass("WMass","WMass", 200,0,160);
+    TH1F h_TopMass("TopMass","TopMass", 200,0,350);
+    TH1F h_MlbMass("MlbMass","MlbMass",200,0,300);
+    TH1F h_MqqbMass("MqqbMass","MlbMass",400,0,500);
+    
     TH2F h_MlbMqqbCorrectChosen("MlbMqqbCorrectChosen","MlbMqqbCorrectChosen",200,0,500,200,0,300);
     TH2F h_MlbMqqbCorrectAll("MlbMqqbCorrectAll","MlbMqqbCorrectAll",200,0,500,200,0,300);
     TH2F h_MlbMqqbWrongOne("MlbMqqbWrongOne","MlbMqqbWrongOne",200,0,500,200,0,300);
@@ -431,6 +433,7 @@ int main (int argc, char *argv[])
     ////////////////////////////  
     BTagStudy bTagStudy;  //--> Should only be called before the event loop (otherwise the counters will not give the correct result)
     bTagStudy.InitializeBegin();
+    MlbStudy mlbStudy;
 
     ////////////////////////////////////
     //	loop on events
@@ -441,11 +444,12 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
+      mlbStudy.initializePerEvent();
 
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -1179,7 +1183,31 @@ int main (int argc, char *argv[])
 	    }
       	  }
       	}
-	
+
+	if(verbose > 3){
+	//First index is the jet number, the second one the mcParticle number:
+	std::cout << " Indices of quark 1 : " << hadronicWJet1_.first << " & " << hadronicWJet1_.second << std::endl;
+	if(hadronicWJet1_.first != 9999){
+	   std::cout << "      --- Pt of jet : " << selectedJets[hadronicWJet1_.first]->Pt() << std::endl;
+	   std::cout << "      --- CSV value : " << selectedJets[hadronicWJet1_.first]->btag_combinedSecondaryVertexBJetTags() << " (light cut = 0.244) " << std::endl;
+	}
+	if(hadronicWJet1_.second != 9999){
+	   std::cout << "      --- Pt of mc  : " << mcParticlesMatching[hadronicWJet1_.second].Pt() << std::endl;
+	   std::cout << "      --- Type      : " << mcParticlesMatching[hadronicWJet1_.second].type() << std::endl;
+	}
+	std::cout << " " << std::endl;
+        std::cout << " Indices of quark 2 : " << hadronicWJet2_.first << " & " << hadronicWJet2_.second << std::endl;
+        if(hadronicWJet2_.first != 9999){
+	   std::cout << "      --- Pt of jet : " << selectedJets[hadronicWJet2_.first]->Pt() << std::endl;
+	   std::cout << "      --- CSV value : " << selectedJets[hadronicWJet2_.first]->btag_combinedSecondaryVertexBJetTags() << " (light cut = 0.244) " << std::endl;
+	}
+        if(hadronicWJet2_.second != 9999){
+           std::cout << "      --- Pt of mc  : " << mcParticlesMatching[hadronicWJet2_.second].Pt() << std::endl;
+           std::cout << "      --- Type      : " << mcParticlesMatching[hadronicWJet2_.second].type() << std::endl;
+        }
+	std::cout << " ************************************" << std::endl;	
+	}
+
       	jetCombi.push_back(hadronicWJet1_.first);
       	jetCombi.push_back(hadronicWJet2_.first);
       	jetCombi.push_back(hadronicBJet_.first);
@@ -1225,6 +1253,10 @@ int main (int argc, char *argv[])
 	  histo1D["TopMass"]->Fill(CorrectRecMassTop);
 	  histo1D["MlbMass"]->Fill(CorrectRecMassMlb);
 	  histo1D["MqqbMass"]->Fill(CorrectRecMassMqqb);
+	  h_WMass.Fill(CorrectRecMassW);
+	  h_TopMass.Fill(CorrectRecMassTop);
+	  h_MlbMass.Fill(CorrectRecMassMlb);
+	  h_MqqbMass.Fill(CorrectRecMassMqqb);
 	}	      	      	      	       	      
       }//if dataset Semi mu ttbar
 
@@ -1339,28 +1371,26 @@ int main (int argc, char *argv[])
       
       ////////////////////////////////
       //  Mlb and Mqqb information  //
-      ////////////i////////////////////
+      ////////////////////////////////
       //
       vector<int> LeptonicB, HadronicB;
-      float MlbCorrect = 0;
+      float MlbCorrect = 0, MqqbCorrect = 0;
       if(CorrectBLeptonic != 9999) MlbCorrect = (*selectedLepton+*selectedJets[CorrectBLeptonic]).M();
-      float MqqbCorrect = 0;
       if(CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999) MqqbCorrect = (*selectedJets[CorrectBHadronic] + *selectedJets[CorrectQuark1] + *selectedJets[CorrectQuark2]).M();
       h_MlbMqqbCorrectAll.Fill(MqqbCorrect,MlbCorrect);
+      vector<int> CorrectValues;  //Find better solution!
+      CorrectValues.clear();
+      CorrectValues.push_back(CorrectBLeptonic);
+      CorrectValues.push_back(CorrectBHadronic);
+      CorrectValues.push_back(CorrectQuark1);
+      CorrectValues.push_back(CorrectQuark2);
       
       for(int Option = 0; Option < NrConsideredOptions; Option++){
+	mlbStudy.calculateChiSquared(CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb, Option);
+	mlbStudy.calculateEfficiency(Option, CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option));
+
+
 	if(bTagStudy.getbTaggedJets(Option).size() >1 && bTagStudy.getLightJets(Option).size() > 1){
-	  float Mlb[2] = {(*selectedLepton+*selectedJets[(bTagStudy.getbTaggedJets(Option))[0]]).M(),(*selectedLepton+*selectedJets[(bTagStudy.getbTaggedJets(Option))[1]]).M()};
-	  float Mqqb[2] = {(*selectedJets[(bTagStudy.getbTaggedJets(Option))[1]] + *selectedJets[(bTagStudy.getLightJets(Option))[0]] + *selectedJets[(bTagStudy.getLightJets(Option))[1]]).M(),
-	  	           (*selectedJets[(bTagStudy.getbTaggedJets(Option))[0]] + *selectedJets[(bTagStudy.getLightJets(Option))[0]] + *selectedJets[(bTagStudy.getLightJets(Option))[1]]).M()};
-	  if(verbose > 3){
-	    std::cout << " Looking at option : " << Option << std::endl;
-	    std::cout << " Mlb value : " << Mlb[0] << " or " << Mlb[1] << std::endl;
-	    std::cout << " Correct Mlb value : " << MlbCorrect << std::endl;
-	    std::cout << " Mqqb value : " << Mqqb[0] << " or " << Mqqb[1] << std::endl;
-	    std::cout << " Correct Mqqb value : " << MqqbCorrect << std::endl;
-	    std::cout << " " << std::endl;
-	  }
 
 	  if( (CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[1]) &
 	      (CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[1] || CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[0]) &&
@@ -1368,41 +1398,10 @@ int main (int argc, char *argv[])
 	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
 		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
 	  }
-	  else{
-		h_MlbMqqbWrongOne.Fill(Mqqb[0], Mlb[0]);
-		h_MlbMqqbWrongTwo.Fill(Mqqb[1], Mlb[1]);
-	  }
 	  
-	  float ChiSquared[2] = {0,0};
-	  int LeptBCombi=0;           //This means that the hightest Pt jet is considered as the leptonic b-jet! 
-	  int HadrBCombi=1;
-	  for(int ii = 0; ii<2; ii++){
-	     ChiSquared[ii] = ((MassMlb-Mlb[ii])/SigmaMlb)*((MassMlb-Mlb[ii])/SigmaMlb) + ((MassMqqb - Mqqb[ii])/SigmaMqqb)*((MassMqqb - Mqqb[ii])/SigmaMqqb);
-	     if(ii == 1 && ChiSquared[0]>ChiSquared[1]){
-	 	LeptBCombi = 1;          //This means that the second highest Pt jet is considered as the leptonic b-jet!
-		HadrBCombi = 0;
-	     }
-	  }
-
-	  //std::cout << " Chosen leptonic combination : " << LeptBCombi << "    --> for option : " << Option << std::endl;
-	  //std::cout << " Chi-sq values : " << ChiSquared[0] << " , " << ChiSquared[1] << std::endl;
-	  //std::cout << " Correct jets (bLept, bHadr, q, q) : " << CorrectBLeptonic << ", " << CorrectBHadronic
-
-	  //Check the efficiency of the chi-squared method!
-	  if(CorrectBLeptonic != 9999 && CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999){ 
-	  if( CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[LeptBCombi] && CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[HadrBCombi] && 
-	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
-	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1]) ){
-		CorrectEventMlbMqqb[Option]++;
-	  }
-	  else{
-		WrongEventMlbMqqb[Option]++;
-	  }
-	  }
-
 	  // Match the jet number to the particles
-	  LeptonicB.push_back(bTagStudy.getbTaggedJets(Option)[LeptBCombi]);
-	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[HadrBCombi]);
+	  LeptonicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBLept()]);
+	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()]);
         }
       }
 
@@ -1416,11 +1415,6 @@ int main (int argc, char *argv[])
       //   Reconstructing Lepton & Neutrino (partially)      //
       //   -> Neutrino Pt and M needs to be known for .lhco  //
       /////////////////////////////////////////////////////////  
-      //
-
-      ///////////////////////////////////////////////
-      //  Reconstructing the neutrino kinematics   //
-      ///////////////////////////////////////////////
       //  --> Only do this part for the combination which is actually chosen!
       float UsedLeptonicB = 0;
       float UsedHadronicB = 1;
@@ -1530,15 +1524,32 @@ int main (int argc, char *argv[])
     //////////////////////////////
     //  Jet combination output  //
     //////////////////////////////
-    std::cout << "           Option                   |  all 4 correct | at least 1 wrong | s/sqrt(b) | non-matched evts " << std::endl;
-    for(int ii = 0; ii < NrConsideredOptions; ii++){
-	    std::cout << OptionName[ii] << " |        " << bTagStudy.getNrCorrectMatchedEvts(ii) << "      |          " << bTagStudy.getNrWrongMatchedEvts(ii) << "      |   " << bTagStudy.getSignalOverBackground(ii) << " |       " << bTagStudy.getNrNotFoundEvts(ii) << std::endl;
-    }
-    for(int jj = 0; jj < NrConsideredOptions; jj++){
-	    std::cout << OptionName[NrConsideredOptions+jj] << " |        " << CorrectEventMlbMqqb[jj] << "      |          " << WrongEventMlbMqqb[jj] << "      |   " << CorrectEventMlbMqqb[jj]/(sqrt(WrongEventMlbMqqb[jj])) << " |       " << bTagStudy.getNrNotFoundEvts(jj) << std::endl;
-    }
-    std::cout << " " << std::endl;
-   
+    //--> Save directly to .tex output as a table
+    ofstream eventSelOutput;
+    eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
+
+    bTagStudy.ReturnTable(OptionName, 0, NrConsideredOptions, eventSelOutput);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
+    bTagStudy.ReturnTable(OptionName, 1, NrConsideredOptions, eventSelOutput);
+    bTagStudy.ReturnTable(OptionName, 2, NrConsideredOptions, eventSelOutput);
+    eventSelOutput.close();
+
+    //////////////////////////////
+    //  Mlb combination output  //
+    //////////////////////////////
+    ofstream mlbOutput;
+    mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");
+    mlbStudy.saveNumbers(OptionName, 0, NrConsideredOptions, mlbOutput);
+    mlbStudy.saveNumbers(OptionName, 1, NrConsideredOptions, mlbOutput);
+    mlbOutput.close();
+
+    TH1F h_CorrectOptionChiSq("CorrectOptionChiSq","CorrectOptionChiSq",200,0,100);
+    TH1F h_WrongOptionChiSq("WrongOptionChiSq","WrongOptionChiSq",200,0,100);
+    for(int ii = 0; ii < (mlbStudy.getHistoCorrectOptionChiSq()).size(); ii++)
+       h_CorrectOptionChiSq.Fill((mlbStudy.getHistoCorrectOptionChiSq())[ii]);
+
+    for(int ii = 0; ii < (mlbStudy.getHistoWrongOptionChiSq()).size(); ii++)
+       h_WrongOptionChiSq.Fill((mlbStudy.getHistoWrongOptionChiSq())[ii]);
+
     //Close the LHCO Output files!
     for(int ii = 0; ii<16; ii++){
       if(ii < 4) outFile[ii].close();	
@@ -1548,6 +1559,10 @@ int main (int argc, char *argv[])
     
     //TFile* fout = new TFile("GeneratorOutput.root","RECREATE");
     fout->cd();
+
+    h_CorrectOptionChiSq.Write();
+    h_WrongOptionChiSq.Write();
+
     h_StandardCosThetaNoEvtSel.Write();
     h_StandardCosThetaNoBTag.Write();
     h_StandardCosThetaLCSV.Write();
@@ -1571,6 +1586,11 @@ int main (int argc, char *argv[])
     h_CorrectBHadrCSVDiscr.Write();
     h_CorrectQuark1CSVDiscr.Write();
     h_CorrectQuark2CSVDiscr.Write();
+
+    h_WMass.Write();
+    h_TopMass.Write();
+    h_MlbMass.Write();
+    h_MqqbMass.Write();
     
     h_CosThetaReco.Write();
     h_NeutrinoEta.Write();
