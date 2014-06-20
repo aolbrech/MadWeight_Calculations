@@ -95,19 +95,32 @@ int main (int argc, char *argv[])
   bool GenLHCOOutput = false;
   bool RecoLHCOOutput = false;  
 
-  const int NrConsideredOptions = 6;   //Make sure this number is also the same in the bTagStudy class!!
-  int CorrectEventMlbMqqb[NrConsideredOptions];
-  int WrongEventMlbMqqb[NrConsideredOptions];
-  for(int ii = 0; ii < NrConsideredOptions; ii++){
+  //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
+  const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
+  const int ChosenBTagOption = 3;  //2 T b-tags!!
+
+  int CorrectEventMlbMqqb[NrConsideredBTagOptions];
+  int WrongEventMlbMqqb[NrConsideredBTagOptions];
+  for(int ii = 0; ii < NrConsideredBTagOptions; ii++){
      CorrectEventMlbMqqb[ii] = 0;
      WrongEventMlbMqqb[ii] = 0;
   }
-  std::string OptionName[NrConsideredOptions] = {"2 L b-tags,               ", //#1
-       					           "2 M b-tags,             ", //#2
-						   "2 M b-tags, light L-veto", //#3
-						   "2 T b-tags,             ", //#4
-						   "2 T b-tags, light M-veto", //#5
-						   "2 T b-tags, light L-veto"};//#6
+
+  float BJetWP[6] = {0.244,0.679,0.679,0.898,0.898,0.898};
+  float LightJetWP[6] = {0.244,0.679,0.244,0.898,0.679,0.244};
+  
+  std::string OptionName[6] = {"2 L b-tags,             ", //#0
+    			       "2 M b-tags,             ", //#1
+			       "2 M b-tags, light L-veto", //#2
+			       "2 T b-tags,             ", //#3
+			       "2 T b-tags, light M-veto", //#4
+			       "2 T b-tags, light L-veto"};//#5
+
+  //Values needed for comparison between 4-jet and 5-jet case (Hence having the choice between three light jets!)
+  int MoreThanTwoLightJets = 0, ThirdJetIsCorrectQuark = 0, AtLeastTwoLightJets = 0, FiveJetsAllCorrect = 0, FiveJetsOneWrong = 0;
+  int NrConsideredJets = 5;  //Options are 4 or 5
+  unsigned int NrEventsWithTwoLightJets = 0, NrEventsWithMoreThanTwoLightJets = 0;
+
   ////////////////////////////////////
   /// AnalysisEnvironment  
   ////////////////////////////////////
@@ -308,17 +321,9 @@ int main (int argc, char *argv[])
     int iFile = -1;
     string dataSetName = datasets[d]->Name();
     
-    int nSelectedMu=0;
-    int nSelectedMuLCSV=0;
-    int nSelectedMuMCSV=0;
-    int nSelectedMuTCSV=0;
-    int nSelectedEl=0;
-    int nSelectedElLCSV=0;
-    int nSelectedElMCSV=0;
-    int nSelectedElTCSV=0;
-    int nLargeLCSVEvents = 0;
-    int nLargeMCSVEvents = 0;
-    int nLargeTCSVEvents = 0;
+    int nSelectedMu=0, nSelectedMuLCSV=0, nSelectedMuMCSV=0, nSelectedMuTCSV=0;
+    int nSelectedEl=0, nSelectedElLCSV=0, nSelectedElMCSV=0, nSelectedElTCSV=0;
+    int nLargeLCSVEvents = 0, nLargeMCSVEvents = 0, nLargeTCSVEvents = 0;
     
     if (verbose > 1)
       cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
@@ -370,16 +375,10 @@ int main (int argc, char *argv[])
     outFile[3].open("TTbarLHCO_NegativeElectron.lhco");
 
     ofstream outFileReco[16];
-    unsigned int NumberPosRecoMu = 0;
-    unsigned int NumberNegRecoMu = 0;
-    unsigned int NumberPosRecoEl = 0;
-    unsigned int NumberNegRecoEl = 0;
+    unsigned int NumberPosRecoMu = 0, NumberNegRecoMu = 0, NumberPosRecoEl = 0, NumberNegRecoEl = 0;
     
     unsigned int NumberCorrectEvents = 0; //Counts the number of semi-leptonic events
-    unsigned int NumberNegativeElectrons = 0;
-    unsigned int NumberNegativeMuons = 0;
-    unsigned int NumberPositiveElectrons = 0;
-    unsigned int NumberPositiveMuons = 0;
+    unsigned int NumberNegativeElectrons = 0, NumberNegativeMuons = 0, NumberPositiveElectrons = 0, NumberPositiveMuons = 0;
     int EventContent[5]; //0:top; 1:b; 2: u,c,d,s; 3:W; 4:mu + neutrino
     
     //Cos Theta information
@@ -408,6 +407,9 @@ int main (int argc, char *argv[])
     TH1F h_CorrectBHadrCSVDiscr("CorrectBHadrCSVDiscr","CorrectBHadrCSVDiscr",400,-2.5,1.5);
     TH1F h_CorrectQuark1CSVDiscr("CorrectQuark1CSVDiscr","CorrectQuark1CSVDiscr",400,-2.5,1.5);
     TH1F h_CorrectQuark2CSVDiscr("CorrectQuark2CSVDiscr","CorrectQuark2CSVDiscr",400,-2.5,1.5);
+
+    TH1F h_Quark1JetNumber("Quark1JetNumber","Quark1JetNumber",12,-1.5,10.5);
+    TH1F h_Quark2JetNumber("Quark2JetNumber","Quark2JetNumber",12,-1.5,10.5);
 
     TH1F h_CosThetaReco("CosThetaReco","CosThetaReco",200,-1,1);
     TH1F h_NeutrinoEta("NeutrinoEta","NeutrinoEta",200,-8,8);
@@ -444,8 +446,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    for (unsigned int ievt = 0; ievt < 50000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -931,10 +933,7 @@ int main (int argc, char *argv[])
       }
 
       //Variables containing the right jet combination for TTJets
-      int CorrectQuark1=999;  //Needed for Monte Carlo
-      int CorrectQuark2=999;
-      int CorrectBHadronic=999;
-      int CorrectBLeptonic=999;
+      int CorrectQuark1=999, CorrectQuark2=999, CorrectBHadronic=999, CorrectBLeptonic=999;
       
       ///////////////////////////////////////
       //  Initialize variables ChiSquared  //
@@ -1024,10 +1023,8 @@ int main (int argc, char *argv[])
       if(FalseEventContent == 0) EventInfoFile << "             1          ";  //To avoid tau's which are reconstructed as muons!
       
       //Counting the number of events passing through the 'basic' event selection requirements    
-      if (eventselectedSemiMu)
-	nSelectedMu++;
-      if (eventselectedSemiEl)
-	nSelectedEl++;
+      if (eventselectedSemiMu) nSelectedMu++;
+      if (eventselectedSemiEl) nSelectedEl++;
       
       //-----------------//
       // do some data-mc //
@@ -1184,6 +1181,12 @@ int main (int argc, char *argv[])
       	  }
       	}
 
+	//Plot the jet number of the two light jets:
+	if(hadronicWJet1_.first != 9999) h_Quark1JetNumber.Fill(hadronicWJet1_.first);
+	else 				 h_Quark1JetNumber.Fill(-1);
+	if(hadronicWJet2_.first != 9999) h_Quark2JetNumber.Fill(hadronicWJet2_.first);
+	else				 h_Quark2JetNumber.Fill(-1);
+
 	if(verbose > 3){
 	//First index is the jet number, the second one the mcParticle number:
 	std::cout << " Indices of quark 1 : " << hadronicWJet1_.first << " & " << hadronicWJet1_.second << std::endl;
@@ -1260,115 +1263,183 @@ int main (int argc, char *argv[])
 	}	      	      	      	       	      
       }//if dataset Semi mu ttbar
 
+      //----------------------------------------------------------------------------------------------------------------------------------- Start of bTagStudy class stuff!!
+
       /////////////////////////////
       //   B-Tag requirements    //
       /////////////////////////////
-      float BJetWP[NrConsideredOptions] = {0.244,0.679,0.679,0.898,0.898,0.898};
-      float LightJetWP[NrConsideredOptions] = {0.244,0.679,0.244,0.898,0.679,0.244};
 
-      for(int option = 0; option < NrConsideredOptions; option++){
-	 bTagStudy.CalculateJets(selectedJets, BJetWP[option], LightJetWP[option], option);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
-         //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
+      if(NrConsideredBTagOptions > 1){   //Go through the different options and compare the efficiencies!
 
-         if(verbose > 3){
-	   cout<<" Size of bTaggedJets: "<<(bTagStudy.getbTaggedJets(option)).size()<<" , of NonbTaggedJets: "<<(bTagStudy.getNonbTaggedJets(option)).size()<<" & of lightJets: "<<(bTagStudy.getLightJets(option)).size()<<endl;
-	   cout<<" Index of BHadronic: "<<CorrectBHadronic<<" , Index of BLeptonic: "<<CorrectBLeptonic<<" , Index of quark1: "<<CorrectQuark1<<" & Index of quark2: "<<CorrectQuark2<<endl;
+         for(int option = 0; option < NrConsideredBTagOptions; option++){
+	    bTagStudy.CalculateJets(selectedJets, BJetWP[option], LightJetWP[option], option);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
+            //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
+
+            if(verbose > 3){
+	       cout<<" Size of bTaggedJets: "<<(bTagStudy.getbTaggedJets(option)).size()<<" , of NonbTaggedJets: "<<(bTagStudy.getNonbTaggedJets(option)).size()<<" & of lightJets: "<<(bTagStudy.getLightJets(option)).size()<<endl;
+	       cout<<" Index of BHadronic: "<<CorrectBHadronic<<" , Index of BLeptonic: "<<CorrectBLeptonic<<" , Index of quark1: "<<CorrectQuark1<<" & Index of quark2: "<<CorrectQuark2<<endl;
+            }
+
+            //Also check the correct jet combi:
+            if((bTagStudy.getbTaggedJets(option)).size() >= 2 && (bTagStudy.getLightJets(option)).size() >=2){
+	       bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, option);
+            }
+            else{
+	       if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
+            }
          }
 
-         //Also check the correct jet combi:
-         if((bTagStudy.getbTaggedJets(option)).size() >= 2 && (bTagStudy.getLightJets(option)).size() >=2){
-	    bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, option);
-         }
-         else{
-	    if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
-         }
-      }
+         ///////////////////////////////////////////////////////
+         //  Kinematic information for different b-tag cases  //
+         ///////////////////////////////////////////////////////
+         //
+         if(dataSetName.find("TTbarJets") == 0){
 
-      ///////////////////////////////////////////////////////
-      //  Kinematic information for different b-tag cases  //
-      ///////////////////////////////////////////////////////
-      //
-      if(dataSetName.find("TTbarJets") == 0){
+	   for(int jj = 0; jj < 2; jj++){      //Only look at the two leading jets!
 
-	for(int jj = 0; jj < 2; jj++){      //Only look at the two leading jets!
+	      //Kinematic information for the light (= Non LCSV jets)
+	      if((bTagStudy.getLightJets(0)).size()>=2){
+	        h_CSVDiscrLCSVLightJets.Fill(selectedJets[(bTagStudy.getLightJets(0))[jj]]->btag_combinedSecondaryVertexBJetTags());   
+		//--> check whether the so-called light jets don't all have discr -1 ...	
 
-	   //Kinematic information for the light (= Non LCSV jets)
-	   if((bTagStudy.getLightJets(0)).size()>=2){
-	     h_CSVDiscrLCSVLightJets.Fill(selectedJets[(bTagStudy.getLightJets(0))[jj]]->btag_combinedSecondaryVertexBJetTags());   //--> check whether the so-called light jets don't all have discr -1 ...	
-
-	     for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-	        if((bTagStudy.getLightJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-		  h_JetTypeLCSVLightJets.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+	        for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+	          if((bTagStudy.getLightJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+		    h_JetTypeLCSVLightJets.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+	          }
+	          else{    //Unmatched jets!
+		    h_JetTypeLCSVLightJets.Fill(25.);
+	          }
 	        }
-	        else{    //Unmatched jets!
-		  h_JetTypeLCSVLightJets.Fill(25.);
-	        }
-	     }
-	   }//End of light (= non LCSV) jets
+	      }//End of light (= non LCSV) jets
 
-	   //Kinematic information for the Loose b-jets
-           if((bTagStudy.getbTaggedJets(0)).size() >=2){
-             h_StandardCosThetaLCSV.Fill(standardCosTheta);
-             for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-                if((bTagStudy.getbTaggedJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-                  h_JetTypeLCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+	      //Kinematic information for the Loose b-jets
+              if((bTagStudy.getbTaggedJets(0)).size() >=2){
+                h_StandardCosThetaLCSV.Fill(standardCosTheta);
+                for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+                   if((bTagStudy.getbTaggedJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+                      h_JetTypeLCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+                   }
+                   else{
+                      h_JetTypeLCSV.Fill(25.);
+                   }
                 }
-                else{
-                  h_JetTypeLCSV.Fill(25.);
-                }
-             }
-           }//End of Loose b-jets 
+              }//End of Loose b-jets 
 
-	   //Kinematic information for the Medium b-jets
-           if((bTagStudy.getbTaggedJets(1)).size() >=2){
-             h_StandardCosThetaMCSV.Fill(standardCosTheta);
-             for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-                if((bTagStudy.getbTaggedJets(1))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-                  h_JetTypeMCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
-                }
-                else{
-                  h_JetTypeMCSV.Fill(25.);
-                }
-             }
-           }//End of Medium b-jets 
+	      //Kinematic information for the Medium b-jets
+              if((bTagStudy.getbTaggedJets(1)).size() >=2){
+                 h_StandardCosThetaMCSV.Fill(standardCosTheta);
+                 for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+                    if((bTagStudy.getbTaggedJets(1))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+                        h_JetTypeMCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+                    }
+                    else{
+                        h_JetTypeMCSV.Fill(25.);
+                    }
+                 }
+              }//End of Medium b-jets 
 
-	   //Kinematic information for the Tight b-jets
-	   if((bTagStudy.getbTaggedJets(3)).size() >=2){
-             h_StandardCosThetaTCSV.Fill(standardCosTheta);
-             for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-		if((bTagStudy.getbTaggedJets(3))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-                  h_JetTypeTCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
-		}
-		else{
-                  h_JetTypeTCSV.Fill(25.);
-		}
-	     }
-	   }//End of Tight b-jets 
+	      //Kinematic information for the Tight b-jets
+	      if((bTagStudy.getbTaggedJets(3)).size() >=2){
+                 h_StandardCosThetaTCSV.Fill(standardCosTheta);
+                 for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+		    if((bTagStudy.getbTaggedJets(3))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+                        h_JetTypeTCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		    }
+		    else{
+                        h_JetTypeTCSV.Fill(25.);
+		    }
+	         }
+	      }//End of Tight b-jets 
         
-	}//Only look at the two leading jets!
-      }//End of TTbarJets!
-      
+	   }//Only look at the two leading jets!
+        }//End of TTbarJets!
+
+        /////////////////////////////////////////////
+        //   Count the selected number of events   //
+        /////////////////////////////////////////////
+        // 2 Loose CSV b-tags
+        if((bTagStudy.getbTaggedJets(0)).size() >= 2 && eventselectedSemiMu) nSelectedMuLCSV++;
+        if((bTagStudy.getbTaggedJets(0)).size() >= 2 && eventselectedSemiEl) nSelectedElLCSV++;
+        if((bTagStudy.getbTaggedJets(0)).size() > 2) nLargeLCSVEvents++;
+
+        // 2 Medium CSV b-tags
+        if((bTagStudy.getbTaggedJets(1)).size() >= 2 && eventselectedSemiMu) nSelectedMuMCSV++;
+        if((bTagStudy.getbTaggedJets(1)).size() >= 2 && eventselectedSemiEl) nSelectedElMCSV++;
+        if((bTagStudy.getbTaggedJets(1)).size() > 2) nLargeMCSVEvents++;
+
+        // 2 Tight CSV b-tags
+        if((bTagStudy.getbTaggedJets(3)).size() >= 2 && eventselectedSemiMu) nSelectedMuTCSV++;
+        if((bTagStudy.getbTaggedJets(3)).size() >= 2 && eventselectedSemiEl) nSelectedElTCSV++;
+        if((bTagStudy.getbTaggedJets(3)).size() > 2) nLargeTCSVEvents++;
+
+      }//End of loop for NrConsideredBTagOptions larger than 1!
+      else if(NrConsideredBTagOptions == 1){
+        std::cout << " Looking at case with only one bTag considered! " << std::endl;
+	bTagStudy.CalculateJets(selectedJets, BJetWP[ChosenBTagOption], LightJetWP[ChosenBTagOption], ChosenBTagOption);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
+        //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
+
+        if(verbose > 3){
+	  cout<<" Size of bTaggedJets: "<<(bTagStudy.getbTaggedJets(ChosenBTagOption)).size()<<" , of NonbTaggedJets: "<<(bTagStudy.getNonbTaggedJets(ChosenBTagOption)).size()<<" & of lightJets: "<<(bTagStudy.getLightJets(ChosenBTagOption)).size()<<endl;
+	  cout<<" Index of BHadronic: "<<CorrectBHadronic<<" , Index of BLeptonic: "<<CorrectBLeptonic<<" , Index of quark1: "<<CorrectQuark1<<" & Index of quark2: "<<CorrectQuark2<<endl;
+        }
+
+        //Also check the correct jet combi:  --> Do this for both the 4- and 5-jet case (will make it possible to compare values!)
+        if((bTagStudy.getbTaggedJets(ChosenBTagOption)).size() >= 2 && (bTagStudy.getLightJets(ChosenBTagOption)).size() >=2){
+	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() >= 2)
+	      bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);
+	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() >= 2){
+	      NrEventsWithTwoLightJets++;
+	      if( (bTagStudy.getLightJets(ChosenBTagOption)).size() > 2){
+		NrEventsWithMoreThanTwoLightJets++;
+	        bTagStudy.CorrectJetCombi5Jets(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);
+	      }
+	    }
+        }
+        else{
+	    if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
+        }
+
+      }//End of loop for NrConsideredBTagOptions equal to 1!
       h_StandardCosThetaNoBTag.Fill(standardCosTheta); 
+      //---------------------------------------------------------------------------------------------------------------------------- End of bTagStudy class stuff
 
-      /////////////////////////////////////////////
-      //   Count the selected number of events   //
-      /////////////////////////////////////////////
-      // 2 Loose CSV b-tags
-      if((bTagStudy.getbTaggedJets(0)).size() >= 2 && eventselectedSemiMu) nSelectedMuLCSV++;
-      if((bTagStudy.getbTaggedJets(0)).size() >= 2 && eventselectedSemiEl) nSelectedElLCSV++;
-      if((bTagStudy.getbTaggedJets(0)).size() > 2) nLargeLCSVEvents++;
-
-      // 2 Medium CSV b-tags
-      if((bTagStudy.getbTaggedJets(1)).size() >= 2 && eventselectedSemiMu) nSelectedMuMCSV++;
-      if((bTagStudy.getbTaggedJets(1)).size() >= 2 && eventselectedSemiEl) nSelectedElMCSV++;
-      if((bTagStudy.getbTaggedJets(1)).size() > 2) nLargeMCSVEvents++;
-
-      // 2 Tight CSV b-tags
-      if((bTagStudy.getbTaggedJets(3)).size() >= 2 && eventselectedSemiMu) nSelectedMuTCSV++;
-      if((bTagStudy.getbTaggedJets(3)).size() >= 2 && eventselectedSemiEl) nSelectedElTCSV++;
-      if((bTagStudy.getbTaggedJets(3)).size() > 2) nLargeTCSVEvents++;
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
+      //  Event selection choice (17/06/2014)  //
+      //   --> Continue with 2 T b-tags        //
+      //   --> No veto on light jets!          //
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
+      //
+      if((bTagStudy.getbTaggedJets(3)).size() < 2) continue;
       
+      // Count the number of events:
+      if(eventselectedSemiMu) nSelectedMu++;
+      if(eventselectedSemiEl) nSelectedEl++;
       
+      //--> Now check whether improvement is obtained when adding another light jet (so look at three jet possibilities!)
+      if( (bTagStudy.getLightJets(3)).size() >2 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999 && CorrectBLeptonic != 9999 && CorrectBHadronic != 9999){
+	 MoreThanTwoLightJets++;
+	 if(verbose > 3){
+	   std::cout << " Check whether the third light jet can be matched with the correct quarks: " << std::endl;
+	   std::cout << " Correct quark indices         : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
+	   std::cout << " Three first light jet indices : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
+	   std::cout << " ------------ " << std::endl;
+ 	 }
+
+	 if(CorrectQuark1 == (bTagStudy.getLightJets(3))[2] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2])
+		ThirdJetIsCorrectQuark++;
+
+	 //Count how often the correct event topology is found:
+	 if( ( CorrectQuark1 == (bTagStudy.getLightJets(3))[0] || CorrectQuark1 == (bTagStudy.getLightJets(3))[1] || CorrectQuark1 == (bTagStudy.getLightJets(3))[2] ) &&
+ 	     ( CorrectQuark2 == (bTagStudy.getLightJets(3))[0] || CorrectQuark2 == (bTagStudy.getLightJets(3))[1] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2] ) &&
+	     ( CorrectBLeptonic == (bTagStudy.getbTaggedJets(3))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(3))[1] ) &&
+             ( CorrectBHadronic == (bTagStudy.getbTaggedJets(3))[0] || CorrectBHadronic == (bTagStudy.getbTaggedJets(3))[1] ) ){
+		FiveJetsAllCorrect++;
+	 }
+	 else{
+		FiveJetsOneWrong++;
+	 }
+      }
+  
       ////////////////////////////////
       //  Mlb and Mqqb information  //
       ////////////////////////////////
@@ -1384,8 +1455,9 @@ int main (int argc, char *argv[])
       CorrectValues.push_back(CorrectBHadronic);
       CorrectValues.push_back(CorrectQuark1);
       CorrectValues.push_back(CorrectQuark2);
-      
-      for(int Option = 0; Option < NrConsideredOptions; Option++){
+     
+      //Should not go over this loop if the b-tag option is already chosen! 
+      for(int Option = 0; Option < NrConsideredBTagOptions; Option++){
 	mlbStudy.calculateChiSquared(CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb, Option);
 	mlbStudy.calculateEfficiency(Option, CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option));
 
@@ -1520,35 +1592,52 @@ int main (int argc, char *argv[])
 
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
+    cout << " " << endl;
+    
+    //Output for 4 of 5 jet-case!
+    std::cout << " Number of events with at least two light jets : " << AtLeastTwoLightJets << std::endl;
+    std::cout << " Number of times more than two light jets have been found : " << MoreThanTwoLightJets << std::endl;
+    std::cout << " Number of times the third jet is one of the correct ones : " << ThirdJetIsCorrectQuark << std::endl;
+    std::cout << " ------------------------ " << std::endl;
+    std::cout << " Four jets case (all correct vs one wrong): " << bTagStudy.getNrCorrectMatchedEvts(ChosenBTagOption) << " vs " << bTagStudy.getNrWrongMatchedEvts(ChosenBTagOption) << std::endl;
+    std::cout << " Signal over background in case of 4 jets : " << bTagStudy.getSignalOverBkg(ChosenBTagOption) << std::endl;
+    std::cout << " Five jets case (all correct vs one wrong): " << FiveJetsAllCorrect << " vs " << FiveJetsOneWrong << std::endl;
+    std::cout << " Signal over background in case of 5 jets : " << (float)FiveJetsAllCorrect/(float)FiveJetsOneWrong << std::endl;
+    std::cout << " Signal over background from class (5)    : " << bTagStudy.getSignalOverBkg5Jets(ChosenBTagOption) << std::endl;
+    std::cout << " " << std::endl;
+    std::cout << " Number of events with at least two light jets   : " << NrEventsWithTwoLightJets << std::endl;
+    std::cout << " Number of events with at least three light jets : " << NrEventsWithMoreThanTwoLightJets << std::endl;
 
     //////////////////////////////
     //  Jet combination output  //
     //////////////////////////////
     //--> Save directly to .tex output as a table
-    ofstream eventSelOutput;
-    eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
+    if(NrConsideredBTagOptions > 1){
+      ofstream eventSelOutput;
+      eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
 
-    bTagStudy.ReturnTable(OptionName, 0, NrConsideredOptions, eventSelOutput);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
-    bTagStudy.ReturnTable(OptionName, 1, NrConsideredOptions, eventSelOutput);
-    bTagStudy.ReturnTable(OptionName, 2, NrConsideredOptions, eventSelOutput);
-    eventSelOutput.close();
+      bTagStudy.ReturnTable(OptionName, 0, NrConsideredBTagOptions, eventSelOutput);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
+      bTagStudy.ReturnTable(OptionName, 1, NrConsideredBTagOptions, eventSelOutput);
+      bTagStudy.ReturnTable(OptionName, 2, NrConsideredBTagOptions, eventSelOutput);
+      eventSelOutput.close();
+    
+      //////////////////////////////
+      //  Mlb combination output  //
+      //////////////////////////////
+      ofstream mlbOutput;
+      mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");
+      mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, mlbOutput);
+      mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, mlbOutput);
+      mlbOutput.close();
 
-    //////////////////////////////
-    //  Mlb combination output  //
-    //////////////////////////////
-    ofstream mlbOutput;
-    mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");
-    mlbStudy.saveNumbers(OptionName, 0, NrConsideredOptions, mlbOutput);
-    mlbStudy.saveNumbers(OptionName, 1, NrConsideredOptions, mlbOutput);
-    mlbOutput.close();
+      TH1F h_CorrectOptionChiSq("CorrectOptionChiSq","CorrectOptionChiSq",200,0,100);
+      TH1F h_WrongOptionChiSq("WrongOptionChiSq","WrongOptionChiSq",200,0,100);
+      for(int ii = 0; ii < (mlbStudy.getHistoCorrectOptionChiSq()).size(); ii++)
+         h_CorrectOptionChiSq.Fill((mlbStudy.getHistoCorrectOptionChiSq())[ii]);
 
-    TH1F h_CorrectOptionChiSq("CorrectOptionChiSq","CorrectOptionChiSq",200,0,100);
-    TH1F h_WrongOptionChiSq("WrongOptionChiSq","WrongOptionChiSq",200,0,100);
-    for(int ii = 0; ii < (mlbStudy.getHistoCorrectOptionChiSq()).size(); ii++)
-       h_CorrectOptionChiSq.Fill((mlbStudy.getHistoCorrectOptionChiSq())[ii]);
-
-    for(int ii = 0; ii < (mlbStudy.getHistoWrongOptionChiSq()).size(); ii++)
-       h_WrongOptionChiSq.Fill((mlbStudy.getHistoWrongOptionChiSq())[ii]);
+      for(int ii = 0; ii < (mlbStudy.getHistoWrongOptionChiSq()).size(); ii++)
+         h_WrongOptionChiSq.Fill((mlbStudy.getHistoWrongOptionChiSq())[ii]);
+    }
 
     //Close the LHCO Output files!
     for(int ii = 0; ii<16; ii++){
@@ -1560,8 +1649,8 @@ int main (int argc, char *argv[])
     //TFile* fout = new TFile("GeneratorOutput.root","RECREATE");
     fout->cd();
 
-    h_CorrectOptionChiSq.Write();
-    h_WrongOptionChiSq.Write();
+    //h_CorrectOptionChiSq.Write();
+    //h_WrongOptionChiSq.Write();
 
     h_StandardCosThetaNoEvtSel.Write();
     h_StandardCosThetaNoBTag.Write();
@@ -1586,6 +1675,9 @@ int main (int argc, char *argv[])
     h_CorrectBHadrCSVDiscr.Write();
     h_CorrectQuark1CSVDiscr.Write();
     h_CorrectQuark2CSVDiscr.Write();
+
+    h_Quark1JetNumber.Write();
+    h_Quark2JetNumber.Write();
 
     h_WMass.Write();
     h_TopMass.Write();
