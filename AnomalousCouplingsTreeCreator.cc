@@ -117,9 +117,9 @@ int main (int argc, char *argv[])
 			       "2 T b-tags, light L-veto"};//#5
 
   //Values needed for comparison between 4-jet and 5-jet case (Hence having the choice between three light jets!)
-  int MoreThanTwoLightJets = 0, ThirdJetIsCorrectQuark = 0, AtLeastTwoLightJets = 0, FiveJetsAllCorrect = 0, FiveJetsOneWrong = 0;
   int NrConsideredJets = 5;  //Options are 4 or 5
-  unsigned int NrEventsWithTwoLightJets = 0, NrEventsWithMoreThanTwoLightJets = 0;
+  unsigned int ThirdJetIsCorrectQuark = 0;
+  int FiveJetsAllCorrect = 0;
 
   ////////////////////////////////////
   /// AnalysisEnvironment  
@@ -1374,7 +1374,6 @@ int main (int argc, char *argv[])
 
       }//End of loop for NrConsideredBTagOptions larger than 1!
       else if(NrConsideredBTagOptions == 1){
-        std::cout << " Looking at case with only one bTag considered! " << std::endl;
 	bTagStudy.CalculateJets(selectedJets, BJetWP[ChosenBTagOption], LightJetWP[ChosenBTagOption], ChosenBTagOption);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
         //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
 
@@ -1384,16 +1383,12 @@ int main (int argc, char *argv[])
         }
 
         //Also check the correct jet combi:  --> Do this for both the 4- and 5-jet case (will make it possible to compare values!)
-        if((bTagStudy.getbTaggedJets(ChosenBTagOption)).size() >= 2 && (bTagStudy.getLightJets(ChosenBTagOption)).size() >=2){
+        if((bTagStudy.getbTaggedJets(ChosenBTagOption)).size() >= 2 && (bTagStudy.getLightJets(ChosenBTagOption)).size() >=2){ 
+
 	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() >= 2)
-	      bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);
-	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() >= 2){
-	      NrEventsWithTwoLightJets++;
-	      if( (bTagStudy.getLightJets(ChosenBTagOption)).size() > 2){
-		NrEventsWithMoreThanTwoLightJets++;
-	        bTagStudy.CorrectJetCombi5Jets(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);
-	      }
-	    }
+	      bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);      //4-jet case
+	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() > 2)
+	      bTagStudy.CorrectJetCombi5Jets(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption); //5-jet case
         }
         else{
 	    if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
@@ -1409,7 +1404,7 @@ int main (int argc, char *argv[])
       //   --> No veto on light jets!          //
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
       //
-      if((bTagStudy.getbTaggedJets(3)).size() < 2) continue;
+      if((bTagStudy.getbTaggedJets(ChosenBTagOption)).size() < 2) continue;
       
       // Count the number of events:
       if(eventselectedSemiMu) nSelectedMu++;
@@ -1417,27 +1412,35 @@ int main (int argc, char *argv[])
       
       //--> Now check whether improvement is obtained when adding another light jet (so look at three jet possibilities!)
       if( (bTagStudy.getLightJets(3)).size() >2 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999 && CorrectBLeptonic != 9999 && CorrectBHadronic != 9999){
-	 MoreThanTwoLightJets++;
 	 if(verbose > 3){
-	   std::cout << " Check whether the third light jet can be matched with the correct quarks: " << std::endl;
+	   std::cout << " \n Check whether the third light jet can be matched with the correct quarks: " << std::endl;
 	   std::cout << " Correct quark indices         : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
 	   std::cout << " Three first light jet indices : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
-	   std::cout << " ------------ " << std::endl;
  	 }
 
-	 if(CorrectQuark1 == (bTagStudy.getLightJets(3))[2] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2])
-		ThirdJetIsCorrectQuark++;
-
-	 //Count how often the correct event topology is found:
 	 if( ( CorrectQuark1 == (bTagStudy.getLightJets(3))[0] || CorrectQuark1 == (bTagStudy.getLightJets(3))[1] || CorrectQuark1 == (bTagStudy.getLightJets(3))[2] ) &&
  	     ( CorrectQuark2 == (bTagStudy.getLightJets(3))[0] || CorrectQuark2 == (bTagStudy.getLightJets(3))[1] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2] ) &&
 	     ( CorrectBLeptonic == (bTagStudy.getbTaggedJets(3))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(3))[1] ) &&
              ( CorrectBHadronic == (bTagStudy.getbTaggedJets(3))[0] || CorrectBHadronic == (bTagStudy.getbTaggedJets(3))[1] ) ){
 		FiveJetsAllCorrect++;
-	 }
-	 else{
-		FiveJetsOneWrong++;
-	 }
+		if( CorrectQuark1 == (bTagStudy.getLightJets(3))[2] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2] ){
+		    ThirdJetIsCorrectQuark++;
+		    std::cout << " \n Accepted with method 1 ! " << std::endl;
+		    std::cout << " Correct quark indices : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
+		    std::cout << " Light jet indices     : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
+		}
+	}
+
+	 if( (CorrectQuark1 == (bTagStudy.getLightJets(3))[2] && (CorrectQuark2 == (bTagStudy.getLightJets(3))[0] || CorrectQuark2 == (bTagStudy.getLightJets(3))[1]) ) || 
+	     (CorrectQuark2 == (bTagStudy.getLightJets(3))[2] && (CorrectQuark1 == (bTagStudy.getLightJets(3))[0] || CorrectQuark1 == (bTagStudy.getLightJets(3))[1]) ) ){
+		//ThirdJetIsCorrectQuark++;
+		std::cout << " Accepted with method 2 ! " << std::endl;
+                    std::cout << " Correct quark indices : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
+                    std::cout << " Light jet indices     : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
+		   std::cout << " " << std::endl;
+
+		//std::cout << " ----------->   Third jet is correct quark !! " << std::endl;
+	}
       }
   
       ////////////////////////////////
@@ -1449,6 +1452,7 @@ int main (int argc, char *argv[])
       if(CorrectBLeptonic != 9999) MlbCorrect = (*selectedLepton+*selectedJets[CorrectBLeptonic]).M();
       if(CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999) MqqbCorrect = (*selectedJets[CorrectBHadronic] + *selectedJets[CorrectQuark1] + *selectedJets[CorrectQuark2]).M();
       h_MlbMqqbCorrectAll.Fill(MqqbCorrect,MlbCorrect);
+
       vector<int> CorrectValues;  //Find better solution!
       CorrectValues.clear();
       CorrectValues.push_back(CorrectBLeptonic);
@@ -1588,25 +1592,23 @@ int main (int argc, char *argv[])
     cout<<endl; 
     cout << "-> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuLCSV << " have two or more Light wp CSV b-tags, " << nSelectedMuMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedMuTCSV << " have two or more Tight wp CSV b-tags " << endl;
     cout << "-> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElLCSV << " have two or more Light wp CSV b-tags, " << nSelectedElMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedElTCSV << " have two or more Tight wp CSV b-tags " << endl;
-    cout << "-> " << nLargeMCSVEvents << " events with more than 2 Medium CSV b-tags ( " << nLargeTCSVEvents << " with 2 Tight CSV b-tags) --> Reject these events! " << endl;
+    //cout << "-> " << nLargeMCSVEvents << " events with more than 2 Medium CSV b-tags ( " << nLargeTCSVEvents << " with 2 Tight CSV b-tags) --> Reject these events! " << endl;
 
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
     
     //Output for 4 of 5 jet-case!
-    std::cout << " Number of events with at least two light jets : " << AtLeastTwoLightJets << std::endl;
-    std::cout << " Number of times more than two light jets have been found : " << MoreThanTwoLightJets << std::endl;
-    std::cout << " Number of times the third jet is one of the correct ones : " << ThirdJetIsCorrectQuark << std::endl;
+    std::cout << " Events with at least two light jets : " << bTagStudy.getNrEventsWithTwoLightJetsAndBTagged(ChosenBTagOption)   << std::endl;
+    std::cout << " Events with more than two light jets: " << bTagStudy.getNrEventsWithThreeLightJetsAndBTagged(ChosenBTagOption) << std::endl;
+    cout << " Number of times the third jet is one of the correct ones : " << ThirdJetIsCorrectQuark      << " (from class : " << bTagStudy.getNrTimesThirdJetIsActualQuark(ChosenBTagOption) << " )"<<endl;
     std::cout << " ------------------------ " << std::endl;
     std::cout << " Four jets case (all correct vs one wrong): " << bTagStudy.getNrCorrectMatchedEvts(ChosenBTagOption) << " vs " << bTagStudy.getNrWrongMatchedEvts(ChosenBTagOption) << std::endl;
     std::cout << " Signal over background in case of 4 jets : " << bTagStudy.getSignalOverBkg(ChosenBTagOption) << std::endl;
-    std::cout << " Five jets case (all correct vs one wrong): " << FiveJetsAllCorrect << " vs " << FiveJetsOneWrong << std::endl;
-    std::cout << " Signal over background in case of 5 jets : " << (float)FiveJetsAllCorrect/(float)FiveJetsOneWrong << std::endl;
+    std::cout << " Five jets case all correct (code vs class): " << FiveJetsAllCorrect << " vs " << bTagStudy.getNrCorrectMatchedEvts5Jets(ChosenBTagOption) << std::endl;
+    //std::cout << " Signal over background in case of 5 jets : " << (float)FiveJetsAllCorrect/(float)FiveJetsOneWrong << std::endl;
     std::cout << " Signal over background from class (5)    : " << bTagStudy.getSignalOverBkg5Jets(ChosenBTagOption) << std::endl;
     std::cout << " " << std::endl;
-    std::cout << " Number of events with at least two light jets   : " << NrEventsWithTwoLightJets << std::endl;
-    std::cout << " Number of events with at least three light jets : " << NrEventsWithMoreThanTwoLightJets << std::endl;
 
     //////////////////////////////
     //  Jet combination output  //
