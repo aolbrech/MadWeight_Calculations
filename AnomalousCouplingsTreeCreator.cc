@@ -95,6 +95,8 @@ int main (int argc, char *argv[])
   bool GenLHCOOutput = false;
   bool RecoLHCOOutput = false;  
 
+  bool FinalEventSelectionChoiceIsMade = false;
+
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
   const int ChosenBTagOption = 3;  //2 T b-tags!!
@@ -118,8 +120,6 @@ int main (int argc, char *argv[])
 
   //Values needed for comparison between 4-jet and 5-jet case (Hence having the choice between three light jets!)
   int NrConsideredJets = 5;  //Options are 4 or 5
-  unsigned int ThirdJetIsCorrectQuark = 0;
-  int FiveJetsAllCorrect = 0;
 
   ////////////////////////////////////
   /// AnalysisEnvironment  
@@ -447,7 +447,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 50000; ievt++){
+    for (unsigned int ievt = 0; ievt < 500; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1297,6 +1297,7 @@ int main (int argc, char *argv[])
 
 	   for(int jj = 0; jj < 2; jj++){      //Only look at the two leading jets!
 
+
 	      //Kinematic information for the light (= Non LCSV jets)
 	      if((bTagStudy.getLightJets(0)).size()>=2){
 	        h_CSVDiscrLCSVLightJets.Fill(selectedJets[(bTagStudy.getLightJets(0))[jj]]->btag_combinedSecondaryVertexBJetTags());   
@@ -1312,6 +1313,31 @@ int main (int argc, char *argv[])
 	        }
 	      }//End of light (= non LCSV) jets
 
+	      //********** Try to combine this with a loop !!
+	      // ==> Use vector of TH1F's!
+	      // + Add the event selection counter for each option!
+/*	      TH1F CosThetaHistos[3] = {h_StandardCosThetaLCSV, h_StandardCosThetaMCSV, h_StandardCosThetaTCSV};      --> Empty histograms for the moment ! 
+	      TH1F JetTypeHistos[3]  = {h_JetTypeLCSV         , h_JetTypeMCSV        ,  h_JetTypeTCSV         };
+	      int  bTagOption[3]     = {0                     , 1                    ,  3                     };
+	      int nSelectedEvtsMu[3] = {nSelectedMuLCSV       , nSelectedMuMCSV      , nSelectedMuTCSV        };
+              int nSelectedEvtsEl[3] = {nSelectedElLCSV       , nSelectedElMCSV      , nSelectedElTCSV        };
+
+	      for(int options = 0; options < 3; options++){
+		if( (bTagStudy.getbTaggedJets(bTagOption[options])).size() >= 2){
+		   CosThetaHistos[options].Fill(standardCosTheta);
+		   if(eventselectedSemiMu) nSelectedEvtsMu[options]++;    //Maybe not possible to have existing integers as elements!
+		   if(eventselectedSemiEl) nSelectedEvtsEl[options]++;
+
+		   for(int ii = 0; ii < JetPartonPair.size(); ii++){                            //Look at all the matched jets
+		      if( (bTagStudy.getbTaggedJets(options))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!	
+			JetTypeHistos[options].Fill( mcParticlesMatching[JetPartonPair[ii].second].type() );
+		      }
+		      else
+			JetTypeHistos[options].Fill(25.);
+		   }
+		}
+	      }
+*/	
 	      //Kinematic information for the Loose b-jets
               if((bTagStudy.getbTaggedJets(0)).size() >=2){
                 h_StandardCosThetaLCSV.Fill(standardCosTheta);
@@ -1372,9 +1398,13 @@ int main (int argc, char *argv[])
         if((bTagStudy.getbTaggedJets(3)).size() >= 2 && eventselectedSemiEl) nSelectedElTCSV++;
         if((bTagStudy.getbTaggedJets(3)).size() > 2) nLargeTCSVEvents++;
 
-      }//End of loop for NrConsideredBTagOptions larger than 1!
+      }
+      ///////////////////////////////////////////////////////////////
+      //   End of loop for NrConsideredBTagOptions larger than 1   //
+      ///////////////////////////////////////////////////////////////
       else if(NrConsideredBTagOptions == 1){
-	bTagStudy.CalculateJets(selectedJets, BJetWP[ChosenBTagOption], LightJetWP[ChosenBTagOption], ChosenBTagOption);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
+	bTagStudy.CalculateJets(selectedJets, BJetWP[ChosenBTagOption], LightJetWP[ChosenBTagOption], ChosenBTagOption);  
+	//First float is the working point for the b-jets, the second is the one for the light jets!! 
         //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
 
         if(verbose > 3){
@@ -1409,7 +1439,7 @@ int main (int argc, char *argv[])
       // Count the number of events:
       if(eventselectedSemiMu) nSelectedMu++;
       if(eventselectedSemiEl) nSelectedEl++;
-      
+     
       //--> Now check whether improvement is obtained when adding another light jet (so look at three jet possibilities!)
       if( (bTagStudy.getLightJets(3)).size() >2 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999 && CorrectBLeptonic != 9999 && CorrectBHadronic != 9999){
 	 if(verbose > 3){
@@ -1417,30 +1447,6 @@ int main (int argc, char *argv[])
 	   std::cout << " Correct quark indices         : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
 	   std::cout << " Three first light jet indices : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
  	 }
-
-	 if( ( CorrectQuark1 == (bTagStudy.getLightJets(3))[0] || CorrectQuark1 == (bTagStudy.getLightJets(3))[1] || CorrectQuark1 == (bTagStudy.getLightJets(3))[2] ) &&
- 	     ( CorrectQuark2 == (bTagStudy.getLightJets(3))[0] || CorrectQuark2 == (bTagStudy.getLightJets(3))[1] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2] ) &&
-	     ( CorrectBLeptonic == (bTagStudy.getbTaggedJets(3))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(3))[1] ) &&
-             ( CorrectBHadronic == (bTagStudy.getbTaggedJets(3))[0] || CorrectBHadronic == (bTagStudy.getbTaggedJets(3))[1] ) ){
-		FiveJetsAllCorrect++;
-		if( CorrectQuark1 == (bTagStudy.getLightJets(3))[2] || CorrectQuark2 == (bTagStudy.getLightJets(3))[2] ){
-		    ThirdJetIsCorrectQuark++;
-		    std::cout << " \n Accepted with method 1 ! " << std::endl;
-		    std::cout << " Correct quark indices : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
-		    std::cout << " Light jet indices     : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
-		}
-	}
-
-	 if( (CorrectQuark1 == (bTagStudy.getLightJets(3))[2] && (CorrectQuark2 == (bTagStudy.getLightJets(3))[0] || CorrectQuark2 == (bTagStudy.getLightJets(3))[1]) ) || 
-	     (CorrectQuark2 == (bTagStudy.getLightJets(3))[2] && (CorrectQuark1 == (bTagStudy.getLightJets(3))[0] || CorrectQuark1 == (bTagStudy.getLightJets(3))[1]) ) ){
-		//ThirdJetIsCorrectQuark++;
-		std::cout << " Accepted with method 2 ! " << std::endl;
-                    std::cout << " Correct quark indices : " << CorrectQuark1 << " & " << CorrectQuark2 << std::endl;
-                    std::cout << " Light jet indices     : " << (bTagStudy.getLightJets(3))[0] << " , " << (bTagStudy.getLightJets(3))[1] << " & " << (bTagStudy.getLightJets(3))[2] << std::endl;
-		   std::cout << " " << std::endl;
-
-		//std::cout << " ----------->   Third jet is correct quark !! " << std::endl;
-	}
       }
   
       ////////////////////////////////
@@ -1460,11 +1466,15 @@ int main (int argc, char *argv[])
       CorrectValues.push_back(CorrectQuark1);
       CorrectValues.push_back(CorrectQuark2);
      
-      //Should not go over this loop if the b-tag option is already chosen! 
+      //****************************************//
+      //  Loop can be kept, since if NrConsideredBTagOptions == 1 only 1 case will be considered  //
+      //    --> If this is the case, force the option to be the one chosen above!!                //
+      //******************************************************************************************//
       for(int Option = 0; Option < NrConsideredBTagOptions; Option++){
-	mlbStudy.calculateChiSquared(CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb, Option);
-	mlbStudy.calculateEfficiency(Option, CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option));
+	if(NrConsideredBTagOptions == 1) Option = ChosenBTagOption;    //Force Option to be equal to the one chosen!
 
+	mlbStudy.calculateChiSquared(CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
+	mlbStudy.calculateEfficiency(Option, CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option));
 
 	if(bTagStudy.getbTaggedJets(Option).size() >1 && bTagStudy.getLightJets(Option).size() > 1){
 
@@ -1477,15 +1487,15 @@ int main (int argc, char *argv[])
 	  
 	  // Match the jet number to the particles
 	  LeptonicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBLept()]);
-	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()]);
+	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()]);          
         }
       }
 
-      //************************************************************//   
-      //  Only go on with events with exactly 2 Medium CSV b-tags:  //
-      //************************************************************//
-      //Only consider events with exactly two M CSV b-tags !
-      if((bTagStudy.getbTaggedJets(1)).size() != 2) continue;
+      //************************************************************************************//   
+      //  Only go on to produce the .lhco output if final event selection choice is made !! //
+      //************************************************************************************//
+      //
+      if( FinalEventSelectionChoiceIsMade == false || RecoLHCOOutput == false) continue;
 
       /////////////////////////////////////////////////////////
       //   Reconstructing Lepton & Neutrino (partially)      //
@@ -1599,16 +1609,21 @@ int main (int argc, char *argv[])
     cout << " " << endl;
     
     //Output for 4 of 5 jet-case!
-    std::cout << " Events with at least two light jets : " << bTagStudy.getNrEventsWithTwoLightJetsAndBTagged(ChosenBTagOption)   << std::endl;
-    std::cout << " Events with more than two light jets: " << bTagStudy.getNrEventsWithThreeLightJetsAndBTagged(ChosenBTagOption) << std::endl;
-    cout << " Number of times the third jet is one of the correct ones : " << ThirdJetIsCorrectQuark      << " (from class : " << bTagStudy.getNrTimesThirdJetIsActualQuark(ChosenBTagOption) << " )"<<endl;
+    std::cout << " ********************************************* " << std::endl;
+    std::cout << " **  Output for 4- or 5-jet case choice !!  ** " << std::endl;
+    std::cout << " ********************************************* " << std::endl;
+    std::cout << " BTagged events with at least two light jets : " << bTagStudy.getNrEventsWithTwoLightJetsAndBTagged(ChosenBTagOption)   << std::endl;
+    std::cout << " BTagged events with more than two light jets: " << bTagStudy.getNrEventsWithThreeLightJetsAndBTagged(ChosenBTagOption) << std::endl;
+    std::cout << " Number of times the third jet is one of the correct ones : " << bTagStudy.getNrTimesThirdJetIsActualQuark(ChosenBTagOption)  ;
+    std::cout << "  ==> In " << (float)((float)(bTagStudy.getNrTimesThirdJetIsActualQuark(ChosenBTagOption)*100.0)/((float)bTagStudy.getNrEventsWithThreeLightJetsAndBTagged(ChosenBTagOption))) << " \% of the cases an improvement is found when adding a third light jet !! " << std::endl;
+    std::cout << " Number of times the third light jet is correct (no b's)  : " << bTagStudy.getNrTimesThirdJetIsCorrectQuark(ChosenBTagOption) << std::endl;
     std::cout << " ------------------------ " << std::endl;
     std::cout << " Four jets case (all correct vs one wrong): " << bTagStudy.getNrCorrectMatchedEvts(ChosenBTagOption) << " vs " << bTagStudy.getNrWrongMatchedEvts(ChosenBTagOption) << std::endl;
     std::cout << " Signal over background in case of 4 jets : " << bTagStudy.getSignalOverBkg(ChosenBTagOption) << std::endl;
-    std::cout << " Five jets case all correct (code vs class): " << FiveJetsAllCorrect << " vs " << bTagStudy.getNrCorrectMatchedEvts5Jets(ChosenBTagOption) << std::endl;
-    //std::cout << " Signal over background in case of 5 jets : " << (float)FiveJetsAllCorrect/(float)FiveJetsOneWrong << std::endl;
-    std::cout << " Signal over background from class (5)    : " << bTagStudy.getSignalOverBkg5Jets(ChosenBTagOption) << std::endl;
-    std::cout << " " << std::endl;
+    std::cout << " Five jets case (all correct vs one wrong): " << bTagStudy.getNrCorrectMatchedEvts5Jets(ChosenBTagOption) << " vs " << bTagStudy.getNrWrongMatchedEvts5Jets(ChosenBTagOption) << std::endl;
+    std::cout << " Signal over background in case of 5 jets : " << bTagStudy.getSignalOverBkg5Jets(ChosenBTagOption) << std::endl;
+    std::cout << " Signal over background for 4 & 5 jets    : " << (float)(bTagStudy.getNrCorrectMatchedEvts(ChosenBTagOption)+bTagStudy.getNrCorrectMatchedEvts5Jets(ChosenBTagOption))/(bTagStudy.getNrWrongMatchedEvts(ChosenBTagOption)+bTagStudy.getNrWrongMatchedEvts5Jets(ChosenBTagOption)) << std::endl;
+    std::cout << " ------------------------------------------------------------------------- \n" << std::endl;
 
     //////////////////////////////
     //  Jet combination output  //
