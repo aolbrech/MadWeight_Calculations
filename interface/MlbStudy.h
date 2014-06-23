@@ -25,14 +25,10 @@ class MlbStudy{
    void initializePerEvent();
    void initializeBegin();
 
-   int chosenBHadr, chosenBLept;
-   int chosenQuarks[2];
-   float ChiSquared[6];
+   int chosenBHadr, chosenBLept, chosenQuark1, chosenQuark2;
    int LowestChiSq;                //Since Mqqb Values are set artificially high, only the first two chi-sq will be the lowest one in the case of only 4 jets!
 
-   float MlbValues[6];
-   float MqqbValues[6];
-   
+   float MlbValues[6], MqqbValues[6], ChiSquared[6];
 
    vector<float> h_CorrectOptionChiSq;
    vector<float> h_WrongOptionChiSq;
@@ -47,6 +43,8 @@ class MlbStudy{
 
    int getChosenBLept() {return chosenBLept;};
    int getChosenBHadr() {return chosenBHadr;};
+   int getChosenQuark1(){return chosenQuark1;};
+   int getChosenQuark2(){return chosenQuark2;};
    vector<float> getHistoCorrectOptionChiSq() {return h_CorrectOptionChiSq;};
    vector<float> getHistoWrongOptionChiSq()   {return h_WrongOptionChiSq;};
 

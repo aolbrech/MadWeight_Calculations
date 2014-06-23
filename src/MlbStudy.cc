@@ -10,10 +10,14 @@
 void MlbStudy::initializePerEvent(){
  
   for(int ii = 0; ii < 6; ii++){
-     ChiSquared[ii] = 0.;
-     MlbValues[ii] = 0.;
-     MqqbValues[ii] = 0.;
+     ChiSquared[ii] = 999.;
+     MlbValues[ii] = 999.;
+     MqqbValues[ii] = 999.;
   }
+  chosenBLept = 999; //This means that the hightest Pt jet is considered as the leptonic b-jet!
+  chosenBHadr = 999;
+  chosenQuark1 = 999;
+  chosenQuark2 = 999;
 }
 
 void MlbStudy::initializeBegin(){
@@ -31,9 +35,10 @@ void MlbStudy::calculateChiSquared(vector<int> CorrectValues, vector<int> bTagge
        float MqqbValuesLocal[6] = {(*Jets[bTaggedJets[1]] + *Jets[lightJets[0]] + *Jets[lightJets[1]]).M(), (*Jets[bTaggedJets[0]] + *Jets[lightJets[0]] + *Jets[lightJets[1]]).M(),
 	         	       10000., 10000.,10000., 10000.};
        if(lightJets.size() > 2){  //5-jet case!
-         float MqqbValuesLocal[6] = {(*Jets[bTaggedJets[1]] + *Jets[lightJets[0]] + *Jets[lightJets[1]]).M(), (*Jets[bTaggedJets[0]] + *Jets[lightJets[0]] + *Jets[lightJets[1]]).M(),
-	         	             (*Jets[bTaggedJets[1]] + *Jets[lightJets[0]] + *Jets[lightJets[2]]).M(), (*Jets[bTaggedJets[0]] + *Jets[lightJets[0]] + *Jets[lightJets[2]]).M(),
-				     (*Jets[bTaggedJets[1]] + *Jets[lightJets[1]] + *Jets[lightJets[2]]).M(), (*Jets[bTaggedJets[0]] + *Jets[lightJets[1]] + *Jets[lightJets[2]]).M()};
+         MqqbValuesLocal[2] = (*Jets[bTaggedJets[1]] + *Jets[lightJets[0]] + *Jets[lightJets[2]]).M();
+	 MqqbValuesLocal[3] = (*Jets[bTaggedJets[0]] + *Jets[lightJets[0]] + *Jets[lightJets[2]]).M();
+	 MqqbValuesLocal[4] = (*Jets[bTaggedJets[1]] + *Jets[lightJets[1]] + *Jets[lightJets[2]]).M();
+	 MqqbValuesLocal[5] = (*Jets[bTaggedJets[0]] + *Jets[lightJets[1]] + *Jets[lightJets[2]]).M();
        }
 
        //Copy events to general MlbValues and MqqbValues array!
@@ -43,30 +48,22 @@ void MlbStudy::calculateChiSquared(vector<int> CorrectValues, vector<int> bTagge
        }
 
        LowestChiSq = 0;
-
-	std::cout << " MqqbValues in class : " << MqqbValues[0] << ", " << MqqbValues[1] << ", " << MqqbValues[2] << ", " << MqqbValues[3] << ", " << MqqbValues[4] << ", " << MqqbValues[5] << std::endl;
-
        for(int ii = 0; ii<6; ii++){
            ChiSquared[ii] = ((MassMlb-MlbValues[ii])/SigmaMlb)*((MassMlb-MlbValues[ii])/SigmaMlb) + ((MassMqqb - MqqbValues[ii])/SigmaMqqb)*((MassMqqb - MqqbValues[ii])/SigmaMqqb);
-	   if(ii == 0) LowestChiSq = ChiSquared[0];
-	   if( ii > 0 && ChiSquared[ii] < LowestChiSq)
+	   if(ii == 0) LowestChiSq = 0;
+	   if( ii > 0 && ChiSquared[ii] < ChiSquared[LowestChiSq])
 	      LowestChiSq = ii; 
        }
 
        //Match the correct indices to the quarks!
-       chosenBLept=0;           //This means that the hightest Pt jet is considered as the leptonic b-jet! 
-       chosenBHadr=1;
-       int chosenQuarks[2] = {0,1};
-
-       //if( LowestChiSq == 0 ||2 || 4
-
-
-   }
-   else{
-	chosenBLept = 999;
-	chosenBHadr = 999;
-	ChiSquared[0] = 999;
-	ChiSquared[1] = 999;
+       // --> b-jets
+       if( LowestChiSq == 0 || LowestChiSq == 2 || LowestChiSq == 4){ chosenBLept = 0; chosenBHadr = 1;}
+       else                                                         { chosenBLept = 1; chosenBHadr = 1;}
+       // --> light jets
+       if      ( LowestChiSq == 0 || LowestChiSq == 1){ chosenQuark1 = 0; chosenQuark2 = 1;}
+       else if ( LowestChiSq == 2 || LowestChiSq == 3){ chosenQuark1 = 0; chosenQuark2 = 2;}
+       else if ( LowestChiSq == 4 || LowestChiSq == 5){ chosenQuark1 = 1; chosenQuark2 = 2;}
+	 
    }
 }
 
