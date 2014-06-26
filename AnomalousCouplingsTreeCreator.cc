@@ -96,6 +96,7 @@ int main (int argc, char *argv[])
   bool RecoLHCOOutput = false;  
 
   bool FinalEventSelectionChoiceIsMade = false;
+  int CorrectEventFound5Jets = 0, CorrectEventFound4Jets = 0;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
@@ -446,8 +447,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 500000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1453,7 +1454,7 @@ int main (int argc, char *argv[])
       //  Mlb and Mqqb information  //
       ////////////////////////////////
       //
-      vector<int> LeptonicB, HadronicB;
+      vector<int> LeptonicB, HadronicB, Quark1, Quark2;
       float MlbCorrect = 0, MqqbCorrect = 0;
       if(CorrectBLeptonic != 9999) MlbCorrect = (*selectedLepton+*selectedJets[CorrectBLeptonic]).M();
       if(CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999) MqqbCorrect = (*selectedJets[CorrectBHadronic] + *selectedJets[CorrectQuark1] + *selectedJets[CorrectQuark2]).M();
@@ -1474,20 +1475,42 @@ int main (int argc, char *argv[])
 	if(NrConsideredBTagOptions == 1) Option = ChosenBTagOption;    //Force Option to be equal to the one chosen!
 
 	mlbStudy.calculateChiSquared(CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
-	mlbStudy.calculateEfficiency(Option, CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option));
 
 	if(bTagStudy.getbTaggedJets(Option).size() >1 && bTagStudy.getLightJets(Option).size() > 1){
 
+	//TODO --> Update!!
 	  if( (CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[1]) &
 	      (CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[1] || CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[0]) &&
-	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
-	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0] || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
+	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
+	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
 		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
-	  }
-	  
+	  } 
+	
+	  mlbStudy.calculateEfficiency(Option, CorrectValues, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions );
+
 	  // Match the jet number to the particles
-	  LeptonicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBLept()]);
-	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()]);          
+	  mlbStudy.getIndices(mlbStudy.getLowestChiSqIndex());   //Or use .getLowestChiSq4JetsIndex() when only considering the 4-jet case!
+	  LeptonicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBLept()]);   //!! Probably not possible to use push_back ...
+	  HadronicB.push_back(bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()]);
+          Quark1.push_back(bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()]);
+	  Quark2.push_back(bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()]);
+
+	  //Looking how often the correct event is found (in the 5-jet case):    --> Have to ask .getIndices() since otherwise last call from class will be used!
+	  if( (CorrectBLeptonic == bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBLept()] ) &&
+	      (CorrectBHadronic == bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()] ) &&
+	      (CorrectQuark1    == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()] || CorrectQuark1 == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()] ) &&
+	      (CorrectQuark2    == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()] || CorrectQuark2 == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()] ) ){
+		CorrectEventFound5Jets++;
+	  }
+
+	  mlbStudy.getIndices(mlbStudy.getLowestChiSq4JetsIndex());
+          //Looking how often the correct event is found (in the 5-jet case):    --> Have to ask .getIndices() since otherwise last call from class will be used!
+          if( (CorrectBLeptonic == bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBLept()] ) &&
+              (CorrectBHadronic == bTagStudy.getbTaggedJets(Option)[mlbStudy.getChosenBHadr()] ) &&
+              (CorrectQuark1    == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()] || CorrectQuark1 == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()] ) &&
+              (CorrectQuark2    == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()] || CorrectQuark2 == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()] ) )
+                CorrectEventFound4Jets++;
+          
         }
       }
 
@@ -1629,33 +1652,58 @@ int main (int argc, char *argv[])
     //  Jet combination output  //
     //////////////////////////////
     //--> Save directly to .tex output as a table
+    ofstream eventSelOutput;
+    int BTagOptionOfInterest;
+    std::string OptionName5Jets[6];
+    std::string OptionName4Jets[6];
     if(NrConsideredBTagOptions > 1){
-      ofstream eventSelOutput;
       eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
-
-      bTagStudy.ReturnTable(OptionName, 0, NrConsideredBTagOptions, eventSelOutput);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
-      bTagStudy.ReturnTable(OptionName, 1, NrConsideredBTagOptions, eventSelOutput);
-      bTagStudy.ReturnTable(OptionName, 2, NrConsideredBTagOptions, eventSelOutput);
-      eventSelOutput.close();
-    
-      //////////////////////////////
-      //  Mlb combination output  //
-      //////////////////////////////
-      ofstream mlbOutput;
-      mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");
-      mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, mlbOutput);
-      mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, mlbOutput);
-      mlbOutput.close();
-
-      TH1F h_CorrectOptionChiSq("CorrectOptionChiSq","CorrectOptionChiSq",200,0,100);
-      TH1F h_WrongOptionChiSq("WrongOptionChiSq","WrongOptionChiSq",200,0,100);
-      for(int ii = 0; ii < (mlbStudy.getHistoCorrectOptionChiSq()).size(); ii++)
-         h_CorrectOptionChiSq.Fill((mlbStudy.getHistoCorrectOptionChiSq())[ii]);
-
-      for(int ii = 0; ii < (mlbStudy.getHistoWrongOptionChiSq()).size(); ii++)
-         h_WrongOptionChiSq.Fill((mlbStudy.getHistoWrongOptionChiSq())[ii]);
+      BTagOptionOfInterest = 7;
+      for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = OptionName[ii]; OptionName5Jets[ii] = OptionName[ii];}
+    }
+    if(NrConsideredBTagOptions == 1){
+      eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionTableForChosenCombination.tex");
+      for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case with "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case with "+OptionName[ii];}
+      BTagOptionOfInterest = ChosenBTagOption;
     }
 
+    bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 0, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
+    bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 1, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);
+    bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 2, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);
+    eventSelOutput.close();
+        
+    //////////////////////////////
+    //  Mlb combination output  //
+    //////////////////////////////
+    std::cout << " Number of correct reconstructed events for 5-jet case using Mlb method : " << CorrectEventFound5Jets << std::endl;
+    std::cout << " Number of correct reconstructed events for 4-jet case using Mlb method : " << CorrectEventFound4Jets << std::endl;
+
+    ofstream mlbOutput;
+    int OptionOfInterest;
+    if(NrConsideredBTagOptions > 1 ){ 
+	mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");              
+	OptionOfInterest = 7;
+    } 
+    //In above case the OptionOfInterest variable will not be used inside the class! Is only used when only one bTag should be considered!
+    if(NrConsideredBTagOptions == 1){ 
+	mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbTableForChosenCombination.tex"); 
+	OptionOfInterest = ChosenBTagOption;
+	OptionName[ChosenBTagOption+2] = " Pure 5 jet case with "+OptionName[ChosenBTagOption];
+        OptionName[ChosenBTagOption+1] = " 4 jet case with      "+OptionName[ChosenBTagOption];
+	OptionName[ChosenBTagOption] =   " 5 jet case with      "+OptionName[ChosenBTagOption];
+    }
+    mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //All 4 jets correctly matched
+    mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //Only b-jets correctly matched
+    mlbOutput.close();
+
+   TH1F h_CorrectOptionChiSq("CorrectOptionChiSq","CorrectOptionChiSq",200,0,100);
+   TH1F h_WrongOptionChiSq("WrongOptionChiSq","WrongOptionChiSq",200,0,100);
+   //for(int ii = 0; ii < (mlbStudy.getHistoCorrectOptionChiSq()).size(); ii++)
+   //  h_CorrectOptionChiSq.Fill((mlbStudy.getHistoCorrectOptionChiSq())[ii]);
+
+   //for(int ii = 0; ii < (mlbStudy.getHistoWrongOptionChiSq()).size(); ii++)
+   //  h_WrongOptionChiSq.Fill((mlbStudy.getHistoWrongOptionChiSq())[ii]);
+   
     //Close the LHCO Output files!
     for(int ii = 0; ii<16; ii++){
       if(ii < 4) outFile[ii].close();	
