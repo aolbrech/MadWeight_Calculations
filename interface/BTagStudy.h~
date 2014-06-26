@@ -2,7 +2,7 @@
 #define BTagStudy_h
 
 #include <string>
-//#include <vector>
+#include <vector>
 #include <iostream>
 #include <math.h>
 
@@ -22,7 +22,7 @@ class BTagStudy{
    void CalculateJets(vector<TRootJet*>, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr);
    void CorrectJetCombi(int, int, int, int, int);
    void CorrectJetCombi5Jets(int, int, int, int, int);
-   void ReturnTable(std::string NameOfOption[6], int WhichJets, int NrOptionsConsidered, ofstream &output);  //Automatically writes everything out into a .tex file!
+   void ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets, int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest);//Automatically writes everything out into a .tex file!
 
    vector<int> bTaggedJetNr[6];
    vector<int> NonbTaggedJetNr[6];
