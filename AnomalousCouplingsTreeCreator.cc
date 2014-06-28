@@ -437,6 +437,7 @@ int main (int argc, char *argv[])
     BTagStudy bTagStudy;  //--> Should only be called before the event loop (otherwise the counters will not give the correct result)
     bTagStudy.InitializeBegin();
     MlbStudy mlbStudy;
+    mlbStudy.initializeBegin();
 
     ////////////////////////////////////
     //	loop on events
@@ -447,8 +448,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 500000; ievt++){
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    for (unsigned int ievt = 0; ievt < 5000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1510,7 +1511,6 @@ int main (int argc, char *argv[])
               (CorrectQuark1    == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()] || CorrectQuark1 == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()] ) &&
               (CorrectQuark2    == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark1()] || CorrectQuark2 == bTagStudy.getLightJets(Option)[mlbStudy.getChosenQuark2()] ) )
                 CorrectEventFound4Jets++;
-          
         }
       }
 
@@ -1520,28 +1520,17 @@ int main (int argc, char *argv[])
       //
       if( FinalEventSelectionChoiceIsMade == false || RecoLHCOOutput == false) continue;
 
-      /////////////////////////////////////////////////////////
-      //   Reconstructing Lepton & Neutrino (partially)      //
-      //   -> Neutrino Pt and M needs to be known for .lhco  //
-      /////////////////////////////////////////////////////////  
-      //  --> Only do this part for the combination which is actually chosen!
-      float UsedLeptonicB = 0;
-      float UsedHadronicB = 1;
-      float UsedQuark1 = 2;   //--> Quarks need to be interchanged, but for the neutrino values this doesn't make any difference!
-      float UsedQuark2 = 3;
-      NeutrinoPx = -(*selectedLepton+*selectedJets[UsedLeptonicB]+*selectedJets[UsedHadronicB]+*selectedJets[UsedQuark1]+*selectedJets[UsedQuark2]).Px();  //Need to use the jets which are actually used!
-      NeutrinoPy = -(*selectedLepton+*selectedJets[UsedLeptonicB]+*selectedJets[UsedHadronicB]+*selectedJets[UsedQuark1]+*selectedJets[UsedQuark2]).Py();
-      Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
-      Neutrino.SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, Neutrino.Pt());  //Reset the Neutrino Energy to get the correct precision
-      if(verbosity > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
+      //Array of b-tagged jets and light jets for the possible configurations
+      const int NrCombi = 2;  //--> Is only 2 in the case of a chi-squared applied!
+      TLorentzVector* LeptBArray[NrCombi] = {selectedJets[(bTagStudy.getbTaggedJets(ChosenBTagOption))[mlbStudy.getChosenBLept()]],
+					     selectedJets[(bTagStudy.getbTaggedJets(ChosenBTagOption))[mlbStudy.getChosenBLept()]]};
+      TLorentzVector* HadrBArray[NrCombi] = {selectedJets[(bTagStudy.getbTaggedJets(ChosenBTagOption))[mlbStudy.getChosenBHadr()]],
+					     selectedJets[(bTagStudy.getbTaggedJets(ChosenBTagOption))[mlbStudy.getChosenBHadr()]]};
+      TLorentzVector* Quark1Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark1()]], 
+					     selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark2()]]};
+      TLorentzVector* Quark2Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark2()]], 
+					     selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark1()]]}; 
 
-
-      //Array of b-tagged jets and light jets for the 4 possible configurations
-      const int NrCombi = 4;  //--> Is only 2 in the case of a chi-squared applied!
-      TLorentzVector* LeptBArray[NrCombi] = {selectedJets[(bTagStudy.getbTaggedJets(1))[0]], selectedJets[(bTagStudy.getbTaggedJets(1))[0]], selectedJets[(bTagStudy.getbTaggedJets(1))[1]], selectedJets[(bTagStudy.getbTaggedJets(1))[1]]};
-      TLorentzVector* HadrBArray[NrCombi] = {selectedJets[(bTagStudy.getbTaggedJets(1))[1]], selectedJets[(bTagStudy.getbTaggedJets(1))[1]], selectedJets[(bTagStudy.getbTaggedJets(1))[0]], selectedJets[(bTagStudy.getbTaggedJets(1))[0]]};
-      TLorentzVector* Quark1Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(1))[0]], selectedJets[(bTagStudy.getLightJets(1))[1]], selectedJets[(bTagStudy.getLightJets(1))[0]], selectedJets[(bTagStudy.getLightJets(1))[1]]} ;
-      TLorentzVector* Quark2Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(1))[1]], selectedJets[(bTagStudy.getLightJets(1))[0]], selectedJets[(bTagStudy.getLightJets(1))[1]], selectedJets[(bTagStudy.getLightJets(1))[0]]}; 	
 
       /////////////////////////////////////////////
       //  Filling of LHCO files for reco events  //
@@ -1551,6 +1540,18 @@ int main (int argc, char *argv[])
       //Need to distinguish between charge and lepton type
       for(int ConsideredCombi = 0; ConsideredCombi <NrCombi; ConsideredCombi++){  
 	      string JetCombiString = static_cast<ostringstream*>( &(ostringstream() << ConsideredCombi) )->str();
+
+	      /////////////////////////////////////////////////////////
+	      //   Reconstructing Lepton & Neutrino (partially)      //
+	      //   -> Neutrino Pt and M needs to be known for .lhco  //
+	      /////////////////////////////////////////////////////////  
+	      //  --> Only do this part for the combination which is actually chosen!
+//	      Neutrino.clear();
+	      NeutrinoPx = -(*selectedLepton+*LeptBArray[ConsideredCombi]+*HadrBArray[ConsideredCombi]+*Quark1Array[ConsideredCombi]+*Quark2Array[ConsideredCombi]).Px();
+	      NeutrinoPy = -(*selectedLepton+*LeptBArray[ConsideredCombi]+*HadrBArray[ConsideredCombi]+*Quark1Array[ConsideredCombi]+*Quark2Array[ConsideredCombi]).Py();
+	      Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
+	      Neutrino.SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, Neutrino.Pt());  //Reset the Neutrino Energy to get the correct precision
+	      if(verbosity > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
 
 	      if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
 		      if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
@@ -1696,14 +1697,53 @@ int main (int argc, char *argv[])
     mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //Only b-jets correctly matched
     mlbOutput.close();
 
-   TH1F h_CorrectOptionChiSq("CorrectOptionChiSq","CorrectOptionChiSq",200,0,100);
-   TH1F h_WrongOptionChiSq("WrongOptionChiSq","WrongOptionChiSq",200,0,100);
-   //for(int ii = 0; ii < (mlbStudy.getHistoCorrectOptionChiSq()).size(); ii++)
-   //  h_CorrectOptionChiSq.Fill((mlbStudy.getHistoCorrectOptionChiSq())[ii]);
+   //vector<std::string> HistoTitle = {"ChiSqCorrect","ChiSqCorrectFound","ChiSqMinimum","ChiSqNotMinimum","ChiSqWrong","ChiSqCorrectWhenMatched","ChiSqMinimumWhenMatched","ChiSqNotMinimumWhenMatched","ChiSqAllWhenNotMatched"};
+   /*vector<std::string> Histoname = {"#chi^{2} distribution for the correct combination (all events)",
+				    "#chi^{2} distribution for the correct combination (when it is one of the 6 considered)",
+				    "#chi^{2} distribution of the minimal combination considered (all events)",
+				    "#chi^{2} distribution of the non-minimal combinations considered (all events)",
+				    "#chi^{2} distribution of the non-correct combinations considered (all events)",
+				    "#chi^{2} distribution for the correct combination (matched events only)",
+				    "#chi^{2} distribution for the minimal combination (matched events only)",
+				    "#chi^{2} distribution for the non-minimal combinations (matched events only)",
+				    "#chi^{2} distribution for all the combinations when the event is not matched"};
+*/
+   std::string Title[3] = {"5Jets","4Jets","Pure5Jets"};
+   std::string Name[3] =  {" - 5 jets case) "," - 4 jets case) "," - pure 5 jets case) "};
+ 
+   TH1F *h_ChiSqCorrect[3], *h_ChiSqCorrectFound[3], *h_ChiSqMinimum[3],* h_ChiSqNotMinimum[3], *h_ChiSqWrong[3];
+   TH1F *h_ChiSqCorrectWhenMatched[3], *h_ChiSqMinimumWhenMatched[3], *h_ChiSqNotMinimumWhenMatched[3], *h_ChiSqAllWhenNotMatched[3]; 
+   for(int ii = 0; ii < 3; ii++){
+     h_ChiSqCorrect[ii]     =new TH1F(("ChiSqCorrect"+Title[ii]).c_str(),     ("#chi^{2} distribution for the correct combination (all events"+Name[ii]).c_str() ,              500,0,500);
+     h_ChiSqCorrectFound[ii]=new TH1F(("ChiSqCorrectFound"+Title[ii]).c_str(),("#chi^{2} distribution for the correct combination (when found"+Name[ii]).c_str(),               500,0,500);
+     h_ChiSqMinimum[ii]     =new TH1F(("ChiSqMinimum"+Title[ii]).c_str(),     ("#chi^{2} distribution of the minimal combination considered (all events"+Name[ii]).c_str(),     500,0,500);
+     h_ChiSqNotMinimum[ii]  =new TH1F(("ChiSqNotMinimum"+Title[ii]).c_str(),  ("#chi^{2} distribution of the non-minimal combinations considered (all events"+Name[ii]).c_str(),500,0,500);
+     h_ChiSqWrong[ii]       =new TH1F(("ChiSqWrong"+Title[ii]).c_str(),       ("#chi^{2} distribution of the non-correct combinations considered (all events"+Name[ii]).c_str(),500,0,500);
+     
+     h_ChiSqCorrectWhenMatched[ii]   =new TH1F(("ChiSqCorrectWhenMatched"+Title[ii]).c_str(),("#chi^{2} distribution for the correct combination (matched events only"+Name[ii]).c_str(),        100,0,100);
+     h_ChiSqMinimumWhenMatched[ii]   =new TH1F(("ChiSqMinimumWhenMatched"+Title[ii]).c_str(),("#chi^{2} distribution for the minimal combination (matched events only"+Name[ii]).c_str(),        500,0,500);
+     h_ChiSqNotMinimumWhenMatched[ii]=new TH1F(("ChiSqNotMinimumWhenMatched"+Title[ii]).c_str(),("#chi^{2} distribution for the non-minimal combinations (matched events only"+Name[ii]).c_str(),500,0,500);
+     h_ChiSqAllWhenNotMatched[ii]    =new TH1F(("ChiSqAllWhenNotMatched"+Title[ii]).c_str(),    ("#chi^{2} distribution for all the combinations (non-matched evens only"+Name[ii]).c_str(),     500,0,500);
+   }
 
-   //for(int ii = 0; ii < (mlbStudy.getHistoWrongOptionChiSq()).size(); ii++)
-   //  h_WrongOptionChiSq.Fill((mlbStudy.getHistoWrongOptionChiSq())[ii]);
-   
+   for(int jetCase = ChosenBTagOption; jetCase <(ChosenBTagOption+3); jetCase++){
+      std::cout << " Size of ChiSqCorect : " << (mlbStudy.getChiSqCorrect(jetCase)).size() << " for jetCase : " << jetCase << std::endl;
+      for(int ii = 0; ii < (mlbStudy.getChiSqCorrect(jetCase)).size(); ii++){
+	//In mlb Class the ChosenBTagOption, ChosenBTagOption+1 and ChosenBTagOption+2 indices are filled (from the 6 options).
+	//However to reduce the number of TH1F's made, this is translated to 0,1 and 2 here in the analyzer!!
+	h_ChiSqCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrect(jetCase))[ii]);
+        h_ChiSqCorrectFound[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectFound(jetCase))[ii]);
+	h_ChiSqMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimum(jetCase))[ii]);
+	h_ChiSqNotMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimum(jetCase))[ii]);
+	h_ChiSqWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqWrong(jetCase))[ii]);
+
+	h_ChiSqCorrectWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectWhenMatched(jetCase))[ii]);
+	h_ChiSqMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
+	h_ChiSqNotMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimumWhenMatched(jetCase))[ii]);
+	h_ChiSqAllWhenNotMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqAllWhenNotMatched(jetCase))[ii]);
+      }
+   }   
+
     //Close the LHCO Output files!
     for(int ii = 0; ii<16; ii++){
       if(ii < 4) outFile[ii].close();	
@@ -1714,8 +1754,19 @@ int main (int argc, char *argv[])
     //TFile* fout = new TFile("GeneratorOutput.root","RECREATE");
     fout->cd();
 
-    //h_CorrectOptionChiSq.Write();
-    //h_WrongOptionChiSq.Write();
+    //Write down the different Chi-Sq histograms obtained from the mlb class!
+    for(int ii = 0; ii < 3; ii++){
+       h_ChiSqCorrect[ii]->Write();
+       h_ChiSqCorrectFound[ii]->Write();
+       h_ChiSqMinimum[ii]->Write();
+       h_ChiSqNotMinimum[ii]->Write();
+       h_ChiSqWrong[ii]->Write();
+
+       h_ChiSqCorrectWhenMatched[ii]->Write();
+       h_ChiSqMinimumWhenMatched[ii]->Write();
+       h_ChiSqNotMinimumWhenMatched[ii]->Write();
+       h_ChiSqAllWhenNotMatched[ii]->Write();
+    }
 
     h_StandardCosThetaNoEvtSel.Write();
     h_StandardCosThetaNoBTag.Write();
