@@ -174,7 +174,6 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
 
 	if(NrOptionsConsidered == 1){
 	  ii = OptionOfInterest;
-	  std::cout << " Looking at option : " << ii << " (inside ==1 loop ) --> Should be = " << OptionOfInterest << std::endl;
           int CorrectOnes5Jets[3] = {allFourJetsCorrectlyMatched5Jets[OptionOfInterest], twoBTagsCorrectlyMatched5Jets[OptionOfInterest] , twoLightJetsCorrectlyMatched5Jets[OptionOfInterest]};
           int WrongOnes5Jets[3] = {atLeastOneWronglyMatched5Jets[OptionOfInterest], atLeastOneBTagWronglyMatched5Jets[OptionOfInterest], atLeastOneLightJetWronglyMatched5Jets[OptionOfInterest]};
 
@@ -186,8 +185,6 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
           float(CorrectOnes5Jets[WhichJets])/float(WrongOnes5Jets[WhichJets])       << " & " <<
           NotReconstructedEvent[ii]                                                 << " \\\\ " << endl;
 	} 
-	std::cout << " Looking at option : " << ii << " (outside == 1 loop ) " << std::endl;
-
 	int CorrectOnes[3] = {allFourJetsCorrectlyMatched[ii], twoBTagsCorrectlyMatched[ii]    , twoLightJetsCorrectlyMatched[ii]};
 	int WrongOnes[3]   = {atLeastOneWronglyMatched[ii],    atLeastOneBTagWronglyMatched[ii], atLeastOneLightJetWronglyMatched[ii]};
 

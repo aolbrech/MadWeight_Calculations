@@ -24,6 +24,15 @@ void MlbStudy::initializePerEvent(){
 
 void MlbStudy::initializeBegin(){
 
+  for(int ii = 0; ii < 6; ii++){
+   NumberMatchedEvents[ii] = 0;
+   NumberNotMatchedEvents[ii] = 0;
+   CorrectOptionAvailable[ii] = 0;
+   CorrectOptionChosen[ii] = 0;
+   WrongOptionChosen[ii] = 0;
+   CorrectEventMlbMqqb[ii] = 0;
+   WrongEventMlbMqqb[ii] = 0;
+  }
 }
 
 void MlbStudy::calculateChiSquared(vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, TLorentzVector* lepton, vector<TRootJet*> Jets, float MassMlb, float SigmaMlb, float MassMqqb, float SigmaMqqb){
@@ -83,8 +92,6 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 	int NumberTimesLoopShouldBeRepeated = 1;
 	if(NrConsideredBTagOptions == 1) NumberTimesLoopShouldBeRepeated = 3;
 
-	//std::cout << " \n Correct values : " << CorrectValues[0] << ", " << CorrectValues[1] << ", " << CorrectValues[2] << " & " << CorrectValues[3] << std::endl;
-
 	for(int ii = 0; ii < NumberTimesLoopShouldBeRepeated; ii++){
 	
 	   if(NrConsideredBTagOptions > 1) getIndices(LowestChiSq4Jets); //Get the indices updated!
@@ -94,38 +101,50 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 	   if(NrConsideredBTagOptions == 1 && ii == 2){getIndices(LowestChiSq);      option = option+1;} //5-jet case when number of light jets > 2! (only +1 since already did +1 in previous line!!)
 
 	   //For the 'pure' 5-jet case the number of light jets should be larger than 2!
-	   //if(ii == 2) std::cout << " \n Size of lightJets : " << lightJets.size() << std::endl;
 	   if(NrConsideredBTagOptions == 1 && ii == 2 && lightJets.size() < 3) continue;
-	   //if(ii == 2) std::cout << " --> Event passed the continue requirement ! " << std::endl;
-
-	   //std::cout << " --> Looking at option " << ii << " with " << lightJets.size() << " # light jets, which has indices : " << bTaggedJets[chosenBLept] << ", " << bTaggedJets[chosenBHadr] << ", " << lightJets[chosenQuark1] << " & " << lightJets[chosenQuark2] << std::endl;
-	
 	   NumberMatchedEvents[option]++;
 
-           //How often is the correct option chosen?
-           if( ( (NrConsideredBTagOptions == 1 && ii == 1) || NrConsideredBTagOptions > 1 ) &&   //Will never look at 5 jets AND all the b-tag options ...
+	   ///////////////////////////////////////////////
+           //  How often is the correct option chosen?  //
+	   ///////////////////////////////////////////////
+   	   //--> 4-jet case
+           if( ( (NrConsideredBTagOptions == 1 && ( ii == 1 || (ii == 0 && lightJets.size() < 3) ) ) || NrConsideredBTagOptions > 1 ) &&   //Will never look at 5 jets AND all the b-tag options ...
 	       (CorrectValues[0] == bTaggedJets[0] || CorrectValues[0] == bTaggedJets[1])   &&
                (CorrectValues[1] == bTaggedJets[1] || CorrectValues[1] == bTaggedJets[0])   ){  //Correct option is available!
 		  CorrectOptionAvailable[option]++;
+	   	  if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr] && 
+		      (CorrectValues[2] == lightJets[chosenQuark1] || CorrectValues[2] == lightJets[chosenQuark2] ) &&
+		      (CorrectValues[3] == lightJets[chosenQuark2] || CorrectValues[3] == lightJets[chosenQuark2] ) ){
+		         CorrectOptionChosen[option]++;
+		  }
+		  else{
+			 WrongOptionChosen[option]++;
+		  }
+		//h_CorrectOptionChiSq.push_back(ChiSquared[chosenBLept]);
 	   }
-           if(  (NrConsideredBTagOptions == 1 && ii == 0)  &&   
+
+	   //--> 5-jet case
+           if(  (NrConsideredBTagOptions == 1 && (ii == 0 || ii == 2) && lightJets.size() > 2 )  &&   
 	        (CorrectValues[0] == bTaggedJets[0] || CorrectValues[0] == bTaggedJets[1])   &&
                 (CorrectValues[1] == bTaggedJets[1] || CorrectValues[1] == bTaggedJets[0])   &&
 		(CorrectValues[2] == lightJets[0] || CorrectValues[2] == lightJets[1] || CorrectValues[2] == lightJets[2]) &&
 		(CorrectValues[3] == lightJets[0] || CorrectValues[3] == lightJets[1] || CorrectValues[3] == lightJets[2]) ){  //Correct option is available!
 		  CorrectOptionAvailable[option]++;
+//		  std::cout << " ++++++++++++++++++++ Size of light jets : " << lightJets.size() << std::endl;
+//		  std::cout << " ---- Looking at option : " << option << std::endl;
+//		  std::cout << " Available indices for b's : " << bTaggedJets[0] << " & " << bTaggedJets[1] << " --> chosen = " << chosenBLept << " & " << chosenBHadr<< std::endl;
+//		  std::cout << " Available indices for light:" << lightJets[0] << ", " << lightJets[1] << " & " << lightJets[2] << " --> chosen = " << chosenQuark1 << " & " << chosenQuark2 <<std::endl;
+//		  std::cout << " ******** Correct indices = " << CorrectValues[0] << ", " << CorrectValues[1] << ", " << CorrectValues[2] << " & " << CorrectValues[3] << std::endl;
+	   	  if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr] && 
+		     (CorrectValues[2] == lightJets[chosenQuark1]  || CorrectValues[2] == lightJets[chosenQuark2] ) &&
+		     (CorrectValues[3] == lightJets[chosenQuark2]  || CorrectValues[3] == lightJets[chosenQuark2] ) ){
+		         CorrectOptionChosen[option]++;
+		  }
+		  else{
+			 WrongOptionChosen[option]++;
+		  }
 	   }
-
 	   
-	   if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr] && (CorrectValues[2] == lightJets[chosenQuark1] || CorrectValues[2] == lightJets[chosenQuark2] ) &&
-													       (CorrectValues[3] == lightJets[chosenQuark2] || CorrectValues[3] == lightJets[chosenQuark2] ) ){
-		CorrectOptionChosen[option]++;
-		//h_CorrectOptionChiSq.push_back(ChiSquared[chosenBLept]);
-	   }
-	   else{
-		WrongOptionChosen[option]++;
-		//h_WrongOptionChiSq.push_back(ChiSquared[chosenBHadr]);
-	   }
 	
            //How often is the full event found?
            if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr]  &&
@@ -166,7 +185,7 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
        int CorrectOnes[2] = {CorrectEventMlbMqqb[ii],   CorrectOptionChosen[ii] };
        int WrongOnes[2]   = {WrongEventMlbMqqb[ii],     WrongOptionChosen[ii]};
        int LastOnes[2]    = {NumberNotMatchedEvents[ii],CorrectOptionAvailable[ii]}; 
-       int sOverSqrtBORPercentage[2] = {(float)(CorrectOnes[WhichJets])/(float)(sqrt(WrongOnes[WhichJets])), (float)(CorrectOptionChosen[ii])/(float)(CorrectOptionAvailable[ii])};
+       float sOverSqrtBORPercentage[2] = {(float)(CorrectOnes[WhichJets])/(float)(sqrt(WrongOnes[WhichJets])), (float)(((float)(CorrectOptionChosen[ii])*100.0)/(float)(CorrectOptionAvailable[ii]))};
 
        output << NameOfOption[ii]                                << " & " <<
        CorrectOnes[WhichJets]                                    << " & " <<
