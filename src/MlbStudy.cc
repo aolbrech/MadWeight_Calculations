@@ -20,6 +20,7 @@ void MlbStudy::initializePerEvent(){
   chosenQuark2 = 999;
   LowestChiSq = 999;
   LowestChiSq4Jets = 999;
+  CorrectChiSq == 999;
 }
 
 void MlbStudy::initializeBegin(){
@@ -64,13 +65,21 @@ void MlbStudy::calculateChiSquared(vector<int> CorrectValues, vector<int> bTagge
            ChiSquared[ii] = ((MassMlb-MlbValues[ii])/SigmaMlb)*((MassMlb-MlbValues[ii])/SigmaMlb) + ((MassMqqb - MqqbValues[ii])/SigmaMqqb)*((MassMqqb - MqqbValues[ii])/SigmaMqqb);
 	   if( ii > 0 && ChiSquared[ii] < ChiSquared[LowestChiSq]) LowestChiSq = ii;
 	   if(ii == 1 && ChiSquared[0] > ChiSquared[1]) LowestChiSq4Jets = 1;
-       }	 
+       }
+
+       //Check which Chi-Sq value corresponds to the correct event topology!
+       if(CorrectValues[0]==bTaggedJets[0]&&CorrectValues[1]==bTaggedJets[1]&&(CorrectValues[2]==lightJets[0]||CorrectValues[2]==lightJets[1])&&(CorrectValues[3]==lightJets[0]||CorrectValues[3]==lightJets[1]))CorrectChiSq=0;
+       if(CorrectValues[0]==bTaggedJets[1]&&CorrectValues[0]==bTaggedJets[1]&&(CorrectValues[2]==lightJets[0]||CorrectValues[2]==lightJets[1])&&(CorrectValues[3]==lightJets[0]||CorrectValues[3]==lightJets[1]))CorrectChiSq=1;
+       if(CorrectValues[0]==bTaggedJets[0]&&CorrectValues[1]==bTaggedJets[1]&&(CorrectValues[2]==lightJets[0]||CorrectValues[2]==lightJets[2])&&(CorrectValues[3]==lightJets[0]||CorrectValues[3]==lightJets[2]))CorrectChiSq=2;
+       if(CorrectValues[0]==bTaggedJets[1]&&CorrectValues[0]==bTaggedJets[1]&&(CorrectValues[2]==lightJets[0]||CorrectValues[2]==lightJets[2])&&(CorrectValues[3]==lightJets[0]||CorrectValues[3]==lightJets[2]))CorrectChiSq=3;
+       if(CorrectValues[0]==bTaggedJets[0]&&CorrectValues[1]==bTaggedJets[1]&&(CorrectValues[2]==lightJets[1]||CorrectValues[2]==lightJets[2])&&(CorrectValues[3]==lightJets[1]||CorrectValues[3]==lightJets[2]))CorrectChiSq=4;
+       if(CorrectValues[0]==bTaggedJets[1]&&CorrectValues[0]==bTaggedJets[1]&&(CorrectValues[2]==lightJets[1]||CorrectValues[2]==lightJets[2])&&(CorrectValues[3]==lightJets[1]||CorrectValues[3]==lightJets[2]))CorrectChiSq=5;
+
    }
 }
 
-void MlbStudy::getIndices(int LowestChiSqIndex){                           //Making this a separate class allows to choice in the analyzer code whether the 4- or 5-jet case will be considered!
+void MlbStudy::getIndices(int LowestChiSqIndex){                  //Making this a separate class allows to choice in the analyzer code whether the 4- or 5-jet case will be considered!
 
-	//std::cout << " ***** Getting the indices for Chi-squared index : " << LowestChiSqIndex << std::endl;
    //Match the correct indices to the quarks!
    // --> b-jets
    if(      LowestChiSqIndex == 0 || LowestChiSqIndex == 2 || LowestChiSqIndex == 4){ chosenBLept = 0; chosenBHadr = 1;}
@@ -83,26 +92,41 @@ void MlbStudy::getIndices(int LowestChiSqIndex){                           //Mak
 }
 
 void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, int NrConsideredBTagOptions){
+  
+   if(	bTaggedJets.size() > 1 && lightJets.size() > 1){                                                                  //Event has the correct amount of b-tagged and light jets!
 
-//In case NrConsideredBTagOptions is only 1, use this option counter to get the numbers for both 4 and 5 jets!
-   
-   if(  CorrectValues[0] != 9999 && CorrectValues[1] != 9999 && CorrectValues[2] != 9999 && CorrectValues[3] != 9999 &&   //Event has been matched!
-	bTaggedJets.size() > 1 && lightJets.size() > 1){                                                                  //Event has the correct amount of b-tagged and light jets!
+     int NumberTimesLoopShouldBeRepeated = 1;
+     if(NrConsideredBTagOptions == 1) NumberTimesLoopShouldBeRepeated = 3;
 
-	int NumberTimesLoopShouldBeRepeated = 1;
-	if(NrConsideredBTagOptions == 1) NumberTimesLoopShouldBeRepeated = 3;
+     for(int ii = 0; ii < NumberTimesLoopShouldBeRepeated; ii++){
 
-	for(int ii = 0; ii < NumberTimesLoopShouldBeRepeated; ii++){
-	
-	   if(NrConsideredBTagOptions > 1) getIndices(LowestChiSq4Jets); //Get the indices updated!
+	//For the 'pure' 5-jet case the number of light jets should be larger than 2!
+	if(NrConsideredBTagOptions == 1 && ii == 2 && lightJets.size() < 3) continue;
 
-	   if(NrConsideredBTagOptions == 1 && ii == 0) getIndices(LowestChiSq);                          //5-jet case
-	   if(NrConsideredBTagOptions == 1 && ii == 1){getIndices(LowestChiSq4Jets); option = option+1;} //4-jet case
-	   if(NrConsideredBTagOptions == 1 && ii == 2){getIndices(LowestChiSq);      option = option+1;} //5-jet case when number of light jets > 2! (only +1 since already did +1 in previous line!!)
+	//Get the correct indices, plot the minimum chi-sq values and initialize the chi-sq counter!
+	int NrChiSqs = 6;
+	if(NrConsideredBTagOptions > 1){            getIndices(LowestChiSq4Jets); NrChiSqs = 0;} 
+	if(NrConsideredBTagOptions == 1 && ii == 0){getIndices(LowestChiSq);                         h_ChiSqMinimum[option].push_back(ChiSquared[LowestChiSq]);}      //5-jet case
+	if(NrConsideredBTagOptions == 1 && ii == 1){getIndices(LowestChiSq4Jets); option = option+1; h_ChiSqMinimum[option].push_back(ChiSquared[LowestChiSq4Jets]); NrChiSqs = 2;} //4-jet case
+	if(NrConsideredBTagOptions == 1 && ii == 2){getIndices(LowestChiSq);      option = option+1; h_ChiSqMinimum[option].push_back(ChiSquared[LowestChiSq]);} //pure 5-jet case! (only +1 since already did +1 for 4jets!!)
 
-	   //For the 'pure' 5-jet case the number of light jets should be larger than 2!
-	   if(NrConsideredBTagOptions == 1 && ii == 2 && lightJets.size() < 3) continue;
-	   NumberMatchedEvents[option]++;
+	//Plot the distribution for the correct and wrong chi-sq values
+	h_ChiSqCorrect[option].push_back(ChiSquared[CorrectChiSq]);
+	if(CorrectChiSq != 999) h_ChiSqCorrectFound[option].push_back(ChiSquared[CorrectChiSq]);
+	for(int jj = 0; jj < NrChiSqs; jj++){
+	   if(jj != CorrectChiSq) h_ChiSqWrong[option].push_back(ChiSquared[jj]);
+	}
+
+	//Plot the maximum chi-sq values:
+	for(int jj = 0; jj < NrChiSqs; jj++){
+	  if(NrConsideredBTagOptions == 1 && ( (ii == 1 && jj != LowestChiSq4Jets) || ( (ii == 2 || ii == 0) && jj != LowestChiSq ) ) ) h_ChiSqNotMinimum[option].push_back(ChiSquared[jj]);
+	}
+
+	//----------------------------//
+	//  Get the matched events!!  //
+	//----------------------------//    
+	if(  CorrectValues[0] != 9999 && CorrectValues[1] != 9999 && CorrectValues[2] != 9999 && CorrectValues[3] != 9999 ){   //Event has been matched!
+           NumberMatchedEvents[option]++;
 
 	   ///////////////////////////////////////////////
            //  How often is the correct option chosen?  //
@@ -112,15 +136,22 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 	       (CorrectValues[0] == bTaggedJets[0] || CorrectValues[0] == bTaggedJets[1])   &&
                (CorrectValues[1] == bTaggedJets[1] || CorrectValues[1] == bTaggedJets[0])   ){  //Correct option is available!
 		  CorrectOptionAvailable[option]++;
+
+		  h_ChiSqCorrectWhenMatched[option].push_back(ChiSquared[CorrectChiSq]);
+		  h_ChiSqMinimumWhenMatched[option].push_back(ChiSquared[LowestChiSq4Jets]);
+		  for(int jj = 0; jj < NrChiSqs; jj++){
+                    if(NrConsideredBTagOptions == 1 && ( (ii == 1 && jj != LowestChiSq4Jets) || ( (ii == 2 || ii == 0) && jj != LowestChiSq ) ) )
+			h_ChiSqNotMinimumWhenMatched[option].push_back(ChiSquared[jj]);
+		  }
+
+		  //Correct option chosen or not?
 	   	  if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr] && 
-		      (CorrectValues[2] == lightJets[chosenQuark1] || CorrectValues[2] == lightJets[chosenQuark2] ) &&
-		      (CorrectValues[3] == lightJets[chosenQuark2] || CorrectValues[3] == lightJets[chosenQuark2] ) ){
-		         CorrectOptionChosen[option]++;
+		     (CorrectValues[2] == lightJets[chosenQuark1] || CorrectValues[2] == lightJets[chosenQuark2] ) &&
+		     (CorrectValues[3] == lightJets[chosenQuark2] || CorrectValues[3] == lightJets[chosenQuark2] ) ){
+		        CorrectOptionChosen[option]++;
 		  }
-		  else{
-			 WrongOptionChosen[option]++;
-		  }
-		//h_CorrectOptionChiSq.push_back(ChiSquared[chosenBLept]);
+		  else
+			 WrongOptionChosen[option]++;		 
 	   }
 
 	   //--> 5-jet case
@@ -130,38 +161,45 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 		(CorrectValues[2] == lightJets[0] || CorrectValues[2] == lightJets[1] || CorrectValues[2] == lightJets[2]) &&
 		(CorrectValues[3] == lightJets[0] || CorrectValues[3] == lightJets[1] || CorrectValues[3] == lightJets[2]) ){  //Correct option is available!
 		  CorrectOptionAvailable[option]++;
-//		  std::cout << " ++++++++++++++++++++ Size of light jets : " << lightJets.size() << std::endl;
-//		  std::cout << " ---- Looking at option : " << option << std::endl;
-//		  std::cout << " Available indices for b's : " << bTaggedJets[0] << " & " << bTaggedJets[1] << " --> chosen = " << chosenBLept << " & " << chosenBHadr<< std::endl;
-//		  std::cout << " Available indices for light:" << lightJets[0] << ", " << lightJets[1] << " & " << lightJets[2] << " --> chosen = " << chosenQuark1 << " & " << chosenQuark2 <<std::endl;
-//		  std::cout << " ******** Correct indices = " << CorrectValues[0] << ", " << CorrectValues[1] << ", " << CorrectValues[2] << " & " << CorrectValues[3] << std::endl;
+
+		  h_ChiSqCorrectWhenMatched[option].push_back(ChiSquared[CorrectChiSq]);
+		  h_ChiSqMinimumWhenMatched[option].push_back(ChiSquared[LowestChiSq4Jets]);
+		  for(int jj = 0; jj < NrChiSqs; jj++){
+                    if(NrConsideredBTagOptions == 1 && ( (ii == 1 && jj != LowestChiSq4Jets) || ( (ii == 2 || ii == 0) && jj != LowestChiSq ) ) )
+			h_ChiSqNotMinimumWhenMatched[option].push_back(ChiSquared[jj]);
+		  }
+
+		  //Correct option chosen or not?
 	   	  if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr] && 
 		     (CorrectValues[2] == lightJets[chosenQuark1]  || CorrectValues[2] == lightJets[chosenQuark2] ) &&
-		     (CorrectValues[3] == lightJets[chosenQuark2]  || CorrectValues[3] == lightJets[chosenQuark2] ) ){
-		         CorrectOptionChosen[option]++;
-		  }
-		  else{
-			 WrongOptionChosen[option]++;
-		  }
-	   }
-	   
+		     (CorrectValues[3] == lightJets[chosenQuark2]  || CorrectValues[3] == lightJets[chosenQuark2] ) )
+		         CorrectOptionChosen[option]++;		  
+		  else
+			 WrongOptionChosen[option]++;		  
+	   }	   
 	
-           //How often is the full event found?
+           //How often is the full event found and correctly reconstructed?
            if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr]  &&
              ( CorrectValues[2] == lightJets[chosenQuark1]  || CorrectValues[2] == lightJets[chosenQuark2] ) &&
-             ( CorrectValues[3] == lightJets[chosenQuark1]  || CorrectValues[3] == lightJets[chosenQuark2] ) ){
+             ( CorrectValues[3] == lightJets[chosenQuark1]  || CorrectValues[3] == lightJets[chosenQuark2] ) )
                 CorrectEventMlbMqqb[option]++;
-           }
-           else{
+           else
                 WrongEventMlbMqqb[option]++;
-           }
-       }//End of loop over ii !
+        }//End of loop over matched events !
+	else{
+	   for(int jj = 0; jj < NrChiSqs; jj++){
+	     //std::cout << " ChiSquared value for non-matched events : " << ChiSquared[jj] << std::endl;
+	     //std::cout << " Value of NrChiSqs : " << NrChiSqs << std::endl;
+	     h_ChiSqAllWhenNotMatched[option].push_back(ChiSquared[jj]);
+	   }
+	}
 
-   }//End of matched event found!
-   else{
-	NumberNotMatchedEvents[option]++;
-	if(NrConsideredBTagOptions == 1){ NumberNotMatchedEvents[option+1]++; NumberNotMatchedEvents[option+2]++;}  //Also count for the 4-jet and the pure 5-jet case!
-   }
+     }//End of loop over ii!
+  }//End of loop over events with at least two b-tagged jets and two light jets
+  if(  CorrectValues[0] == 9999 || CorrectValues[1] == 9999 || CorrectValues[2] == 9999 || CorrectValues[3] == 9999 ){
+     NumberNotMatchedEvents[option]++;
+     if(NrConsideredBTagOptions == 1){ NumberNotMatchedEvents[option+1]++; NumberNotMatchedEvents[option+2]++;}  //Also count for the 4-jet and the pure 5-jet case!
+  }
 }
 
 void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest){
