@@ -112,7 +112,7 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 
 	//Plot the distribution for the correct and wrong chi-sq values
         for(int ll = 0; ll < 6; ll++){ if(ChiSquared[ll] >=50) ChiSquared[ii] = 49.9;}  //Force the ChiSquared values to be in the ROOT histograms to see the overflow!
-	if(CorrectChiSq != 999){ 
+	if(CorrectChiSq != 999){
 	   h_ChiSqCorrectFound[option].push_back(ChiSquared[CorrectChiSq]); 
 	   h_ChiSqCorrect[option].push_back(ChiSquared[CorrectChiSq]);
 	}
@@ -157,8 +157,8 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 			h_ChiSqMinimumWhenCorrect[option].push_back(ChiSquared[LowestChiSq4Jets]);
 		  }
 		  else{
-			WrongOptionChosen[option]++;		 
-			h_ChiSqMinimumWhenWrong[option].push_back(ChiSquared[LowestChiSq4Jets]);
+			WrongOptionChosen[option]++;
+			h_ChiSqMinimumWhenWrong[option].push_back(ChiSquared[LowestChiSq4Jets]); 
 		  }
 	   }
 
@@ -171,7 +171,7 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 		  CorrectOptionAvailable[option]++;
 
 		  h_ChiSqCorrectWhenMatched[option].push_back(ChiSquared[CorrectChiSq]);
-		  h_ChiSqMinimumWhenMatched[option].push_back(ChiSquared[LowestChiSq4Jets]);
+		  h_ChiSqMinimumWhenMatched[option].push_back(ChiSquared[LowestChiSq]);
 		  for(int jj = 0; jj < NrChiSqs; jj++){
                     if(NrConsideredBTagOptions == 1 && ( (ii == 1 && jj != LowestChiSq4Jets) || ( (ii == 2 || ii == 0) && jj != LowestChiSq ) ) ) 
 			h_ChiSqNotMinimumWhenMatched[option].push_back(ChiSquared[jj]); 
@@ -182,11 +182,11 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 		     (CorrectValues[2] == lightJets[chosenQuark1]  || CorrectValues[2] == lightJets[chosenQuark2] ) &&
 		     (CorrectValues[3] == lightJets[chosenQuark2]  || CorrectValues[3] == lightJets[chosenQuark2] ) ){
 		        CorrectOptionChosen[option]++;
-			h_ChiSqMinimumWhenCorrect[option].push_back(ChiSquared[LowestChiSq4Jets]);
+			h_ChiSqMinimumWhenCorrect[option].push_back(ChiSquared[LowestChiSq]);
                   }
 		  else{
 		 	WrongOptionChosen[option]++;		  
-			h_ChiSqMinimumWhenWrong[option].push_back(ChiSquared[LowestChiSq4Jets]);
+			h_ChiSqMinimumWhenWrong[option].push_back(ChiSquared[LowestChiSq]);
                   }
 	   }	   
 	

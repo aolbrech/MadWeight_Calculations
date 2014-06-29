@@ -32,15 +32,10 @@ class MlbStudy{
    float MlbValues[6], MqqbValues[6], ChiSquared[6];
 
    vector<float> h_ChiSqCorrect[6], h_ChiSqCorrectFound[6], h_ChiSqMinimum[6], h_ChiSqNotMinimum[6], h_ChiSqWrong[6];
-   vector<float> h_ChiSqCorrectWhenMatched[6], h_ChiSqMinimumWhenMatched[6], h_ChiSqNotMinimumWhenMatched[6], h_ChiSqAllWhenNotMatched[6];
+   vector<float> h_ChiSqCorrectWhenMatched[6], h_ChiSqMinimumWhenMatched[6], h_ChiSqNotMinimumWhenMatched[6], h_ChiSqAllWhenNotMatched[6], h_ChiSqMinimumWhenCorrect[6], h_ChiSqMinimumWhenWrong[6];
+   vector<float> h_test[3];
 
-   int NumberMatchedEvents[6];
-   int NumberNotMatchedEvents[6];
-   int CorrectOptionAvailable[6];
-   int CorrectOptionChosen[6];
-   int WrongOptionChosen[6];
-   int CorrectEventMlbMqqb[6];
-   int WrongEventMlbMqqb[6];
+   int NumberMatchedEvents[6], NumberNotMatchedEvents[6], CorrectOptionAvailable[6], CorrectOptionChosen[6], WrongOptionChosen[6], CorrectEventMlbMqqb[6], WrongEventMlbMqqb[6];
 
    int getLowestChiSqIndex()      {return LowestChiSq;};
    int getLowestChiSq4JetsIndex() {return LowestChiSq4Jets;};
@@ -59,6 +54,8 @@ class MlbStudy{
    vector<float> getChiSqMinimumWhenMatched(int jetCase)    {return h_ChiSqMinimumWhenMatched[jetCase];   };
    vector<float> getChiSqNotMinimumWhenMatched(int jetCase) {return h_ChiSqNotMinimumWhenMatched[jetCase];};
    vector<float> getChiSqAllWhenNotMatched(int jetCase)     {return h_ChiSqAllWhenNotMatched[jetCase];    };
+   vector<float> getChiSqMinimumWhenCorrect(int jetCase)    {return h_ChiSqMinimumWhenCorrect[jetCase];   };
+   vector<float> getChiSqMinimumWhenWrong(int jetCase)      {return h_ChiSqMinimumWhenWrong[jetCase];     };
 
    int getMlbValue(int order)     {return MlbValues[order];};
    int getMqqbValue(int order)    {return MqqbValues[order];};
