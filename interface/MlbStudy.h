@@ -34,7 +34,7 @@ class MlbStudy{
    vector<float> h_ChiSqCorrect[6], h_ChiSqCorrectFound[6], h_ChiSqMinimum[6], h_ChiSqNotMinimum[6], h_ChiSqWrong[6];
    vector<float> h_ChiSqCorrectWhenMatched[6], h_ChiSqMinimumWhenMatched[6], h_ChiSqNotMinimumWhenMatched[6], h_ChiSqAllWhenNotMatched[6], h_ChiSqMinimumWhenCorrect[6], h_ChiSqMinimumWhenWrong[6];
 
-   int NumberMatchedEvents[6], NumberNotMatchedEvents[6], CorrectOptionAvailable[6], CorrectOptionChosen[6], WrongOptionChosen[6], CorrectEventMlbMqqb[6], WrongEventMlbMqqb[6];
+   int NumberMatchedEvents[6], NumberNotMatchedEvents[6], CorrectOptionAvailable[6], CorrectBOptionChosen[6], WrongBOptionChosen[6], CorrectEventChosen[6], WrongEventChosen[6];
 
    int getLowestChiSqIndex()      {return LowestChiSq;};
    int getLowestChiSq4JetsIndex() {return LowestChiSq4Jets;};
@@ -62,8 +62,8 @@ class MlbStudy{
 
    int getNrMatchedEvents( int OptionNr) {return NumberMatchedEvents[OptionNr];};
    int getNrCorrectOptionsAvailable(int OptionNr) {return CorrectOptionAvailable[OptionNr];};
-   int getNrCorrectOptionChosen(int OptionNr) {return CorrectOptionChosen[OptionNr];};
-   int getNrWrongOptionChosen(int OptionNr) {return WrongOptionChosen[OptionNr];};
+   int getNrCorrectBOptionChosen(int OptionNr) {return CorrectBOptionChosen[OptionNr];};
+   int getNrWrongBOptionChosen(int OptionNr) {return WrongBOptionChosen[OptionNr];};
 };
 
 #endif
