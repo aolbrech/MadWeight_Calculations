@@ -1219,7 +1219,7 @@ int main (int argc, char *argv[])
 	CorrectBLeptonic = jetCombi[0];
 	CorrectBHadronic = jetCombi[1];
 	CorrectQuark1 = jetCombi[2];
-	CorrectQuark2 = jetComi[3];	
+	CorrectQuark2 = jetCombi[3];	
 
 	for(int ii = 0; ii < JetPartonPair.size(); ii++){
 	   if(CorrectBLeptonic == JetPartonPair[ii].first){
@@ -1474,7 +1474,6 @@ int main (int argc, char *argv[])
 //	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
 //		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
 //	  } 
-        }
       }
 
       //************************************************************************************//   
