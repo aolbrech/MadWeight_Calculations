@@ -33,7 +33,6 @@ class MlbStudy{
 
    vector<float> h_ChiSqCorrect[6], h_ChiSqCorrectFound[6], h_ChiSqMinimum[6], h_ChiSqNotMinimum[6], h_ChiSqWrong[6];
    vector<float> h_ChiSqCorrectWhenMatched[6], h_ChiSqMinimumWhenMatched[6], h_ChiSqNotMinimumWhenMatched[6], h_ChiSqAllWhenNotMatched[6], h_ChiSqMinimumWhenCorrect[6], h_ChiSqMinimumWhenWrong[6];
-   vector<float> h_test[3];
 
    int NumberMatchedEvents[6], NumberNotMatchedEvents[6], CorrectOptionAvailable[6], CorrectOptionChosen[6], WrongOptionChosen[6], CorrectEventMlbMqqb[6], WrongEventMlbMqqb[6];
 
