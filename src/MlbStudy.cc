@@ -154,8 +154,12 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 		     (CorrectValues[2] == lightJets[chosenQuark1] || CorrectValues[2] == lightJets[chosenQuark2] ) &&
 		     (CorrectValues[3] == lightJets[chosenQuark2] || CorrectValues[3] == lightJets[chosenQuark2] ) ){
 		        CorrectOptionChosen[option]++;
+			h_ChiSqMinimumWhenCorrect[option].push_back(ChiSquared[LowestChiSq4Jets]);
 		  }
-		  else  WrongOptionChosen[option]++;		 
+		  else{
+			WrongOptionChosen[option]++;		 
+			h_ChiSqMinimumWhenWrong[option].push_back(ChiSquared[LowestChiSq4Jets]);
+		  }
 	   }
 
 	   //--> 5-jet case
@@ -176,9 +180,14 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 		  //Correct option chosen or not?
 	   	  if( CorrectValues[0] == bTaggedJets[chosenBLept] && CorrectValues[1] == bTaggedJets[chosenBHadr] && 
 		     (CorrectValues[2] == lightJets[chosenQuark1]  || CorrectValues[2] == lightJets[chosenQuark2] ) &&
-		     (CorrectValues[3] == lightJets[chosenQuark2]  || CorrectValues[3] == lightJets[chosenQuark2] ) )
-		         CorrectOptionChosen[option]++;		  
-		  else 	 WrongOptionChosen[option]++;		  
+		     (CorrectValues[3] == lightJets[chosenQuark2]  || CorrectValues[3] == lightJets[chosenQuark2] ) ){
+		        CorrectOptionChosen[option]++;
+			h_ChiSqMinimumWhenCorrect[option].push_back(ChiSquared[LowestChiSq4Jets]);
+                  }
+		  else{
+		 	WrongOptionChosen[option]++;		  
+			h_ChiSqMinimumWhenWrong[option].push_back(ChiSquared[LowestChiSq4Jets]);
+                  }
 	   }	   
 	
            //How often is the full event found and correctly reconstructed?
