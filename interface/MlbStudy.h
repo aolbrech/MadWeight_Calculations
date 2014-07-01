@@ -35,6 +35,7 @@ class MlbStudy{
    vector<float> h_ChiSqCorrectWhenMatched[6], h_ChiSqMinimumWhenMatched[6], h_ChiSqNotMinimumWhenMatched[6], h_ChiSqAllWhenNotMatched[6], h_ChiSqMinimumWhenCorrect[6], h_ChiSqMinimumWhenWrong[6];
 
    int NumberMatchedEvents[6], NumberNotMatchedEvents[6], CorrectOptionAvailable[6], CorrectBOptionChosen[6], WrongBOptionChosen[6], CorrectEventChosen[6], WrongEventChosen[6];
+   int ThirdQuarkChosen[6], ThirdQuarkCorrectChosen[6], ThirdQuarkShouldBeChosen[6];
 
    int getLowestChiSqIndex()      {return LowestChiSq;};
    int getLowestChiSq4JetsIndex() {return LowestChiSq4Jets;};

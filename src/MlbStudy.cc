@@ -33,6 +33,10 @@ void MlbStudy::initializeBegin(){
    WrongEventChosen[ii] = 0;
    CorrectBOptionChosen[ii] = 0;
    WrongBOptionChosen[ii] = 0;
+
+   ThirdQuarkShouldBeChosen[ii] = 0;
+   ThirdQuarkChosen[ii] = 0;
+   ThirdQuarkCorrectChosen[ii] = 0;
   }
 }
 
@@ -155,12 +159,20 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
                                                                                              (CorrectValues[3] == lightJets[0]   || CorrectValues[3] == lightJets[1]  ) )      
 	       ){
 		CorrectOptionAvailable[option]++;
+		
+		//See how often the light jet is chosen, and how often it is the correct choice!
+		if(chosenQuark1 == 2 || chosenQuark2 == 2){
+		    ThirdQuarkChosen[option]++;
+		    if(CorrectValues[2] == lightJets[2] || CorrectValues[3] == lightJets[2])
+			ThirdQuarkCorrectChosen[option]++;
+		}
+		if(lightJets.size() > 2 && (CorrectValues[2] == lightJets[2] || CorrectValues[3] == lightJets[2]) && (chosenQuark1 != 2 && chosenQuark2 != 2)) ThirdQuarkShouldBeChosen[option]++;
 
 		//Fill the histograms!
 		h_ChiSqCorrectWhenMatched[option].push_back(ChiSquared[UsedCorrectChiSq]);
 		h_ChiSqMinimumWhenMatched[option].push_back(ChiSquared[UsedLowestChiSq]);
 		for(int jj = 0; jj < NrChiSqs; jj++){
-		  if( jj != UsedLowestChiSq) h_ChiSqNotMinimumWhenMatched[option].push_back(ChiSquared[jj]); 
+		  if( jj != UsedLowestChiSq){ h_ChiSqNotMinimumWhenMatched[option].push_back(ChiSquared[jj]); }
 		}
 		
 		//Correct b-jets chosen or not?
@@ -196,13 +208,13 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 
 void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest){
 
-   std::string Title[2] = {" \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong  & \\% good choice & $\\frac{s}{b}$ & non-matched \\\\", 
+   std::string Title[2] = {" \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong  & \\% good choice & $\\frac{s}{b}$ & non-matched & 3rd jet chosen & 3rd jet chosen and correct & 3rd jet correct, not chosen \\\\", 
 			   " \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & Correct b's   & Wrong b's & \\% good choice & $\\frac{s}{b}$ & Correct option exists \\\\"};
 
    std::string Caption[2] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags when a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method is applied} ", 
 			     " \\caption{Overview of the number of times the correct b-jet combination is chosen when using a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
 
-   output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c|c} " << endl;
+   output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c|c|c|c|c} " << endl;
    output << Title[WhichJets] << " \\hline " << endl;
 
    bool lookingAtOneBTagOption = false;
@@ -215,6 +227,10 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
        int CorrectOnes[2] = {CorrectEventChosen[ii],    CorrectBOptionChosen[ii] };
        int WrongOnes[2]   = {WrongEventChosen[ii],      WrongBOptionChosen[ii]};
        int LastOnes[2]    = {NumberNotMatchedEvents[ii],CorrectOptionAvailable[ii]}; 
+       int ThirdJetChosen[2] = {ThirdQuarkChosen[ii], 0};
+       int ThirdJetCorrectChosen[2] = {ThirdQuarkCorrectChosen[ii], 0};
+       int ThirdJetShouldBeChosen[2] = {ThirdQuarkShouldBeChosen[ii], 0};
+
        float sOverSqrtB[2], CorrectPercentage[2], sOverB[2];
        for(int jj = 0; jj < 2; jj++){
 	 sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
@@ -227,7 +243,10 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
        WrongOnes[WhichJets]         << " & " <<
        CorrectPercentage[WhichJets] << " & " <<
        sOverB[WhichJets]             << " & " <<
-       LastOnes[WhichJets]          << " \\\\ " << endl;
+       LastOnes[WhichJets]          << " & " <<
+       ThirdJetChosen[WhichJets]    << " & " << 
+       ThirdJetCorrectChosen[WhichJets]  << " & " << 
+       ThirdJetShouldBeChosen[WhichJets] << " \\\\ " << endl;
 
        if( ii == OptionOfInterest   && lookingAtOneBTagOption == true) ii = 0;  //Otherwise loop will not continue!
        if( ii == OptionOfInterest+1 && lookingAtOneBTagOption == true) ii = 1;  //Otherwise loop will not continue!
