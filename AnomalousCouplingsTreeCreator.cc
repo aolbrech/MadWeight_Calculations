@@ -1449,14 +1449,6 @@ int main (int argc, char *argv[])
          h_MlbMqqbCorrectAll.Fill(MqqbCorrect,MlbCorrect);
       }
 
-      vector<int> CorrectValues;  //Find better solution!
-      CorrectValues.clear();
-      CorrectValues.push_back(CorrectBLeptonic);
-      CorrectValues.push_back(CorrectBHadronic);
-      CorrectValues.push_back(CorrectQuark1);
-      CorrectValues.push_back(CorrectQuark2);
-	if(jetCombi[0] != CorrectValues[0] || jetCombi[1] != CorrectValues[1] || jetCombi[2] != CorrectValues[2] || jetCombi[3] != CorrectValues[3]) std::cout << " ERROR WITH JETCOMBI " << std::endl;
-     
       //******************************************************************************************//
       //  Loop can be kept, since if NrConsideredBTagOptions == 1 only 1 case will be considered  //
       //    --> If this is the case, force the option to be the one chosen above!!                //
@@ -1593,18 +1585,7 @@ int main (int argc, char *argv[])
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
     
-    //Output for 4 of 5 jet-case!
-    std::cout << " ********************************************* " << std::endl;
-    std::cout << " **  Output for 4- or 5-jet case choice !!  ** " << std::endl;
-    std::cout << " ********************************************* " << std::endl;
-    std::cout << " BTagged events with at least two light jets : " << bTagStudy.getNrEventsWithTwoLightJetsAndBTagged(ChosenBTagOption)   << std::endl;
-    std::cout << " BTagged events with more than two light jets: " << bTagStudy.getNrEventsWithThreeLightJetsAndBTagged(ChosenBTagOption) << std::endl;
-    std::cout << " Number of times the third jet is one of the correct ones : " << bTagStudy.getNrTimesThirdJetIsActualQuark(ChosenBTagOption)  ;
-    std::cout << "  ==> In " << (float)((float)(bTagStudy.getNrTimesThirdJetIsActualQuark(ChosenBTagOption)*100.0)/((float)bTagStudy.getNrEventsWithThreeLightJetsAndBTagged(ChosenBTagOption))) << " \% of the cases an improvement is found when adding a third light jet !! " << std::endl;
-    std::cout << " Number of times the third light jet is correct (no b's)  : " << bTagStudy.getNrTimesThirdJetIsCorrectQuark(ChosenBTagOption) << std::endl;
-    std::cout << " ------------------------ " << std::endl;
-
-    //////////////////////////////
+//////////////////////////////
     //  Jet combination output  //
     //////////////////////////////
     //--> Save directly to .tex output as a table
@@ -1707,6 +1688,8 @@ int main (int argc, char *argv[])
        h_ChiSqCorrectWhenMatched[ii]->Write();
        h_ChiSqMinimumWhenMatched[ii]->Write();
        h_ChiSqNotMinimumWhenMatched[ii]->Write();
+       h_ChiSqMinimumWhenCorrect[ii]->Write();
+       h_ChiSqMinimumWhenWrong[ii]->Write();
        h_ChiSqAllWhenNotMatched[ii]->Write();
     }
 
