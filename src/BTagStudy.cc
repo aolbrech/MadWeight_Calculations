@@ -136,6 +136,7 @@ void BTagStudy::CorrectJetCombi5Jets(int BHadrIndex, int BLeptIndex, int Quark1I
 	if( (BLeptIndex == bTaggedJetNr[OptionNr][0] || BLeptIndex == bTaggedJetNr[OptionNr][1]) &&
             (BHadrIndex == bTaggedJetNr[OptionNr][0] || BHadrIndex == bTaggedJetNr[OptionNr][1])){
 		twoBTagsCorrectlyMatched5Jets[OptionNr]++;
+		if(Quark1Index == LightJetNr[OptionNr][2] || Quark2Index == LightJetNr[OptionNr][2]) thirdJetIsGoodQuark[OptionNr]++;
 	}
 	if( (BLeptIndex != bTaggedJetNr[OptionNr][0] && BLeptIndex != bTaggedJetNr[OptionNr][1]) ||
             (BHadrIndex != bTaggedJetNr[OptionNr][0] && BHadrIndex != bTaggedJetNr[OptionNr][1])){
@@ -160,15 +161,15 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
 	// 1 = only the b-jets matched and compared
 	// 2 = only the light jets matched and compared
 
-    std::string Title[3] = {" \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct   & $\\geq$ 1 wrong       & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\", 
-			    " \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's good      & $\\geq$ 1 b wrong     & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\", 
-			    " \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good    & $\\geq$ 1 light wrong & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\"};
+    std::string Title[3]= {"\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong       & \\% good choice & $\\frac{s}{b}$ & non-matched & Correct 3rd jet & \\% good 3rd jet \\\\", 
+			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's good    & $\\geq$ 1 b wrong     & \\% good choice & $\\frac{s}{b}$ & non-matched & Correct 3rd jet & \\% good 3rd jet \\\\", 
+			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good  & $\\geq$ 1 light wrong & \\% good choice & $\\frac{s}{b}$ & non-matched & Correct 3rd jet & \\% good 3rd jet \\\\"};
 
-    std::string Caption[3] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
-			      " \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
-			      " \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
+    std::string Caption[3] = {"\\caption{Overview of correct and wrong reconstructed events for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
+			      "\\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
+			      "\\caption{Overview of correct and wrong reconstructed light jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
 
-    output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c|c} " << endl;
+    output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c|c|c|c} " << endl;
     output << Title[WhichJets] << " \\hline " << endl;
     for(int ii = 0; ii < NrOptionsConsidered; ii++){
 
@@ -176,74 +177,43 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
 	  ii = OptionOfInterest;
           int CorrectOnes5Jets[3] = {allFourJetsCorrectlyMatched5Jets[OptionOfInterest], twoBTagsCorrectlyMatched5Jets[OptionOfInterest] , twoLightJetsCorrectlyMatched5Jets[OptionOfInterest]};
           int WrongOnes5Jets[3] = {atLeastOneWronglyMatched5Jets[OptionOfInterest], atLeastOneBTagWronglyMatched5Jets[OptionOfInterest], atLeastOneLightJetWronglyMatched5Jets[OptionOfInterest]};
+    	  int Correct3rdJet[3] = {thirdJetIsActualQuark[OptionOfInterest],thirdJetIsGoodQuark[OptionOfInterest], thirdJetIsCorrectQuark[OptionOfInterest]};
+	  float sOverSqrtB5Jets[3], sOverB5Jets[3], CorrectPercentage5Jets[3], ThirdJetPercentage[3];
+	  for(int jj = 0; jj < 3; jj++){
+	     sOverSqrtB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(sqrt(WrongOnes5Jets[jj]));
+	     sOverB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(WrongOnes5Jets[jj]);
+	     CorrectPercentage5Jets[jj] = (float)(CorrectOnes5Jets[jj]*100.0)/(float)(CorrectOnes5Jets[jj]+WrongOnes5Jets[jj]);
+	     ThirdJetPercentage[jj] = (float)(Correct3rdJet[jj]*100.0)/(float)(CorrectOnes5Jets[jj]);
+	  }
 
           // 5-jet output
-          output << NameOfOption5Jets[ii]                                           << " & " <<
-          CorrectOnes5Jets[WhichJets]                                               << " & " <<
-          WrongOnes5Jets[WhichJets]                                                 << " & " <<
-          float(CorrectOnes5Jets[WhichJets])/float(sqrt(WrongOnes5Jets[WhichJets])) << " & " <<
-          float(CorrectOnes5Jets[WhichJets])/float(WrongOnes5Jets[WhichJets])       << " & " <<
-          NotReconstructedEvent[ii]                                                 << " \\\\ " << endl;
+          output << NameOfOption5Jets[ii] << " & " <<
+          CorrectOnes5Jets[WhichJets]     << " & " <<
+          WrongOnes5Jets[WhichJets]       << " & " <<
+          CorrectPercentage5Jets[WhichJets]    << " & " <<
+          sOverB5Jets[WhichJets]               << " & " <<
+          NotReconstructedEvent5Jets[ii]       << " & " <<
+	  Correct3rdJet[WhichJets]           << " & " << 
+	  ThirdJetPercentage[WhichJets]       << "\\\\ " << endl;
 	} 
 	int CorrectOnes[3] = {allFourJetsCorrectlyMatched[ii], twoBTagsCorrectlyMatched[ii]    , twoLightJetsCorrectlyMatched[ii]};
 	int WrongOnes[3]   = {atLeastOneWronglyMatched[ii],    atLeastOneBTagWronglyMatched[ii], atLeastOneLightJetWronglyMatched[ii]};
+        float sOverSqrtB[3], sOverB[3], CorrectPercentage[3];
+        for(int jj = 0; jj < 3; jj++){
+           sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
+           sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[jj]);
+           CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOnes[jj]+WrongOnes[jj]);
+        }
 
-        output << NameOfOption4Jets[ii]                                 << " & " <<
-        CorrectOnes[WhichJets]                                          << " & " <<
-        WrongOnes[WhichJets]                                            << " & " <<
-	float(CorrectOnes[WhichJets])/float(sqrt(WrongOnes[WhichJets])) << " & " <<
-	float(CorrectOnes[WhichJets])/float(WrongOnes[WhichJets])       << " & " <<
-	NotReconstructedEvent[ii]                                       << " \\\\ " << endl;
+        output << NameOfOption4Jets[ii] << " & " <<
+        CorrectOnes[WhichJets]          << " & " <<
+        WrongOnes[WhichJets]            << " & " <<
+	CorrectPercentage[WhichJets]    << " & " <<
+	sOverB[WhichJets]               << " & " <<
+	NotReconstructedEvent[ii]       << " & X & X \\\\ " << endl;
     }
     output << " \\end{tabular} " << endl;
     output << Caption[WhichJets] << endl;
     output << " \\end{table} \n " << endl;
 
 }
-
-/*void BTagStudy::ReturnTable5Jets(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, ofstream &outputNrJets, int OptionOfInterest){
-	
-    //Values of WhichJets are the following:
-	// 0 = all 4 jets matched and compared
-	// 1 = only the b-jets matched and compared
-	// 2 = only the light jets matched and compared
-
-    std::string Title[3] = {" \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct   & $\\geq$ 1 wrong       & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\", 
-			    " \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's good      & $\\geq$ 1 b wrong     & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\", 
-			    " \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good    & $\\geq$ 1 light wrong & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\"};
-
-    std::string Caption[3] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
-			      " \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
-			      " \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
-
-    std::cout << " In class ReturnTable !" << std::endl;
-    outputNrJets << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c|c} " << endl;
-    outputNrJets << Title[WhichJets] << " \\hline " << endl;
-
-    int CorrectOnes[3]      = {allFourJetsCorrectlyMatched[OptionOfInterest],      twoBTagsCorrectlyMatched[OptionOfInterest]      , twoLightJetsCorrectlyMatched[OptionOfInterest]};
-
-
-    int WrongOnes[3]      = {atLeastOneWronglyMatched[OptionOfInterest],      atLeastOneBTagWronglyMatched[OptionOfInterest],      atLeastOneLightJetWronglyMatched[OptionOfInterest]};
-    int WrongOnes5Jets[3] = {atLeastOneWronglyMatched5Jets[OptionOfInterest], atLeastOneBTagWronglyMatched5Jets[OptionOfInterest], atLeastOneLightJetWronglyMatched5Jets[OptionOfInterest]};
-
-    // 5-jet output
-    outputNrJets << NameOfOption5Jets[ii]                                     << " & " <<
-    CorrectOnes5Jets[WhichJets]                                               << " & " <<
-    WrongOnes5Jets[WhichJets]                                                 << " & " <<
-    float(CorrectOnes5Jets[WhichJets])/float(sqrt(WrongOnes5Jets[WhichJets])) << " & " <<
-    float(CorrectOnes5Jets[WhichJets])/float(WrongOnes5Jets[WhichJets])       << " & " <<
-    NotReconstructedEvent[ii]                                                 << " \\\\ " << endl;
-
-    // 4-jet output
-    outputNrJets << NameOfOption4Jets[ii]                                     << " & " <<
-    CorrectOnes4Jets[WhichJets]                                               << " & " <<
-    WrongOnes4Jets[WhichJets]                                                 << " & " <<
-    float(CorrectOnes4Jets[WhichJets])/float(sqrt(WrongOnes4Jets[WhichJets])) << " & " <<
-    float(CorrectOnes4Jets[WhichJets])/float(WrongOnes4Jets[WhichJets])       << " & " <<
-    NotReconstructedEvent[ii]                                                 << " \\\\ " << endl;
-
-    outputNrJets< " \\end{tabular} " << endl;
-    outputNrJets << Caption[WhichJets] << endl;
-    outputNrJets << " \\end{table} \n " << endl;
-
-}*/

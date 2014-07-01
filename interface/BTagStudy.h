@@ -35,6 +35,7 @@ class BTagStudy{
    int EventWithThreeLightJetsAndBTagged[6];
    int thirdJetIsActualQuark[6];
    int thirdJetIsCorrectQuark[6];
+   int thirdJetIsGoodQuark[6];    //3rd quark is one of the quarks when the two b-jets are correctly matched!
 
    int NotReconstructedEvent[6];
    int allFourJetsCorrectlyMatched[6];

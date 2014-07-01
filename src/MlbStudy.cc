@@ -190,8 +190,8 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 
 void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest){
 
-   std::string Title[2] = {" \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong  & $\\frac{s}{\\sqrt{b}}$ & $\\frac{s}{b}$ & non-matched \\\\", 
-			   " \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & Correct b's   & Wrong b's & \\% good chosen b's & $\\frac{s}{b}$ & Correct option exists \\\\"};
+   std::string Title[2] = {" \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong  & \\% good choice & $\\frac{s}{b}$ & non-matched \\\\", 
+			   " \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & Correct b's   & Wrong b's & \\% good choice & $\\frac{s}{b}$ & Correct option exists \\\\"};
 
    std::string Caption[2] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags when a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method is applied} ", 
 			     " \\caption{Overview of the number of times the correct b-jet combination is chosen when using a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
@@ -209,14 +209,19 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
        int CorrectOnes[2] = {CorrectEventChosen[ii],    CorrectBOptionChosen[ii] };
        int WrongOnes[2]   = {WrongEventChosen[ii],      WrongBOptionChosen[ii]};
        int LastOnes[2]    = {NumberNotMatchedEvents[ii],CorrectOptionAvailable[ii]}; 
-       float sOverSqrtBORPercentage[2] = {(float)(CorrectOnes[WhichJets])/(float)(sqrt(WrongOnes[WhichJets])), (float)(((float)(CorrectBOptionChosen[ii])*100.0)/(float)(CorrectOptionAvailable[ii]))};
+       float sOverSqrtB[2], CorrectPercentage[2], sOverB[2];
+       for(int jj = 0; jj < 2; jj++){
+	 sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
+	 CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOptionAvailable[ii]);
+	 sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[WhichJets]);
+       }
 
-       output << NameOfOption[ii]                                << " & " <<
-       CorrectOnes[WhichJets]                                    << " & " <<
-       WrongOnes[WhichJets]                                      << " & " <<
-       sOverSqrtBORPercentage[WhichJets]                         << " & " <<
-       float(CorrectOnes[WhichJets])/float(WrongOnes[WhichJets]) << " & " <<
-       LastOnes[WhichJets]                                       << " \\\\ " << endl;
+       output << NameOfOption[ii]   << " & " <<
+       CorrectOnes[WhichJets]       << " & " <<
+       WrongOnes[WhichJets]         << " & " <<
+       CorrectPercentage[WhichJets] << " & " <<
+       sOverB[WhichJets]             << " & " <<
+       LastOnes[WhichJets]          << " \\\\ " << endl;
 
        if( ii == OptionOfInterest   && lookingAtOneBTagOption == true) ii = 0;  //Otherwise loop will not continue!
        if( ii == OptionOfInterest+1 && lookingAtOneBTagOption == true) ii = 1;  //Otherwise loop will not continue!
