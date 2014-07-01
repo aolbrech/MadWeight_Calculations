@@ -1585,7 +1585,7 @@ int main (int argc, char *argv[])
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
     
-//////////////////////////////
+    //////////////////////////////
     //  Jet combination output  //
     //////////////////////////////
     //--> Save directly to .tex output as a table
@@ -1659,10 +1659,10 @@ int main (int argc, char *argv[])
       for(int ii = 0; ii < (mlbStudy.getChiSqNotMinimum(jetCase)).size();  ii++) h_ChiSqNotMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimum(jetCase))[ii]);
       for(int ii = 0; ii < (mlbStudy.getChiSqWrong(jetCase)).size();       ii++) h_ChiSqWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqWrong(jetCase))[ii]);
 
-      for(int ii = 0; ii < (mlbStudy.getChiSqCorrectWhenMatched(jetCase)).size();   ii++) h_ChiSqCorrectWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectWhenMatched(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenMatched(jetCase)).size();   ii++) h_ChiSqMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqNotMinimumWhenMatched(jetCase)).size();ii++) h_ChiSqNotMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenCorrect(jetCase)).size();   ii++) h_ChiSqMinimumWhenCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenCorrect(jetCase))[ii]);
+      for(int ii = 0; ii <(mlbStudy.getChiSqCorrectWhenMatched(jetCase)).size();   ii++) h_ChiSqCorrectWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectWhenMatched(jetCase))[ii]);
+      for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenMatched(jetCase)).size();   ii++) h_ChiSqMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
+      for(int ii = 0; ii <(mlbStudy.getChiSqNotMinimumWhenMatched(jetCase)).size();ii++) h_ChiSqNotMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimumWhenMatched(jetCase))[ii]);
+      for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenCorrect(jetCase)).size();   ii++) h_ChiSqMinimumWhenCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenCorrect(jetCase))[ii]);
       for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenWrong(jetCase)).size();     ii++) h_ChiSqMinimumWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenWrong(jetCase))[ii]);
       for(int ii = 0; ii < (mlbStudy.getChiSqAllWhenNotMatched(jetCase)).size();    ii++) h_ChiSqAllWhenNotMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqAllWhenNotMatched(jetCase))[ii]); 
    }   
