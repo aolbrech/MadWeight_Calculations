@@ -98,6 +98,12 @@ int main (int argc, char *argv[])
   bool FinalEventSelectionChoiceIsMade = false;
   int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
 
+  int ChiSqCutValue = 5;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
+  string ChiSqCutValueStr;
+  ostringstream convert; convert << ChiSqCutValue;
+  if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
+  else ChiSqCutValueStr = "";
+
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
   const int ChosenBTagOption = 3;  //2 T b-tags!!
@@ -112,10 +118,10 @@ int main (int argc, char *argv[])
   float BJetWP[6] = {0.244,0.679,0.679,0.898,0.898,0.898};
   float LightJetWP[6] = {0.244,0.679,0.244,0.898,0.679,0.244};
   
-  std::string OptionName[6] = {"2 L b-tags,             ", //#0
-    			       "2 M b-tags,             ", //#1
+  std::string OptionName[6] = {"2 L b-tags             ", //#0
+    			       "2 M b-tags             ", //#1
 			       "2 M b-tags, light L-veto", //#2
-			       "2 T b-tags,             ", //#3
+			       "2 T b-tags             ", //#3
 			       "2 T b-tags, light M-veto", //#4
 			       "2 T b-tags, light L-veto"};//#5
 
@@ -445,8 +451,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    for (unsigned int ievt = 0; ievt < 5000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1457,7 +1463,7 @@ int main (int argc, char *argv[])
 	if(NrConsideredBTagOptions == 1) Option = ChosenBTagOption;    //Force Option to be equal to the one chosen!
 
 	mlbStudy.calculateChiSquared(jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
-	mlbStudy.calculateEfficiency(Option, jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions );
+	mlbStudy.calculateEfficiency(Option, jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions, ChiSqCutValue);
 
 //	//TODO --> Update!!
 //	  if( (CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[1]) &
@@ -1600,7 +1606,7 @@ int main (int argc, char *argv[])
     }
     if(NrConsideredBTagOptions == 1){
       eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionTableForChosenCombination.tex");
-      for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case with "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case with "+OptionName[ii];}
+      for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case, "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case, "+OptionName[ii];}
       BTagOptionOfInterest = ChosenBTagOption;
     }
 
@@ -1620,11 +1626,11 @@ int main (int argc, char *argv[])
     } 
     //In above case the OptionOfInterest variable will not be used inside the class! Is only used when only one bTag should be considered!
     if(NrConsideredBTagOptions == 1){ 
-	mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbTableForChosenCombination.tex"); 
+	mlbOutput.open(("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbTableForChosenCombination"+ChiSqCutValueStr+".tex").c_str()); 
 	OptionOfInterest = ChosenBTagOption;
-	OptionName[ChosenBTagOption+2] = " Pure 5 jet case with "+OptionName[ChosenBTagOption];
-        OptionName[ChosenBTagOption+1] = " 4 jet case with      "+OptionName[ChosenBTagOption];
-	OptionName[ChosenBTagOption] =   " 5 jet case with      "+OptionName[ChosenBTagOption];
+	OptionName[ChosenBTagOption+2] = " Pure 5 jet case, "+OptionName[ChosenBTagOption];
+        OptionName[ChosenBTagOption+1] = " 4 jet case,      "+OptionName[ChosenBTagOption];
+	OptionName[ChosenBTagOption] =   " 5 jet case,      "+OptionName[ChosenBTagOption];
     }
     mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //All 4 jets correctly matched
     mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //Only b-jets correctly matched
