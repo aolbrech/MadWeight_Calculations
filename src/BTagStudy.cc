@@ -161,15 +161,15 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
 	// 1 = only the b-jets matched and compared
 	// 2 = only the light jets matched and compared
 
-    std::string Title[3]= {"\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong       & \\% good choice & $\\frac{s}{b}$ & non-matched & Correct 3rd jet & \\% good 3rd jet \\\\", 
-			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's good    & $\\geq$ 1 b wrong     & \\% good choice & $\\frac{s}{b}$ & non-matched & Correct 3rd jet & \\% good 3rd jet \\\\", 
-			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good  & $\\geq$ 1 light wrong & \\% good choice & $\\frac{s}{b}$ & non-matched & Correct 3rd jet & \\% good 3rd jet \\\\"};
+    std::string Title[3]= {"\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & chosen jets are correct ($\\%$)       & $\\frac{s}{b}$ & 3rd jet is correct ($\\%$) \\\\", 
+			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's chosen correctly ($\\%$)        & $\\frac{s}{b}$ & 3rd jet is correct ($\\%$) \\\\", 
+			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & chosen light jets are correct ($\\%$) & $\\frac{s}{b}$ & 3rd jet is correct ($\\%$) \\\\"};
 
     std::string Caption[3] = {"\\caption{Overview of correct and wrong reconstructed events for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
 			      "\\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
 			      "\\caption{Overview of correct and wrong reconstructed light jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
 
-    output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c|c|c|c} " << endl;
+    output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c} " << endl;
     output << Title[WhichJets] << " \\hline " << endl;
     for(int ii = 0; ii < NrOptionsConsidered; ii++){
 
@@ -187,14 +187,15 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
 	  }
 
           // 5-jet output
-          output << NameOfOption5Jets[ii] << " & " <<
-          CorrectOnes5Jets[WhichJets]     << " & " <<
-          WrongOnes5Jets[WhichJets]       << " & " <<
-          CorrectPercentage5Jets[WhichJets]    << " & " <<
-          sOverB5Jets[WhichJets]               << " & " <<
-          NotReconstructedEvent5Jets[ii]       << " & " <<
-	  Correct3rdJet[WhichJets]           << " & " << 
-	  ThirdJetPercentage[WhichJets]       << "\\\\ " << endl;
+          output << NameOfOption5Jets[ii]            << 
+	  //" & " << CorrectOnes5Jets[WhichJets]       << 
+	  //" & " << WrongOnes5Jets[WhichJets]         << 
+	  " & " << CorrectPercentage5Jets[WhichJets] << 
+	  " & " << sOverB5Jets[WhichJets]            << 
+	  //" & " << NotReconstructedEvent5Jets[ii]    << 
+	  //" & " << Correct3rdJet[WhichJets]          << 
+	  " & " << ThirdJetPercentage[WhichJets]     << 
+	  "\\\\ " << endl;
 	} 
 	int CorrectOnes[3] = {allFourJetsCorrectlyMatched[ii], twoBTagsCorrectlyMatched[ii]    , twoLightJetsCorrectlyMatched[ii]};
 	int WrongOnes[3]   = {atLeastOneWronglyMatched[ii],    atLeastOneBTagWronglyMatched[ii], atLeastOneLightJetWronglyMatched[ii]};
@@ -205,12 +206,13 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
            CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOnes[jj]+WrongOnes[jj]);
         }
 
-        output << NameOfOption4Jets[ii] << " & " <<
-        CorrectOnes[WhichJets]          << " & " <<
-        WrongOnes[WhichJets]            << " & " <<
-	CorrectPercentage[WhichJets]    << " & " <<
-	sOverB[WhichJets]               << " & " <<
-	NotReconstructedEvent[ii]       << " & X & X \\\\ " << endl;
+        output << NameOfOption4Jets[ii]       << 
+	//" & " << CorrectOnes[WhichJets]       << 
+	//" & " << WrongOnes[WhichJets]         << 
+	" & " << CorrectPercentage[WhichJets] << 
+	" & " << sOverB[WhichJets]            << 
+	//" & " << NotReconstructedEvent[ii]    << 
+	" & X \\\\ " << endl;
     }
     output << " \\end{tabular} " << endl;
     output << Caption[WhichJets] << endl;
