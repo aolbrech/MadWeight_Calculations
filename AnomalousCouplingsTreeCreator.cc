@@ -98,7 +98,7 @@ int main (int argc, char *argv[])
   bool FinalEventSelectionChoiceIsMade = false;
   int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
 
-  int ChiSqCutValue = 5;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
+  int ChiSqCutValue =5;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
   string ChiSqCutValueStr;
   ostringstream convert; convert << ChiSqCutValue;
   if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
@@ -246,7 +246,7 @@ int main (int argc, char *argv[])
   histo1D["WMass"]= new TH1F("WMass","WMass", 200,0,160);
   histo1D["TopMass"]= new TH1F("TopMass","TopMass", 200,0,350);
   histo1D["MlbMass"]= new TH1F("MlbMass","MlbMass",200,0,300);
-  histo1D["MqqbMass"]= new TH1F("MqqbMass","MlbMass",400,0,500);
+  histo1D["MqqbMass"]= new TH1F("MqqbMass","MqqbMass",400,0,500);
   
   ////////////////////////////////////
   /// MultiSamplePlot
@@ -423,7 +423,7 @@ int main (int argc, char *argv[])
     TH1F h_WMass("WMass","WMass", 200,0,160);
     TH1F h_TopMass("TopMass","TopMass", 200,0,350);
     TH1F h_MlbMass("MlbMass","MlbMass",200,0,300);
-    TH1F h_MqqbMass("MqqbMass","MlbMass",400,0,500);
+    TH1F h_MqqbMass("MqqbMass","MqqbMass",400,0,500);
     
     TH2F h_MlbMqqbCorrectChosen("MlbMqqbCorrectChosen","MlbMqqbCorrectChosen",200,0,500,200,0,300);
     TH2F h_MlbMqqbCorrectAll("MlbMqqbCorrectAll","MlbMqqbCorrectAll",200,0,500,200,0,300);
@@ -451,8 +451,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
