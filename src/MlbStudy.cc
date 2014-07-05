@@ -240,8 +240,8 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
        float TimesThirdJetIsACorrectJet[2] = {((float)CorrectLightJetsWithThirdChosen[ii]*100.0/(float)CorrectLightJetsChosen[ii]), 0};
        float TimesThirdJetIsChosenANDCorrect[2] = {((float)ThirdQuarkCorrectChosen[ii]*100.0/(float)ThirdQuarkChosen[ii]), 0};
 
-	std::cout << " CorrectLightJetsWithThirdChosen = " << CorrectLightJetsWithThirdChosen[ii] << ", correctLightJetsChosen = " << CorrectLightJetsChosen[ii] << ", ThirdQuarkCorrectChosen = " << ThirdQuarkCorrectChosen[ii] <<  " & ThirdQuarkChosen = " << ThirdQuarkChosen[ii] << std::endl;
-	std::cout << " ==> first entry : " << TimesThirdJetIsACorrectJet[WhichJets] << " & second entry : " << TimesThirdJetIsChosenANDCorrect[WhichJets] << " for whichjets " << WhichJets << std::endl;
+	//std::cout << " CorrectLightJetsWithThirdChosen = " << CorrectLightJetsWithThirdChosen[ii] << ", correctLightJetsChosen = " << CorrectLightJetsChosen[ii] << ", ThirdQuarkCorrectChosen = " << ThirdQuarkCorrectChosen[ii] <<  " & ThirdQuarkChosen = " << ThirdQuarkChosen[ii] << std::endl;
+	//std::cout << " ==> first entry : " << TimesThirdJetIsACorrectJet[WhichJets] << " & second entry : " << TimesThirdJetIsChosenANDCorrect[WhichJets] << " for whichjets " << WhichJets << std::endl;
 
        float sOverSqrtB[2], CorrectPercentage[2], sOverB[2];
        for(int jj = 0; jj < 2; jj++){
