@@ -1,7 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///// Analysis Skeleton.cc: This macro is intended to be an example analysis macro which works out of the box. /////
-/////       It should serve as the first port of call for new users of the TopBrussels framework.              /////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "TStyle.h"
 #include <cmath>
@@ -93,12 +90,12 @@ int main (int argc, char *argv[])
   //  Run specific parts only  //
   ///////////////////////////////
   bool GenLHCOOutput = false;
-  bool RecoLHCOOutput = false;  
+  bool RecoLHCOOutput = true;  
 
-  bool FinalEventSelectionChoiceIsMade = false;
+  bool FinalEventSelectionChoiceIsMade = true;
   int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
 
-  int ChiSqCutValue =5;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
+  int ChiSqCutValue =1;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
   string ChiSqCutValueStr;
   ostringstream convert; convert << ChiSqCutValue;
   if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
@@ -452,7 +449,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    //for (unsigned int ievt = 0; ievt < 500000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1640,7 +1637,7 @@ int main (int argc, char *argv[])
    std::string Name[3] =  {" - 5 jets case) "," - 4 jets case) "," - pure 5 jets case) "};
  
    TH1F *h_ChiSqCorrect[3], *h_ChiSqCorrectFound[3], *h_ChiSqMinimum[3],* h_ChiSqNotMinimum[3], *h_ChiSqWrong[3];
-   TH1F *h_ChiSqCorrectWhenMatched[3], *h_ChiSqMinimumWhenMatched[3], *h_ChiSqNotMinimumWhenMatched[3], *h_ChiSqAllWhenNotMatched[3], *h_ChiSqMinimumWhenCorrect[3], *h_ChiSqMinimumWhenWrong[3]; 
+   TH1F *h_ChiSqCorrectWhenMatched[3], *h_ChiSqMinimumWhenMatched[3], *h_ChiSqNotMinimumWhenMatched[3], *h_ChiSqAllWhenNotMatched[3], *h_ChiSqMinimumWhenCorrect[3], *h_ChiSqMinimumWhenWrong[3], *h_ChiSqDiffWhenWrong[3]; 
    for(int ii = 0; ii < 3; ii++){
      h_ChiSqCorrect[ii]     =new TH1F(("ChiSqCorrect"+Title[ii]).c_str(),     ("#chi^{2} distribution for the correct combination (all events"+Name[ii]).c_str() ,              150,0,50);
      h_ChiSqCorrectFound[ii]=new TH1F(("ChiSqCorrectFound"+Title[ii]).c_str(),("#chi^{2} distribution for the correct combination (when found"+Name[ii]).c_str(),               150,0,50);
@@ -1654,6 +1651,8 @@ int main (int argc, char *argv[])
      h_ChiSqMinimumWhenCorrect[ii]   =new TH1F(("ChiSqMinimumWhenCorrect"+Title[ii]).c_str(),   ("#chi^{2} distribution for the minimal combination (correct choice only"+Name[ii]).c_str(),     150,0,50);
      h_ChiSqMinimumWhenWrong[ii]     =new TH1F(("ChiSqMinimumWhenWrong"+Title[ii]).c_str(),     ("#chi^{2} distribution for the minimal combination (wrong choice only"+Name[ii]).c_str(),       150,0,50);
      h_ChiSqAllWhenNotMatched[ii]    =new TH1F(("ChiSqAllWhenNotMatched"+Title[ii]).c_str(),    ("#chi^{2} distribution for all the combinations (non-matched evens only"+Name[ii]).c_str(),     150,0,50);
+
+     h_ChiSqDiffWhenWrong[ii] = new TH1F(("ChiSqDiffWhenWrong"+Title[ii]).c_str(), ("#chi^{2}_{correct} - #chi^{2}_{minimum} for the wrong choice"+Name[ii]).c_str(),500,-5,15);
    }
 
    for(int jetCase = ChosenBTagOption; jetCase <(ChosenBTagOption+3); jetCase++){
@@ -1669,8 +1668,10 @@ int main (int argc, char *argv[])
       for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenMatched(jetCase)).size();   ii++) h_ChiSqMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
       for(int ii = 0; ii <(mlbStudy.getChiSqNotMinimumWhenMatched(jetCase)).size();ii++) h_ChiSqNotMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimumWhenMatched(jetCase))[ii]);
       for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenCorrect(jetCase)).size();   ii++) h_ChiSqMinimumWhenCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenCorrect(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenWrong(jetCase)).size();     ii++) h_ChiSqMinimumWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenWrong(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqAllWhenNotMatched(jetCase)).size();    ii++) h_ChiSqAllWhenNotMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqAllWhenNotMatched(jetCase))[ii]); 
+      for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenWrong(jetCase)).size();    ii++) h_ChiSqMinimumWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenWrong(jetCase))[ii]);
+      for(int ii = 0; ii < (mlbStudy.getChiSqAllWhenNotMatched(jetCase)).size();   ii++) h_ChiSqAllWhenNotMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqAllWhenNotMatched(jetCase))[ii]); 
+
+      for(int ii = 0; ii < (mlbStudy.getChiSqDiffWhenWrong(jetCase)).size(); ii++) h_ChiSqDiffWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqDiffWhenWrong(jetCase))[ii]);
    }   
 
     //Close the LHCO Output files!
@@ -1697,6 +1698,8 @@ int main (int argc, char *argv[])
        h_ChiSqMinimumWhenCorrect[ii]->Write();
        h_ChiSqMinimumWhenWrong[ii]->Write();
        h_ChiSqAllWhenNotMatched[ii]->Write();
+
+       h_ChiSqDiffWhenWrong[ii]->Write();
     }
 
     h_StandardCosThetaNoEvtSel.Write();
