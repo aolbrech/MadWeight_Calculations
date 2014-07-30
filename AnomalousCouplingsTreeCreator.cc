@@ -90,19 +90,19 @@ int main (int argc, char *argv[])
   //  Run specific parts only  //
   ///////////////////////////////
   bool GenLHCOOutput = false;
-  bool RecoLHCOOutput = true;  
+  bool RecoLHCOOutput = false;  
 
   bool FinalEventSelectionChoiceIsMade = true;
   int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
 
-  int ChiSqCutValue =1;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
+  int ChiSqCutValue =51;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
   string ChiSqCutValueStr;
   ostringstream convert; convert << ChiSqCutValue;
   if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
   else ChiSqCutValueStr = "";
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
-  const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
+  const int NrConsideredBTagOptions = 6;   //Make sure this number is also the same in the bTagStudy class!!
   const int ChosenBTagOption = 3;  //2 T b-tags!!
 
   int CorrectEventMlbMqqb[NrConsideredBTagOptions];
@@ -256,16 +256,16 @@ int main (int argc, char *argv[])
   ////////////////////////////////////
       
   vector<string> CutsSelecTableSemiMu;
-  CutsSelecTableSemiMu.push_back(string("preselected"));
-  CutsSelecTableSemiMu.push_back(string("trigged"));
+  CutsSelecTableSemiMu.push_back(string("Preselected"));
+  CutsSelecTableSemiMu.push_back(string("Trigged"));
   CutsSelecTableSemiMu.push_back(string("Good PV"));
   CutsSelecTableSemiMu.push_back(string("1 selected muon"));
   CutsSelecTableSemiMu.push_back(string("Veto 2nd muon"));
   CutsSelecTableSemiMu.push_back(string("Veto electron"));
   
   vector<string> CutsSelecTableSemiEl;
-  CutsSelecTableSemiEl.push_back(string("preselected"));
-  CutsSelecTableSemiEl.push_back(string("trigged"));
+  CutsSelecTableSemiEl.push_back(string("Preselected"));
+  CutsSelecTableSemiEl.push_back(string("Trigged"));
   CutsSelecTableSemiEl.push_back(string("Good PV"));
   CutsSelecTableSemiEl.push_back(string("1 selected electron"));
   CutsSelecTableSemiEl.push_back(string("Veto muon"));
@@ -449,7 +449,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 500000; ievt++){
+    //for (unsigned int ievt = 0; ievt < 500; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -864,12 +864,27 @@ int main (int argc, char *argv[])
       /////////////////////
       // EVENT SELECTION //
       /////////////////////
+
+      // MSPlots before 'basic' event selection (no b-tag)
+      if (MSPlot.find("Init_Events_pT_jet1_beforeEvtSel") == MSPlot.end()){
+	MSPlot["Init_Events_pT_jet1_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet1_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Init_Events_pT_jet2_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet2_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Init_Events_pT_jet3_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet3_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Init_Events_pT_jet4_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet4_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+      }
+
+      if(init_jets_corrected.size() >=4){
+          MSPlot["Init_Events_pT_jet1_beforeEvtSel"]->Fill(init_jets_corrected[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+          MSPlot["Init_Events_pT_jet2_beforeEvtSel"]->Fill(init_jets_corrected[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+          MSPlot["Init_Events_pT_jet3_beforeEvtSel"]->Fill(init_jets_corrected[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+          MSPlot["Init_Events_pT_jet4_beforeEvtSel"]->Fill(init_jets_corrected[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      }
       
       //Declare selection instance    
       Selection selection(init_jets_corrected, init_muons, init_electrons, mets, event->kt6PFJets_rho());
-      selection.setJetCuts(40,2.5,0.01,1.,0.98,0.3,0.1);     
-      selection.setMuonCuts(25,2.1,0.12,0.2,0.3,1,0.5,5,0); 
-      selection.setElectronCuts(32,2.5,0.1,0.02,0.5,0.3,0); 
+      selection.setJetCuts(30,2.5,0.01,1.,0.98,0.3,0.1);     
+      selection.setMuonCuts(26,2.1,0.12,0.2,0.3,1,0.5,5,0); 
+      selection.setElectronCuts(30,2.5,0.1,0.02,0.5,0.3,0); 
       selection.setLooseMuonCuts(10,2.5,0.2);
       selection.setLooseElectronCuts(20,2.5,0.15,0.);
       
@@ -969,26 +984,45 @@ int main (int argc, char *argv[])
       //////////////////////
       // Event selection  //
       //////////////////////
+      
+
       bool eventselectedSemiMu = false;
       bool eventselectedSemiEl = false;
       
       // semi-mu selection
+      selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);
       if (triggedSemiMu) {
+	selecTableSemiMu.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV) {
+	  selecTableSemiMu.Fill(d,2,scaleFactor*lumiWeight);
 	  if(dataSetName.find("InvIso") != string::npos) selectedJets = selectedJetsNoMu;
 	  if (selectedMuons.size() == 1) {
+	    selecTableSemiMu.Fill(d,3,scaleFactor*lumiWeight);
 	    if( vetoMuons.size() == 1 || ( dataSetName.find("InvIso") != string::npos && vetoMuons.size() == 0 ) ) { // if InvertedIso, selected muon not part of vetoMuons vector!
+	      selecTableSemiMu.Fill(d,4,scaleFactor*lumiWeight);
 	      if (vetoElectronsSemiMu.size() == 0) {
-		if (selectedJets.size() >= 4) {
-		  eventselectedSemiMu = true;
+		selecTableSemiMu.Fill(d,5,scaleFactor*lumiWeight);
+		if (selectedJets.size() >= 1) {
+		  selecTableSemiMu.Fill(d,6,scaleFactor*lumiWeight);
+		  if (selectedJets.size() >= 2) {
+		    selecTableSemiMu.Fill(d,7,scaleFactor*lumiWeight);
+		    if (selectedJets.size() >= 3) {
+		      selecTableSemiMu.Fill(d,8,scaleFactor*lumiWeight);
+		      if (selectedJets.size() >= 4) {
+			selecTableSemiMu.Fill(d,9,scaleFactor*lumiWeight);
+		 	eventselectedSemiMu = true;
+		      }
+		    }
+		  }
 		}
 	      }
 	    }
 	  }
 	}
       }
+
+      // semi-elec selection
       selecTableSemiEl.Fill(d,0,scaleFactor*lumiWeight);
-      
       if( triggedSemiEl) {
 	if(dataSetName.find("InvIso") != string::npos) selectedJets = selectedJetsNoEl;
 	selecTableSemiEl.Fill(d,1,scaleFactor*lumiWeight);
@@ -1010,6 +1044,7 @@ int main (int argc, char *argv[])
 		      if( selectedJets.size()>=4 ) {
 			selecTableSemiEl.Fill(d,10,scaleFactor*lumiWeight);
 			eventselectedSemiEl=true;
+
 		      }
 		    }
 		  }
@@ -1062,18 +1097,22 @@ int main (int argc, char *argv[])
       
       // MSPlots after 'basic' event selection (no b-tag)
       if (MSPlot.find("Selected_Events_pT_jet1"+leptonFlav) == MSPlot.end()){
-	MSPlot["Selected_Events_pT_jet1"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet1"+leptonFlav, 30, 0, 600, "p_{T} (GeV)");
-	MSPlot["Selected_Events_pT_jet2"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet2"+leptonFlav, 30, 0, 600, "p_{T} (GeV)");
-	MSPlot["Selected_Events_pT_jet3"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet3"+leptonFlav, 30, 0, 600, "p_{T} (GeV)");
-	MSPlot["Selected_Events_pT_jet4"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet4"+leptonFlav, 30, 0, 600, "p_{T} (GeV)");
-	MSPlot["Selected_Events_pT_4leadingjets"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_4leadingjets"+leptonFlav, 30, 0, 600, "p_{T} (GeV)");
-	MSPlot["Selected_Events_pT_alljets"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_alljets"+leptonFlav, 30, 0, 600, "p_{T} (GeV)");
+	MSPlot["Selected_Events_pT_jet1"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet1"+leptonFlav, 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Selected_Events_pT_jet2"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet2"+leptonFlav, 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Selected_Events_pT_jet3"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet3"+leptonFlav, 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Selected_Events_pT_jet4"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet4"+leptonFlav, 60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Selected_Events_pT_4leadingjets"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_4leadingjets"+leptonFlav,60, 0, 600, "p_{T} (GeV)");
+	MSPlot["Selected_Events_pT_alljets"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_alljets"+leptonFlav, 60, 0, 600, "p_{T} (GeV)");
+
+	MSPlot["Selected_Events_pT_lepton"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_lepton"+leptonFlav,150,0,300,"p_{t} (GeV)");
       }
-      
+
       MSPlot["Selected_Events_pT_jet1"+leptonFlav]->Fill(selectedJets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       MSPlot["Selected_Events_pT_jet2"+leptonFlav]->Fill(selectedJets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       MSPlot["Selected_Events_pT_jet3"+leptonFlav]->Fill(selectedJets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       MSPlot["Selected_Events_pT_jet4"+leptonFlav]->Fill(selectedJets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+
+      MSPlot["Selected_Events_pT_lepton"+leptonFlav]->Fill(selectedLepton->Pt(), datasets[d], true, Luminosity*scaleFactor);
       
       for (unsigned int q=0; q<selectedJets.size(); q++) {
 	MSPlot["Selected_Events_pT_alljets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor);       
@@ -1780,6 +1819,9 @@ int main (int argc, char *argv[])
   }
   
   //Selection tables
+  selecTableSemiMu.TableCalculator(false,true,true,true,true);
+  string selectiontableMu = "SelectionTable_BTAG_SEMIMU.tex";
+  selecTableSemiMu.Write(selectiontableMu.c_str());
   selecTableSemiEl.TableCalculator(false, true, true, true, true);
   string selectiontableEl = "SelectionTable_BTAG_SEMIEL.tex";
   selecTableSemiEl.Write(selectiontableEl.c_str());
