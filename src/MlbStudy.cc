@@ -118,7 +118,7 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 	int NrChiSqs = 6;
 	int UsedLowestChiSq = LowestChiSq;
 	int UsedCorrectChiSq = CorrectChiSq;
-	if(NrConsideredBTagOptions > 1){ getIndices(LowestChiSq4Jets); NrChiSqs = 0; }
+	if(NrConsideredBTagOptions > 1){ UsedLowestChiSq = LowestChiSq4Jets; getIndices(LowestChiSq4Jets); NrChiSqs = 0; if(CorrectChiSq > 1) UsedCorrectChiSq = 999;}
 	else if(NrConsideredBTagOptions == 1){
 	   if(ii == 1){ option=option+1; NrChiSqs = 2; UsedLowestChiSq = LowestChiSq4Jets; if(CorrectChiSq > 1) UsedCorrectChiSq = 999;} //4-jet case
 	   if(ii == 2){ option=option+1;                                                                                               } //pure 5-jet case! (+1 since +1 done for 4jets)
@@ -206,6 +206,7 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 	   }//Correct option is available
 	   else{
 		CorrectMatchingNotExisting[option]++;
+		WrongEventChosen[option]++;
 		for(int jj = 0; jj < NrChiSqs;jj++) h_ChiSqAllMatchingNotExisting[option].push_back(ChiSquared[jj]);
 	   }
  
@@ -224,7 +225,7 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
 //   std::string Title[2] = {"\\multirow{2}{*}{\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$)} & 4 chosen jets & $\\frac{s}{b}$ & 3rd jet is one of the & 3rd jet is chosen \\\\ & are correct ($\\%$)    & 	             & 2 correct light jets ($\\%$) &  and correct ($\\%$)	  \\\\",
 //			   " \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & \\% b's correct   & $\\frac{s}{b}$ &  &  \\\\"};
   
-   std::string Title[2] = {"\\multirow{2}{*}{\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$)} & all 4 correct & $\\geq$ 1 wrong & 4 chosen jets & $\\frac{s}{b}$ & non-matched \\\\ & & & are correct (&\\%$) & & \\\\",
+   std::string Title[2] = {"\\multirow{2}{*}{\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$)} & all 4 correct & $\\geq$ 1 wrong & 4 chosen jets & $\\frac{s}{b}$ & non-matched \\\\ & & & are correct ($\\%$) & & \\\\",
 			   "\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & Correct b's & Wrong b's & & \\% b's correct   & $\\frac{s}{b}$ & Correct option exists \\\\"};
    std::string Caption[2] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags when a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method is applied} ", 
 			     " \\caption{Overview of the number of times the correct b-jet combination is chosen when using a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
