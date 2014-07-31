@@ -105,6 +105,9 @@ int main (int argc, char *argv[])
   const int NrConsideredBTagOptions = 6;   //Make sure this number is also the same in the bTagStudy class!!
   const int ChosenBTagOption = 3;  //2 T b-tags!!
 
+  int bTagCounter = 0;  //Only used for debugging!
+  int mlbCounter = 0;
+
   int CorrectEventMlbMqqb[NrConsideredBTagOptions];
   int WrongEventMlbMqqb[NrConsideredBTagOptions];
   for(int ii = 0; ii < NrConsideredBTagOptions; ii++){
@@ -1325,6 +1328,7 @@ int main (int argc, char *argv[])
             //Also check the correct jet combi:
             if((bTagStudy.getbTaggedJets(option)).size() >= 2 && (bTagStudy.getLightJets(option)).size() >=2){
 	       bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, option);
+		if(option == 0) bTagCounter++;
             }
             else{
 	       if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
@@ -1498,6 +1502,9 @@ int main (int argc, char *argv[])
       for(int Option = 0; Option < NrConsideredBTagOptions; Option++){
 	if(NrConsideredBTagOptions == 1) Option = ChosenBTagOption;    //Force Option to be equal to the one chosen!
 
+	if(Option == 0 && (bTagStudy.getbTaggedJets(Option)).size() > 1 && (bTagStudy.getLightJets(Option)).size() > 1){
+		mlbCounter++;
+	}
 	mlbStudy.calculateChiSquared(jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
 	mlbStudy.calculateEfficiency(Option, jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions, ChiSqCutValue);
 
@@ -1626,6 +1633,9 @@ int main (int argc, char *argv[])
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
+
+    cout << " Number of events send to b-tag calculation: "<< bTagCounter << std::endl;
+    cout << " Number of events send to mlb calculation  : "<< mlbCounter << std::endl;
     
     //////////////////////////////
     //  Jet combination output  //
