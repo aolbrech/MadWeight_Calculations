@@ -34,9 +34,6 @@ source /jefmount_mnt/jefmount/cmss/slc5_amd64_gcc462/external/dcap/2.47.5.0-cms/
 ./AnomalousCouplingsTreeCreator
 
 ----------------
-Git Rsource /jefmount_mnt/jefmount/cmss/slc5_amd64_gcc462/external/dcap/2.47.5.0-cms/etc/profile.d/init.shemark:
-----------------
-
 push command which need to be used: git push origin master
 --> Important to make sure that origin is defined correctly in the .git/config file
 Should be as followed:
@@ -53,3 +50,8 @@ Should be as followed:
 	remote = origin
 	merge = refs/heads/master
 
+Git command to merge development branch 'test' with master branch:
+ * git checkout master
+ * git pull origin master
+ * git merge test
+ * git push origin master
