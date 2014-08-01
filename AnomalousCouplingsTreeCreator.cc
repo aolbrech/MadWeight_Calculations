@@ -885,8 +885,8 @@ int main (int argc, char *argv[])
       
       //Declare selection instance    
       Selection selection(init_jets_corrected, init_muons, init_electrons, mets, event->kt6PFJets_rho());
-      selection.setJetCuts(40,2.5,0.01,1.,0.98,0.3,0.1);     
-      selection.setMuonCuts(25,2.1,0.12,0.2,0.3,1,0.5,5,0); 
+      selection.setJetCuts(30,2.5,0.01,1.,0.98,0.3,0.1);     
+      selection.setMuonCuts(26,2.1,0.12,0.2,0.3,1,0.5,5,0); 
       selection.setElectronCuts(32,2.5,0.1,0.02,0.5,0.3,0); 
       selection.setLooseMuonCuts(10,2.5,0.2);
       selection.setLooseElectronCuts(20,2.5,0.15,0.);
