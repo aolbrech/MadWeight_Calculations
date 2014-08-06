@@ -312,7 +312,13 @@ int main (int argc, char *argv[])
   LumiWeightsDown = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
 
   cout << " Initialized LumiReWeighting stuff" << endl;
-  
+
+  // initialize lepton SF
+  LeptonTools* leptonTools = new LeptonTools(false);
+  leptonTools->readMuonSF("LeptonSF/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.root", "LeptonSF/MuonEfficiencies_Run_2012A_2012B_53X.root", "LeptonSF/MuonEfficiencies_Run_2012C_53X.root", "LeptonSF/TriggerMuonEfficiencies_Run_2012D_53X.root");
+  leptonTools->readElectronSF();
+
+
   ////////////////////////////////////
   //	Loop on datasets
   ////////////////////////////////////
@@ -340,30 +346,38 @@ int main (int argc, char *argv[])
     cout<<"LoadEvent"<<endl;
     
     /////////////////////////////////////
-    /// Initialize JEC factors
+    /// Initialize JEC factors            --> Updated on 5/08/2014
     /////////////////////////////////////
-   	    
+
     vector<JetCorrectorParameters> vCorrParam;
 
-    /*JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L3Absolute_AK5PFchs.txt");
-    JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L2Relative_AK5PFchs.txt");
-    JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_MC_L1FastJet_AK5PFchs.txt");
-    
-    //  Load the JetCorrectorParameter objects into a vector, IMPORTANT: THE ORDER MATTERS HERE !!!! 
-    vCorrParam.push_back(*L1JetPar);
-    vCorrParam.push_back(*L2JetPar);
-    vCorrParam.push_back(*L3JetPar);
+    if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) // Data!
+    {
+      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
+      vCorrParam.push_back(*L1JetCorPar);
+      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
+      vCorrParam.push_back(*L2JetCorPar);
+      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
+      vCorrParam.push_back(*L3JetCorPar);
+      JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
+      vCorrParam.push_back(*L2L3ResJetCorPar);
+    }
+    else
+    {
+      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
+      vCorrParam.push_back(*L1JetCorPar);
+      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
+      vCorrParam.push_back(*L2JetCorPar);
+      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
+      vCorrParam.push_back(*L3JetCorPar);
+    }
+    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
+    //JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "SubTotalMC")));
+    //JetCorrectionUncertainty *jecUncTotal = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
 
-    if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) { // DATA!
-      JetCorrectorParameters *ResJetCorPar = new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Summer12_V3_DATA_L2L3Residual_AK5PFchs.txt");
-      vCorrParam.push_back(*ResJetCorPar);
-      }*/
-    
-    JetCorrectionUncertainty *jecUnc =new JetCorrectionUncertainty(*(new JetCorrectorParameters("../TopTreeAnalysisBase/Calibrations/JECFiles/Fall12_V6_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
-    
-    // true means redo also the L1
+    //True means also redo L1        
     JetTools *jetTools = new JetTools(vCorrParam, jecUnc, true);
-    
+   
     /////////////////////////////////////////
     //  LHCO Output files + GeneratorInfo  //
     /////////////////////////////////////////
@@ -492,9 +506,7 @@ int main (int argc, char *argv[])
       
       // check with genEvent which ttbar channel it is
       if(dataSetName.find("TTbarJets") == 0)  {
-	//cout << "LOADING GenEvent" << endl;
 	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
-	//std::cout << "genEvt: " << genEvt << std::endl;
 	if( genEvt->isSemiLeptonic(TRootGenEvent::kMuon) ) {
 	  isSemiMu=true;
 	  isSemiE=false;
@@ -533,27 +545,43 @@ int main (int argc, char *argv[])
       //////////////////////////////////////
       // Apply Jet Corrections on-the-fly //   
       //////////////////////////////////////
+      if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 )
+      {
+        jetTools->unCorrectMETTypeOne(init_jets, mets[0], true);
+        jetTools->correctJets(init_jets, event->kt6PFJets_rho(), true);
+        jetTools->correctMETTypeOne(init_jets, mets[0], true);
+      }
+      else
+      {
+        jetTools->unCorrectMETTypeOne(init_jets, mets[0], false);
+        jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
+        jetTools->correctMETTypeOne(init_jets, mets[0], false);
+      }
 
-      // not needed for now, GT contains good stuff
-      /*if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) {
-      	//jetTools->correctJets(init_jets_corrected,event->kt6PFJetsPF2PAT_rho(),true); //last boolean: isData (needed for L2L3Residual...)
-      } else {
-	jetTools->correctJets(init_jets_corrected,event->kt6PFJets_rho(),false); //last boolean: isData (needed for L2L3Residual...)
-	}*/
+      ////////////////////////////////////////
+      //  Beam scraping and PU reweighting
+      ////////////////////////////////////////
+      if(dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA"){
+	 // Apply the scraping veto. (Is it still needed?)
+         bool isBeamBG = true;
+         if(event->nTracks() > 10){
+             if( ( (float) event->nHighPurityTracks() ) / ( (float) event->nTracks() ) > 0.25 )
+		isBeamBG = false;
+	 }
+      	 if(isBeamBG) continue;
+      }
+      else{
+ 	 double lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
+	 double lumiWeightOLD=lumiWeight;
+         if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0){
+	     lumiWeight=1;
+         }
+	 scaleFactor = scaleFactor*lumiWeight;
+      }
+      //histo1D["lumiWeights"]->Fill(scaleFactor);	
 
-      // PU reweighting
-
-      // old method
-
-      double lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-
-      if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0)
-	lumiWeight=1;
-      
       // up syst -> lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
       // down syst -> lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
-
-      scaleFactor = scaleFactor*lumiWeight;
 
       ///////////////////
       // TRIGGER SETUP //
@@ -574,65 +602,53 @@ int main (int argc, char *argv[])
 	//semi-mu
 	if(dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) {
 	  
-	  // 2.7/fb recalib 
-	  if( event->runId() <= 190738 )
-	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
-
-	  else if( event->runId() >= 191043 && event->runId() <= 193621 )
-	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v12"), currentRun, iFile);
-	  
-	  else if( event->runId() >= 193834 && event->runId() <= 196531 )
-	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun, iFile);
-
-	  else if( event->runId() >= 198049 && event->runId() <= 199608)
-	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v14"), currentRun, iFile);
-
-	  else if( event->runId() >= 199698 && event->runId() <= 208357)
-	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v15"), currentRun, iFile);
-
-	  else {
-	    cout << "Unknown run for HLTpath selection: " << event->runId() << endl;
-	    exit(1);
-	  }
-	  
-	  if( itriggerSemiMu == 9999 ){	    
-            cout << "itriggerSemiMu == 9999 for SemiMu HLTpath selection: " << event->runId() << endl;
-            exit(-1);
-          }
-	  
-	} else {
-	  itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun); // Summer12 DR53X
+	    // 2.7/fb recalib 
+            if( event->runId() >= 190456 && event->runId() <= 190738 )
+		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
+	    else if( event->runId() >= 190782 && event->runId() <= 193621)
+		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v12"), currentRun, iFile);
+	    else if(event->runId() >= 193834  && event->runId() <= 196531 )
+		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun, iFile);
+	    else if( event->runId() >= 198022  && event->runId() <= 199608)
+		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v14"), currentRun, iFile);
+	    else if( event->runId() >= 199698 && event->runId() <= 209151)
+		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v15"), currentRun, iFile);
+	    else
+		cout << "Unknown run for SemiMu HLTpath selection: " << event->runId() << endl;
+	    if( itrigger == 9999 ){
+		cout << "itriggerSemiMu == 9999 for SemiMu HLTpath selection: " << event->runId() << endl;
+                exit(-1);
+            }
+        }
+        else{ 
+	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun); // Summer12 DR53X
 	}
 	
-	// semi-el
 	// semi-electron
         if(dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0 ) {
 	  
-	  // 2.7/fb recalib 
-	  if( event->runId() <= 190738 )
-	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
-	  
-	  else if( event->runId() >= 191043 && event->runId() <= 191411 )
-	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v9"), currentRun, iFile);
-
-	  else if( event->runId() >= 191695 && event->runId() <= 196531)
-	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun, iFile);
-	  
-	  else if( event->runId() >= 198049 && event->runId() <= 208357)
-	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
-  
-	  else { 
-            cout << "Unknown run for SemiEl HLTpath selection: " << event->runId() << endl;
-	    exit(1);
-	  }
-	  if( itriggerSemiEl == 9999 ){	    
-	    cout << "itriggerSemiEl == 9999 for SemiEl HLTpath selection: " << event->runId() << endl;
-	    exit(-1);
-	  }
+	     // 2.7/fb recalib 
+             if( event->runId() <= 190738 )
+                itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
+             else if( event->runId() >= 190782 && event->runId() <= 191411 )
+                 itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v9"), currentRun, iFile);
+             else if( event->runId() >= 191695 && event->runId() <= 196531)
+                 itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun, iFile);
+             else if( event->runId() >= 198049 && event->runId() <= 208686)
+                 itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
+	     //else if( event->runId() > 208686)
+	     //     itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
+             else { 
+                 cout << "Unknown run for SemiEl HLTpath selection: " << event->runId() << endl;
+	         exit(1);
+	     }
+	     if( itriggerSemiEl == 9999 ){	    
+	         cout << "itriggerSemiEl == 9999 for SemiEl HLTpath selection: " << event->runId() << endl;
+	         exit(-1);
+	     }
         }
-        else{	  
+        else	  
 	  itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun); // Summer12 DR53X 
-	}
       }
       
       if (itriggerSemiMu == 9999 && itriggerSemiEl == 9999) {
@@ -649,36 +665,19 @@ int main (int argc, char *argv[])
       //JER Smearing:
       if( ! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) ) {
 	
-	/*    From file James (FourTop_EventSelection.cc)
-	//JER
-	doJERShift == 0;
+	doJERShift == 0;       //Do not put this hard-coded
 	if(doJERShift == 1)
-	jetTools->correctJetJER(init_jets, genjets, mets[0], "minus");
+	   jetTools->correctJetJER(init_jets, genjets, mets[0], "minus",false);
 	else if(doJERShift == 2)
-	jetTools->correctJetJER(init_jets, genjets, mets[0], "plus");
+	   jetTools->correctJetJER(init_jets, genjets, mets[0], "plus",false);
 	else
-	jetTools->correctJetJER(init_jets, genjets, mets[0], "nominal");
-        
-	//     coutObjectsFourVector(init_muons,init_electrons,init_jets,mets,"After JER correction:");
+	   jetTools->correctJetJER(init_jets, genjets, mets[0], "nominal",false); //false means don't use old numbers but newer ones ...
         
 	// JES sysematic!
 	if (doJESShift == 1)
-	jetTools->correctJetJESUnc(init_jets, mets[0], "minus");
+	   jetTools->correctJetJESUnc(init_jets, mets[0], "minus",1);  //1 = nSigma
 	else if (doJESShift == 2)
-	jetTools->correctJetJESUnc(init_jets, mets[0], "plus");
-        
-	//            coutObjectsFourVector(init_muons,init_electrons,init_jets,mets,"Before JES correction:");
-	*/                                                         	                                                                                                	    
-	
-	jetTools->correctJetJER(init_jets_corrected, genjets, mets[0], "nominal",false);
-	
-	//jetTools->correctJetJER(init_jets_corrected, genjets, mets[0], "minus",false); //false means don't use old numbers but newer ones...
-	//jetTools->correctJetJER(init_jets_corrected, genjets, mets[0], "plus",false);
-	
-	// Example how to apply JES systematics
-	 
-	//jetTools->correctJetJESUnc(init_jets_corrected, "minus",1);
-	//jetTools->correctJetJESUnc(init_jets_corrected, "plus",1);
+	   jetTools->correctJetJESUnc(init_jets, mets[0], "plus",1);
       }
 
       ////////////////////////////////////////////////////////
@@ -745,7 +744,6 @@ int main (int argc, char *argv[])
       //  Consider only events with correct event content (b b q q l vl)  //
       //////////////////////////////////////////////////////////////////////
       if(GenLHCOOutput == true) EventInfoFile << "     " << ievt << "         ";
-      //if(ievt == 76 || ievt == 89 || ievt == 153 || ievt == 275) cout << " Lepton type : " << Lepton->type() << " \n " << std::endl;
       if(EventContent[0]==2 && EventContent[1]==2 && EventContent[2]==2 && EventContent[3]==2 && EventContent[4]==2){
 	FalseEventContent = false;
 	vector<TRootMCParticle*> LHCOVector(6);
@@ -902,57 +900,17 @@ int main (int argc, char *argv[])
 
       bool isGoodPV = selection.isPVSelected(vertex, 4, 24, 2.);
 
-      vector<TRootJet*> selectedJets, selectedJetsNoMu, selectedJetsNoEl;
+      vector<TRootJet*> selectedJets;
       vector<TRootMuon*> selectedMuons;
       vector<TRootElectron*> selectedElectrons;
       vector<TRootMuon*> vetoMuons = selection.GetSelectedLooseMuons(10,2.5,0.2);
       vector<TRootElectron*> vetoElectronsSemiMu = selection.GetSelectedLooseElectrons(20,2.5,0.15);
       vector<TRootElectron*> vetoElectronsSemiEl = selection.GetSelectedLooseElectrons(20,2.5,0.15);
 
-      if( dataSetName.find("InvIso") != string::npos )  { // event selection for special Data TopTrees for ARI QCD
-        vector<TRootMuon*> overlapMuons = selection.GetSelectedMuonsInvIso(0.2, vertex[0]);
-        vector<TRootElectron*> overlapElectrons = selection.GetSelectedElectronsInvIso(0.2);
-        selectedJetsNoMu = selection.GetSelectedJets(overlapMuons,true);
-        selectedJetsNoEl = selection.GetSelectedJets(overlapElectrons,true);
-
-	/*if (selectedJetsNoMu.size() >= 4) {
-	  //cout << "ol" << endl;
-	  if (selectedJetsNoMu[0]->Pt() < 45) selectedJetsNoMu.clear();
-	  if (selectedJetsNoMu[1]->Pt() < 45) selectedJetsNoMu.clear();
-	  if (selectedJetsNoMu[2]->Pt() < 40) selectedJetsNoMu.clear();
-	  if (selectedJetsNoMu[3]->Pt() < 40) selectedJetsNoMu.clear();
-	}
-
-	if (selectedJetsNoEl.size() >= 4) {
-	  //cout << "ol" << endl;
-	  if (selectedJetsNoEl[0]->Pt() < 45) selectedJetsNoEl.clear();
-	  if (selectedJetsNoEl[1]->Pt() < 45) selectedJetsNoEl.clear();
-	  if (selectedJetsNoEl[2]->Pt() < 40) selectedJetsNoEl.clear();
-	  if (selectedJetsNoEl[3]->Pt() < 40) selectedJetsNoEl.clear();
-	  }*/
-
-	//selectedJetsNoMu = selection.GetSelectedJets(true);
-        //selectedJetsNoEl = selection.GetSelectedJets(true);
-
-	selectedMuons = selection.GetSelectedMuonsInvIso(0.2, vertex[0], selectedJetsNoMu);
-        selectedElectrons = selection.GetSelectedElectronsInvIso(0.2,selectedJetsNoEl);
-      }
-      else { // Normal selection
-	selectedJets = selection.GetSelectedJets(true);
-	
-	/*if (selectedJets.size() >= 4) {
-	//cout << "ol" << endl;
-	  if (selectedJets[0]->Pt() < 45) selectedJets.clear();
-	  if (selectedJets[1]->Pt() < 45) selectedJets.clear();
-	  if (selectedJets[2]->Pt() < 40) selectedJets.clear();
-	  if (selectedJets[3]->Pt() < 40) selectedJets.clear();
-	  }*/
-
-	//selectedMuons = selection.GetSelectedMuons(vertex[0],selectedJets);	
-	selectedMuons = selection.GetSelectedMuons(vertex[0],selectedJets);
-	selectedElectrons = selection.GetSelectedElectrons(selectedJets);
-      }
-
+      selectedJets = selection.GetSelectedJets(true);
+      selectedMuons = selection.GetSelectedMuons(vertex[0],selectedJets);
+      selectedElectrons = selection.GetSelectedElectrons(selectedJets);
+      
       //Variables containing the right jet combination for TTJets
       int CorrectQuark1=999, CorrectQuark2=999, CorrectBHadronic=999, CorrectBLeptonic=999;
       
@@ -967,11 +925,6 @@ int main (int argc, char *argv[])
       int BLeptIndex, BHadrIndex, QOneIndex, QTwoIndex;
       float ChiSquaredValue;
       	    
-      //float MassW=83.6103;
-      //float MassTop = 172.956;
-      //float SigmaW=11.1534;  //Obtained from gaussian fit on Top and W distribution with simulated information
-      //float SigmaTop=18.232;
-
       float MassMlb = 103.286;
       float MassMqqb = 178.722;
       float SigmaMlb = 26.7764;
@@ -980,8 +933,7 @@ int main (int argc, char *argv[])
       /////////////////////////////
       // Neutrino Reconstruction //
       /////////////////////////////
-      float NeutrinoPx;
-      float NeutrinoPy;
+      float NeutrinoPx, NeutrinoPy;
       float NeutrinoPz=99.;//with this value it can be distinguished in plot!
       TLorentzVector Neutrino;
       
@@ -992,14 +944,18 @@ int main (int argc, char *argv[])
 
       bool eventselectedSemiMu = false;
       bool eventselectedSemiEl = false;
-      
+
+      if (dataSetName != "Data"&&  selectedElectrons.size() ==1 ) {
+           scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(),leptonsyst );
+           //histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(),leptonsyst ));
+      }
+     
       // semi-mu selection
       selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);
       if (triggedSemiMu) {
 	selecTableSemiMu.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV) {
 	  selecTableSemiMu.Fill(d,2,scaleFactor*lumiWeight);
-	  if(dataSetName.find("InvIso") != string::npos) selectedJets = selectedJetsNoMu;
 	  if (selectedMuons.size() == 1) {
 	    selecTableSemiMu.Fill(d,3,scaleFactor*lumiWeight);
 	    if( vetoMuons.size() == 1 || ( dataSetName.find("InvIso") != string::npos && vetoMuons.size() == 0 ) ) { // if InvertedIso, selected muon not part of vetoMuons vector!
@@ -1028,7 +984,6 @@ int main (int argc, char *argv[])
       // semi-elec selection
       selecTableSemiEl.Fill(d,0,scaleFactor*lumiWeight);
       if( triggedSemiEl) {
-	if(dataSetName.find("InvIso") != string::npos) selectedJets = selectedJetsNoEl;
 	selecTableSemiEl.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV ) {
 	  selecTableSemiEl.Fill(d,2,scaleFactor*lumiWeight);
@@ -1061,7 +1016,7 @@ int main (int argc, char *argv[])
  
       if( !eventselectedSemiMu && !eventselectedSemiEl && RecoLHCOOutput == true ) EventInfoFile << "     Evt sel failed   "<<endl;
       if (!eventselectedSemiMu && !eventselectedSemiEl) continue;
-      if(RecoLHCOOutput == true) EventInfoFile << "             1          ";  //To avoid tau's which are reconstructed as muons!
+      if(RecoLHCOOutput == true) EventInfoFile << "             1          ";  
       
       //Counting the number of events passing through the 'basic' event selection requirements    
       if (eventselectedSemiMu) nSelectedMu++;
