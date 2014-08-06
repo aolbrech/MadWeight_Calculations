@@ -27,6 +27,7 @@
 #include "TopTreeAnalysisBase/Reconstruction/interface/JetCorrectorParameters.h"
 #include "Style.C"
 #include "TopTreeAnalysisBase/MCInformation/interface/LumiReWeighting.h"
+#include "TopTreeAnalysisBase/Tools/interface/LeptonTools.h"
 
 //Specific code for anomalous couplings analysis:
 #include "TopTreeAnalysis/AnomCouplings/interface/LHCOOutput.h"
@@ -91,23 +92,18 @@ int main (int argc, char *argv[])
   ///////////////////////////////
   bool GenLHCOOutput = true;
   bool RecoLHCOOutput = true;  
-
   bool FinalEventSelectionChoiceIsMade = true;
-  int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
-
-  int ChiSqCutValue =51;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
-  string ChiSqCutValueStr;
-  ostringstream convert; convert << ChiSqCutValue;
-  if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
-  else ChiSqCutValueStr = "";
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
   const int ChosenBTagOption = 3;  //2 T b-tags!!
+  int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
 
-  int bTagCounter = 0;  //Only used for debugging!
-  int mlbCounter = 0;
+  int ChiSqCutValue =51;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
 
+  /////////////////////////////////////
+  //   Initializiation of counters   //
+  ///////////////////////////////////// 
   int CorrectEventMlbMqqb[NrConsideredBTagOptions];
   int WrongEventMlbMqqb[NrConsideredBTagOptions];
   for(int ii = 0; ii < NrConsideredBTagOptions; ii++){
@@ -125,6 +121,18 @@ int main (int argc, char *argv[])
 			       "2 T b-tags, light M-veto", //#4
 			       "2 T b-tags, light L-veto"};//#5
 
+  string ChiSqCutValueStr;
+  ostringstream convert; convert << ChiSqCutValue;
+  if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
+  else ChiSqCutValueStr = "";
+
+  /////////////////////////////
+  //   Which systematics ?   //
+  /////////////////////////////
+  std::string doJESShift = "nominal"; // Other options are "minus" and "plus"
+  std::string doJERShift = "nominal";
+  std::string doLeptonSFShift = "nominal";
+ 
   ////////////////////////////////////
   /// AnalysisEnvironment  
   ////////////////////////////////////
@@ -303,21 +311,17 @@ int main (int argc, char *argv[])
   // PileUp Reweighting //
   ////////////////////////
 
-  //cout << Luminosity << endl;
-  
   LumiReWeighting LumiWeights, LumiWeightsUp, LumiWeightsDown;
 
-  LumiWeights = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
-  LumiWeightsUp = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
-  LumiWeightsDown = LumiReWeighting("../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_MC_Summer12_S10.root", "../TopTreeAnalysisBase/Calibrations/PileUpReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
-
+  LumiWeights = LumiReWeighting("Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
+  LumiWeightsUp = LumiReWeighting("Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
+  LumiWeightsDown = LumiReWeighting("Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
   cout << " Initialized LumiReWeighting stuff" << endl;
 
   // initialize lepton SF
   LeptonTools* leptonTools = new LeptonTools(false);
-  leptonTools->readMuonSF("LeptonSF/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.root", "LeptonSF/MuonEfficiencies_Run_2012A_2012B_53X.root", "LeptonSF/MuonEfficiencies_Run_2012C_53X.root", "LeptonSF/TriggerMuonEfficiencies_Run_2012D_53X.root");
+  leptonTools->readMuonSF("Calibrations/LeptonSF/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.root", "Calibrations/LeptonSF/MuonEfficiencies_Run_2012A_2012B_53X.root", "Calibrations/LeptonSF/MuonEfficiencies_Run_2012C_53X.root", "Calibrations/LeptonSF/TriggerMuonEfficiencies_Run_2012D_53X.root");
   leptonTools->readElectronSF();
-
 
   ////////////////////////////////////
   //	Loop on datasets
@@ -561,7 +565,8 @@ int main (int argc, char *argv[])
       ////////////////////////////////////////
       //  Beam scraping and PU reweighting
       ////////////////////////////////////////
-      if(dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA"){
+      double lumiWeight = 1;
+      if(dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA"){    //Does this mean that it will be applied on data ? (why not with .find method ) ???
 	 // Apply the scraping veto. (Is it still needed?)
          bool isBeamBG = true;
          if(event->nTracks() > 10){
@@ -571,12 +576,11 @@ int main (int argc, char *argv[])
       	 if(isBeamBG) continue;
       }
       else{
- 	 double lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-	 double lumiWeightOLD=lumiWeight;
-         if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0){
+ 	 lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
+         if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0){   //Loop will never get here ...
 	     lumiWeight=1;
          }
-	 scaleFactor = scaleFactor*lumiWeight;
+	 //scaleFactor = scaleFactor*lumiWeight;  //Correct to do this immediately ?? (Is not the case in analyzer code Stijn ...)
       }
       //histo1D["lumiWeights"]->Fill(scaleFactor);	
 
@@ -595,7 +599,6 @@ int main (int argc, char *argv[])
       }
       
       int currentRun = event->runId();
-      
       if(previousRun != currentRun) {
         previousRun = currentRun;
 	
@@ -604,18 +607,18 @@ int main (int argc, char *argv[])
 	  
 	    // 2.7/fb recalib 
             if( event->runId() >= 190456 && event->runId() <= 190738 )
-		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
+		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
 	    else if( event->runId() >= 190782 && event->runId() <= 193621)
-		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v12"), currentRun, iFile);
+		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v12"), currentRun, iFile);
 	    else if(event->runId() >= 193834  && event->runId() <= 196531 )
-		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun, iFile);
+		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun, iFile);
 	    else if( event->runId() >= 198022  && event->runId() <= 199608)
-		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v14"), currentRun, iFile);
+		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v14"), currentRun, iFile);
 	    else if( event->runId() >= 199698 && event->runId() <= 209151)
-		itrigger = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v15"), currentRun, iFile);
+		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v15"), currentRun, iFile);
 	    else
 		cout << "Unknown run for SemiMu HLTpath selection: " << event->runId() << endl;
-	    if( itrigger == 9999 ){
+	    if( itriggerSemiMu == 9999 ){
 		cout << "itriggerSemiMu == 9999 for SemiMu HLTpath selection: " << event->runId() << endl;
                 exit(-1);
             }
@@ -629,15 +632,15 @@ int main (int argc, char *argv[])
 	  
 	     // 2.7/fb recalib 
              if( event->runId() <= 190738 )
-                itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
+                itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
              else if( event->runId() >= 190782 && event->runId() <= 191411 )
-                 itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v9"), currentRun, iFile);
+                 itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v9"), currentRun, iFile);
              else if( event->runId() >= 191695 && event->runId() <= 196531)
-                 itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun, iFile);
+                 itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun, iFile);
              else if( event->runId() >= 198049 && event->runId() <= 208686)
-                 itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
+                 itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
 	     //else if( event->runId() > 208686)
-	     //     itrigger = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
+	     //     itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
              else { 
                  cout << "Unknown run for SemiEl HLTpath selection: " << event->runId() << endl;
 	         exit(1);
@@ -665,19 +668,10 @@ int main (int argc, char *argv[])
       //JER Smearing:
       if( ! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) ) {
 	
-	doJERShift == 0;       //Do not put this hard-coded
-	if(doJERShift == 1)
-	   jetTools->correctJetJER(init_jets, genjets, mets[0], "minus",false);
-	else if(doJERShift == 2)
-	   jetTools->correctJetJER(init_jets, genjets, mets[0], "plus",false);
-	else
-	   jetTools->correctJetJER(init_jets, genjets, mets[0], "nominal",false); //false means don't use old numbers but newer ones ...
-        
-	// JES sysematic!
-	if (doJESShift == 1)
-	   jetTools->correctJetJESUnc(init_jets, mets[0], "minus",1);  //1 = nSigma
-	else if (doJESShift == 2)
-	   jetTools->correctJetJESUnc(init_jets, mets[0], "plus",1);
+	jetTools->correctJetJER(init_jets, genjets, mets[0], doJERShift, false); //false means don't use old numbers but newer ones ...
+
+	if (doJESShift != "nominal")
+	   jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //1 = nSigma
       }
 
       ////////////////////////////////////////////////////////
@@ -940,25 +934,23 @@ int main (int argc, char *argv[])
       //////////////////////
       // Event selection  //
       //////////////////////
-      
-
       bool eventselectedSemiMu = false;
       bool eventselectedSemiEl = false;
 
       if (dataSetName != "Data"&&  selectedElectrons.size() ==1 ) {
-           scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(),leptonsyst );
-           //histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(),leptonsyst ));
+           scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift );
+           //histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift));
       }
      
       // semi-mu selection
-      selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);
+      selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);               //Now multiplication is done twice ....
       if (triggedSemiMu) {
 	selecTableSemiMu.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV) {
 	  selecTableSemiMu.Fill(d,2,scaleFactor*lumiWeight);
 	  if (selectedMuons.size() == 1) {
 	    selecTableSemiMu.Fill(d,3,scaleFactor*lumiWeight);
-	    if( vetoMuons.size() == 1 || ( dataSetName.find("InvIso") != string::npos && vetoMuons.size() == 0 ) ) { // if InvertedIso, selected muon not part of vetoMuons vector!
+	    if( vetoMuons.size() == 1 ) {
 	      selecTableSemiMu.Fill(d,4,scaleFactor*lumiWeight);
 	      if (vetoElectronsSemiMu.size() == 0) {
 		selecTableSemiMu.Fill(d,5,scaleFactor*lumiWeight);
@@ -1050,7 +1042,6 @@ int main (int argc, char *argv[])
       }
 
       string leptonFlav="_other";
-      
       if (eventselectedSemiMu) leptonFlav="_mu";
       else if (eventselectedSemiEl) leptonFlav="_el";
       
@@ -1284,7 +1275,6 @@ int main (int argc, char *argv[])
             //Also check the correct jet combi:
             if((bTagStudy.getbTaggedJets(option)).size() >= 2 && (bTagStudy.getLightJets(option)).size() >=2){
 	       bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, option);
-		if(option == 0) bTagCounter++;
             }
             else{
 	       if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
@@ -1459,9 +1449,6 @@ int main (int argc, char *argv[])
       for(int Option = 0; Option < NrConsideredBTagOptions; Option++){
 	if(NrConsideredBTagOptions == 1) Option = ChosenBTagOption;    //Force Option to be equal to the one chosen!
 
-	if(Option == 0 && (bTagStudy.getbTaggedJets(Option)).size() > 1 && (bTagStudy.getLightJets(Option)).size() > 1){
-		mlbCounter++;
-	}
 	mlbStudy.calculateChiSquared(jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
 	mlbStudy.calculateEfficiency(Option, jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions, ChiSqCutValue);
 
@@ -1591,9 +1578,6 @@ int main (int argc, char *argv[])
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
 
-    cout << " Number of events send to b-tag calculation: "<< bTagCounter << std::endl;
-    cout << " Number of events send to mlb calculation  : "<< mlbCounter << std::endl;
-    
     //////////////////////////////
     //  Jet combination output  //
     //////////////////////////////
