@@ -96,9 +96,11 @@ int main (int argc, char *argv[])
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
-  const int ChosenBTagOption = 3;  //2 T b-tags!!
-  int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
+  int ChosenBTagOption;
+  if(NrConsideredBTagOptions > 1) ChosenBTagOption = 7;
+  else ChosenBTagOption = 3;    //= 2 T b-tags!  
 
+  int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
   int ChiSqCutValue =51;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
 
   /////////////////////////////////////
@@ -121,7 +123,7 @@ int main (int argc, char *argv[])
 			       "2 T b-tags, light M-veto", //#4
 			       "2 T b-tags, light L-veto"};//#5
 
-  string ChiSqCutValueStr;
+  std::string ChiSqCutValueStr;
   ostringstream convert; convert << ChiSqCutValue;
   if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
   else ChiSqCutValueStr = "";
@@ -470,7 +472,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 500; ievt++){
+    for (unsigned int ievt = 0; ievt < 5000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1448,7 +1450,7 @@ int main (int argc, char *argv[])
       //******************************************************************************************//
       for(int Option = 0; Option < NrConsideredBTagOptions; Option++){
 	if(NrConsideredBTagOptions == 1) Option = ChosenBTagOption;    //Force Option to be equal to the one chosen!
-
+       	
 	mlbStudy.calculateChiSquared(jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
 	mlbStudy.calculateEfficiency(Option, jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions, ChiSqCutValue);
 
@@ -1560,10 +1562,6 @@ int main (int argc, char *argv[])
     }			//loop on events
 
     //--------------------  Sigma for W Mass and Top Mass  --------------------
-    //histo1D["WMass"]->Fit("gaus","Q");     
-    //histo1D["TopMass"]->Fit("gaus","Q");
-    //std::cout << " sigma values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(2) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
-    //std::cout << " mass values : " << histo1D["WMass"]->GetFunction("gaus")->GetParameter(1) << " " << histo1D["TopMass"]->GetFunction("gaus")->GetParameter(1) << std::endl;
     histo1D["MlbMass"]->Fit("gaus","Q");
     histo1D["MqqbMass"]->Fit("gaus","Q");
     std::cout << " values for Mlb :" << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
@@ -1605,24 +1603,10 @@ int main (int argc, char *argv[])
     //////////////////////////////
     //  Mlb combination output  //
     //////////////////////////////
-    ofstream mlbOutput;
-    int OptionOfInterest;
-    if(NrConsideredBTagOptions > 1 ){ 
-	mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");              
-	OptionOfInterest = 7;
-    } 
-    //In above case the OptionOfInterest variable will not be used inside the class! Is only used when only one bTag should be considered!
-    if(NrConsideredBTagOptions == 1){ 
-	mlbOutput.open(("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbTableForChosenCombination"+ChiSqCutValueStr+".tex").c_str()); 
-	OptionOfInterest = ChosenBTagOption;
-	OptionName[ChosenBTagOption+2] = " Pure 5 jet case, "+OptionName[ChosenBTagOption];
-        OptionName[ChosenBTagOption+1] = " 4 jet case,      "+OptionName[ChosenBTagOption];
-	OptionName[ChosenBTagOption] =   " 5 jet case,      "+OptionName[ChosenBTagOption];
-    }
-    mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //All 4 jets correctly matched
-    mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, mlbOutput, OptionOfInterest );  //Only b-jets correctly matched
-    mlbOutput.close();
+    //mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, ChosenBTagOption, ChiSqCutValueStr );  //All 4 jets correctly matched
+    mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, ChosenBTagOption, ChiSqCutValueStr );  //Also get table for "only b-jets correctly matched"
 
+   //Save the histograms belonging to the mlb output information! 
    std::string Title[3] = {"5Jets","4Jets","Pure5Jets"};
    std::string Name[3] =  {" - 5 jets case) "," - 4 jets case) "," - pure 5 jets case) "};
  
@@ -1664,16 +1648,7 @@ int main (int argc, char *argv[])
       for(int ii = 0; ii < (mlbStudy.getChiSqDiffWhenWrong(jetCase)).size(); ii++) h_ChiSqDiffWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqDiffWhenWrong(jetCase))[ii]);
    }   
 
-    //Close the LHCO Output files!
-    for(int ii = 0; ii<16; ii++){
-      if(ii < 4) outFile[ii].close();	
-      outFileReco[ii].close();
-    }
-    EventInfoFile.close();
-    
-    //TFile* fout = new TFile("GeneratorOutput.root","RECREATE");
     fout->cd();
-
     //Write down the different Chi-Sq histograms obtained from the mlb class!
     for(int ii = 0; ii < 3; ii++){
        h_ChiSqCorrect[ii]->Write();
@@ -1719,8 +1694,6 @@ int main (int argc, char *argv[])
     h_Quark1JetNumber.Write();
     h_Quark2JetNumber.Write();
 
-    h_WMass.Write();
-    h_TopMass.Write();
     h_MlbMass.Write();
     h_MqqbMass.Write();
     
@@ -1731,8 +1704,14 @@ int main (int argc, char *argv[])
     h_MlbMqqbCorrectChosen.Write();
     h_MlbMqqbWrongOne.Write();
     h_MlbMqqbWrongTwo.Write();
-    //fout->Close();
     
+    //Close the LHCO Output files!
+    for(int ii = 0; ii<16; ii++){
+      if(ii < 4) outFile[ii].close();	
+      outFileReco[ii].close();
+    }
+    EventInfoFile.close();
+
     //////////////
     // CLEANING //
     //////////////
