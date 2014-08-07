@@ -220,72 +220,104 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
   }//End of loop over events with at least two b-tagged jets and two light jets
 }
 
-void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest){
+void MlbStudy::saveNumbers(std::string NameOfOption[6], int LookAtBJets, int NrOptionsConsidered, int ChosenOption, std::string StrForChiSqCutValue){
 
-//   std::string Title[2] = {"\\multirow{2}{*}{\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$)} & 4 chosen jets & $\\frac{s}{b}$ & 3rd jet is one of the & 3rd jet is chosen \\\\ & are correct ($\\%$)    & 	             & 2 correct light jets ($\\%$) &  and correct ($\\%$)	  \\\\",
-//			   " \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & \\% b's correct   & $\\frac{s}{b}$ &  &  \\\\"};
+   //Initialize and define the output files:
+   ofstream mlbOutput;
+   ofstream mlbMatchingOutput;
+   if(NrOptionsConsidered > 1){
+	mlbOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbChoiceTables.tex");
+	mlbMatchingOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbMatchingChoiceTables.tex");
+   }
+   else if(NrOptionsConsidered == 1){
+	mlbOutput.open(("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbTableForChosenCombination"+StrForChiSqCutValue+".tex").c_str()); 
+	mlbMatchingOutput.open(("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/mlbMatchingTableForChosenCombination"+StrForChiSqCutValue+".tex").c_str());
+	NameOfOption[ChosenOption+2] = " Pure 5 jet case, "+NameOfOption[ChosenOption];
+        NameOfOption[ChosenOption+1] = " 4 jet case,      "+NameOfOption[ChosenOption];
+	NameOfOption[ChosenOption] =   " 5 jet case,      "+NameOfOption[ChosenOption];
+   }
+
+   //Set the titles and captions of the tables!
+   //std::string Title[2] = {"\\multirow{2}{*}{\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$)} & 4 chosen jets & $\\frac{s}{b}$ & 3rd jet is one of the & 3rd jet is chosen \\\\ & are correct ($\\%$) & & 2 correct light jets ($\\%$) & and correct ($\\%$) \\\\",
+   //			   " \\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & \\% b's correct & $\\frac{s}{b}$ & & \\\\"};
   
-   std::string Title[2] = {"\\multirow{2}{*}{\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$)} & all 4 correct & $\\geq$ 1 wrong & 4 chosen jets & $\\frac{s}{b}$ & non-matched \\\\ & & & are correct ($\\%$) & & \\\\",
+   std::string Title[2] = {"\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) &all 4 good &$\\geq$ 1 wrong &4 chosen jets good ($\\%$) &$\\frac{s}{b}$ & non-matched\\\\",
 			   "\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & Correct b's & Wrong b's & & \\% b's correct   & $\\frac{s}{b}$ & Correct option exists \\\\"};
    std::string Caption[2] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags when a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method is applied} ", 
 			     " \\caption{Overview of the number of times the correct b-jet combination is chosen when using a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
 
-   output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c} " << endl;
-   output << Title[WhichJets] << " \\hline " << endl;
+   std::string TitleMatching[2] = {"\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) &all 4 good &$\\geq$ 1 wrong &4 chosen jets good ($\\%$) &$\\frac{s}{b}$ & non-matched\\\\",
+                                   "\\textbf{Option} (with $\\chi^{2}$ $m_{lb}$) & Correct b's & Wrong b's & & \\% b's correct   & $\\frac{s}{b}$ & Correct option exists \\\\"};
+   std::string CaptionMatching[2] = {" \\caption{Overview of correct and wrong reconstructed events for the different b-tags when a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method is applied} ", 
+                                     " \\caption{Overview of the number of times the correct b-jet combination is chosen when using a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
 
+   //Run b-jet info separately:
    bool lookingAtOneBTagOption = false;
    if(NrOptionsConsidered == 1){ NrOptionsConsidered = 3; lookingAtOneBTagOption = true;}
-   for(int ii = 0; ii < NrOptionsConsidered; ii++){
-	if(ii == 0 && lookingAtOneBTagOption == true) ii = OptionOfInterest;
-	if(ii == 1 && lookingAtOneBTagOption == true) ii = OptionOfInterest+1;
-	if(ii == 2 && lookingAtOneBTagOption == true) ii = OptionOfInterest+2;
+   for(int BJetAlso = 0; BJetAlso <= LookAtBJets; BJetAlso++){
+     //Filling of the tables	
+     mlbOutput << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c} \n " << Title[BJetAlso] << "\n \\hline " << endl;
+     mlbMatchingOutput << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c} \n " << TitleMatching[BJetAlso] << "\n \\hline " << endl;
+     for(int ii = 0; ii < NrOptionsConsidered; ii++){
+	 std::cout << " lookingAtOneBTagOption ? = " << lookingAtOneBTagOption << std::endl;
+         if(ii == 0 && lookingAtOneBTagOption == true) ii = ChosenOption;
+         if(ii == 1 && lookingAtOneBTagOption == true) ii = ChosenOption+1;
+         if(ii == 2 && lookingAtOneBTagOption == true) ii = ChosenOption+2;
+ 
+         //Get all the relevant information
+         int CorrectOnes[2] = {CorrectEventChosen[ii],    CorrectBOptionChosen[ii] };
+         int WrongOnes[2]   = {WrongEventChosen[ii],      WrongBOptionChosen[ii]};
+         int LastOnes[2]    = {NumberNotMatchedEvents[ii],CorrectOptionAvailable[ii]}; 
+         int ThirdJetChosen[2] = {ThirdQuarkChosen[ii], 0};
+         int ThirdJetCorrectChosen[2] = {ThirdQuarkCorrectChosen[ii], 0};
+         int ThirdJetShouldBeChosen[2] = {ThirdQuarkShouldBeChosen[ii], 0};
+         float TimesThirdJetIsACorrectJet[2] = {((float)CorrectLightJetsWithThirdChosen[ii]*100.0/(float)CorrectLightJetsChosen[ii]), 0};
+         float TimesThirdJetIsChosenANDCorrect[2] = {((float)ThirdQuarkCorrectChosen[ii]*100.0/(float)ThirdQuarkChosen[ii]), 0};
+         //float TimesEventIsMatched[2] = {((
+    	 //std::cout << " CorrectLightJetsWithThirdChosen = " << CorrectLightJetsWithThirdChosen[ii] << ", correctLightJetsChosen = " << CorrectLightJetsChosen[ii] << ", ThirdQuarkCorrectChosen = " << ThirdQuarkCorrectChosen[ii] <<  " & ThirdQuarkChosen = " << ThirdQuarkChosen[ii] << std::endl;
+	 //std::cout << " ==> first entry : " << TimesThirdJetIsACorrectJet[BJetAlso] << " & second entry : " << TimesThirdJetIsChosenANDCorrect[BJetAlso] << " for whichjets " << BJetAlso << std::endl;
 
-       int CorrectOnes[2] = {CorrectEventChosen[ii],    CorrectBOptionChosen[ii] };
-       int WrongOnes[2]   = {WrongEventChosen[ii],      WrongBOptionChosen[ii]};
-       int LastOnes[2]    = {NumberNotMatchedEvents[ii],CorrectOptionAvailable[ii]}; 
-       int ThirdJetChosen[2] = {ThirdQuarkChosen[ii], 0};
-       int ThirdJetCorrectChosen[2] = {ThirdQuarkCorrectChosen[ii], 0};
-       int ThirdJetShouldBeChosen[2] = {ThirdQuarkShouldBeChosen[ii], 0};
-       float TimesThirdJetIsACorrectJet[2] = {((float)CorrectLightJetsWithThirdChosen[ii]*100.0/(float)CorrectLightJetsChosen[ii]), 0};
-       float TimesThirdJetIsChosenANDCorrect[2] = {((float)ThirdQuarkCorrectChosen[ii]*100.0/(float)ThirdQuarkChosen[ii]), 0};
-       //float TimesEventIsMatched[2] = {((
-	//std::cout << " CorrectLightJetsWithThirdChosen = " << CorrectLightJetsWithThirdChosen[ii] << ", correctLightJetsChosen = " << CorrectLightJetsChosen[ii] << ", ThirdQuarkCorrectChosen = " << ThirdQuarkCorrectChosen[ii] <<  " & ThirdQuarkChosen = " << ThirdQuarkChosen[ii] << std::endl;
-	//std::cout << " ==> first entry : " << TimesThirdJetIsACorrectJet[WhichJets] << " & second entry : " << TimesThirdJetIsChosenANDCorrect[WhichJets] << " for whichjets " << WhichJets << std::endl;
+         float sOverSqrtB[2], CorrectPercentage[2], sOverB[2];
+         for(int jj = 0; jj < 2; jj++){
+  	   sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
+	   CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOptionAvailable[ii]);
+	   sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[BJetAlso]);
+         }
 
-       float sOverSqrtB[2], CorrectPercentage[2], sOverB[2];
-       for(int jj = 0; jj < 2; jj++){
-	 sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
-	 CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOptionAvailable[ii]);
-	 sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[WhichJets]);
-       }
+         float MatchingSOverB[2]      = {(float)(CorrectOptionAvailable[ii]*100.0)/(float)(CorrectMatchingNotExisting[ii]+NumberNotMatchedEvents[ii]),0};
+         float MatchingExactSOverB[2] = {(float)(CorrectEventChosen[ii]*100.0)/(float)(WrongEventChosen[ii]+NumberNotMatchedEvents[ii])              ,0};
+         float SqrtSInverse[2]        = {1/(float)(sqrt(CorrectOptionAvailable[ii]))                                                                 ,0};
+         float SrtSExactInverse[2]    = {1/(float)(sqrt(CorrectEventChosen[ii]))                                                                     ,0};
 
-	float MatchingSOverB = (float)(CorrectOptionAvailable[ii]*100.0)/(float)(CorrectMatchingNotExisting[ii]+NumberNotMatchedEvents[ii]);
-	float MatchingExactSOverB = (float)(CorrectEventChosen[ii]*100.0)/(float)(WrongEventChosen[ii]+NumberNotMatchedEvents[ii]);
+	 //std::cout << " Values for CorrectOnes = " << CorrectOnes[BJetAlso] << " for counter BJetAlso : " << BJetAlso << std::endl;
+	 //std::cout << " Value of CorrectOnes[1] = " << CorrectOnes[1] << std::endl;
+	 //std::cout << " CorrectEventChosen = " << CorrectEventChosen[ii] << " & CorrectBOptionChosen = " << CorrectBOptionChosen[ii] << std::endl;
+	 //std::cout << " ******* ii counter evolution : " << ii << std::endl;
 
-	if(ii == 0) cout << " Matching s/b information:"<< endl;
-	cout << "  ** For option :"<< NameOfOption[ii] << endl;
-	cout << "     -- Correct option exists VS Matching doesn't exist or not matched :"<<MatchingSOverB << endl;
-	cout << "     -- Correct event matched VS Wrong event matched or not matched    :"<<MatchingExactSOverB << endl;
+         //First table: Information about correct and wrong reconstructed events!
+         mlbOutput << NameOfOption[ii]   << 
+  	 " & " << CorrectOnes[BJetAlso]       << 
+	 " & " << WrongOnes[BJetAlso]         << 
+	 " & " << CorrectPercentage[BJetAlso] << 
+	 " & " << sOverB[BJetAlso]             << 
+	 " & " << LastOnes[BJetAlso]          << 
+	 " \\\\ " << endl;
 
-       output << NameOfOption[ii]   << 
-	" & " << CorrectOnes[WhichJets]       << 
-	" & " << WrongOnes[WhichJets]         << 
-	" & " << CorrectPercentage[WhichJets] << 
-	" & " << sOverB[WhichJets]             << 
-	" & " << LastOnes[WhichJets]          << 
-	//" & " << ThirdJetChosen[WhichJets]    << 
-	//" & " << ThirdJetCorrectChosen[WhichJets]  << 
-	//" & " << ThirdJetShouldBeChosen[WhichJets] << 
-	//" & " << TimesThirdJetIsACorrectJet[WhichJets] <<
-	//" & " << TimesThirdJetIsChosenANDCorrect[WhichJets] <<
-	" \\\\ " << endl;
+	 //Second table: Information about matching!
+         mlbMatchingOutput << NameOfOption[ii] <<
+         " & " << MatchingSOverB[BJetAlso] <<
+         " & " << MatchingExactSOverB[BJetAlso] <<
+         " & " << SqrtSInverse[BJetAlso] <<
+         " & " << SrtSExactInverse[BJetAlso] <<
+         " \\\\ " << endl;
 
-       if( ii == OptionOfInterest   && lookingAtOneBTagOption == true) ii = 0;  //Otherwise loop will not continue!
-       if( ii == OptionOfInterest+1 && lookingAtOneBTagOption == true) ii = 1;  //Otherwise loop will not continue!
+         if( ii == ChosenOption   && lookingAtOneBTagOption == true) ii = 0;  //Otherwise loop will not continue!
+         if( ii == ChosenOption+1 && lookingAtOneBTagOption == true) ii = 1;  //Otherwise loop will not continue!
      }
-    output << " \\end{tabular} " << endl;
-    output << Caption[WhichJets] << endl;
-    output << " \\end{table} \n " << endl;
-
+     mlbOutput << " \\end{tabular} \n " << Caption[BJetAlso] << "\n \\end{table} \n " << endl;
+     mlbMatchingOutput << " \\end{tabular} \n " << CaptionMatching[BJetAlso] << "\n \\end{table} \n " << endl;
+  }
+  mlbOutput.close();
+  mlbMatchingOutput.close();
 }
 
