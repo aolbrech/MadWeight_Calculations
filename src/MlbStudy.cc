@@ -259,6 +259,14 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOpt
 	 sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[WhichJets]);
        }
 
+	float MatchingSOverB = (float)(CorrectOptionAvailable[ii]*100.0)/(float)(CorrectMatchingNotExisting[ii]+NumberNotMatchedEvents[ii]);
+	float MatchingExactSOverB = (float)(CorrectEventChosen[ii]*100.0)/(float)(WrongEventChosen[ii]+NumberNotMatchedEvents[ii]);
+
+	if(ii == 0) cout << " Matching s/b information:"<< endl;
+	cout << "  ** For option :"<< NameOfOption[ii] << endl;
+	cout << "     -- Correct option exists VS Matching doesn't exist or not matched :"<<MatchingSOverB << endl;
+	cout << "     -- Correct event matched VS Wrong event matched or not matched    :"<<MatchingExactSOverB << endl;
+
        output << NameOfOption[ii]   << 
 	" & " << CorrectOnes[WhichJets]       << 
 	" & " << WrongOnes[WhichJets]         << 
