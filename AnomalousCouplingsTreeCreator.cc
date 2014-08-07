@@ -90,8 +90,8 @@ int main (int argc, char *argv[])
   ///////////////////////////////
   //  Run specific parts only  //
   ///////////////////////////////
-  bool GenLHCOOutput = true;
-  bool RecoLHCOOutput = true;  
+  bool GenLHCOOutput = false;
+  bool RecoLHCOOutput = false;  
   bool FinalEventSelectionChoiceIsMade = true;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
@@ -131,7 +131,7 @@ int main (int argc, char *argv[])
   /////////////////////////////
   std::string doJESShift = "nominal"; // Other options are "minus" and "plus"
   std::string doJERShift = "nominal";
-  std::string doLeptonSFShift = "nominal";
+  std::string doLeptonSFShift = "Nominal";  //Other options are "Minus" and "Plus" (Capital letters are needed!
  
   ////////////////////////////////////
   /// AnalysisEnvironment  
@@ -357,25 +357,25 @@ int main (int argc, char *argv[])
 
     if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) // Data!
     {
-      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
+      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
       vCorrParam.push_back(*L1JetCorPar);
-      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
+      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
       vCorrParam.push_back(*L2JetCorPar);
-      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
+      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
       vCorrParam.push_back(*L3JetCorPar);
-      JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
+      JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
       vCorrParam.push_back(*L2L3ResJetCorPar);
     }
     else
     {
-      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
+      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
       vCorrParam.push_back(*L1JetCorPar);
-      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
+      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
       vCorrParam.push_back(*L2JetCorPar);
-      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
+      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
       vCorrParam.push_back(*L3JetCorPar);
     }
-    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("../../TopTreeAnalysisBase/Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
+    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
     //JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "SubTotalMC")));
     //JetCorrectionUncertainty *jecUncTotal = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
 
@@ -943,7 +943,7 @@ int main (int argc, char *argv[])
       }
      
       // semi-mu selection
-      selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);               //Now multiplication is done twice ....
+      selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);              
       if (triggedSemiMu) {
 	selecTableSemiMu.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV) {
