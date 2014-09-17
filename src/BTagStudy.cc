@@ -23,7 +23,7 @@ void BTagStudy::InitializeBegin(){
       EventWithThreeLightJets[ii] = 0;
       EventWithTwoLightJetsAndBTagged[ii] = 0;
       EventWithThreeLightJetsAndBTagged[ii] = 0;
-      thirdJetIsActualQuark[ii] = 0;
+      thirdJetIsActualQuark[ii] = 0; secondJetIsActualQuark[ii] = 0; firstJetIsActualQuark[ii] = 0;
       thirdJetIsCorrectQuark[ii] = 0;
 
       //selectedNumberEvents[ii] = 0;    //--> Possible to also count the number of selected events!! (then additional booleans are needed for semiMu of semiEl!)
@@ -126,6 +126,8 @@ void BTagStudy::CorrectJetCombi5Jets(int BHadrIndex, int BLeptIndex, int Quark1I
             (Quark2Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][1] || Quark2Index == LightJetNr[OptionNr][2] ) ){
                 allFourJetsCorrectlyMatched5Jets[OptionNr]++;
  		if(Quark1Index == LightJetNr[OptionNr][2] || Quark2Index == LightJetNr[OptionNr][2]) thirdJetIsActualQuark[OptionNr]++;
+		if(Quark1Index == LightJetNr[OptionNr][1] || Quark2Index == LightJetNr[OptionNr][1]) secondJetIsActualQuark[OptionNr]++;
+		if(Quark1Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][0]) firstJetIsActualQuark[OptionNr]++;
         }
         if( (BLeptIndex != bTaggedJetNr[OptionNr][0] && BLeptIndex != bTaggedJetNr[OptionNr][1]) ||
             (BHadrIndex != bTaggedJetNr[OptionNr][0] && BHadrIndex != bTaggedJetNr[OptionNr][1]) ||
@@ -188,6 +190,12 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
 	     CorrectPercentage5Jets[jj] = (float)(CorrectOnes5Jets[jj]*100.0)/(float)(CorrectOnes5Jets[jj]+WrongOnes5Jets[jj]);
 	     ThirdJetPercentage[jj] = (float)(Correct3rdJet[jj]*100.0)/(float)(CorrectOnes5Jets[jj]);
 	  }
+	
+	  //Print some additional output:	 
+	  //cout << "\n Values for first, second and third light jet (Compared to total number of correctly matched events of " << allFourJetsCorrectlyMatched5Jets[OptionOfInterest] << " ) " << endl;
+	  //cout << "    * First jet : " << firstJetIsActualQuark[OptionOfInterest] << endl;
+	  //cout << "    * Second jet: " << secondJetIsActualQuark[OptionOfInterest] << endl;
+	  //cout << "    * Third jet : " << thirdJetIsActualQuark[OptionOfInterest] << endl;
 
           // 5-jet output
           output << NameOfOption5Jets[ii]            << 

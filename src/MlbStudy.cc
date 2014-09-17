@@ -35,8 +35,9 @@ void MlbStudy::initializeBegin(){
    WrongBOptionChosen[ii] = 0;
 
    ThirdQuarkShouldBeChosen[ii] = 0;
-   ThirdQuarkChosen[ii] = 0;
-   ThirdQuarkCorrectChosen[ii] = 0;
+   ThirdQuarkChosen[ii] = 0; SecondQuarkChosen[ii] = 0; FirstQuarkChosen[ii] = 0;
+   ThirdQuarkCorrectChosen[ii] = 0; SecondQuarkCorrectChosen[ii] = 0; FirstQuarkCorrectChosen[ii] = 0;
+   ThirdQuarkCorrect[ii] = 0; SecondQuarkCorrect[ii] = 0; FirstQuarkCorrect[ii] = 0;
    CorrectLightJetsChosen[ii] = 0;
    CorrectLightJetsWithThirdChosen[ii] = 0;
   }
@@ -163,12 +164,21 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
 	       ){
 		CorrectOptionAvailable[option]++;
 		
-		//See how often the light jet is chosen, and how often it is the correct choice!
-		if(chosenQuark1 == 2 || chosenQuark2 == 2){
-		    ThirdQuarkChosen[option]++;
-		    if(CorrectValues[2] == lightJets[2] || CorrectValues[3] == lightJets[2])
-			ThirdQuarkCorrectChosen[option]++;
+		//See how often each of the light jets are chosen, and how often it is the correct choice!
+		if(CorrectValues[2] == lightJets[2] || CorrectValues[3] == lightJets[2]) ThirdQuarkCorrect[option]++;
+		if(CorrectValues[2] == lightJets[1] || CorrectValues[3] == lightJets[1]) SecondQuarkCorrect[option]++;
+		if(CorrectValues[2] == lightJets[0] || CorrectValues[3] == lightJets[0]) FirstQuarkCorrect[option]++;
+
+		if(chosenQuark1 == 2 || chosenQuark2 == 2){ ThirdQuarkChosen[option]++;
+		    if(CorrectValues[2] == lightJets[2] || CorrectValues[3] == lightJets[2]) ThirdQuarkCorrectChosen[option]++;  //Not the number of correct ones, but the number of correct ones when this quark is actually chosen!!
 		}
+		if(chosenQuark1 == 1 || chosenQuark2 == 1){ SecondQuarkChosen[option]++;
+		    if(CorrectValues[2] == lightJets[1] || CorrectValues[3] == lightJets[1]) SecondQuarkCorrectChosen[option]++;
+		}
+		if(chosenQuark1 == 0 || chosenQuark2 == 0){FirstQuarkChosen[option]++;
+		    if(CorrectValues[2] == lightJets[0] || CorrectValues[3] == lightJets[0]) FirstQuarkCorrectChosen[option]++;
+		}
+
 		if(lightJets.size() > 2 && (CorrectValues[2] == lightJets[2] || CorrectValues[3] == lightJets[2]) && (chosenQuark1 != 2 && chosenQuark2 != 2)) ThirdQuarkShouldBeChosen[option]++;
 		if((CorrectValues[2]==lightJets[chosenQuark1]||CorrectValues[2]==lightJets[chosenQuark2]) && (CorrectValues[3]==lightJets[chosenQuark2]||CorrectValues[3]==lightJets[chosenQuark2])){
 		    CorrectLightJetsChosen[option]++;
@@ -284,6 +294,12 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int LookAtBJets, int NrO
 	   CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOptionAvailable[ii]);
 	   sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[BJetAlso]);
          }
+
+	 //Additional output about light jet percentages:
+	 //cout << " Values when first, second and third jet are correct (Compared to the number of correctly matched events of " << CorrectOptionAvailable[ii] << " ) " << endl;
+	 //cout << "     * First jet : " << FirstQuarkCorrect[ii] << endl;
+	 //cout << "     * Second jet: " << SecondQuarkCorrect[ii] << endl;
+	 //cout << "     * Third jet : " << ThirdQuarkCorrect[ii] << endl;
 
          //First table: Information about correct and wrong reconstructed events!
          mlbOutput << NameOfOption[ii]   << 

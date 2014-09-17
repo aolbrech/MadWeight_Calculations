@@ -36,6 +36,8 @@ class MlbStudy{
 
    int NumberMatchedEvents[6], NumberNotMatchedEvents[6], CorrectOptionAvailable[6], CorrectBOptionChosen[6], WrongBOptionChosen[6], CorrectEventChosen[6],WrongEventChosen[6],CorrectMatchingNotExisting[6];
    int ThirdQuarkChosen[6], ThirdQuarkCorrectChosen[6], ThirdQuarkShouldBeChosen[6], CorrectLightJetsChosen[6], CorrectLightJetsWithThirdChosen[6];
+   int FirstQuarkChosen[6], FirstQuarkCorrectChosen[6], SecondQuarkChosen[6], SecondQuarkCorrectChosen[6];
+   int FirstQuarkCorrect[6], SecondQuarkCorrect[6], ThirdQuarkCorrect[6];
 
    int getLowestChiSqIndex()      {return LowestChiSq;};
    int getLowestChiSq4JetsIndex() {return LowestChiSq4Jets;};
