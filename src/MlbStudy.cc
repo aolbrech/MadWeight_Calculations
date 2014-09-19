@@ -87,6 +87,11 @@ void MlbStudy::calculateChiSquared(vector<int> CorrectValues, vector<int> bTagge
 	   (CorrectValues[2] == lightJets[1] || CorrectValues[2] == lightJets[2]) && (CorrectValues[3] == lightJets[1] || CorrectValues[3] == lightJets[2]) ) CorrectChiSq = 4;
        if( CorrectValues[0] == bTaggedJets[1] && CorrectValues[0] == bTaggedJets[1] && lightJets.size() > 2 &&
 	   (CorrectValues[2] == lightJets[1] || CorrectValues[2] == lightJets[2]) && (CorrectValues[3] == lightJets[1] || CorrectValues[3] == lightJets[2]) ) CorrectChiSq = 5;
+
+	//cout << "   --  End of mlbStudy CalculateChiSq function " << endl;  //Output corresponds to numbers obtained in analyzer code!
+	//cout << "     --  ChiSq Indices (4 jets and 4+ jets case) : " << LowestChiSq4Jets << " & " << LowestChiSq << endl;
+	//cout << "     --  ChiSq index for correct combination     : " << CorrectChiSq << endl;
+	//cout << "     --  ChiSq values : " << ChiSquared[0] << " , " << ChiSquared[1] << " , " << ChiSquared[2] << " , " << ChiSquared[3] << " , " << ChiSquared[4] << " & " << ChiSquared[5] << endl;
    }
 }
 

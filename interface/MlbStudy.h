@@ -41,6 +41,7 @@ class MlbStudy{
 
    int getLowestChiSqIndex()      {return LowestChiSq;};
    int getLowestChiSq4JetsIndex() {return LowestChiSq4Jets;};
+   int getCorrectChiSq()          {return CorrectChiSq;};
    int getChosenBLept()           {return chosenBLept;};
    int getChosenBHadr()           {return chosenBHadr;};
    int getChosenQuark1()          {return chosenQuark1;};
