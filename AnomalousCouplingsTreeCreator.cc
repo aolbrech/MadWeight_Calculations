@@ -1,5 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "TStyle.h"
 #include <cmath>
 #include <fstream>
@@ -97,10 +95,9 @@ int main (int argc, char *argv[])
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
   int ChosenBTagOption;
-  if(NrConsideredBTagOptions > 1) ChosenBTagOption = 7;
-  else ChosenBTagOption = 3;    //= 2 T b-tags!  
+  if(NrConsideredBTagOptions > 1){ ChosenBTagOption = 7; GenLHCOOutput = false; RecoLHCOOutput = false;}
+  else ChosenBTagOption = 3;    //3 = 2 T b-tags!  
 
-  int NrConsideredJets = 5;  //Options are 4 or 5, implying 2 or 3 light jets which are considered
   int ChiSqCutValue =51;  //The Chi-sq values in the mlb method has to be larger than this value! (Put on 51 to include all events, since the chi-sq is set manually to a maximum of 49.5)
 
   /////////////////////////////////////
@@ -127,6 +124,9 @@ int main (int argc, char *argv[])
   ostringstream convert; convert << ChiSqCutValue;
   if(ChiSqCutValue != 51) ChiSqCutValueStr = "_ChiSqSmallerThan"+convert.str();
   else ChiSqCutValueStr = "";
+
+  //Counters needed for N(4) and N(5) categories:
+  int FourJetsCategory = 0, FiveJetsCategory = 0, FourJetsMatched = 0, FiveJetsMatched = 0, FourJetsGoodCombiChosen = 0, FiveJetsAsFourGoodCombiChosen = 0, FiveJetsAsFiveGoodCombiChosen = 0;
 
   /////////////////////////////
   //   Which systematics ?   //
@@ -472,7 +472,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    for (unsigned int ievt = 0; ievt < 500000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -1427,9 +1427,11 @@ int main (int argc, char *argv[])
       //   --> Continue with 2 T b-tags        //
       //   --> No veto on light jets!          //
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
-      if( ( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size() < 2 || (bTagStudy.getLightJets(ChosenBTagOption)).size() < 2 ) && RecoLHCOOutput == true) EventInfoFile<<"    B-tag failed "<<endl;
-      if( ( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size() < 2 || (bTagStudy.getLightJets(ChosenBTagOption)).size() < 2 ) && NrConsideredBTagOptions == 1) continue;
-      
+      if( NrConsideredBTagOptions == 1 && ( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size() < 2 || (bTagStudy.getLightJets(ChosenBTagOption)).size() < 2 ) ){
+	   if(RecoLHCOOutput == true) EventInfoFile<<"    B-tag failed "<<endl;
+	   continue;
+      }      
+
       // Count the number of events:
       if(eventselectedSemiMu) nSelectedMu++;
       if(eventselectedSemiEl) nSelectedEl++;
@@ -1462,6 +1464,39 @@ int main (int argc, char *argv[])
 //		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
 //	  } 
       }
+
+      //*********************************************************//
+      //   Divide events in categories N(4 jets) and N(5 jets)   //
+      //   --> Used to make 2 or 3 light jets choice in evtsel   //
+      //*********************************************************//
+      //cout << " \n ChiSq Indices (4 jets and 4+ jets): " << mlbStudy.getLowestChiSq4JetsIndex() << " & " << mlbStudy.getLowestChiSqIndex() << std::endl;
+      //cout << " Correct ChiSq index               : " << mlbStudy.getCorrectChiSq() << endl;
+      //cout << "  --> Correct indices (bLept, bHadr, quark1 & quark2) : " << jetCombi[0] << " , " << jetCombi[1] << " , " << jetCombi[2] << " & " << jetCombi[3] << endl;
+      //cout << "  --> Available indices (b1, b2, q1, q2 & q3) : " << (bTagStudy.getbTaggedJets(ChosenBTagOption))[0] << " , " << (bTagStudy.getbTaggedJets(ChosenBTagOption))[1] << ", " << (bTagStudy.getLightJets(ChosenBTagOption))[0] << " , " << (bTagStudy.getLightJets(ChosenBTagOption))[1];
+      //if( (bTagStudy.getLightJets(ChosenBTagOption)).size() > 2) cout << " & " << (bTagStudy.getLightJets(ChosenBTagOption))[2] << endl;
+      //else cout << " " << endl;
+
+      if(NrConsideredBTagOptions == 1){  //Only look at these categories for the chosen 2T b-tag option
+	if( (bTagStudy.getLightJets(ChosenBTagOption)).size() == 2){
+	    //Looking at the N(2 light jets) category!
+	    FourJetsCategory++;
+	    if(  jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999 ){  //Event has been matched!
+		FourJetsMatched++;
+		//Include the ChiSq Mlb-Mqqb information for selecting the b-jets (and the 2 light jets in the N(3 light) case)
+		if( mlbStudy.getLowestChiSq4JetsIndex() == mlbStudy.getCorrectChiSq() ) FourJetsGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's' 
+ 	    }
+   	}//End of N(2 light) case
+	else{
+	    FiveJetsCategory++;
+	    if(  jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999 ){  //Event has been matched!
+		FiveJetsMatched++;
+		//Include the ChiSq Mlb-Mqqb information for selecting the b-jets (and the 2 light jets in the N(3 light) case)
+		if( mlbStudy.getLowestChiSq4JetsIndex() == mlbStudy.getCorrectChiSq() ) FiveJetsAsFourGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's'
+		if( mlbStudy.getLowestChiSqIndex() == mlbStudy.getCorrectChiSq() ) FiveJetsAsFiveGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's' 
+ 	    }
+	}//End of N(3 light) case 
+      }
+      
 
       //************************************************************************************//   
       //  Only go on to produce the .lhco output if final event selection choice is made !! //
@@ -1575,6 +1610,11 @@ int main (int argc, char *argv[])
     cout << " " << endl;
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
+
+    cout << " \n Output for N(4 jets) and N(5 jets) categories: " << endl;
+    cout << "   -- Number of events in each category    : " << FourJetsCategory << "   --   " << FiveJetsCategory << endl;
+    cout << "   -- Number of matched events             : " << FourJetsMatched <<  "   --   " << FiveJetsMatched << endl;
+    cout << "   -- Number of times good combi is chosen : " << FourJetsGoodCombiChosen << "   --   " << FiveJetsAsFourGoodCombiChosen << " & " << FiveJetsAsFiveGoodCombiChosen << endl;
 
     //////////////////////////////
     //  Jet combination output  //
