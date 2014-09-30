@@ -34,6 +34,8 @@
 #include "TopTreeAnalysis/AnomCouplings/src/BTagStudy.cc"       //--> Need to fix the makefile (don't include .cc files ...)
 #include "TopTreeAnalysis/AnomCouplings/src/MlbStudy.cc"
 #include "TopTreeAnalysis/AnomCouplings/interface/MlbStudy.h"
+#include "TopTreeAnalysis/AnomCouplings/interface/TFCreation.h"
+#include "TopTreeAnalysis/AnomCouplings/src/TFCreation.cc"
 #include "TLorentzVector.h"
 
 using namespace std;
@@ -90,7 +92,7 @@ int main (int argc, char *argv[])
   ///////////////////////////////
   bool GenLHCOOutput = false;
   bool RecoLHCOOutput = false;  
-  bool FinalEventSelectionChoiceIsMade = true;
+  bool FinalEventSelectionChoiceIsMade = false;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
@@ -263,6 +265,37 @@ int main (int argc, char *argv[])
   ////////////////////////////////////
 
   map<string,MultiSamplePlot*> MSPlot;
+
+  /////////////////////////////
+  /// ResolutionFit Stuff
+  /////////////////////////////
+
+  bool CalculateResolutions = false; // If false, the resolutions will be loaded from a previous calculation
+  bool CalculateTF = true;
+
+  std::cout << " CalculateResolutions = " << CalculateResolutions << endl;
+
+  ResolutionFit *resFitLightJets = 0, *resFitBJets = 0, *resFitMuon = 0, *resFitElectron = 0, *resFitNeutrinoMu = 0, *resFitNeutrinoEl = 0;
+    
+  resFitLightJets = new ResolutionFit("LightJet");
+  resFitBJets = new ResolutionFit("BJet");
+  resFitMuon = new ResolutionFit("Muon");
+  resFitElectron = new ResolutionFit("Electron");
+  resFitNeutrinoMu = new ResolutionFit("NeutrinoMu");
+  resFitNeutrinoEl = new ResolutionFit("NeutrinoEl");
+
+  if(!CalculateResolutions){
+    resFitLightJets->LoadResolutions("resolutions/lightJetReso.root");
+    resFitBJets->LoadResolutions("resolutions/bJetReso.root");
+    resFitMuon->LoadResolutions("resolutions/muonReso.root");
+    resFitNeutrinoMu->LoadResolutions("resolutions/neutrinoSemiMuReso.root");  //Once resolutions are newly created they will be split up for SemiMu and SemiEl for Neutrino !!
+    resFitNeutrinoEl->LoadResolutions("resolutions/neutrinoSemiElReso.root");
+    resFitElectron->LoadResolutions("resolutions/electronReso.root");
+    std::cout << " Resolutions loaded " << std::endl;
+  }
+
+  if (verbose > 0)
+    cout << " - ResolutionFit instantiated ..." << endl;  
 
   ////////////////////////////////////
   /// Selection table
@@ -454,13 +487,15 @@ int main (int argc, char *argv[])
     cout << " FalseEventContent : " << FalseEventContent << endl;
     TRootMCParticle *Top,*TopBar,*Bottom, *BottomBar,*Lepton,*NeutrinoMC,*WPlus,*WMinus,*Light,*LightBar;
 
-    ////////////////////////////
-    //  Class for bTag study  //
-    ////////////////////////////  
+    /////////////////////
+    //  Used classes   //
+    /////////////////////  
     BTagStudy bTagStudy;  //--> Should only be called before the event loop (otherwise the counters will not give the correct result)
     bTagStudy.InitializeBegin();
     MlbStudy mlbStudy;
     mlbStudy.initializeBegin();
+    TFCreation tfCreation;
+    tfCreation.InitializeVariables();
 
     ////////////////////////////////////
     //	loop on events
@@ -472,7 +507,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 500000; ievt++){
+    for (unsigned int ievt = 0; ievt < 8000000; ievt++){
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -877,6 +912,7 @@ int main (int argc, char *argv[])
           MSPlot["Init_Events_pT_jet3_beforeEvtSel"]->Fill(init_jets_corrected[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
           MSPlot["Init_Events_pT_jet4_beforeEvtSel"]->Fill(init_jets_corrected[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       }
+
       
       //Declare selection instance    
       Selection selection(init_jets_corrected, init_muons, init_electrons, mets, event->kt6PFJets_rho());
@@ -1088,7 +1124,6 @@ int main (int argc, char *argv[])
 	pair<unsigned int, unsigned int> leptonicBJet_, hadronicBJet_, hadronicWJet1_, hadronicWJet2_; //First index is the JET number, second one is the parton
 	leptonicBJet_ = hadronicBJet_ = hadronicWJet1_ = hadronicWJet2_ = pair<unsigned int, unsigned int>(9999,9999);
 	vector<TLorentzVector> mcParticlesTLV, selectedJetsTLV;
-	//vector<TRootMCParticle> mcParticlesMatching;
 	bool muPlusFromTop = false, muMinusFromTop = false;
 	bool elPlusFromTop = false, elMinusFromTop = false;
 	if(verbosity>1) cout << " Looking at mcParticlesMatching " << endl;
@@ -1255,8 +1290,31 @@ int main (int argc, char *argv[])
 	  h_MlbMass.Fill(CorrectRecMassMlb);
 	  h_MqqbMass.Fill(CorrectRecMassMqqb);
 	}	      	      	      	       	      
+
+	if(hadronicWJet1_.first < 9999 && hadronicWJet2_.first < 9999 && hadronicBJet_.first < 9999 && leptonicBJet_.first < 9999 ){
+          if(CalculateResolutions){
+	  // Fill the resolution-stuff for events where the 4 ttbar semi-lep partons are all matched to jets
+	    resFitLightJets->Fill(selectedJets[hadronicWJet1_.first], mcParticles[hadronicWJet1_.second]);
+	    resFitLightJets->Fill(selectedJets[hadronicWJet2_.first], mcParticles[hadronicWJet2_.second]);
+	    resFitBJets->Fill(selectedJets[hadronicBJet_.first], mcParticles[hadronicBJet_.second]);
+	    resFitBJets->Fill(selectedJets[leptonicBJet_.first], mcParticles[leptonicBJet_.second]);
+	    if(eventselectedSemiMu == true){
+		resFitMuon->Fill(selectedMuons[0], Lepton);
+		resFitNeutrinoMu->Fill(mets[0], NeutrinoMC);
+	    }
+	    else if(eventselectedSemiEl == true){
+		resFitElectron->Fill(selectedElectrons[0], Lepton);
+		resFitNeutrinoEl->Fill(mets[0], NeutrinoMC);
+	    }
+	  }//End of calculate Resolutions
+	  if(CalculateTF){
+	    tfCreation.FillHistograms(&mcParticlesMatching[hadronicWJet1_.second], &mcParticlesMatching[hadronicWJet2_.second], &mcParticlesMatching[hadronicBJet_.second], &mcParticlesMatching[leptonicBJet_.second], Lepton, selectedJets[hadronicWJet1_.first], selectedJets[hadronicWJet2_.first], selectedJets[hadronicBJet_.first], selectedJets[leptonicBJet_.first], selectedLepton, eventselectedSemiMu, eventselectedSemiEl);
+
+	  }//End of calculate Transfer Functions
+        }//End of matched particles reconstructed
       }//if dataset Semi mu ttbar
 
+	if(CalculateTF) continue;
       //----------------------------------------------------------------------------------------------------------------------------------- Start of bTagStudy class stuff!!
 
       /////////////////////////////
@@ -1427,10 +1485,28 @@ int main (int argc, char *argv[])
       //   --> Continue with 2 T b-tags        //
       //   --> No veto on light jets!          //
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
+
+      if (MSPlot.find("nSelectedJets_BeforeBTag"+leptonFlav) == MSPlot.end()){
+	//MSPlots before and after #b-tagged and #light jets constraints
+	MSPlot["nSelectedJets_BeforeBTag"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "nSelectedJets_BeforeBTag"+leptonFlav,11, -0.5, 10.5, "# selected jets");
+	MSPlot["nSelectedJets_AfterBTag"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "nSelectedJets_AfterBTag"+leptonFlav,11, -0.5, 10.5, "# selected jets");
+	MSPlot["nBTaggedJets_BeforeBTag"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "nBTaggedJets_BeforeBTag"+leptonFlav,11, -0.5, 10.5, "# b-tagged jets");
+	MSPlot["nBTaggedJets_AfterBTag"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "nBTaggedJets_AfterBTag"+leptonFlav,11, -0.5, 10.5, "# b-tagged jets");
+	MSPlot["nLightJets_BeforeBTag"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "nLightJets_BeforeBTag"+leptonFlav,11, -0.5, 10.5, "# light jets");
+	MSPlot["nLightJets_AfterBTag"+leptonFlav] = new MultiSamplePlot(datasetsPlot, "nLightJets_AfterBTag"+leptonFlav,11, -0.5, 10.5, "# light jets");
+      }
+
+      MSPlot["nSelectedJets_BeforeBTag"+leptonFlav]->Fill(selectedJets.size(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["nBTaggedJets_BeforeBTag"+leptonFlav]->Fill( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["nLightJets_BeforeBTag"+leptonFlav]->Fill( (bTagStudy.getLightJets(ChosenBTagOption)).size(), datasets[d], true, Luminosity*scaleFactor);
       if( NrConsideredBTagOptions == 1 && ( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size() < 2 || (bTagStudy.getLightJets(ChosenBTagOption)).size() < 2 ) ){
 	   if(RecoLHCOOutput == true) EventInfoFile<<"    B-tag failed "<<endl;
 	   continue;
       }      
+
+      MSPlot["nSelectedJets_AfterBTag"+leptonFlav]->Fill(selectedJets.size(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["nBTaggedJets_AfterBTag"+leptonFlav]->Fill( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["nLightJets_AfterBTag"+leptonFlav]->Fill( (bTagStudy.getLightJets(ChosenBTagOption)).size(), datasets[d], true, Luminosity*scaleFactor);
 
       // Count the number of events:
       if(eventselectedSemiMu) nSelectedMu++;
@@ -1596,6 +1672,12 @@ int main (int argc, char *argv[])
 
     }			//loop on events
 
+    // -------- Calculate TF MadWeight  --------//
+    if(CalculateTF){
+      //tfCreation.Calculate();
+      tfCreation.CalculateTF(true, false, true, false, true); //bool drawHistos, bool writeTF, bool doFits, bool useROOTClass, bool useStartValues);
+    }
+
     //--------------------  Sigma for W Mass and Top Mass  --------------------
     histo1D["MlbMass"]->Fit("gaus","Q");
     histo1D["MqqbMass"]->Fit("gaus","Q");
@@ -1611,7 +1693,7 @@ int main (int argc, char *argv[])
     if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
     cout << " " << endl;
 
-    cout << " \n Output for N(4 jets) and N(5 jets) categories: " << endl;
+    cout << " \n Output for N(2 light jets) and N(3 light jets) categories: " << endl;
     cout << "   -- Number of events in each category    : " << FourJetsCategory << "   --   " << FiveJetsCategory << endl;
     cout << "   -- Number of matched events             : " << FourJetsMatched <<  "   --   " << FiveJetsMatched << endl;
     cout << "   -- Number of times good combi is chosen : " << FourJetsGoodCombiChosen << "   --   " << FiveJetsAsFourGoodCombiChosen << " & " << FiveJetsAsFiveGoodCombiChosen << endl;
@@ -1778,7 +1860,38 @@ int main (int argc, char *argv[])
   /////////////////////////
   // Write out the plots //
   /////////////////////////
-  
+
+  // Fill the resolution histograms and calculate the resolutions
+  //
+  string pathPNG = "PlotsMacro";
+  if(CalculateResolutions){    
+      mkdir((pathPNG+"resFit_LightJet/").c_str(),0777);
+      mkdir((pathPNG+"resFit_BJet/").c_str(),0777);
+      mkdir((pathPNG+"resFit_Muon/").c_str(),0777);
+      mkdir((pathPNG+"resFit_NeutrinoSemiMu/").c_str(),0777);     
+      mkdir((pathPNG+"resFit_NeutrinoSemiEl/").c_str(),0777);
+      mkdir((pathPNG+"resFit_Electron/").c_str(),0777);
+
+      resFitMuon->WritePlots(fout, true, pathPNG+"resFit_Muon/");
+      resFitMuon->WriteResolutions("muonReso.root");
+
+      resFitNeutrinoMu->WritePlots(fout, true, pathPNG+"resFit_NeutrinoSemiMu/");
+      resFitNeutrinoMu->WriteResolutions("neutrinoSemiMuReso.root");
+
+      resFitNeutrinoEl->WritePlots(fout, true, pathPNG+"resFit_Neutrino/");
+      resFitNeutrinoEl->WriteResolutions("neutrinoSemiElReso.root");
+
+      resFitElectron->WritePlots(fout, true, pathPNG+"resFit_Electron/");
+      resFitElectron->WriteResolutions("electronReso.root");      
+      
+      resFitLightJets->WritePlots(fout, true, pathPNG+"resFit_LightJet/");
+      resFitLightJets->WriteResolutions("lightJetReso.root");
+
+      resFitBJets->WritePlots(fout, true, pathPNG+"resFit_BJet/");
+      resFitBJets->WriteResolutions("bJetReso.root");
+  }
+  fout -> cd();
+
   mkdir("DemoPlots",0777);
   
   for(map<string,MultiSamplePlot*>::const_iterator it = MSPlot.begin(); it != MSPlot.end(); it++){    
