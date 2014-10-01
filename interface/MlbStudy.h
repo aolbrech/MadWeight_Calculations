@@ -62,8 +62,8 @@ class MlbStudy{
 
    vector<float> getChiSqDiffWhenWrong(int jetCase) {return h_ChiSqDiffWhenWrong[jetCase];};
 
-   int getMlbValue(int order)     {return MlbValues[order];};
-   int getMqqbValue(int order)    {return MqqbValues[order];};
+   float getMlbValue(int order)     {return MlbValues[order];};
+   float getMqqbValue(int order)    {return MqqbValues[order];};
    float getChiSquared(int order) {return ChiSquared[order];};
 
    int getNrMatchedEvents( int OptionNr) {return NumberMatchedEvents[OptionNr];};
