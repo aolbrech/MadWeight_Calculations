@@ -2,57 +2,57 @@
 
 void TFCreation::InitializeVariables(){
 	histo2D["Epart_vs_Enonbjet"]                     =new TH2F("Epart_vs_Enonbjet","Energy of first light quark ( gen level (x-axis) vs reco level (y-axis) )", 150, 0, 350, 150, 0, 350);
-	histo2D["Epart_vs_DiffEpartEnonbjet"]            =new TH2F("Epart_vs_DiffEpartEnonbjet","Energy of first light quark versus #Delta(E_{gen} - E_{reco})", 10, 0, 250, 60, -40, 40);
+	histo2D["Epart_vs_DiffEpartEnonbjet"]            =new TH2F("Epart_vs_DiffEpartEnonbjet","Energy of first light quark versus #Delta(E_{gen} - E_{reco})", 10, 20, 250, 80, -40, 40);
 	histo2D["Epart_vs_Ebjet"]                        =new TH2F("Epart_vs_Ebjet","Epart_vs_Ebjet", 150, 0, 350, 150, 0, 350);
-	histo2D["Epart_vs_DiffEpartEbjet"]               =new TH2F("Epart_vs_DiffEpartEbjet","Epart_vs_Epart-Ebjet", 10, 0, 250, 60, -40, 40);
-	histo2D["EgenEl_vs_ErecEl"]                      =new TH2F("EgenEl_vs_ErecEl","EgenEl_vs_ErecEl", 100, 23, 57, 150, 20, 400);
-	histo2D["EgenEl_vs_DiffEgenElErecEl"]            =new TH2F("EgenEl_vs_DiffEgenElErecEl","EgenEl_vs_EgenEl-ErecEl", 100, 23, 57, 50, -100, 25);
-	histo2D["InvPtgenMu_vs_InvPtrecMu"]              =new TH2F("InvPtgenMu_vs_InvPtrecMu","InvPtgenMu_vs_InvPtrecMu", 80, 0.015, 0.05, 80, 0, 0.04);
-	histo2D["InvPtgenMu_vs_DiffInvPtgenMuInvPtrecMu"]=new TH2F("InvPtgenMu_vs_DiffInvPtgenMuInvPtrecMu","InvPtgenMu_vs_InvPtgenMu-InvPtrecMu", 10, 0.015, 0.04, 80, -0.015, 0.04);
+	histo2D["Epart_vs_DiffEpartEbjet"]               =new TH2F("Epart_vs_DiffEpartEbjet","Epart_vs_Epart-Ebjet", 10, 20, 250, 80, -40, 40);
+	histo2D["EgenEl_vs_ErecEl"]                      =new TH2F("EgenEl_vs_ErecEl","EgenEl_vs_ErecEl", 100, 37, 43, 150, 20, 400);
+	histo2D["EgenEl_vs_DiffEgenElErecEl"]            =new TH2F("EgenEl_vs_DiffEgenElErecEl","EgenEl_vs_EgenEl-ErecEl", 10, 37, 43, 75, -100, 25);
+	histo2D["InvPtgenMu_vs_InvPtrecMu"]              =new TH2F("InvPtgenMu_vs_InvPtrecMu","InvPtgenMu_vs_InvPtrecMu", 10, 0.015, 0.05, 80, 0, 0.04);
+	histo2D["InvPtgenMu_vs_DiffInvPtgenMuInvPtrecMu"]=new TH2F("InvPtgenMu_vs_DiffInvPtgenMuInvPtrecMu","InvPtgenMu_vs_InvPtgenMu-InvPtrecMu", 10, 0.02, 0.04, 80, -0.015, 0.04);
 	histo2D["PtgenMu_vs_PtrecMu"]                    =new TH2F("PtgenMu_vs_PtrecMu","PtgenMu_vs_PtrecMu", 50, 0, 60, 150, 0, 250);
-	histo2D["PtgenMu_vs_DiffPtgenMuPtrecMu"]         =new TH2F("PtgenMu_vs_DiffPtgenMuPtrecMu","PtgenMu_vs_PtgenMu-PtrecMu",10, 0, 60, 100, -30, 120);
+	histo2D["PtgenMu_vs_DiffPtgenMuPtrecMu"]         =new TH2F("PtgenMu_vs_DiffPtgenMuPtrecMu","PtgenMu_vs_PtgenMu-PtrecMu",10, 0, 60, 100, -120, 30);
 	
 	histo2D["Thpart_vs_Thnonbjet"]          =new TH2F("Thpart_vs_Thnonbjet","Thpart_vs_Thnonbjet", 60, 0, 3.15, 60, 0, 3.15);
-	histo2D["Thpart_vs_DiffThpartThnonbjet"]=new TH2F("Thpart_vs_DiffThpartThnonbjet","Thpart_vs_Thpart-Thnonbjet", 10, 0.1, 3.1, 50, -0.15, 0.15);
+	histo2D["Thpart_vs_DiffThpartThnonbjet"]=new TH2F("Thpart_vs_DiffThpartThnonbjet","Thpart_vs_Thpart-Thnonbjet", 10, 0.1, 3.1, 100, -0.15, 0.15);
 	histo2D["Thpart_vs_Thbjet"]             =new TH2F("Thpart_vs_Thbjet","Thpart_vs_Thbjet", 60, 0, 3.15, 60, 0, 3.15);
-	histo2D["Thpart_vs_DiffThpartThbjet"]   =new TH2F("Thpart_vs_DiffThpartThbjet","Thpart_vs_Thpart-Thbjet", 10, 0.1, 3.1, 60, -0.15, 0.15);
+	histo2D["Thpart_vs_DiffThpartThbjet"]   =new TH2F("Thpart_vs_DiffThpartThbjet","Thpart_vs_Thpart-Thbjet", 10, 0.1, 3.1, 100, -0.15, 0.15);
 	histo2D["ThgenEl_vs_ThrecEl"]           =new TH2F("ThgenEl_vs_ThrecEl","ThgenEl_vs_ThrecEl", 60, 0, 3.15, 60, 0, 3.15);
-	histo2D["ThgenEl_vs_DiffThgenElThrecEl"]=new TH2F("ThgenEl_vs_DiffThgenElThrecEl","ThgenEl_vs_ThgenEl-ThrecEl", 10, 0, 3.15, 50, -2.5, 2.5);
+	histo2D["ThgenEl_vs_DiffThgenElThrecEl"]=new TH2F("ThgenEl_vs_DiffThgenElThrecEl","ThgenEl_vs_ThgenEl-ThrecEl", 10, 0, 3.15, 100, -2, 2);
 	histo2D["ThgenMu_vs_ThrecMu"]           =new TH2F("ThgenMu_vs_ThrecMu","ThgenMu_vs_ThrecMu", 60, 0, 3.15, 60, 0, 3.15);
-	histo2D["ThgenMu_vs_DiffThgenMuThrecMu"]=new TH2F("ThgenMu_vs_DiffThgenMuThrecMu","ThgenMu_vs_ThgenMu-ThrecMu", 10, 0, 3.15, 50, -2.5, 2.5);
+	histo2D["ThgenMu_vs_DiffThgenMuThrecMu"]=new TH2F("ThgenMu_vs_DiffThgenMuThrecMu","ThgenMu_vs_ThgenMu-ThrecMu", 10, 0, 3.15, 100, -2, 2);
 	histo2D["Epart_vs_Thnonbjet"]           =new TH2F("Epart_vs_Thnonbjet","Epart_vs_Thnonbjet", 120, 0, 300, 60, 0, 3.15);
-	histo2D["Epart_vs_DiffThpartThnonbjet"] =new TH2F("Epart_vs_DiffThpartThnonbjet","Epart_vs_Thpart-Thnonbjet", 10, 0, 250, 50, -0.15, 0.15);
+	histo2D["Epart_vs_DiffThpartThnonbjet"] =new TH2F("Epart_vs_DiffThpartThnonbjet","Epart_vs_Thpart-Thnonbjet", 10, 0, 250, 100, -0.15, 0.15);
 	histo2D["Epart_vs_Thbjet"]              =new TH2F("Epart_vs_Thbjet","Epart_vs_Thbjet", 120, 0, 300, 60, 0, 3.15);
-	histo2D["Epart_vs_DiffThpartThbjet"]    =new TH2F("Epart_vs_DiffThpartThbjet","Epart_vs_Thpart-Thbjet", 10, 0, 250, 50, -0.15, 0.15);
-	histo2D["EgenEl_vs_ThrecEl"]            =new TH2F("EgenEl_vs_ThrecEl","EgenEl_vs_ThrecEl", 100, 23, 57, 60, 0, 3.15);
-	histo2D["EgenEl_vs_DiffThgenElThrecEl"] =new TH2F("EgenEl_vs_DiffThgenElThrecEl","EgenEl_vs_ThgenEl-ThrecEl", 10, 23, 57, 50, -2.5, 2.5);
+	histo2D["Epart_vs_DiffThpartThbjet"]    =new TH2F("Epart_vs_DiffThpartThbjet","Epart_vs_Thpart-Thbjet", 10, 0, 250, 100, -0.15, 0.15);
+	histo2D["EgenEl_vs_ThrecEl"]            =new TH2F("EgenEl_vs_ThrecEl","EgenEl_vs_ThrecEl", 100, 37, 43, 60, 0, 3.15);
+	histo2D["EgenEl_vs_DiffThgenElThrecEl"] =new TH2F("EgenEl_vs_DiffThgenElThrecEl","EgenEl_vs_ThgenEl-ThrecEl", 10, 37, 43, 100, -2, 2);
 	histo2D["InvPtgenMu_vs_ThrecMu"]        =new TH2F("InvPtgenMu_vs_ThrecMu","InvPtgenMu_vs_ThrecMu", 50, 0.015, 0.045, 60, 0, 3.15);
-	histo2D["InvPtgenMu_vs_DiffThgenMuThrecMu"]=new TH2F("InvPtgenMu_vs_DiffThgenMuThrecMu","InvPtgenMu_vs_ThgenMu-ThrecMu", 10, 0.015, 0.04, 50, -2.5, 2.5);
+	histo2D["InvPtgenMu_vs_DiffThgenMuThrecMu"]=new TH2F("InvPtgenMu_vs_DiffThgenMuThrecMu","InvPtgenMu_vs_ThgenMu-ThrecMu", 10, 0.02, 0.04, 100, -2, 2);
 	
 	histo2D["Phipart_vs_Phinonbjet"]             =new TH2F("Phipart_vs_Phinonbjet","Phipart_vs_Phinonbjet", 60, -3.2, 3.2, 60, -3.2, 3.2);
-	histo2D["Phipart_vs_DiffPhipartPhinonbjet"]  =new TH2F("Phipart_vs_DiffPhipartPhinonbjet","Phipart_vs_Phipart-Phinonbjet", 10, -3.2, 3.2, 50, -0.2, 0.2);
+	histo2D["Phipart_vs_DiffPhipartPhinonbjet"]  =new TH2F("Phipart_vs_DiffPhipartPhinonbjet","Phipart_vs_Phipart-Phinonbjet", 10, -3.2, 3.2, 100, -0.2, 0.2);
         histo2D["Phipart_vs_DiffPhipartPhinonbjetFULL"]=new TH2F("Phipart_vs_DiffPhipartPhinonbjetFULL","Phipart_vs_Phipart-Phinonbjet (outliers as well)", 10, -3.2, 3.2, 120, -6.2, 6.2);
 	histo2D["Phipart_vs_Phibjet"]                =new TH2F("Phipart_vs_Phibjet","Phipart_vs_Phibjet", 60, -3.2, 3.2, 60, -3.2, 3.2);
-	histo2D["Phipart_vs_DiffPhipartPhibjet"]     =new TH2F("Phipart_vs_DiffPhipartPhibjet","Phipart_vs_Phipart-Phibjet", 10, -3.2, 3.2, 50, -0.2, 0.2);
+	histo2D["Phipart_vs_DiffPhipartPhibjet"]     =new TH2F("Phipart_vs_DiffPhipartPhibjet","Phipart_vs_Phipart-Phibjet", 10, -3.2, 3.2, 100, -0.2, 0.2);
         histo2D["Phipart_vs_DiffPhipartPhibjetFULL"] =new TH2F("Phipart_vs_DiffPhipartPhibjetFULL","Phipart_vs_Phipart-Phibjet (outliers as well)", 10, -3.2, 3.2, 120, -6.2, 6.2);
 	histo2D["PhigenEl_vs_PhirecEl"]              =new TH2F("PhigenEl_vs_PhirecEl","PhigenEl_vs_PhirecEl", 60, -3.2, 3.2, 60, -3.2, 3.2);
-	histo2D["PhigenEl_vs_DiffPhigenElPhirecEl"]  =new TH2F("PhigenEl_vs_DiffPhigenElPhirecEl","PhigenEl_vs_PhigenEl-PhirecEl", 10, -3.2, 3.2, 75, -1.5, 1.5);
+	histo2D["PhigenEl_vs_DiffPhigenElPhirecEl"]  =new TH2F("PhigenEl_vs_DiffPhigenElPhirecEl","PhigenEl_vs_PhigenEl-PhirecEl", 10, -3.2, 3.2, 75, -2, 2);
         histo2D["PhigenEl_vs_DiffPhigenElPhirecElFULL"]  =new TH2F("PhigenEl_vs_DiffPhigenElPhirecElFULL","PhigenEl_vs_PhigenEl-PhirecEl (outliers as well)", 10, -3.2, 3.2, 80, -3.2, 3.2);
 	histo2D["PhigenMu_vs_PhirecMu"]              =new TH2F("PhigenMu_vs_PhirecMu","PhigenMu_vs_PhirecMu", 60, -3.2, 3.2, 60, -3.2, 3.2);
-	histo2D["PhigenMu_vs_DiffPhigenMuPhirecMu"]  =new TH2F("PhigenMu_vs_DiffPhigenMuPhirecMu","PhigenMu_vs_PhigenMu-PhirecMu", 10, -3.2, 3.2, 75, -1.5, 1.5);
+	histo2D["PhigenMu_vs_DiffPhigenMuPhirecMu"]  =new TH2F("PhigenMu_vs_DiffPhigenMuPhirecMu","PhigenMu_vs_PhigenMu-PhirecMu", 10, -3.2, 3.2, 75, -2, 2);
         histo2D["PhigenMu_vs_DiffPhigenMuPhirecMuFULL"]  =new TH2F("PhigenMu_vs_DiffPhigenMuPhirecMuFULL","PhigenMu_vs_PhigenMu-PhirecMu (outliers as well)", 10, -3.2, 3.2, 80, -3.2, 3.2);
 	histo2D["Epart_vs_Phinonbjet"]               =new TH2F("Epart_vs_Phinonbjet","Epart_vs_Phinonbjet", 75, 0, 250, 60, -3.2, 3.2);
-	histo2D["Epart_vs_DiffPhipartPhinonbjet"]    =new TH2F("Epart_vs_DiffPhipartPhinonbjet","Epart_vs_Phipart-Phinonbjet", 10, 0, 250, 50, -0.15, 0.15);
+	histo2D["Epart_vs_DiffPhipartPhinonbjet"]    =new TH2F("Epart_vs_DiffPhipartPhinonbjet","Epart_vs_Phipart-Phinonbjet", 10, 0, 250, 100, -0.15, 0.15);
         histo2D["Epart_vs_DiffPhipartPhinonbjetFULL"]    =new TH2F("Epart_vs_DiffPhipartPhinonbjetFULL","Epart_vs_Phipart-Phinonbjet (outliers as well)", 10, 0, 250, 120, -6.2, 6.2);
 	histo2D["Epart_vs_Phibjet"]                  =new TH2F("Epart_vs_Phibjet","Epart_vs_Phibjet", 75, 0, 250, 60, -3.2, 3.2);
-	histo2D["Epart_vs_DiffPhipartPhibjet"]       =new TH2F("Epart_vs_DiffPhipartPhibjet","Epart_vs_Phipart-Phibjet", 10, 0, 250, 50, -0.15, 0.15);
+	histo2D["Epart_vs_DiffPhipartPhibjet"]       =new TH2F("Epart_vs_DiffPhipartPhibjet","Epart_vs_Phipart-Phibjet", 10, 0, 250, 100, -0.15, 0.15);
         histo2D["Epart_vs_DiffPhipartPhibjetFULL"]       =new TH2F("Epart_vs_DiffPhipartPhibjetFULL","Epart_vs_Phipart-Phibjet (outliers as well)", 10, 0, 300, 120, -6.2, 6.2);
-	histo2D["EgenEl_vs_PhirecEl"]                =new TH2F("EgenEl_vs_PhirecEl","EgenEl_vs_PhirecEl", 150, 23, 57, 60, -3.2, 3.2);
-	histo2D["EgenEl_vs_DiffPhigenElPhirecEl"]    =new TH2F("EgenEl_vs_DiffPhigenElPhirecEl","EgenEl_vs_PhigenEl-PhirecEl", 10, 23, 57, 75, -1.5, 1.5);
+	histo2D["EgenEl_vs_PhirecEl"]                =new TH2F("EgenEl_vs_PhirecEl","EgenEl_vs_PhirecEl", 150, 37, 43, 60, -3.2, 3.2);
+	histo2D["EgenEl_vs_DiffPhigenElPhirecEl"]    =new TH2F("EgenEl_vs_DiffPhigenElPhirecEl","EgenEl_vs_PhigenEl-PhirecEl", 10, 37, 43, 75, -1.5, 1.5);
         histo2D["EgenEl_vs_DiffPhigenElPhirecElFULL"]    =new TH2F("EgenEl_vs_DiffPhigenElPhirecElFULL","EgenEl_vs_PhigenEl-PhirecEl (outliers as well)", 10, 0, 400, 120, -6.2, 6.2);
 	histo2D["InvPtgenMu_vs_PhirecMu"]            =new TH2F("InvPtgenMu_vs_PhirecMu","InvPtgenMu_vs_PhirecMu", 80, 0.015, 0.045, 60, -3.2, 3.2);
-	histo2D["InvPtgenMu_vs_DiffPhigenMuPhirecMu"]=new TH2F("InvPtgenMu_vs_DiffPhigenMuPhirecMu","InvPtgenMu_vs_PhigenMu-PhirecMu", 10, 0.015, 0.04, 75, -1.5, 1.5);
-        histo2D["InvPtgenMu_vs_DiffPhigenMuPhirecMuFULL"]=new TH2F("InvPtgenMu_vs_DiffPhigenMuPhirecMuFULL","InvPtgenMu_vs_PhigenMu-PhirecMu (outliers as well)", 10, 0.015, 0.04, 120, -6.2, 6.2);
+	histo2D["InvPtgenMu_vs_DiffPhigenMuPhirecMu"]=new TH2F("InvPtgenMu_vs_DiffPhigenMuPhirecMu","InvPtgenMu_vs_PhigenMu-PhirecMu", 10, 0.02, 0.04, 75, -1.5, 1.5);
+        histo2D["InvPtgenMu_vs_DiffPhigenMuPhirecMuFULL"]=new TH2F("InvPtgenMu_vs_DiffPhigenMuPhirecMuFULL","InvPtgenMu_vs_PhigenMu-PhirecMu (outliers as well)", 10, 0.02, 0.04, 120, -6.2, 6.2);
 }
 
 void TFCreation::FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* hadrWJet2, TRootMCParticle* hadrBJet, TRootMCParticle* leptBJet, TRootMCParticle* lepton, TRootJet* selHadrWJet1, TRootJet* selHadrWJet2, TRootJet* selHadrBJet, TRootJet* selLeptBJet, TLorentzVector* selLepton, bool isSemiMu, bool isSemiEl){
@@ -221,6 +221,8 @@ void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool us
 	    hlist = new TH1D*[npar];
 	    if(useStartValues)
 		SetStartValuesDoubleGaussian(f);
+
+	    doubleGaussianFit->SetRange( histoForFit->GetYaxis()->GetXmin(), histoForFit->GetYaxis()->GetXmin() );
 	    TObjArray aSlices;
 	    if(useROOTClass){
 		//Fit using the FitSliceY function of TF1!
@@ -247,14 +249,14 @@ void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool us
 
 		hlist[ipar]->Fit(caloEnergyFit);
 		hlist[ipar]->Write();            
-		caloEnergyFit->Write();
+		//caloEnergyFit->Write();
 	    }
 	    hlist[npar]->Write();
 						
 	  }//Loop over f						
 	  delete caloEnergyFit, doubleGaussianFit;
 	  delete histoForFit;
-	  //delete [] hlist;
+	  delete [] hlist;
 	}                               //Boolean doFits = true
 	file->Close();
 }
@@ -279,12 +281,13 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 	//Loop on all bins in X, generate a projection along Y and fit each bin separately!
 	int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
 	int nbins = histoForFit->GetXaxis()->GetNbins();
+	cout << " ** Looking at histogram : " << histoForFit->GetName() << "                            ** " << endl;
 	for(int bin=1;bin <= nbins+1;bin ++) {
 	    string projection_title = string(histoForFit->GetName())+"_sliceXbin"+tostr(bin);
 
 	    TH1D *hp = histoForFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
 	    //if(bin==nbins) hp = histoForFit->ProjectionY(projection_title.c_str(),bin,bin+1,"e"); //include overflow in last bin
-	    if(bin==1) hp = histoForFit->ProjectionY(projection_title.c_str(),bin-1,bin,"e"); //include underflow in first bin
+	    //if(bin==1) hp = histoForFit->ProjectionY(projection_title.c_str(),bin-1,bin,"e"); //include underflow in first bin
 
 	    //Histogram doesn't have any memory space ...
 	    if(hp == 0) continue;
@@ -296,17 +299,19 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 	    int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
 	    if(npfits > npar && npfits >= cut) {
 
+		cout << "   --  Looking at bin : " << bin << endl;
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
 		    hlist[ipar]->Fill(histoForFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
-		    hlist[ipar]->SetBinError(histoForFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
+                    hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
+
 	        }
 		//Save hchi2 histogram as extra hlist!
 	        hlist[npar]->Fill(histoForFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-npar));
 	    }
 	    hp->Write();
-	    doubleGaussianFit->Write();     //--> Interesting to draw this as well ?? Should appear in the histogram ...
+	    //doubleGaussianFit->Write();     //--> Interesting to draw this as well ?? Should appear in the histogram ...
 	    delete hp;
 	}//loop over bins!
 }	
