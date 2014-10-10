@@ -90,7 +90,7 @@ int main (int argc, char *argv[])
   ///////////////////////////////
   //  Run specific parts only  //
   ///////////////////////////////
-  bool GenLHCOOutput = false;
+  bool GenLHCOOutput = true;
   bool RecoLHCOOutput = false;  
   bool FinalEventSelectionChoiceIsMade = false;
 
@@ -259,7 +259,23 @@ int main (int argc, char *argv[])
   histo1D["TopMass"]= new TH1F("TopMass","TopMass", 200,0,350);
   histo1D["MlbMass"]= new TH1F("MlbMass","MlbMass",200,0,300);
   histo1D["MqqbMass"]= new TH1F("MqqbMass","MqqbMass",400,0,500);
-  
+
+  histo1D["DeltaR_Ana_Muon"] = new TH1F("DeltaR_Ana_Muon","DeltaR_Ana_Muon",200,0,1);
+  histo1D["DeltaR_Ana_Elec"] = new TH1F("DeltaR_Ana_Elec","DeltaR_Ana_Elec",200,0,1);
+  histo1D["DeltaR_Ana_Light1_mcPartMatch"] = new TH1F("DeltaR_Ana_Light1_mcPartMatch","DeltaR_Ana_Light1_mcPartMatch",200,0,1);
+  histo1D["DeltaR_Ana_Light1_mcPart"] = new TH1F("DeltaR_Ana_Light1_mcPart","DeltaR_Ana_Light1_mcPart",200,0,10);
+  histo1D["DeltaR_Ana_Light2_mcPartMatch"] = new TH1F("DeltaR_Ana_Light2_mcPartMatch","DeltaR_Ana_Light2_mcMatching",200,0,1);
+  histo1D["DeltaR_Ana_Light2_mcPart"] = new TH1F("DeltaR_Ana_Light2_mcPart","DeltaR_Ana_Light2_mcPart",200,0,10);
+  histo1D["DeltaR_Ana_BHadr_mcPartMatch"] = new TH1F("DeltaR_Ana_BHadr_mcPartMatch","DeltaR_Ana_BHadr_mcPartMatch",200,0,1);
+  histo1D["DeltaR_Ana_BHadr_mcPart"] = new TH1F("DeltaR_Ana_BHadr_mcPart","DeltaR_Ana_BHadr_mcPart",200,0,10);
+  histo1D["DeltaR_Ana_BLept_mcPartMatch"] = new TH1F("DeltaR_Ana_BLept_mcPartMatch","DeltaR_Ana_BLept_mcPartMatch",200,0,1);
+  histo1D["DeltaR_Ana_BLept_mcPart"] = new TH1F("DeltaR_Ana_BLept_mcPart","DeltaR_Ana_BLept_mcPart",200,0,10);
+
+  histo1D["genPt_Muon"] = new TH1F("genPt_Muon","genPt_Muon",400,0,200);
+  histo1D["recoPt_Muon"] = new TH1F("recoPt_Muon","recoPt_Muon",400,0,200);
+  histo1D["genPt_Elec"] = new TH1F("genPt_Elec","genPt_Elec",400,0,200);
+  histo1D["recoPt_Elec"] = new TH1F("recoPt_Elec","recoPt_Elec",400,0,200);
+
   ////////////////////////////////////
   /// MultiSamplePlot
   ////////////////////////////////////
@@ -284,7 +300,7 @@ int main (int argc, char *argv[])
   resFitNeutrinoMu = new ResolutionFit("NeutrinoMu");
   resFitNeutrinoEl = new ResolutionFit("NeutrinoEl");
 
-  if(!CalculateResolutions){
+  if(!CalculateResolutions && !CalculateTF){
     resFitLightJets->LoadResolutions("resolutions/lightJetReso.root");
     resFitBJets->LoadResolutions("resolutions/bJetReso.root");
     resFitMuon->LoadResolutions("resolutions/muonReso.root");
@@ -421,17 +437,18 @@ int main (int argc, char *argv[])
     //  LHCO Output files + GeneratorInfo  //
     /////////////////////////////////////////
     ofstream EventInfoFile;
-    EventInfoFile.open("EventNumberInformation.lhco");
-    EventInfoFile << " Event Number  MuPos  MuNeg   ElPos   ElNeg  ChannelNumber  FalseEventContent       selectedEvent      selectedChannelNumber " << endl;
-
+    ofstream outFileReco[16];
     LHCOOutput lhcoOutput; //Initialize class
     ofstream outFile[4];
-    outFile[0].open("TTbarLHCO_PositiveMuon.lhco");
-    outFile[1].open("TTbarLHCO_NegativeMuon.lhco");
-    outFile[2].open("TTbarLHCO_PositiveElectron.lhco");
-    outFile[3].open("TTbarLHCO_NegativeElectron.lhco");
+    if(GenLHCOOutput == true){	
+       EventInfoFile.open("EventNumberInformation.lhco");
+       EventInfoFile << " Event Number  MuPos  MuNeg   ElPos   ElNeg  ChannelNumber  FalseEventContent       selectedEvent      selectedChannelNumber " << endl;
 
-    ofstream outFileReco[16];
+       outFile[0].open("TTbarLHCO_PositiveMuon.lhco");
+       outFile[1].open("TTbarLHCO_NegativeMuon.lhco");
+       outFile[2].open("TTbarLHCO_PositiveElectron.lhco");
+       outFile[3].open("TTbarLHCO_NegativeElectron.lhco");
+    }
     unsigned int NumberPosRecoMu = 0, NumberNegRecoMu = 0, NumberPosRecoEl = 0, NumberNegRecoEl = 0;
     
     unsigned int NumberCorrectEvents = 0; //Counts the number of semi-leptonic events
@@ -439,7 +456,8 @@ int main (int argc, char *argv[])
     int EventContent[5]; //0:top; 1:b; 2: u,c,d,s; 3:W; 4:mu + neutrino
     
     //Cos Theta information
-    TLorentzVector *sTop, *WLeptTRF, *leptonWRF;
+    TLorentzVector *sTop, *WLeptTRF;       //Pointers allowed .. ?
+    TLorentzVector leptonWRF;              //Don't use pointers here to avoid overwriting the original TLorentzVectors!
     float standardCosTheta = 0;
     TH1F h_StandardCosThetaNoEvtSel("StCosTheta_BeforeEvtSel","StCosTheta_BeforeEvtSel",200,-1,1);
     TH1F h_StandardCosThetaNoBTag("StCosThetaNoBTag","StCosThetaNoBTag",200,-1,1);
@@ -506,8 +524,10 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 8000000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 2000000; ievt++){
+
+      if(ievt > 20000) GenLHCOOutput = false;	
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -867,17 +887,17 @@ int main (int argc, char *argv[])
 	//////////////////////////////////////
 	//  Look at cos theta distribution  //
 	////////////////////////////////////// 
-	
+
 	//-----    Applying boost on muon and W    -----//
-	leptonWRF = Lepton;
-	leptonWRF->Boost(-WLeptTRF->BoostVector());
+	leptonWRF = *Lepton;
+	leptonWRF.Boost(-WLeptTRF->BoostVector());
 	WLeptTRF->Boost(-sTop->BoostVector());
 	if(verbosity>3){
-	  cout<<" leptonWRF information : "<<leptonWRF->Px()<<", "<<leptonWRF->Py()<<", "<<leptonWRF->Pz()<<", "<<leptonWRF->E()<<endl;
+	  cout<<" leptonWRF information : "<<leptonWRF.Px()<<", "<<leptonWRF.Py()<<", "<<leptonWRF.Pz()<<", "<<leptonWRF.E()<<endl;
 	}
 	
 	//-----   Calculating cos theta:   -----
-	standardCosTheta = ((WLeptTRF->Vect()).Dot(leptonWRF->Vect()))/(((WLeptTRF->Vect()).Mag())*((leptonWRF->Vect()).Mag()));
+	standardCosTheta = ((WLeptTRF->Vect()).Dot(leptonWRF.Vect()))/(((WLeptTRF->Vect()).Mag())*((leptonWRF.Vect()).Mag()));
 	if(verbosity>4) cout << " cos theta (gen): " << standardCosTheta << endl << endl;
 	h_StandardCosThetaNoEvtSel.Fill(standardCosTheta);
 	
@@ -1051,7 +1071,7 @@ int main (int argc, char *argv[])
       //Counting the number of events passing through the 'basic' event selection requirements    
       if (eventselectedSemiMu) nSelectedMu++;
       if (eventselectedSemiEl) nSelectedEl++;
-      
+
       //-----------------//
       // do some data-mc //
       //-----------------//
@@ -1309,6 +1329,27 @@ int main (int argc, char *argv[])
 	  }//End of calculate Resolutions
 	  if(CalculateTF){
 	    tfCreation.FillHistograms(&mcParticlesMatching[hadronicWJet1_.second], &mcParticlesMatching[hadronicWJet2_.second], &mcParticlesMatching[hadronicBJet_.second], &mcParticlesMatching[leptonicBJet_.second], Lepton, selectedJets[hadronicWJet1_.first], selectedJets[hadronicWJet2_.first], selectedJets[hadronicBJet_.first], selectedJets[leptonicBJet_.first], selectedLepton, eventselectedSemiMu, eventselectedSemiEl);
+
+	    //Check the DeltaR vlaue between the different partons and reconstructed particles!:
+	    if(eventselectedSemiMu == true){
+		histo1D["DeltaR_Ana_Muon"]->Fill( sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
+		histo1D["genPt_Muon"]->Fill( Lepton->Pt() );
+		histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());
+	    }
+            if(eventselectedSemiEl == true){
+		histo1D["DeltaR_Ana_Elec"]->Fill(sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
+		histo1D["genPt_Elec"]->Fill( Lepton->Pt() );
+		histo1D["recoPt_Elec"]->Fill( selectedLepton->Pt());
+	    }
+	    histo1D["DeltaR_Ana_Light1_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicWJet1_.first]->Phi() - mcParticlesMatching[hadronicWJet1_.second].Phi()),2) + pow((selectedJets[hadronicWJet1_.first]->Eta() - mcParticlesMatching[hadronicWJet1_.second].Eta()),2) ) );
+            histo1D["DeltaR_Ana_Light1_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicWJet1_.first]->Phi() - mcParticles[hadronicWJet1_.second]->Phi()),2) + pow((selectedJets[hadronicWJet1_.first]->Eta() - mcParticles[hadronicWJet1_.second]->Eta()),2) ) );
+            histo1D["DeltaR_Ana_Light2_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicWJet2_.first]->Phi() - mcParticlesMatching[hadronicWJet2_.second].Phi()),2) + pow((selectedJets[hadronicWJet2_.first]->Eta() - mcParticlesMatching[hadronicWJet2_.second].Eta()),2) ) );
+            histo1D["DeltaR_Ana_Light2_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicWJet2_.first]->Phi() - mcParticles[hadronicWJet2_.second]->Phi()),2) + pow((selectedJets[hadronicWJet2_.first]->Eta() - mcParticles[hadronicWJet2_.second]->Eta()),2) ) );
+	    histo1D["DeltaR_Ana_BHadr_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicBJet_.first]->Phi() - mcParticlesMatching[hadronicBJet_.second].Phi()),2) + pow((selectedJets[hadronicBJet_.first]->Eta() - mcParticlesMatching[hadronicBJet_.second].Eta()),2) ) );
+            histo1D["DeltaR_Ana_BHadr_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicBJet_.first]->Phi() - mcParticles[hadronicBJet_.second]->Phi()),2) + pow((selectedJets[hadronicBJet_.first]->Eta() - mcParticles[hadronicBJet_.second]->Eta()),2) ) );
+            histo1D["DeltaR_Ana_BLept_mcPartMatch"]->Fill( sqrt( pow((selectedJets[leptonicBJet_.first]->Phi() - mcParticlesMatching[leptonicBJet_.second].Phi()),2) + pow((selectedJets[leptonicBJet_.first]->Eta() - mcParticlesMatching[leptonicBJet_.second].Eta()),2) ) );
+            histo1D["DeltaR_Ana_BLept_mcPart"]->Fill( sqrt( pow((selectedJets[leptonicBJet_.first]->Phi() - mcParticles[leptonicBJet_.second]->Phi()),2) + pow((selectedJets[leptonicBJet_.first]->Eta() - mcParticles[leptonicBJet_.second]->Eta()),2) ) );
+
 
 	  }//End of calculate Transfer Functions
         }//End of matched particles reconstructed
@@ -1623,20 +1664,24 @@ int main (int argc, char *argv[])
 		      if(eventselectedSemiEl){//Negative electron
 			      MadGraphRecoId[1] = 1;
 			      MadGraphRecoId[2] = 6;
-			      if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
-			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
-			      if(NumberNegRecoEl == 1) outFileReco[3*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
-			      lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
-			      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoEl << endl;  //Only need the output once!
+			      if(RecoLHCOOutput == true){
+				if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
+				if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
+				if(NumberNegRecoEl == 1) outFileReco[3*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
+			      	lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
+			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoEl << endl;  //Only need the output once!
+			      }
 		      }
 		      if(eventselectedSemiMu){//Negative muon
 			      MadGraphRecoId[1] = 2;
 			      MadGraphRecoId[2] = 6;
-			      if(ConsideredCombi == 0) NumberNegRecoMu++;
-			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
-			      if(NumberNegRecoMu == 1) outFileReco[1*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
-			      lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
-			      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoMu << endl;
+			      if(RecoLHCOOutput == true){
+			      	if(ConsideredCombi == 0) NumberNegRecoMu++;
+			      	if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
+			      	if(NumberNegRecoMu == 1) outFileReco[1*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
+			      	lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
+			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoMu << endl;
+			      }	
 		      }
 	      }//End of negative lepton
 
@@ -1651,20 +1696,24 @@ int main (int argc, char *argv[])
 		      if(eventselectedSemiEl){//Positive electron
 			      MadGraphRecoId[1] = 1;
 			      MadGraphRecoId[2] = 6;
-			      if(ConsideredCombi == 0) NumberPosRecoEl++;
-			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
-			      if(NumberPosRecoEl == 1) outFileReco[2*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
-			      lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
-			      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoEl << endl;
+			      if(RecoLHCOOutput == true){ 
+			      	if(ConsideredCombi == 0) NumberPosRecoEl++;
+			      	if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
+			      	if(NumberPosRecoEl == 1) outFileReco[2*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
+			      	lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
+			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoEl << endl;
+			      }
 		      }
 		      if(eventselectedSemiMu){//Positive muon
 			      MadGraphRecoId[1] = 2;
 			      MadGraphRecoId[2] = 6;
-			      if(ConsideredCombi == 0) NumberPosRecoMu++;
-			      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
-			      if(NumberPosRecoMu == 1) outFileReco[0*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
-			      lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
-			      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoMu << endl;
+			      if(RecoLHCOOutput == true){
+			      	if(ConsideredCombi == 0) NumberPosRecoMu++;
+			      	if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
+			      	if(NumberPosRecoMu == 1) outFileReco[0*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
+			      	lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
+			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoMu << endl;
+			      }	
 		      }
 	      }//End of positive lepton
 
@@ -1674,9 +1723,9 @@ int main (int argc, char *argv[])
 
     // -------- Calculate TF MadWeight  --------//
     if(CalculateTF){
-      //tfCreation.Calculate();
       tfCreation.CalculateTF(true, false, true, false, true); //bool drawHistos, bool writeTF, bool doFits, bool useROOTClass, bool useStartValues);
     }
+    else{	
 
     //--------------------  Sigma for W Mass and Top Mass  --------------------
     histo1D["MlbMass"]->Fit("gaus","Q");
@@ -1826,13 +1875,14 @@ int main (int argc, char *argv[])
     h_MlbMqqbCorrectChosen.Write();
     h_MlbMqqbWrongOne.Write();
     h_MlbMqqbWrongTwo.Write();
-    
+    } //Only go through all of this output if the TF are not being calculated!
+
     //Close the LHCO Output files!
     for(int ii = 0; ii<16; ii++){
       if(ii < 4) outFile[ii].close();	
       outFileReco[ii].close();
     }
-    EventInfoFile.close();
+    if(GenLHCOOutput == true) EventInfoFile.close();
 
     //////////////
     // CLEANING //
@@ -1890,17 +1940,38 @@ int main (int argc, char *argv[])
       resFitBJets->WritePlots(fout, true, pathPNG+"resFit_BJet/");
       resFitBJets->WriteResolutions("bJetReso.root");
   }
+
+  //Write away the MSPlots, the histo1D's and the histo2D's!!
   fout -> cd();
 
-  mkdir("DemoPlots",0777);
-  
+  mkdir("MSPlots",0777);
+ 
+  TDirectory* msdir = fout->mkdir("MSPlots");
+  msdir->cd(); 
   for(map<string,MultiSamplePlot*>::const_iterator it = MSPlot.begin(); it != MSPlot.end(); it++){    
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name); //, true, true, true, true, true, 1, false);
-    temp->Write(fout, name, true, "DemoPlots/");
+    temp->Write(fout, name, true, "MSPlots/");
   }
-  
+
+  TDirectory* th1dir = fout->mkdir("1D_histograms");
+  th1dir->cd();
+  for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
+     TH1F *temp = it->second;
+     int N = temp->GetNbinsX();
+     temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+     temp->SetBinContent(N+1,0);
+     temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+     temp->Write();
+  }
+  TDirectory* th2dir = fout->mkdir("2D_histograms_graphs");
+  th2dir->cd();
+  for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){
+     TH2F *temp = it->second;
+     temp->Write();
+  }
+
   //Selection tables
   selecTableSemiMu.TableCalculator(false,true,true,true,true);
   string selectiontableMu = "SelectionTable_BTAG_SEMIMU.tex";
