@@ -23,7 +23,7 @@
 #include "TopTreeAnalysisBase/MCInformation/interface/ResolutionFit.h"
 #include "TopTreeAnalysisBase/MCInformation/interface/JetPartonMatching.h"
 #include "TopTreeAnalysisBase/Reconstruction/interface/JetCorrectorParameters.h"
-#include "Style.C"
+#include "PersonalClasses/Style.C"                                                 //CHECK if this works!
 #include "TopTreeAnalysisBase/MCInformation/interface/LumiReWeighting.h"
 #include "TopTreeAnalysisBase/Tools/interface/LeptonTools.h"
 
@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
   /////////////////////
 
   //xml file
-  string xmlFileName ="config/myAnomCouplConfig.xml";
+  string xmlFileName ="PersonalClasses/config/myAnomCouplConfig.xml";
 
   if (argc > 3)
     xmlFileName = (string)argv[3];
@@ -108,8 +108,8 @@ int main (int argc, char *argv[])
   int CorrectEventMlbMqqb[NrConsideredBTagOptions];
   int WrongEventMlbMqqb[NrConsideredBTagOptions];
   for(int ii = 0; ii < NrConsideredBTagOptions; ii++){
-     CorrectEventMlbMqqb[ii] = 0;
-     WrongEventMlbMqqb[ii] = 0;
+    CorrectEventMlbMqqb[ii] = 0;
+    WrongEventMlbMqqb[ii] = 0;
   }
 
   float BJetWP[6] = {0.244,0.679,0.679,0.898,0.898,0.898};
@@ -197,18 +197,17 @@ int main (int argc, char *argv[])
     if( dataSetName.find("TT") == 0 ) datasets[d]->SetColor(kRed+1);
     if( dataSetName.find("TTbarJets_Other") == 0 ) datasets[d]->SetColor(kRed-7);
     if( dataSetName.find("WJets") == 0 )
-    {
-      datasets[d]->SetTitle("W#rightarrowl#nu");
-      datasets[d]->SetColor(kGreen-3);
-    }
+      {
+	datasets[d]->SetTitle("W#rightarrowl#nu");
+	datasets[d]->SetColor(kGreen-3);
+      }
     if( dataSetName.find("ZJets") == 0 )
-    {
-      datasets[d]->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");
-      datasets[d]->SetColor(kAzure-2);
-    }
+      {
+	datasets[d]->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");
+	datasets[d]->SetColor(kAzure-2);
+      }
     if( dataSetName.find("ST") == 0 || dataSetName.find("SingleTop") ==0 )
       datasets[d]->SetColor(kMagenta);
-    
   }
   
   if(!foundMu && !foundEl && Luminosity != oldLuminosity) cout << "changed analysis environment luminosity to "<< Luminosity << endl;
@@ -301,12 +300,12 @@ int main (int argc, char *argv[])
   resFitNeutrinoEl = new ResolutionFit("NeutrinoEl");
 
   if(!CalculateResolutions && !CalculateTF){
-    resFitLightJets->LoadResolutions("resolutions/lightJetReso.root");
-    resFitBJets->LoadResolutions("resolutions/bJetReso.root");
-    resFitMuon->LoadResolutions("resolutions/muonReso.root");
-    resFitNeutrinoMu->LoadResolutions("resolutions/neutrinoSemiMuReso.root");  //Once resolutions are newly created they will be split up for SemiMu and SemiEl for Neutrino !!
-    resFitNeutrinoEl->LoadResolutions("resolutions/neutrinoSemiElReso.root");
-    resFitElectron->LoadResolutions("resolutions/electronReso.root");
+    resFitLightJets->LoadResolutions("PersonalClasses/resolutions/lightJetReso.root");
+    resFitBJets->LoadResolutions("PersonalClasses/resolutions/bJetReso.root");
+    resFitMuon->LoadResolutions("PersonalClasses/resolutions/muonReso.root");
+    resFitNeutrinoMu->LoadResolutions("PersonalClasses/resolutions/neutrinoSemiMuReso.root");  //Once resolutions are newly created they will be split up for SemiMu and SemiEl for Neutrino !!
+    resFitNeutrinoEl->LoadResolutions("PersonalClasses/resolutions/neutrinoSemiElReso.root");
+    resFitElectron->LoadResolutions("PersonalClasses/resolutions/electronReso.root");
     std::cout << " Resolutions loaded " << std::endl;
   }
 
@@ -364,14 +363,14 @@ int main (int argc, char *argv[])
 
   LumiReWeighting LumiWeights, LumiWeightsUp, LumiWeightsDown;
 
-  LumiWeights = LumiReWeighting("Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
-  LumiWeightsUp = LumiReWeighting("Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
-  LumiWeightsDown = LumiReWeighting("Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
+  LumiWeights = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClassesCalibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
+  LumiWeightsUp = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
+  LumiWeightsDown = LumiReWeighting("PersonalClassesCalibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
   cout << " Initialized LumiReWeighting stuff" << endl;
 
   // initialize lepton SF
   LeptonTools* leptonTools = new LeptonTools(false);
-  leptonTools->readMuonSF("Calibrations/LeptonSF/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.root", "Calibrations/LeptonSF/MuonEfficiencies_Run_2012A_2012B_53X.root", "Calibrations/LeptonSF/MuonEfficiencies_Run_2012C_53X.root", "Calibrations/LeptonSF/TriggerMuonEfficiencies_Run_2012D_53X.root");
+  leptonTools->readMuonSF("PersonalClasses/Calibrations/LeptonSF/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.root", "PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run_2012A_2012B_53X.root", "PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run_2012C_53X.root", "PersonalClasses/Calibrations/LeptonSF/TriggerMuonEfficiencies_Run_2012D_53X.root");
   leptonTools->readElectronSF();
 
   ////////////////////////////////////
@@ -407,26 +406,26 @@ int main (int argc, char *argv[])
     vector<JetCorrectorParameters> vCorrParam;
 
     if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) // Data!
-    {
-      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
-      vCorrParam.push_back(*L1JetCorPar);
-      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
-      vCorrParam.push_back(*L2JetCorPar);
-      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
-      vCorrParam.push_back(*L3JetCorPar);
-      JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
-      vCorrParam.push_back(*L2L3ResJetCorPar);
-    }
+      {
+	JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
+	vCorrParam.push_back(*L1JetCorPar);
+	JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
+	vCorrParam.push_back(*L2JetCorPar);
+	JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
+	vCorrParam.push_back(*L3JetCorPar);
+	JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
+	vCorrParam.push_back(*L2L3ResJetCorPar);
+      }
     else
-    {
-      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
-      vCorrParam.push_back(*L1JetCorPar);
-      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
-      vCorrParam.push_back(*L2JetCorPar);
-      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
-      vCorrParam.push_back(*L3JetCorPar);
-    }
-    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
+      {
+	JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
+	vCorrParam.push_back(*L1JetCorPar);
+	JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
+	vCorrParam.push_back(*L2JetCorPar);
+	JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
+	vCorrParam.push_back(*L3JetCorPar);
+      }
+    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
     //JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "SubTotalMC")));
     //JetCorrectionUncertainty *jecUncTotal = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
 
@@ -441,13 +440,13 @@ int main (int argc, char *argv[])
     LHCOOutput lhcoOutput; //Initialize class
     ofstream outFile[4];
     if(GenLHCOOutput == true){	
-       EventInfoFile.open("EventNumberInformation.lhco");
-       EventInfoFile << " Event Number  MuPos  MuNeg   ElPos   ElNeg  ChannelNumber  FalseEventContent       selectedEvent      selectedChannelNumber " << endl;
+      EventInfoFile.open("MadWeightInput/AnalyzerOutput/EventNumberInformation.lhco");
+      EventInfoFile << " Event Number  MuPos  MuNeg   ElPos   ElNeg  ChannelNumber  FalseEventContent       selectedEvent      selectedChannelNumber " << endl;
 
-       outFile[0].open("TTbarLHCO_PositiveMuon.lhco");
-       outFile[1].open("TTbarLHCO_NegativeMuon.lhco");
-       outFile[2].open("TTbarLHCO_PositiveElectron.lhco");
-       outFile[3].open("TTbarLHCO_NegativeElectron.lhco");
+      outFile[0].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveMuon.lhco");
+      outFile[1].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeMuon.lhco");
+      outFile[2].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveElectron.lhco");
+      outFile[3].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeElectron.lhco");
     }
     unsigned int NumberPosRecoMu = 0, NumberNegRecoMu = 0, NumberPosRecoEl = 0, NumberNegRecoEl = 0;
     
@@ -525,7 +524,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 2000000; ievt++){
+      //for (unsigned int ievt = 0; ievt < 2000000; ievt++){
 
       if(ievt > 20000) GenLHCOOutput = false;	
 
@@ -593,51 +592,51 @@ int main (int argc, char *argv[])
       /*if(dataSetName.find("TTbarJets") == 0)
 	{
 	//cout << "LOADING GenEvent" << endl;
-	  TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
-	  if( genEvt->isSemiLeptonic() )
-	    scaleFactor *= (0.108*9.)*(0.676*1.5);
-	  else if( genEvt->isFullHadronic() )
-	    scaleFactor *= (0.676*1.5)*(0.676*1.5);
-	  else if( genEvt->isFullLeptonic() )
-	    scaleFactor *= (0.108*9.)*(0.108*9.);
+	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
+	if( genEvt->isSemiLeptonic() )
+	scaleFactor *= (0.108*9.)*(0.676*1.5);
+	else if( genEvt->isFullHadronic() )
+	scaleFactor *= (0.676*1.5)*(0.676*1.5);
+	else if( genEvt->isFullLeptonic() )
+	scaleFactor *= (0.108*9.)*(0.108*9.);
 
-      }*/
+	}*/
       
       //////////////////////////////////////
       // Apply Jet Corrections on-the-fly //   
       //////////////////////////////////////
       if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 )
-      {
-        jetTools->unCorrectMETTypeOne(init_jets, mets[0], true);
-        jetTools->correctJets(init_jets, event->kt6PFJets_rho(), true);
-        jetTools->correctMETTypeOne(init_jets, mets[0], true);
-      }
+	{
+	  jetTools->unCorrectMETTypeOne(init_jets, mets[0], true);
+	  jetTools->correctJets(init_jets, event->kt6PFJets_rho(), true);
+	  jetTools->correctMETTypeOne(init_jets, mets[0], true);
+	}
       else
-      {
-        jetTools->unCorrectMETTypeOne(init_jets, mets[0], false);
-        jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
-        jetTools->correctMETTypeOne(init_jets, mets[0], false);
-      }
+	{
+	  jetTools->unCorrectMETTypeOne(init_jets, mets[0], false);
+	  jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
+	  jetTools->correctMETTypeOne(init_jets, mets[0], false);
+	}
 
       ////////////////////////////////////////
       //  Beam scraping and PU reweighting
       ////////////////////////////////////////
       double lumiWeight = 1;
       if(dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA"){    //Does this mean that it will be applied on data ? (why not with .find method ) ???
-	 // Apply the scraping veto. (Is it still needed?)
-         bool isBeamBG = true;
-         if(event->nTracks() > 10){
-             if( ( (float) event->nHighPurityTracks() ) / ( (float) event->nTracks() ) > 0.25 )
-		isBeamBG = false;
-	 }
-      	 if(isBeamBG) continue;
+	// Apply the scraping veto. (Is it still needed?)
+	bool isBeamBG = true;
+	if(event->nTracks() > 10){
+	  if( ( (float) event->nHighPurityTracks() ) / ( (float) event->nTracks() ) > 0.25 )
+	    isBeamBG = false;
+	}
+	if(isBeamBG) continue;
       }
       else{
- 	 lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-         if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0){   //Loop will never get here ...
-	     lumiWeight=1;
-         }
-	 //scaleFactor = scaleFactor*lumiWeight;  //Correct to do this immediately ?? (Is not the case in analyzer code Stijn ...)
+	lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
+	if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0){   //Loop will never get here ...
+	  lumiWeight=1;
+	}
+	//scaleFactor = scaleFactor*lumiWeight;  //Correct to do this immediately ?? (Is not the case in analyzer code Stijn ...)
       }
       //histo1D["lumiWeights"]->Fill(scaleFactor);	
 
@@ -662,50 +661,50 @@ int main (int argc, char *argv[])
 	//semi-mu
 	if(dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) {
 	  
-	    // 2.7/fb recalib 
-            if( event->runId() >= 190456 && event->runId() <= 190738 )
-		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
-	    else if( event->runId() >= 190782 && event->runId() <= 193621)
-		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v12"), currentRun, iFile);
-	    else if(event->runId() >= 193834  && event->runId() <= 196531 )
-		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun, iFile);
-	    else if( event->runId() >= 198022  && event->runId() <= 199608)
-		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v14"), currentRun, iFile);
-	    else if( event->runId() >= 199698 && event->runId() <= 209151)
-		itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v15"), currentRun, iFile);
-	    else
-		cout << "Unknown run for SemiMu HLTpath selection: " << event->runId() << endl;
-	    if( itriggerSemiMu == 9999 ){
-		cout << "itriggerSemiMu == 9999 for SemiMu HLTpath selection: " << event->runId() << endl;
-                exit(-1);
-            }
+	  // 2.7/fb recalib 
+	  if( event->runId() >= 190456 && event->runId() <= 190738 )
+	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
+	  else if( event->runId() >= 190782 && event->runId() <= 193621)
+	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v12"), currentRun, iFile);
+	  else if(event->runId() >= 193834  && event->runId() <= 196531 )
+	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun, iFile);
+	  else if( event->runId() >= 198022  && event->runId() <= 199608)
+	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v14"), currentRun, iFile);
+	  else if( event->runId() >= 199698 && event->runId() <= 209151)
+	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v15"), currentRun, iFile);
+	  else
+	    cout << "Unknown run for SemiMu HLTpath selection: " << event->runId() << endl;
+	  if( itriggerSemiMu == 9999 ){
+	    cout << "itriggerSemiMu == 9999 for SemiMu HLTpath selection: " << event->runId() << endl;
+	    exit(-1);
+	  }
         }
         else{ 
-	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun); // Summer12 DR53X
+	  itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v13"), currentRun); // Summer12 DR53X
 	}
 	
 	// semi-electron
         if(dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0 ) {
 	  
-	     // 2.7/fb recalib 
-             if( event->runId() <= 190738 )
-                itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
-             else if( event->runId() >= 190782 && event->runId() <= 191411 )
-                 itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v9"), currentRun, iFile);
-             else if( event->runId() >= 191695 && event->runId() <= 196531)
-                 itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun, iFile);
-             else if( event->runId() >= 198049 && event->runId() <= 208686)
-                 itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
-	     //else if( event->runId() > 208686)
-	     //     itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
-             else { 
-                 cout << "Unknown run for SemiEl HLTpath selection: " << event->runId() << endl;
-	         exit(1);
-	     }
-	     if( itriggerSemiEl == 9999 ){	    
-	         cout << "itriggerSemiEl == 9999 for SemiEl HLTpath selection: " << event->runId() << endl;
-	         exit(-1);
-	     }
+	  // 2.7/fb recalib 
+	  if( event->runId() <= 190738 )
+	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
+	  else if( event->runId() >= 190782 && event->runId() <= 191411 )
+	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v9"), currentRun, iFile);
+	  else if( event->runId() >= 191695 && event->runId() <= 196531)
+	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun, iFile);
+	  else if( event->runId() >= 198049 && event->runId() <= 208686)
+	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
+	  //else if( event->runId() > 208686)
+	  //     itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v11"), currentRun, iFile);
+	  else { 
+	    cout << "Unknown run for SemiEl HLTpath selection: " << event->runId() << endl;
+	    exit(1);
+	  }
+	  if( itriggerSemiEl == 9999 ){	    
+	    cout << "itriggerSemiEl == 9999 for SemiEl HLTpath selection: " << event->runId() << endl;
+	    exit(-1);
+	  }
         }
         else	  
 	  itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v10"), currentRun); // Summer12 DR53X 
@@ -728,7 +727,7 @@ int main (int argc, char *argv[])
 	jetTools->correctJetJER(init_jets, genjets, mets[0], doJERShift, false); //false means don't use old numbers but newer ones ...
 
 	if (doJESShift != "nominal")
-	   jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //1 = nSigma
+	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //1 = nSigma
       }
 
       ////////////////////////////////////////////////////////
@@ -824,8 +823,8 @@ int main (int argc, char *argv[])
 	    MadGraphId[5] = 6; 
 	    NumberNegativeElectrons++;
 	    if(GenLHCOOutput == true){
-		lhcoOutput.LHCOEventOutput(3, outFile[3], NumberNegativeElectrons,LHCOVector,MadGraphId);
-	    	EventInfoFile << "  0      0       0       1        " << NumberNegativeElectrons << "     ";
+	      lhcoOutput.LHCOEventOutput(3, outFile[3], NumberNegativeElectrons,LHCOVector,MadGraphId);
+	      EventInfoFile << "  0      0       0       1        " << NumberNegativeElectrons << "     ";
 	    }
 	  }//Negative electron
 	  else if(Lepton->type() == 13){       //Looking at negative muon events (index 1 for LHCO file)
@@ -833,8 +832,8 @@ int main (int argc, char *argv[])
 	    MadGraphId[5] = 6; 
 	    NumberNegativeMuons++;
 	    if(GenLHCOOutput == true){
-		lhcoOutput.LHCOEventOutput(1, outFile[1], NumberNegativeMuons,LHCOVector,MadGraphId);
-		EventInfoFile << "  0      1       0       0        " << NumberNegativeMuons << "     ";
+	      lhcoOutput.LHCOEventOutput(1, outFile[1], NumberNegativeMuons,LHCOVector,MadGraphId);
+	      EventInfoFile << "  0      1       0       0        " << NumberNegativeMuons << "     ";
 	    }
 	  }//Negative muon
 
@@ -861,8 +860,8 @@ int main (int argc, char *argv[])
 	    MadGraphId[2] = 6; 
 	    NumberPositiveElectrons++;
 	    if(GenLHCOOutput == true){
-		lhcoOutput.LHCOEventOutput(2, outFile[2], NumberPositiveElectrons,LHCOVector,MadGraphId);
-		EventInfoFile << "  0      0       1       0        " << NumberPositiveElectrons << "     ";
+	      lhcoOutput.LHCOEventOutput(2, outFile[2], NumberPositiveElectrons,LHCOVector,MadGraphId);
+	      EventInfoFile << "  0      0       1       0        " << NumberPositiveElectrons << "     ";
 	    }
 	  }//Positive electron
 	  else if(Lepton->type() == -13){             //Looking at positive muon events (index 0 for LHCO file)
@@ -870,8 +869,8 @@ int main (int argc, char *argv[])
 	    MadGraphId[2] = 6; 
 	    NumberPositiveMuons++;
 	    if(GenLHCOOutput == true){
-		lhcoOutput.LHCOEventOutput(0, outFile[0], NumberPositiveMuons,LHCOVector,MadGraphId);
-		EventInfoFile << "  1      0       0       0        " << NumberPositiveMuons << "     ";
+	      lhcoOutput.LHCOEventOutput(0, outFile[0], NumberPositiveMuons,LHCOVector,MadGraphId);
+	      EventInfoFile << "  1      0       0       0        " << NumberPositiveMuons << "     ";
 	    }
 	  }//Positive muon
 	  
@@ -927,10 +926,10 @@ int main (int argc, char *argv[])
       }
 
       if(init_jets_corrected.size() >=4){
-          MSPlot["Init_Events_pT_jet1_beforeEvtSel"]->Fill(init_jets_corrected[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-          MSPlot["Init_Events_pT_jet2_beforeEvtSel"]->Fill(init_jets_corrected[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-          MSPlot["Init_Events_pT_jet3_beforeEvtSel"]->Fill(init_jets_corrected[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-          MSPlot["Init_Events_pT_jet4_beforeEvtSel"]->Fill(init_jets_corrected[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["Init_Events_pT_jet1_beforeEvtSel"]->Fill(init_jets_corrected[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["Init_Events_pT_jet2_beforeEvtSel"]->Fill(init_jets_corrected[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["Init_Events_pT_jet3_beforeEvtSel"]->Fill(init_jets_corrected[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["Init_Events_pT_jet4_beforeEvtSel"]->Fill(init_jets_corrected[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       }
 
       
@@ -996,8 +995,8 @@ int main (int argc, char *argv[])
       bool eventselectedSemiEl = false;
 
       if (dataSetName != "Data"&&  selectedElectrons.size() ==1 ) {
-           scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift );
-           //histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift));
+	scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift );
+	//histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift));
       }
      
       // semi-mu selection
@@ -1204,9 +1203,9 @@ int main (int argc, char *argv[])
       	  unsigned int j = JetPartonPair[i].second;
 	 
 	  if(verbosity > 3){ 
-		std::cout <<" Jet number " << JetPartonPair[i].first << " can be matched with the mcParticle number " << JetPartonPair[i].second << " which is of the type : " << mcParticlesMatching[j].type() << std::endl;
-		std::cout << " Type of mcParticlesMatching[JetPartonPair[i].first] = " << mcParticlesMatching[JetPartonPair[i].first].type() << std::endl;
-  }
+	    std::cout <<" Jet number " << JetPartonPair[i].first << " can be matched with the mcParticle number " << JetPartonPair[i].second << " which is of the type : " << mcParticlesMatching[j].type() << std::endl;
+	    std::cout << " Type of mcParticlesMatching[JetPartonPair[i].first] = " << mcParticlesMatching[JetPartonPair[i].first].type() << std::endl;
+	  }
  
       	  if( fabs(mcParticlesMatching[j].type()) < 6 ){
       	    if( ( (muPlusFromTop || elPlusFromTop) && mcParticlesMatching[j].motherType() == -24 && mcParticlesMatching[j].grannyType() == -6 ) || ( (muMinusFromTop || elMinusFromTop) && mcParticlesMatching[j].motherType() == 24 && mcParticlesMatching[j].grannyType() == 6 ) ){
@@ -1236,27 +1235,27 @@ int main (int argc, char *argv[])
 	else				 h_Quark2JetNumber.Fill(-1);
 
 	if(verbose > 3){
-	//First index is the jet number, the second one the mcParticle number:
-	std::cout << " Indices of quark 1 : " << hadronicWJet1_.first << " & " << hadronicWJet1_.second << std::endl;
-	if(hadronicWJet1_.first != 9999){
-	   std::cout << "      --- Pt of jet : " << selectedJets[hadronicWJet1_.first]->Pt() << std::endl;
-	   std::cout << "      --- CSV value : " << selectedJets[hadronicWJet1_.first]->btag_combinedSecondaryVertexBJetTags() << " (light cut = 0.244) " << std::endl;
-	}
-	if(hadronicWJet1_.second != 9999){
-	   std::cout << "      --- Pt of mc  : " << mcParticlesMatching[hadronicWJet1_.second].Pt() << std::endl;
-	   std::cout << "      --- Type      : " << mcParticlesMatching[hadronicWJet1_.second].type() << std::endl;
-	}
-	std::cout << " " << std::endl;
-        std::cout << " Indices of quark 2 : " << hadronicWJet2_.first << " & " << hadronicWJet2_.second << std::endl;
-        if(hadronicWJet2_.first != 9999){
-	   std::cout << "      --- Pt of jet : " << selectedJets[hadronicWJet2_.first]->Pt() << std::endl;
-	   std::cout << "      --- CSV value : " << selectedJets[hadronicWJet2_.first]->btag_combinedSecondaryVertexBJetTags() << " (light cut = 0.244) " << std::endl;
-	}
-        if(hadronicWJet2_.second != 9999){
-           std::cout << "      --- Pt of mc  : " << mcParticlesMatching[hadronicWJet2_.second].Pt() << std::endl;
-           std::cout << "      --- Type      : " << mcParticlesMatching[hadronicWJet2_.second].type() << std::endl;
-        }
-	std::cout << " ************************************" << std::endl;	
+	  //First index is the jet number, the second one the mcParticle number:
+	  std::cout << " Indices of quark 1 : " << hadronicWJet1_.first << " & " << hadronicWJet1_.second << std::endl;
+	  if(hadronicWJet1_.first != 9999){
+	    std::cout << "      --- Pt of jet : " << selectedJets[hadronicWJet1_.first]->Pt() << std::endl;
+	    std::cout << "      --- CSV value : " << selectedJets[hadronicWJet1_.first]->btag_combinedSecondaryVertexBJetTags() << " (light cut = 0.244) " << std::endl;
+	  }
+	  if(hadronicWJet1_.second != 9999){
+	    std::cout << "      --- Pt of mc  : " << mcParticlesMatching[hadronicWJet1_.second].Pt() << std::endl;
+	    std::cout << "      --- Type      : " << mcParticlesMatching[hadronicWJet1_.second].type() << std::endl;
+	  }
+	  std::cout << " " << std::endl;
+	  std::cout << " Indices of quark 2 : " << hadronicWJet2_.first << " & " << hadronicWJet2_.second << std::endl;
+	  if(hadronicWJet2_.first != 9999){
+	    std::cout << "      --- Pt of jet : " << selectedJets[hadronicWJet2_.first]->Pt() << std::endl;
+	    std::cout << "      --- CSV value : " << selectedJets[hadronicWJet2_.first]->btag_combinedSecondaryVertexBJetTags() << " (light cut = 0.244) " << std::endl;
+	  }
+	  if(hadronicWJet2_.second != 9999){
+	    std::cout << "      --- Pt of mc  : " << mcParticlesMatching[hadronicWJet2_.second].Pt() << std::endl;
+	    std::cout << "      --- Type      : " << mcParticlesMatching[hadronicWJet2_.second].type() << std::endl;
+	  }
+	  std::cout << " ************************************" << std::endl;	
 	}
 
 	//Change order to match with class! (0 = BLeptonic, 1 = BHadronic, 2 = Quark1 & 3 =  Quark2!!)
@@ -1271,18 +1270,18 @@ int main (int argc, char *argv[])
 	CorrectQuark2 = jetCombi[3];	
 
 	for(int ii = 0; ii < JetPartonPair.size(); ii++){
-	   if(CorrectBLeptonic == JetPartonPair[ii].first){
-		if(verbosity>3) cout<<"Type of lept b : "<<mcParticlesMatching[JetPartonPair[ii].second].type()<<" - from JetPartonPair "<<JetPartonPair[ii].first<<" , "<<JetPartonPair[ii].second<<endl;
-  	   }
-	   else if(CorrectBHadronic == JetPartonPair[ii].first){
-		if(verbosity>3) cout<<"Type of hadr b : "<<mcParticlesMatching[JetPartonPair[ii].second].type()<<" - from JetPartonPair "<<JetPartonPair[ii].first<<" , "<<JetPartonPair[ii].second<<endl;
-	   }
-	   else if(CorrectBHadronic == 9999){
-		if(verbosity>3) std::cout << " CorrectBHadronic not matched to jet " << std::endl;
-	   }
-	   else if(CorrectBLeptonic == 9999){
-		if(verbosity>3) std::cout << " CorrectBLeptonic not matched to jet " << std::endl;
-	   }
+	  if(CorrectBLeptonic == JetPartonPair[ii].first){
+	    if(verbosity>3) cout<<"Type of lept b : "<<mcParticlesMatching[JetPartonPair[ii].second].type()<<" - from JetPartonPair "<<JetPartonPair[ii].first<<" , "<<JetPartonPair[ii].second<<endl;
+	  }
+	  else if(CorrectBHadronic == JetPartonPair[ii].first){
+	    if(verbosity>3) cout<<"Type of hadr b : "<<mcParticlesMatching[JetPartonPair[ii].second].type()<<" - from JetPartonPair "<<JetPartonPair[ii].first<<" , "<<JetPartonPair[ii].second<<endl;
+	  }
+	  else if(CorrectBHadronic == 9999){
+	    if(verbosity>3) std::cout << " CorrectBHadronic not matched to jet " << std::endl;
+	  }
+	  else if(CorrectBLeptonic == 9999){
+	    if(verbosity>3) std::cout << " CorrectBLeptonic not matched to jet " << std::endl;
+	  }
 	}
 
 	if(CorrectBLeptonic != 9999) h_CorrectBLeptCSVDiscr.Fill(selectedJets[CorrectBLeptonic]->btag_combinedSecondaryVertexBJetTags());
@@ -1313,18 +1312,18 @@ int main (int argc, char *argv[])
 
 	if(hadronicWJet1_.first < 9999 && hadronicWJet2_.first < 9999 && hadronicBJet_.first < 9999 && leptonicBJet_.first < 9999 ){
           if(CalculateResolutions){
-	  // Fill the resolution-stuff for events where the 4 ttbar semi-lep partons are all matched to jets
+	    // Fill the resolution-stuff for events where the 4 ttbar semi-lep partons are all matched to jets
 	    resFitLightJets->Fill(selectedJets[hadronicWJet1_.first], mcParticles[hadronicWJet1_.second]);
 	    resFitLightJets->Fill(selectedJets[hadronicWJet2_.first], mcParticles[hadronicWJet2_.second]);
 	    resFitBJets->Fill(selectedJets[hadronicBJet_.first], mcParticles[hadronicBJet_.second]);
 	    resFitBJets->Fill(selectedJets[leptonicBJet_.first], mcParticles[leptonicBJet_.second]);
 	    if(eventselectedSemiMu == true){
-		resFitMuon->Fill(selectedMuons[0], Lepton);
-		resFitNeutrinoMu->Fill(mets[0], NeutrinoMC);
+	      resFitMuon->Fill(selectedMuons[0], Lepton);
+	      resFitNeutrinoMu->Fill(mets[0], NeutrinoMC);
 	    }
 	    else if(eventselectedSemiEl == true){
-		resFitElectron->Fill(selectedElectrons[0], Lepton);
-		resFitNeutrinoEl->Fill(mets[0], NeutrinoMC);
+	      resFitElectron->Fill(selectedElectrons[0], Lepton);
+	      resFitNeutrinoEl->Fill(mets[0], NeutrinoMC);
 	    }
 	  }//End of calculate Resolutions
 	  if(CalculateTF){
@@ -1332,14 +1331,14 @@ int main (int argc, char *argv[])
 
 	    //Check the DeltaR vlaue between the different partons and reconstructed particles!:
 	    if(eventselectedSemiMu == true){
-		histo1D["DeltaR_Ana_Muon"]->Fill( sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
-		histo1D["genPt_Muon"]->Fill( Lepton->Pt() );
-		histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());
+	      histo1D["DeltaR_Ana_Muon"]->Fill( sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
+	      histo1D["genPt_Muon"]->Fill( Lepton->Pt() );
+	      histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());
 	    }
             if(eventselectedSemiEl == true){
-		histo1D["DeltaR_Ana_Elec"]->Fill(sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
-		histo1D["genPt_Elec"]->Fill( Lepton->Pt() );
-		histo1D["recoPt_Elec"]->Fill( selectedLepton->Pt());
+	      histo1D["DeltaR_Ana_Elec"]->Fill(sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
+	      histo1D["genPt_Elec"]->Fill( Lepton->Pt() );
+	      histo1D["recoPt_Elec"]->Fill( selectedLepton->Pt());
 	    }
 	    histo1D["DeltaR_Ana_Light1_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicWJet1_.first]->Phi() - mcParticlesMatching[hadronicWJet1_.second].Phi()),2) + pow((selectedJets[hadronicWJet1_.first]->Eta() - mcParticlesMatching[hadronicWJet1_.second].Eta()),2) ) );
             histo1D["DeltaR_Ana_Light1_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicWJet1_.first]->Phi() - mcParticles[hadronicWJet1_.second]->Phi()),2) + pow((selectedJets[hadronicWJet1_.first]->Eta() - mcParticles[hadronicWJet1_.second]->Eta()),2) ) );
@@ -1355,7 +1354,7 @@ int main (int argc, char *argv[])
         }//End of matched particles reconstructed
       }//if dataset Semi mu ttbar
 
-	if(CalculateTF) continue;
+      if(CalculateTF) continue;
       //----------------------------------------------------------------------------------------------------------------------------------- Start of bTagStudy class stuff!!
 
       /////////////////////////////
@@ -1364,113 +1363,113 @@ int main (int argc, char *argv[])
 
       if(NrConsideredBTagOptions > 1){   //Go through the different options and compare the efficiencies!
 
-         for(int option = 0; option < NrConsideredBTagOptions; option++){
-	    bTagStudy.CalculateJets(selectedJets, BJetWP[option], LightJetWP[option], option);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
-            //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
+	for(int option = 0; option < NrConsideredBTagOptions; option++){
+	  bTagStudy.CalculateJets(selectedJets, BJetWP[option], LightJetWP[option], option);  //First float is the working point for the b-jets, the second is the one for the light jets!! 
+	  //Added integer points to which of the considered options is currently active. This should allow to obtain the final numbers at the end of the file!
 
-            if(verbose > 3){
-	       cout<<" Size of bTaggedJets: "<<(bTagStudy.getbTaggedJets(option)).size()<<" , of NonbTaggedJets: "<<(bTagStudy.getNonbTaggedJets(option)).size()<<" & of lightJets: "<<(bTagStudy.getLightJets(option)).size()<<endl;
-	       cout<<" Index of BHadronic: "<<CorrectBHadronic<<" , Index of BLeptonic: "<<CorrectBLeptonic<<" , Index of quark1: "<<CorrectQuark1<<" & Index of quark2: "<<CorrectQuark2<<endl;
-            }
+	  if(verbose > 3){
+	    cout<<" Size of bTaggedJets: "<<(bTagStudy.getbTaggedJets(option)).size()<<" , of NonbTaggedJets: "<<(bTagStudy.getNonbTaggedJets(option)).size()<<" & of lightJets: "<<(bTagStudy.getLightJets(option)).size()<<endl;
+	    cout<<" Index of BHadronic: "<<CorrectBHadronic<<" , Index of BLeptonic: "<<CorrectBLeptonic<<" , Index of quark1: "<<CorrectQuark1<<" & Index of quark2: "<<CorrectQuark2<<endl;
+	  }
 
-            //Also check the correct jet combi:
-            if((bTagStudy.getbTaggedJets(option)).size() >= 2 && (bTagStudy.getLightJets(option)).size() >=2){
-	       bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, option);
-            }
-            else{
-	       if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
-            }
-         }
+	  //Also check the correct jet combi:
+	  if((bTagStudy.getbTaggedJets(option)).size() >= 2 && (bTagStudy.getLightJets(option)).size() >=2){
+	    bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, option);
+	  }
+	  else{
+	    if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
+	  }
+	}
 
-         ///////////////////////////////////////////////////////
-         //  Kinematic information for different b-tag cases  //
-         ///////////////////////////////////////////////////////
-         //
-         if(dataSetName.find("TTbarJets") == 0){
+	///////////////////////////////////////////////////////
+	//  Kinematic information for different b-tag cases  //
+	///////////////////////////////////////////////////////
+	//
+	if(dataSetName.find("TTbarJets") == 0){
 
-	   for(int jj = 0; jj < 2; jj++){      //Only look at the two leading jets!
+	  for(int jj = 0; jj < 2; jj++){      //Only look at the two leading jets!
 
 
-	      //Kinematic information for the light (= Non LCSV jets)
-	      if((bTagStudy.getLightJets(0)).size()>=2){
-	        h_CSVDiscrLCSVLightJets.Fill(selectedJets[(bTagStudy.getLightJets(0))[jj]]->btag_combinedSecondaryVertexBJetTags());   
-		//--> check whether the so-called light jets don't all have discr -1 ...	
+	    //Kinematic information for the light (= Non LCSV jets)
+	    if((bTagStudy.getLightJets(0)).size()>=2){
+	      h_CSVDiscrLCSVLightJets.Fill(selectedJets[(bTagStudy.getLightJets(0))[jj]]->btag_combinedSecondaryVertexBJetTags());   
+	      //--> check whether the so-called light jets don't all have discr -1 ...	
 
-	        for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-	          if((bTagStudy.getLightJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-		    h_JetTypeLCSVLightJets.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
-	          }
-	          else{    //Unmatched jets!
-		    h_JetTypeLCSVLightJets.Fill(25.);
-	          }
-	        }
-	      }//End of light (= non LCSV) jets
-
-	      //********** Try to combine this with a loop !!
-	      // ==> Use vector of TH1F's!
-	      // + Add the event selection counter for each option!
-/*	      TH1F CosThetaHistos[3] = {h_StandardCosThetaLCSV, h_StandardCosThetaMCSV, h_StandardCosThetaTCSV};      --> Empty histograms for the moment ! 
-	      TH1F JetTypeHistos[3]  = {h_JetTypeLCSV         , h_JetTypeMCSV        ,  h_JetTypeTCSV         };
-	      int  bTagOption[3]     = {0                     , 1                    ,  3                     };
-	      int nSelectedEvtsMu[3] = {nSelectedMuLCSV       , nSelectedMuMCSV      , nSelectedMuTCSV        };
-              int nSelectedEvtsEl[3] = {nSelectedElLCSV       , nSelectedElMCSV      , nSelectedElTCSV        };
-
-	      for(int options = 0; options < 3; options++){
-		if( (bTagStudy.getbTaggedJets(bTagOption[options])).size() >= 2){
-		   CosThetaHistos[options].Fill(standardCosTheta);
-		   if(eventselectedSemiMu) nSelectedEvtsMu[options]++;    //Maybe not possible to have existing integers as elements!
-		   if(eventselectedSemiEl) nSelectedEvtsEl[options]++;
-
-		   for(int ii = 0; ii < JetPartonPair.size(); ii++){                            //Look at all the matched jets
-		      if( (bTagStudy.getbTaggedJets(options))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!	
-			JetTypeHistos[options].Fill( mcParticlesMatching[JetPartonPair[ii].second].type() );
-		      }
-		      else
-			JetTypeHistos[options].Fill(25.);
-		   }
+	      for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+		if((bTagStudy.getLightJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+		  h_JetTypeLCSVLightJets.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		}
+		else{    //Unmatched jets!
+		  h_JetTypeLCSVLightJets.Fill(25.);
 		}
 	      }
-*/	
-	      //Kinematic information for the Loose b-jets
-              if((bTagStudy.getbTaggedJets(0)).size() >=2){
-                h_StandardCosThetaLCSV.Fill(standardCosTheta);
-                for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-                   if((bTagStudy.getbTaggedJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-                      h_JetTypeLCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
-                   }
-                   else{
-                      h_JetTypeLCSV.Fill(25.);
-                   }
-                }
-              }//End of Loose b-jets 
+	    }//End of light (= non LCSV) jets
 
-	      //Kinematic information for the Medium b-jets
-              if((bTagStudy.getbTaggedJets(1)).size() >=2){
-                 h_StandardCosThetaMCSV.Fill(standardCosTheta);
-                 for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-                    if((bTagStudy.getbTaggedJets(1))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-                        h_JetTypeMCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
-                    }
-                    else{
-                        h_JetTypeMCSV.Fill(25.);
-                    }
-                 }
-              }//End of Medium b-jets 
+	    //********** Try to combine this with a loop !!
+	    // ==> Use vector of TH1F's!
+	    // + Add the event selection counter for each option!
+	    /*	      TH1F CosThetaHistos[3] = {h_StandardCosThetaLCSV, h_StandardCosThetaMCSV, h_StandardCosThetaTCSV};      --> Empty histograms for the moment ! 
+		      TH1F JetTypeHistos[3]  = {h_JetTypeLCSV         , h_JetTypeMCSV        ,  h_JetTypeTCSV         };
+		      int  bTagOption[3]     = {0                     , 1                    ,  3                     };
+		      int nSelectedEvtsMu[3] = {nSelectedMuLCSV       , nSelectedMuMCSV      , nSelectedMuTCSV        };
+		      int nSelectedEvtsEl[3] = {nSelectedElLCSV       , nSelectedElMCSV      , nSelectedElTCSV        };
 
-	      //Kinematic information for the Tight b-jets
-	      if((bTagStudy.getbTaggedJets(3)).size() >=2){
-                 h_StandardCosThetaTCSV.Fill(standardCosTheta);
-                 for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-		    if((bTagStudy.getbTaggedJets(3))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
-                        h_JetTypeTCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
-		    }
-		    else{
-                        h_JetTypeTCSV.Fill(25.);
-		    }
-	         }
-	      }//End of Tight b-jets 
+		      for(int options = 0; options < 3; options++){
+		      if( (bTagStudy.getbTaggedJets(bTagOption[options])).size() >= 2){
+		      CosThetaHistos[options].Fill(standardCosTheta);
+		      if(eventselectedSemiMu) nSelectedEvtsMu[options]++;    //Maybe not possible to have existing integers as elements!
+		      if(eventselectedSemiEl) nSelectedEvtsEl[options]++;
+
+		      for(int ii = 0; ii < JetPartonPair.size(); ii++){                            //Look at all the matched jets
+		      if( (bTagStudy.getbTaggedJets(options))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!	
+		      JetTypeHistos[options].Fill( mcParticlesMatching[JetPartonPair[ii].second].type() );
+		      }
+		      else
+		      JetTypeHistos[options].Fill(25.);
+		      }
+		      }
+		      }
+	    */	
+	    //Kinematic information for the Loose b-jets
+	    if((bTagStudy.getbTaggedJets(0)).size() >=2){
+	      h_StandardCosThetaLCSV.Fill(standardCosTheta);
+	      for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+		if((bTagStudy.getbTaggedJets(0))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+		  h_JetTypeLCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		}
+		else{
+		  h_JetTypeLCSV.Fill(25.);
+		}
+	      }
+	    }//End of Loose b-jets 
+
+	    //Kinematic information for the Medium b-jets
+	    if((bTagStudy.getbTaggedJets(1)).size() >=2){
+	      h_StandardCosThetaMCSV.Fill(standardCosTheta);
+	      for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+		if((bTagStudy.getbTaggedJets(1))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+		  h_JetTypeMCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		}
+		else{
+		  h_JetTypeMCSV.Fill(25.);
+		}
+	      }
+	    }//End of Medium b-jets 
+
+	    //Kinematic information for the Tight b-jets
+	    if((bTagStudy.getbTaggedJets(3)).size() >=2){
+	      h_StandardCosThetaTCSV.Fill(standardCosTheta);
+	      for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
+		if((bTagStudy.getbTaggedJets(3))[jj] == JetPartonPair[ii].first){  //Check whether the considered jet can be matched!
+		  h_JetTypeTCSV.Fill(mcParticlesMatching[JetPartonPair[ii].second].type());
+		}
+		else{
+		  h_JetTypeTCSV.Fill(25.);
+		}
+	      }
+	    }//End of Tight b-jets 
         
-	   }//Only look at the two leading jets!
+	  }//Only look at the two leading jets!
         }//End of TTbarJets!
 
         /////////////////////////////////////////////
@@ -1508,13 +1507,13 @@ int main (int argc, char *argv[])
         //Also check the correct jet combi:  --> Do this for both the 4- and 5-jet case (will make it possible to compare values!)
         if((bTagStudy.getbTaggedJets(ChosenBTagOption)).size() >= 2 && (bTagStudy.getLightJets(ChosenBTagOption)).size() >=2){ 
 
-	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() >= 2)
-	      bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);      //4-jet case
-	    if( (bTagStudy.getLightJets(ChosenBTagOption)).size() > 2)
-	      bTagStudy.CorrectJetCombi5Jets(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption); //5-jet case
+	  if( (bTagStudy.getLightJets(ChosenBTagOption)).size() >= 2)
+	    bTagStudy.CorrectJetCombi(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption);      //4-jet case
+	  if( (bTagStudy.getLightJets(ChosenBTagOption)).size() > 2)
+	    bTagStudy.CorrectJetCombi5Jets(CorrectBHadronic, CorrectBLeptonic, CorrectQuark1, CorrectQuark2, ChosenBTagOption); //5-jet case
         }
         else{
-	    if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
+	  if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
         }
 
       }//End of loop for NrConsideredBTagOptions equal to 1!
@@ -1541,8 +1540,8 @@ int main (int argc, char *argv[])
       MSPlot["nBTaggedJets_BeforeBTag"+leptonFlav]->Fill( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size(), datasets[d], true, Luminosity*scaleFactor);
       MSPlot["nLightJets_BeforeBTag"+leptonFlav]->Fill( (bTagStudy.getLightJets(ChosenBTagOption)).size(), datasets[d], true, Luminosity*scaleFactor);
       if( NrConsideredBTagOptions == 1 && ( (bTagStudy.getbTaggedJets(ChosenBTagOption)).size() < 2 || (bTagStudy.getLightJets(ChosenBTagOption)).size() < 2 ) ){
-	   if(RecoLHCOOutput == true) EventInfoFile<<"    B-tag failed "<<endl;
-	   continue;
+	if(RecoLHCOOutput == true) EventInfoFile<<"    B-tag failed "<<endl;
+	continue;
       }      
 
       MSPlot["nSelectedJets_AfterBTag"+leptonFlav]->Fill(selectedJets.size(), datasets[d], true, Luminosity*scaleFactor);
@@ -1558,9 +1557,9 @@ int main (int argc, char *argv[])
       ////////////////////////////////
       float MlbCorrect = 0, MqqbCorrect = 0;
       if(CorrectBLeptonic != 9999 && CorrectBHadronic != 9999 && CorrectQuark1 != 9999 && CorrectQuark2 != 9999){
-	 MlbCorrect = (*selectedLepton+*selectedJets[CorrectBLeptonic]).M();
-         MqqbCorrect = (*selectedJets[CorrectBHadronic] + *selectedJets[CorrectQuark1] + *selectedJets[CorrectQuark2]).M();
-         h_MlbMqqbCorrectAll.Fill(MqqbCorrect,MlbCorrect);
+	MlbCorrect = (*selectedLepton+*selectedJets[CorrectBLeptonic]).M();
+	MqqbCorrect = (*selectedJets[CorrectBHadronic] + *selectedJets[CorrectQuark1] + *selectedJets[CorrectQuark2]).M();
+	h_MlbMqqbCorrectAll.Fill(MqqbCorrect,MlbCorrect);
       }
 
       //******************************************************************************************//
@@ -1573,13 +1572,13 @@ int main (int argc, char *argv[])
 	mlbStudy.calculateChiSquared(jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), selectedLepton, selectedJets, MassMlb, SigmaMlb, MassMqqb, SigmaMqqb);
 	mlbStudy.calculateEfficiency(Option, jetCombi, bTagStudy.getbTaggedJets(Option), bTagStudy.getLightJets(Option), NrConsideredBTagOptions, ChiSqCutValue);
 
-//	//TODO --> Update!!
-//	  if( (CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[1]) &
-//	      (CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[1] || CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[0]) &&
-//	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
-//	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
-//		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
-//	  } 
+	//	//TODO --> Update!!
+	//	  if( (CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[0] || CorrectBLeptonic == (bTagStudy.getbTaggedJets(Option))[1]) &
+	//	      (CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[1] || CorrectBHadronic == (bTagStudy.getbTaggedJets(Option))[0]) &&
+	//	      (CorrectQuark1 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark1 == (bTagStudy.getLightJets(Option))[1]) &&
+	//	      (CorrectQuark2 == (bTagStudy.getLightJets(Option))[0]      || CorrectQuark2 == (bTagStudy.getLightJets(Option))[1])){ 
+	//		h_MlbMqqbCorrectChosen.Fill(MqqbCorrect,MlbCorrect); 
+	//	  } 
       }
 
       //*********************************************************//
@@ -1595,26 +1594,26 @@ int main (int argc, char *argv[])
 
       if(NrConsideredBTagOptions == 1){  //Only look at these categories for the chosen 2T b-tag option
 	if( (bTagStudy.getLightJets(ChosenBTagOption)).size() == 2){
-	    //Looking at the N(2 light jets) category!
-	    FourJetsCategory++;
-	    if(  jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999 ){  //Event has been matched!
-		FourJetsMatched++;
-		//Include the ChiSq Mlb-Mqqb information for selecting the b-jets (and the 2 light jets in the N(3 light) case)
-		if( mlbStudy.getLowestChiSq4JetsIndex() == mlbStudy.getCorrectChiSq() ) FourJetsGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's' 
- 	    }
+	  //Looking at the N(2 light jets) category!
+	  FourJetsCategory++;
+	  if(  jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999 ){  //Event has been matched!
+	    FourJetsMatched++;
+	    //Include the ChiSq Mlb-Mqqb information for selecting the b-jets (and the 2 light jets in the N(3 light) case)
+	    if(mlbStudy.getLowestChiSq4JetsIndex() == mlbStudy.getCorrectChiSq()) FourJetsGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's'
+	  }
    	}//End of N(2 light) case
 	else{
-	    FiveJetsCategory++;
-	    if(  jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999 ){  //Event has been matched!
-		FiveJetsMatched++;
-		//Include the ChiSq Mlb-Mqqb information for selecting the b-jets (and the 2 light jets in the N(3 light) case)
-		if( mlbStudy.getLowestChiSq4JetsIndex() == mlbStudy.getCorrectChiSq() ) FiveJetsAsFourGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's'
-		if( mlbStudy.getLowestChiSqIndex() == mlbStudy.getCorrectChiSq() ) FiveJetsAsFiveGoodCombiChosen++; //Represents 's' and 'b' is defined as FourJetsCategory (all evts) - 's' 
- 	    }
+	  FiveJetsCategory++;
+	  if(  jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999 ){  //Event has been matched!
+	    FiveJetsMatched++;
+	    //Include the ChiSq Mlb-Mqqb information for selecting the b-jets (and the 2 light jets in the N(3 light) case)
+	    //Represents 's', and 'b' is defined as FourJetsCategory (all evts) - 's'
+	    if( mlbStudy.getLowestChiSq4JetsIndex() == mlbStudy.getCorrectChiSq() ) FiveJetsAsFourGoodCombiChosen++; 
+	    if( mlbStudy.getLowestChiSqIndex() == mlbStudy.getCorrectChiSq() ) FiveJetsAsFiveGoodCombiChosen++; 
+	  }
 	}//End of N(3 light) case 
       }
       
-
       //************************************************************************************//   
       //  Only go on to produce the .lhco output if final event selection choice is made !! //
       //************************************************************************************//
@@ -1639,242 +1638,236 @@ int main (int argc, char *argv[])
       vector<int> MadGraphRecoId(6,4);
       //Need to distinguish between charge and lepton type
       for(int ConsideredCombi = 0; ConsideredCombi <NrCombi; ConsideredCombi++){  
-	      string JetCombiString = static_cast<ostringstream*>( &(ostringstream() << ConsideredCombi) )->str();
+	string JetCombiString = static_cast<ostringstream*>( &(ostringstream() << ConsideredCombi) )->str();
 
-	      /////////////////////////////////////////////////////////
-	      //   Reconstructing Lepton & Neutrino (partially)      //
-	      //   -> Neutrino Pt and M needs to be known for .lhco  //
-	      /////////////////////////////////////////////////////////  
-	      //  --> Only do this part for the combination which is actually chosen!
-//	      Neutrino.clear();
-	      NeutrinoPx = -(*selectedLepton+*LeptBArray[ConsideredCombi]+*HadrBArray[ConsideredCombi]+*Quark1Array[ConsideredCombi]+*Quark2Array[ConsideredCombi]).Px();
-	      NeutrinoPy = -(*selectedLepton+*LeptBArray[ConsideredCombi]+*HadrBArray[ConsideredCombi]+*Quark1Array[ConsideredCombi]+*Quark2Array[ConsideredCombi]).Py();
-	      Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
-	      Neutrino.SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, Neutrino.Pt());  //Reset the Neutrino Energy to get the correct precision
-	      if(verbosity > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
+	/////////////////////////////////////////////////////////
+	//   Reconstructing Lepton & Neutrino (partially)      //
+	//   -> Neutrino Pt and M needs to be known for .lhco  //
+	/////////////////////////////////////////////////////////  
+	//  --> Only do this part for the combination which is actually chosen!
+	//	      Neutrino.clear();
+	NeutrinoPx = -(*selectedLepton+*LeptBArray[ConsideredCombi]+*HadrBArray[ConsideredCombi]+*Quark1Array[ConsideredCombi]+*Quark2Array[ConsideredCombi]).Px();
+	NeutrinoPy = -(*selectedLepton+*LeptBArray[ConsideredCombi]+*HadrBArray[ConsideredCombi]+*Quark1Array[ConsideredCombi]+*Quark2Array[ConsideredCombi]).Py();
+	Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
+	Neutrino.SetPxPyPzE(NeutrinoPx,NeutrinoPy,0.0, Neutrino.Pt());  //Reset the Neutrino Energy to get the correct precision
+	if(verbosity > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
 
-	      if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
-		      if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
-		      LHCORecoVector[0] = HadrBArray[ConsideredCombi]; 
-		      LHCORecoVector[1] = Quark1Array[ConsideredCombi];
-		      LHCORecoVector[2] = Quark2Array[ConsideredCombi];
-		      LHCORecoVector[3] = LeptBArray[ConsideredCombi];
-		      LHCORecoVector[4] = selectedLepton;
-		      LHCORecoVector[5] = &Neutrino;
-		      if(eventselectedSemiEl){//Negative electron
-			      MadGraphRecoId[1] = 1;
-			      MadGraphRecoId[2] = 6;
-			      if(RecoLHCOOutput == true){
-				if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
-				if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
-				if(NumberNegRecoEl == 1) outFileReco[3*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
-			      	lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
-			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoEl << endl;  //Only need the output once!
-			      }
-		      }
-		      if(eventselectedSemiMu){//Negative muon
-			      MadGraphRecoId[1] = 2;
-			      MadGraphRecoId[2] = 6;
-			      if(RecoLHCOOutput == true){
-			      	if(ConsideredCombi == 0) NumberNegRecoMu++;
-			      	if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
-			      	if(NumberNegRecoMu == 1) outFileReco[1*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
-			      	lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
-			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoMu << endl;
-			      }	
-		      }
-	      }//End of negative lepton
+	if(LeptonRecoCharge < 0.0 ){ //Negative lepton events
+	  if(verbosity>4) cout << " Looking at negative lepton events for Reco LHCO files " << endl;
+	  LHCORecoVector[0] = HadrBArray[ConsideredCombi]; 
+	  LHCORecoVector[1] = Quark1Array[ConsideredCombi];
+	  LHCORecoVector[2] = Quark2Array[ConsideredCombi];
+	  LHCORecoVector[3] = LeptBArray[ConsideredCombi];
+	  LHCORecoVector[4] = selectedLepton;
+	  LHCORecoVector[5] = &Neutrino;
+	  if(eventselectedSemiEl){//Negative electron
+	    MadGraphRecoId[1] = 1;
+	    MadGraphRecoId[2] = 6;
+	    if(RecoLHCOOutput == true){
+	      if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
+	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
+	      if(NumberNegRecoEl==1)outFileReco[3*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
+	      lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
+	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoEl << endl;  //Only need the output once!
+	    }
+	  }
+	  if(eventselectedSemiMu){//Negative muon
+	    MadGraphRecoId[1] = 2;
+	    MadGraphRecoId[2] = 6;
+	    if(RecoLHCOOutput == true){
+	      if(ConsideredCombi == 0) NumberNegRecoMu++;
+	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
+	      if(NumberNegRecoMu==1) outFileReco[1*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
+	      lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
+	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoMu << endl;
+	    }	
+	  }
+	}//End of negative lepton
 
-	      if(LeptonRecoCharge > 0.0 ){ //Positive lepton events
-		      if(verbosity>4) cout << " Looking at positive lepton events for Reco LHCO files " << endl;
-		      LHCORecoVector[0] = LeptBArray[ConsideredCombi];
-		      LHCORecoVector[1] = selectedLepton;
-		      LHCORecoVector[2] = &Neutrino;
-		      LHCORecoVector[3] = HadrBArray[ConsideredCombi];
-		      LHCORecoVector[4] = Quark1Array[ConsideredCombi];
-		      LHCORecoVector[5] = Quark2Array[ConsideredCombi];
-		      if(eventselectedSemiEl){//Positive electron
-			      MadGraphRecoId[1] = 1;
-			      MadGraphRecoId[2] = 6;
-			      if(RecoLHCOOutput == true){ 
-			      	if(ConsideredCombi == 0) NumberPosRecoEl++;
-			      	if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
-			      	if(NumberPosRecoEl == 1) outFileReco[2*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
-			      	lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
-			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoEl << endl;
-			      }
-		      }
-		      if(eventselectedSemiMu){//Positive muon
-			      MadGraphRecoId[1] = 2;
-			      MadGraphRecoId[2] = 6;
-			      if(RecoLHCOOutput == true){
-			      	if(ConsideredCombi == 0) NumberPosRecoMu++;
-			      	if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
-			      	if(NumberPosRecoMu == 1) outFileReco[0*4+ConsideredCombi].open(("TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
-			      	lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
-			      	if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoMu << endl;
-			      }	
-		      }
-	      }//End of positive lepton
-
+	if(LeptonRecoCharge > 0.0 ){ //Positive lepton events
+	  if(verbosity>4) cout << " Looking at positive lepton events for Reco LHCO files " << endl;
+	  LHCORecoVector[0] = LeptBArray[ConsideredCombi];
+	  LHCORecoVector[1] = selectedLepton;
+	  LHCORecoVector[2] = &Neutrino;
+	  LHCORecoVector[3] = HadrBArray[ConsideredCombi];
+	  LHCORecoVector[4] = Quark1Array[ConsideredCombi];
+	  LHCORecoVector[5] = Quark2Array[ConsideredCombi];
+	  if(eventselectedSemiEl){//Positive electron
+	    MadGraphRecoId[1] = 1;
+	    MadGraphRecoId[2] = 6;
+	    if(RecoLHCOOutput == true){ 
+	      if(ConsideredCombi == 0) NumberPosRecoEl++;
+	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
+	      if(NumberPosRecoEl==1)outFileReco[2*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
+	      lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
+	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoEl << endl;
+	    }
+	  }
+	  if(eventselectedSemiMu){//Positive muon
+	    MadGraphRecoId[1] = 2;
+	    MadGraphRecoId[2] = 6;
+	    if(RecoLHCOOutput == true){
+	      if(ConsideredCombi == 0) NumberPosRecoMu++;
+	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
+	      if(NumberPosRecoMu==1)outFileReco[0*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
+	      lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
+	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoMu << endl;
+	    }	
+	  }
+	}//End of positive lepton
       }//End of loop over the different jet combinations  
-
-    }			//loop on events
+    } //loop on events
 
     // -------- Calculate TF MadWeight  --------//
     if(CalculateTF){
       tfCreation.CalculateTF(true, false, true, false, true); //bool drawHistos, bool writeTF, bool doFits, bool useROOTClass, bool useStartValues);
     }
     else{	
+      //--------------------  Sigma for W Mass and Top Mass  --------------------
+      histo1D["MlbMass"]->Fit("gaus","Q");
+      histo1D["MqqbMass"]->Fit("gaus","Q");
+      cout <<" values for Mlb :"<< histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(2) << endl;
+      cout <<" values for Mqqb :" << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(2) << endl;
 
-    //--------------------  Sigma for W Mass and Top Mass  --------------------
-    histo1D["MlbMass"]->Fit("gaus","Q");
-    histo1D["MqqbMass"]->Fit("gaus","Q");
-    std::cout << " values for Mlb :" << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
-    std::cout << " values for Mqqb :" << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(2) << std::endl;
+      cout << "\n -> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuLCSV << " have two or more Light wp CSV b-tags, " << nSelectedMuMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedMuTCSV << " have two or more Tight wp CSV b-tags " << endl;
+      cout << "-> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElLCSV << " have two or more Light wp CSV b-tags, " << nSelectedElMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedElTCSV << " have two or more Tight wp CSV b-tags " << endl;
+      //cout << "-> " << nLargeMCSVEvents << " events with more than 2 Medium CSV b-tags ( " << nLargeTCSVEvents << " with 2 Tight CSV b-tags) --> Reject these events! " << endl;
 
-    cout<<endl; 
-    cout << "-> " << nSelectedMu << " mu+jets events where selected from which " << nSelectedMuLCSV << " have two or more Light wp CSV b-tags, " << nSelectedMuMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedMuTCSV << " have two or more Tight wp CSV b-tags " << endl;
-    cout << "-> " << nSelectedEl << " e+jets events where selected from which " << nSelectedElLCSV << " have two or more Light wp CSV b-tags, " << nSelectedElMCSV << " have two or more Medium wp CSV b-tags and " << nSelectedElTCSV << " have two or more Tight wp CSV b-tags " << endl;
-    //cout << "-> " << nLargeMCSVEvents << " events with more than 2 Medium CSV b-tags ( " << nLargeTCSVEvents << " with 2 Tight CSV b-tags) --> Reject these events! " << endl;
+      if(verbosity>0) cout << "\n ---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) \n" << endl;
 
-    cout << " " << endl;
-    if(verbosity>0) cout << "---> Number of events with correct semileptonic event content on generator level: " << NumberCorrectEvents << " (semiMuon, semiElec) : ( " << NumberPositiveMuons+NumberNegativeMuons << " , " << NumberPositiveElectrons+NumberNegativeElectrons << " ) " << endl;
-    cout << " " << endl;
+      cout << " \n Output for N(2 light jets) and N(3 light jets) categories: " << endl;
+      cout << "   -- Number of events in each category    : " << FourJetsCategory << "   --   " << FiveJetsCategory << endl;
+      cout << "   -- Number of matched events             : " << FourJetsMatched <<  "   --   " << FiveJetsMatched << endl;
+      cout<<"   -- Number of times good combi is chosen : "<<FourJetsGoodCombiChosen<< "   --   "<<FiveJetsAsFourGoodCombiChosen<<" & "<<FiveJetsAsFiveGoodCombiChosen<<endl;
 
-    cout << " \n Output for N(2 light jets) and N(3 light jets) categories: " << endl;
-    cout << "   -- Number of events in each category    : " << FourJetsCategory << "   --   " << FiveJetsCategory << endl;
-    cout << "   -- Number of matched events             : " << FourJetsMatched <<  "   --   " << FiveJetsMatched << endl;
-    cout << "   -- Number of times good combi is chosen : " << FourJetsGoodCombiChosen << "   --   " << FiveJetsAsFourGoodCombiChosen << " & " << FiveJetsAsFiveGoodCombiChosen << endl;
+      //////////////////////////////
+      //  Jet combination output  //
+      //////////////////////////////
+      //--> Save directly to .tex output as a table
+      ofstream eventSelOutput;
+      int BTagOptionOfInterest;
+      std::string OptionName5Jets[6];
+      std::string OptionName4Jets[6];
+      if(NrConsideredBTagOptions > 1){
+	eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
+	BTagOptionOfInterest = 7;
+	for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = OptionName[ii]; OptionName5Jets[ii] = OptionName[ii];}
+      }
+      if(NrConsideredBTagOptions == 1){
+	eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionTableForChosenCombination.tex");
+	for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case, "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case, "+OptionName[ii];}
+	BTagOptionOfInterest = ChosenBTagOption;
+      }
 
-    //////////////////////////////
-    //  Jet combination output  //
-    //////////////////////////////
-    //--> Save directly to .tex output as a table
-    ofstream eventSelOutput;
-    int BTagOptionOfInterest;
-    std::string OptionName5Jets[6];
-    std::string OptionName4Jets[6];
-    if(NrConsideredBTagOptions > 1){
-      eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
-      BTagOptionOfInterest = 7;
-      for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = OptionName[ii]; OptionName5Jets[ii] = OptionName[ii];}
-    }
-    if(NrConsideredBTagOptions == 1){
-      eventSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionTableForChosenCombination.tex");
-      for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case, "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case, "+OptionName[ii];}
-      BTagOptionOfInterest = ChosenBTagOption;
-    }
-
-    bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 0, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
-    bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 1, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);
-    bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 2, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);
-    eventSelOutput.close();
+      bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 0, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);  //0 stands for all 4 particles, 1 for b-jets and 2 for light jets!
+      bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 1, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);
+      bTagStudy.ReturnTable(OptionName4Jets, OptionName5Jets, 2, NrConsideredBTagOptions, eventSelOutput, BTagOptionOfInterest);
+      eventSelOutput.close();
         
-    //////////////////////////////
-    //  Mlb combination output  //
-    //////////////////////////////
-    //mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, ChosenBTagOption, ChiSqCutValueStr );  //All 4 jets correctly matched
-    mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, ChosenBTagOption, ChiSqCutValueStr );  //Also get table for "only b-jets correctly matched"
+      //////////////////////////////
+      //  Mlb combination output  //
+      //////////////////////////////
+      //mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, ChosenBTagOption, ChiSqCutValueStr );  //All 4 jets correctly matched
+      mlbStudy.saveNumbers(OptionName, 1, NrConsideredBTagOptions, ChosenBTagOption, ChiSqCutValueStr );  //Also get table for "only b-jets correctly matched"
 
-   //Save the histograms belonging to the mlb output information! 
-   std::string Title[3] = {"5Jets","4Jets","Pure5Jets"};
-   std::string Name[3] =  {" - 5 jets case) "," - 4 jets case) "," - pure 5 jets case) "};
+      //Save the histograms belonging to the mlb output information! 
+      std::string Title[3] = {"5Jets","4Jets","Pure5Jets"};
+      std::string Name[3] =  {" - 5 jets case) "," - 4 jets case) "," - pure 5 jets case) "};
  
-   TH1F *h_ChiSqCorrect[3], *h_ChiSqCorrectFound[3], *h_ChiSqMinimum[3],* h_ChiSqNotMinimum[3], *h_ChiSqWrong[3];
-   TH1F *h_ChiSqCorrectWhenMatched[3], *h_ChiSqMinimumWhenMatched[3], *h_ChiSqNotMinimumWhenMatched[3], *h_ChiSqAllWhenNotMatched[3], *h_ChiSqMinimumWhenCorrect[3], *h_ChiSqMinimumWhenWrong[3], *h_ChiSqDiffWhenWrong[3]; 
-   for(int ii = 0; ii < 3; ii++){
-     h_ChiSqCorrect[ii]     =new TH1F(("ChiSqCorrect"+Title[ii]).c_str(),     ("#chi^{2} distribution for the correct combination (all events"+Name[ii]).c_str() ,              150,0,50);
-     h_ChiSqCorrectFound[ii]=new TH1F(("ChiSqCorrectFound"+Title[ii]).c_str(),("#chi^{2} distribution for the correct combination (when found"+Name[ii]).c_str(),               150,0,50);
-     h_ChiSqMinimum[ii]     =new TH1F(("ChiSqMinimum"+Title[ii]).c_str(),     ("#chi^{2} distribution of the minimal combination considered (all events"+Name[ii]).c_str(),     150,0,50);
-     h_ChiSqNotMinimum[ii]  =new TH1F(("ChiSqNotMinimum"+Title[ii]).c_str(),  ("#chi^{2} distribution of the non-minimal combinations considered (all events"+Name[ii]).c_str(),150,0,50);
-     h_ChiSqWrong[ii]       =new TH1F(("ChiSqWrong"+Title[ii]).c_str(),       ("#chi^{2} distribution of the non-correct combinations considered (all events"+Name[ii]).c_str(),150,0,50);
+      TH1F *h_ChiSqCorrect[3], *h_ChiSqCorrectFound[3], *h_ChiSqMinimum[3],* h_ChiSqNotMinimum[3], *h_ChiSqWrong[3];
+      TH1F *h_ChiSqCorrectWhenMatched[3], *h_ChiSqMinimumWhenMatched[3], *h_ChiSqNotMinimumWhenMatched[3], *h_ChiSqAllWhenNotMatched[3], *h_ChiSqMinimumWhenCorrect[3], *h_ChiSqMinimumWhenWrong[3], *h_ChiSqDiffWhenWrong[3]; 
+      for(int ii = 0; ii < 3; ii++){
+	h_ChiSqCorrect[ii]     =new TH1F(("ChiSqCorrect"+Title[ii]).c_str(),     ("#chi^{2} distribution for the correct combination (all events"+Name[ii]).c_str() ,              150,0,50);
+	h_ChiSqCorrectFound[ii]=new TH1F(("ChiSqCorrectFound"+Title[ii]).c_str(),("#chi^{2} distribution for the correct combination (when found"+Name[ii]).c_str(),               150,0,50);
+	h_ChiSqMinimum[ii]     =new TH1F(("ChiSqMinimum"+Title[ii]).c_str(),     ("#chi^{2} distribution of the minimal combination considered (all events"+Name[ii]).c_str(),     150,0,50);
+	h_ChiSqNotMinimum[ii]  =new TH1F(("ChiSqNotMinimum"+Title[ii]).c_str(),  ("#chi^{2} distribution of the non-minimal combinations considered (all events"+Name[ii]).c_str(),150,0,50);
+	h_ChiSqWrong[ii]       =new TH1F(("ChiSqWrong"+Title[ii]).c_str(),       ("#chi^{2} distribution of the non-correct combinations considered (all events"+Name[ii]).c_str(),150,0,50);
      
-     h_ChiSqCorrectWhenMatched[ii]   =new TH1F(("ChiSqCorrectWhenMatched"+Title[ii]).c_str(),   ("#chi^{2} distribution for the correct combination (matched events only"+Name[ii]).c_str(),     150,0,50);
-     h_ChiSqMinimumWhenMatched[ii]   =new TH1F(("ChiSqMinimumWhenMatched"+Title[ii]).c_str(),   ("#chi^{2} distribution for the minimal combination (matched events only"+Name[ii]).c_str(),     150,0,50);
-     h_ChiSqNotMinimumWhenMatched[ii]=new TH1F(("ChiSqNotMinimumWhenMatched"+Title[ii]).c_str(),("#chi^{2} distribution for the non-minimal combinations (matched events only"+Name[ii]).c_str(),150,0,50);
-     h_ChiSqMinimumWhenCorrect[ii]   =new TH1F(("ChiSqMinimumWhenCorrect"+Title[ii]).c_str(),   ("#chi^{2} distribution for the minimal combination (correct choice only"+Name[ii]).c_str(),     150,0,50);
-     h_ChiSqMinimumWhenWrong[ii]     =new TH1F(("ChiSqMinimumWhenWrong"+Title[ii]).c_str(),     ("#chi^{2} distribution for the minimal combination (wrong choice only"+Name[ii]).c_str(),       150,0,50);
-     h_ChiSqAllWhenNotMatched[ii]    =new TH1F(("ChiSqAllWhenNotMatched"+Title[ii]).c_str(),    ("#chi^{2} distribution for all the combinations (non-matched evens only"+Name[ii]).c_str(),     150,0,50);
+	h_ChiSqCorrectWhenMatched[ii]   =new TH1F(("ChiSqCorrectWhenMatched"+Title[ii]).c_str(),   ("#chi^{2} distribution for the correct combination (matched events only"+Name[ii]).c_str(),     150,0,50);
+	h_ChiSqMinimumWhenMatched[ii]   =new TH1F(("ChiSqMinimumWhenMatched"+Title[ii]).c_str(),   ("#chi^{2} distribution for the minimal combination (matched events only"+Name[ii]).c_str(),     150,0,50);
+	h_ChiSqNotMinimumWhenMatched[ii]=new TH1F(("ChiSqNotMinimumWhenMatched"+Title[ii]).c_str(),("#chi^{2} distribution for the non-minimal combinations (matched events only"+Name[ii]).c_str(),150,0,50);
+	h_ChiSqMinimumWhenCorrect[ii]   =new TH1F(("ChiSqMinimumWhenCorrect"+Title[ii]).c_str(),   ("#chi^{2} distribution for the minimal combination (correct choice only"+Name[ii]).c_str(),     150,0,50);
+	h_ChiSqMinimumWhenWrong[ii]     =new TH1F(("ChiSqMinimumWhenWrong"+Title[ii]).c_str(),     ("#chi^{2} distribution for the minimal combination (wrong choice only"+Name[ii]).c_str(),       150,0,50);
+	h_ChiSqAllWhenNotMatched[ii]    =new TH1F(("ChiSqAllWhenNotMatched"+Title[ii]).c_str(),    ("#chi^{2} distribution for all the combinations (non-matched evens only"+Name[ii]).c_str(),     150,0,50);
 
-     h_ChiSqDiffWhenWrong[ii] = new TH1F(("ChiSqDiffWhenWrong"+Title[ii]).c_str(), ("#chi^{2}_{correct} - #chi^{2}_{minimum} for the wrong choice"+Name[ii]).c_str(),500,-5,15);
-   }
+	h_ChiSqDiffWhenWrong[ii] = new TH1F(("ChiSqDiffWhenWrong"+Title[ii]).c_str(), ("#chi^{2}_{correct} - #chi^{2}_{minimum} for the wrong choice"+Name[ii]).c_str(),500,-5,15);
+      }
 
-   for(int jetCase = ChosenBTagOption; jetCase <(ChosenBTagOption+3); jetCase++){
-      //In mlb Class the ChosenBTagOption, ChosenBTagOption+1 and ChosenBTagOption+2 indices are filled (from the 6 options).
-      //However to reduce the number of TH1F's made, this is translated to 0,1 and 2 here in the analyzer!!
-      for(int ii = 0; ii < (mlbStudy.getChiSqCorrect(jetCase)).size();     ii++) h_ChiSqCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrect(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqCorrectFound(jetCase)).size();ii++) h_ChiSqCorrectFound[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectFound(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqMinimum(jetCase)).size();     ii++) h_ChiSqMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimum(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqNotMinimum(jetCase)).size();  ii++) h_ChiSqNotMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimum(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqWrong(jetCase)).size();       ii++) h_ChiSqWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqWrong(jetCase))[ii]);
+      for(int jetCase = ChosenBTagOption; jetCase <(ChosenBTagOption+3); jetCase++){
+	//In mlb Class the ChosenBTagOption, ChosenBTagOption+1 and ChosenBTagOption+2 indices are filled (from the 6 options).
+	//However to reduce the number of TH1F's made, this is translated to 0,1 and 2 here in the analyzer!!
+	for(int ii = 0; ii < (mlbStudy.getChiSqCorrect(jetCase)).size();     ii++) h_ChiSqCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrect(jetCase))[ii]);
+	for(int ii = 0; ii < (mlbStudy.getChiSqCorrectFound(jetCase)).size();ii++) h_ChiSqCorrectFound[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectFound(jetCase))[ii]);
+	for(int ii = 0; ii < (mlbStudy.getChiSqMinimum(jetCase)).size();     ii++) h_ChiSqMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimum(jetCase))[ii]);
+	for(int ii = 0; ii < (mlbStudy.getChiSqNotMinimum(jetCase)).size();  ii++) h_ChiSqNotMinimum[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimum(jetCase))[ii]);
+	for(int ii = 0; ii < (mlbStudy.getChiSqWrong(jetCase)).size();       ii++) h_ChiSqWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqWrong(jetCase))[ii]);
 
-      for(int ii = 0; ii <(mlbStudy.getChiSqCorrectWhenMatched(jetCase)).size();   ii++) h_ChiSqCorrectWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectWhenMatched(jetCase))[ii]);
-      for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenMatched(jetCase)).size();   ii++) h_ChiSqMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
-      for(int ii = 0; ii <(mlbStudy.getChiSqNotMinimumWhenMatched(jetCase)).size();ii++) h_ChiSqNotMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimumWhenMatched(jetCase))[ii]);
-      for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenCorrect(jetCase)).size();   ii++) h_ChiSqMinimumWhenCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenCorrect(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenWrong(jetCase)).size();    ii++) h_ChiSqMinimumWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenWrong(jetCase))[ii]);
-      for(int ii = 0; ii < (mlbStudy.getChiSqAllWhenNotMatched(jetCase)).size();   ii++) h_ChiSqAllWhenNotMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqAllWhenNotMatched(jetCase))[ii]); 
+	for(int ii = 0; ii <(mlbStudy.getChiSqCorrectWhenMatched(jetCase)).size();   ii++) h_ChiSqCorrectWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqCorrectWhenMatched(jetCase))[ii]);
+	for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenMatched(jetCase)).size();   ii++) h_ChiSqMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenMatched(jetCase))[ii]);
+	for(int ii = 0; ii <(mlbStudy.getChiSqNotMinimumWhenMatched(jetCase)).size();ii++) h_ChiSqNotMinimumWhenMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqNotMinimumWhenMatched(jetCase))[ii]);
+	for(int ii = 0; ii <(mlbStudy.getChiSqMinimumWhenCorrect(jetCase)).size();   ii++) h_ChiSqMinimumWhenCorrect[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenCorrect(jetCase))[ii]);
+	for(int ii = 0; ii < (mlbStudy.getChiSqMinimumWhenWrong(jetCase)).size();    ii++) h_ChiSqMinimumWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqMinimumWhenWrong(jetCase))[ii]);
+	for(int ii = 0; ii < (mlbStudy.getChiSqAllWhenNotMatched(jetCase)).size();   ii++) h_ChiSqAllWhenNotMatched[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqAllWhenNotMatched(jetCase))[ii]); 
 
-      for(int ii = 0; ii < (mlbStudy.getChiSqDiffWhenWrong(jetCase)).size(); ii++) h_ChiSqDiffWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqDiffWhenWrong(jetCase))[ii]);
-   }   
+	for(int ii = 0; ii < (mlbStudy.getChiSqDiffWhenWrong(jetCase)).size(); ii++) h_ChiSqDiffWhenWrong[jetCase-ChosenBTagOption]->Fill((mlbStudy.getChiSqDiffWhenWrong(jetCase))[ii]);
+      }   
 
-    fout->cd();
-    //Write down the different Chi-Sq histograms obtained from the mlb class!
-    for(int ii = 0; ii < 3; ii++){
-       h_ChiSqCorrect[ii]->Write();
-       h_ChiSqCorrectFound[ii]->Write();
-       h_ChiSqMinimum[ii]->Write();
-       h_ChiSqNotMinimum[ii]->Write();
-       h_ChiSqWrong[ii]->Write();
+      fout->cd();
+      //Write down the different Chi-Sq histograms obtained from the mlb class!
+      for(int ii = 0; ii < 3; ii++){
+	h_ChiSqCorrect[ii]->Write();
+	h_ChiSqCorrectFound[ii]->Write();
+	h_ChiSqMinimum[ii]->Write();
+	h_ChiSqNotMinimum[ii]->Write();
+	h_ChiSqWrong[ii]->Write();
 
-       h_ChiSqCorrectWhenMatched[ii]->Write();
-       h_ChiSqMinimumWhenMatched[ii]->Write();
-       h_ChiSqNotMinimumWhenMatched[ii]->Write();
-       h_ChiSqMinimumWhenCorrect[ii]->Write();
-       h_ChiSqMinimumWhenWrong[ii]->Write();
-       h_ChiSqAllWhenNotMatched[ii]->Write();
+	h_ChiSqCorrectWhenMatched[ii]->Write();
+	h_ChiSqMinimumWhenMatched[ii]->Write();
+	h_ChiSqNotMinimumWhenMatched[ii]->Write();
+	h_ChiSqMinimumWhenCorrect[ii]->Write();
+	h_ChiSqMinimumWhenWrong[ii]->Write();
+	h_ChiSqAllWhenNotMatched[ii]->Write();
 
-       h_ChiSqDiffWhenWrong[ii]->Write();
-    }
+	h_ChiSqDiffWhenWrong[ii]->Write();
+      }
 
-    h_StandardCosThetaNoEvtSel.Write();
-    h_StandardCosThetaNoBTag.Write();
-    h_StandardCosThetaLCSV.Write();
-    h_StandardCosThetaAllLCSV.Write();
-    h_StandardCosThetaMCSV.Write();
-    h_StandardCosThetaTCSV.Write();
-    h_JetTypeLargeLCSVEvents.Write();
-    h_JetTypeLargeLCSVLeadingPtEvents.Write();
-    h_JetTypeLCSVLightJetsLeadingPt.Write();
-    h_JetTypeLargeMCSVEvents.Write();
-    h_JetTypeLargeMCSVLeadingPtEvents.Write();
-    h_JetTypeLargeTCSVEvents.Write();
-    h_JetTypeLargeTCSVLeadingPtEvents.Write();
-    h_JetTypeLCSV.Write();
-    h_JetTypeMCSV.Write();
-    h_JetTypeTCSV.Write();
-    h_JetTypeLCSVLightJets.Write();
-    h_CSVDiscrLCSVLightJets.Write();
-    h_CSVDiscrLCSVLightJetsLeadingPt.Write();
-    h_CorrectBLeptCSVDiscr.Write();
-    h_CorrectBHadrCSVDiscr.Write();
-    h_CorrectQuark1CSVDiscr.Write();
-    h_CorrectQuark2CSVDiscr.Write();
+      h_StandardCosThetaNoEvtSel.Write();
+      h_StandardCosThetaNoBTag.Write();
+      h_StandardCosThetaLCSV.Write();
+      h_StandardCosThetaAllLCSV.Write();
+      h_StandardCosThetaMCSV.Write();
+      h_StandardCosThetaTCSV.Write();
+      h_JetTypeLargeLCSVEvents.Write();
+      h_JetTypeLargeLCSVLeadingPtEvents.Write();
+      h_JetTypeLCSVLightJetsLeadingPt.Write();
+      h_JetTypeLargeMCSVEvents.Write();
+      h_JetTypeLargeMCSVLeadingPtEvents.Write();
+      h_JetTypeLargeTCSVEvents.Write();
+      h_JetTypeLargeTCSVLeadingPtEvents.Write();
+      h_JetTypeLCSV.Write();
+      h_JetTypeMCSV.Write();
+      h_JetTypeTCSV.Write();
+      h_JetTypeLCSVLightJets.Write();
+      h_CSVDiscrLCSVLightJets.Write();
+      h_CSVDiscrLCSVLightJetsLeadingPt.Write();
+      h_CorrectBLeptCSVDiscr.Write();
+      h_CorrectBHadrCSVDiscr.Write();
+      h_CorrectQuark1CSVDiscr.Write();
+      h_CorrectQuark2CSVDiscr.Write();
 
-    h_Quark1JetNumber.Write();
-    h_Quark2JetNumber.Write();
+      h_Quark1JetNumber.Write();
+      h_Quark2JetNumber.Write();
 
-    h_MlbMass.Write();
-    h_MqqbMass.Write();
+      h_MlbMass.Write();
+      h_MqqbMass.Write();
     
-    h_CosThetaReco.Write();
-    h_NeutrinoEta.Write();
+      h_CosThetaReco.Write();
+      h_NeutrinoEta.Write();
 
-    h_MlbMqqbCorrectAll.Write();
-    h_MlbMqqbCorrectChosen.Write();
-    h_MlbMqqbWrongOne.Write();
-    h_MlbMqqbWrongTwo.Write();
+      h_MlbMqqbCorrectAll.Write();
+      h_MlbMqqbCorrectChosen.Write();
+      h_MlbMqqbWrongOne.Write();
+      h_MlbMqqbWrongTwo.Write();
     } //Only go through all of this output if the TF are not being calculated!
 
     //Close the LHCO Output files!
@@ -1893,15 +1886,13 @@ int main (int argc, char *argv[])
     //delete WLeptTRF;
     //delete leptonWRF;
     //delete Top, TopBar, Bottom, BottomBar, Lepton, NeutrinoMC, WPlus, WMinus, Light, LightBar;
- 
 
     if (jecUnc) delete jecUnc;
     if (jetTools) delete jetTools;
   
     //important: free memory
-    treeLoader.UnLoadDataset();
-    
-  }				//loop on datasets
+    treeLoader.UnLoadDataset();    
+  }  //loop on datasets
   
   //Once everything is filled ...
   if (verbose > 0)
@@ -1910,41 +1901,39 @@ int main (int argc, char *argv[])
   /////////////////////////
   // Write out the plots //
   /////////////////////////
-
   // Fill the resolution histograms and calculate the resolutions
   //
   string pathPNG = "PlotsMacro";
   if(CalculateResolutions){    
-      mkdir((pathPNG+"resFit_LightJet/").c_str(),0777);
-      mkdir((pathPNG+"resFit_BJet/").c_str(),0777);
-      mkdir((pathPNG+"resFit_Muon/").c_str(),0777);
-      mkdir((pathPNG+"resFit_NeutrinoSemiMu/").c_str(),0777);     
-      mkdir((pathPNG+"resFit_NeutrinoSemiEl/").c_str(),0777);
-      mkdir((pathPNG+"resFit_Electron/").c_str(),0777);
+    mkdir((pathPNG+"/resFit_LightJet/").c_str(),0777);
+    mkdir((pathPNG+"/resFit_BJet/").c_str(),0777);
+    mkdir((pathPNG+"/resFit_Muon/").c_str(),0777);
+    mkdir((pathPNG+"/resFit_NeutrinoSemiMu/").c_str(),0777);     
+    mkdir((pathPNG+"/resFit_NeutrinoSemiEl/").c_str(),0777);
+    mkdir((pathPNG+"/resFit_Electron/").c_str(),0777);
 
-      resFitMuon->WritePlots(fout, true, pathPNG+"resFit_Muon/");
-      resFitMuon->WriteResolutions("muonReso.root");
+    resFitMuon->WritePlots(fout, true, pathPNG+"resFit_Muon/");
+    resFitMuon->WriteResolutions("PersonalClasses/resolutions/Calculated/muonReso.root");
 
-      resFitNeutrinoMu->WritePlots(fout, true, pathPNG+"resFit_NeutrinoSemiMu/");
-      resFitNeutrinoMu->WriteResolutions("neutrinoSemiMuReso.root");
+    resFitNeutrinoMu->WritePlots(fout, true, pathPNG+"/resFit_NeutrinoSemiMu/");
+    resFitNeutrinoMu->WriteResolutions("PersonalClasses/resolutions/Calculated/neutrinoSemiMuReso.root");
 
-      resFitNeutrinoEl->WritePlots(fout, true, pathPNG+"resFit_Neutrino/");
-      resFitNeutrinoEl->WriteResolutions("neutrinoSemiElReso.root");
+    resFitNeutrinoEl->WritePlots(fout, true, pathPNG+"/resFit_Neutrino/");
+    resFitNeutrinoEl->WriteResolutions("PersonalClasses/resolutions/Calculated/neutrinoSemiElReso.root");
 
-      resFitElectron->WritePlots(fout, true, pathPNG+"resFit_Electron/");
-      resFitElectron->WriteResolutions("electronReso.root");      
+    resFitElectron->WritePlots(fout, true, pathPNG+"/resFit_Electron/");
+    resFitElectron->WriteResolutions("PersonalClasses/resolutions/Calculated/electronReso.root");      
       
-      resFitLightJets->WritePlots(fout, true, pathPNG+"resFit_LightJet/");
-      resFitLightJets->WriteResolutions("lightJetReso.root");
+    resFitLightJets->WritePlots(fout, true, pathPNG+"/resFit_LightJet/");
+    resFitLightJets->WriteResolutions("PersonalClasses/resolutions/Calculated/lightJetReso.root");
 
-      resFitBJets->WritePlots(fout, true, pathPNG+"resFit_BJet/");
-      resFitBJets->WriteResolutions("bJetReso.root");
+    resFitBJets->WritePlots(fout, true, pathPNG+"/resFit_BJet/");
+    resFitBJets->WriteResolutions("PersonalClasses/resolutions/Calculated/bJetReso.root");
   }
 
   //Write away the MSPlots, the histo1D's and the histo2D's!!
   fout -> cd();
-
-  mkdir("MSPlots",0777);
+  mkdir((pathPNG+"/MSPlots").c_str(),0777);
  
   TDirectory* msdir = fout->mkdir("MSPlots");
   msdir->cd(); 
@@ -1952,24 +1941,24 @@ int main (int argc, char *argv[])
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name); //, true, true, true, true, true, 1, false);
-    temp->Write(fout, name, true, "MSPlots/");
+    temp->Write(fout, name, true, "PlotsMacro/MSPlots/");
   }
 
   TDirectory* th1dir = fout->mkdir("1D_histograms");
   th1dir->cd();
   for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
-     TH1F *temp = it->second;
-     int N = temp->GetNbinsX();
-     temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
-     temp->SetBinContent(N+1,0);
-     temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
-     temp->Write();
+    TH1F *temp = it->second;
+    int N = temp->GetNbinsX();
+    temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+    temp->SetBinContent(N+1,0);
+    temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+    temp->Write();
   }
   TDirectory* th2dir = fout->mkdir("2D_histograms_graphs");
   th2dir->cd();
   for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){
-     TH2F *temp = it->second;
-     temp->Write();
+    TH2F *temp = it->second;
+    temp->Write();
   }
 
   //Selection tables
@@ -1990,7 +1979,6 @@ int main (int argc, char *argv[])
   delete configTree;
   
   cout << "It took us " << ((double)clock() - start) / CLOCKS_PER_SEC << " to run the program" << endl;
-  
   cout << "********************************************" << endl;
   cout << "           End of the program !!            " << endl;
   cout << "           hasn't crashed yet ;-)           " << endl;
