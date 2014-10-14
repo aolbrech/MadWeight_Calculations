@@ -1,5 +1,10 @@
-g++ -m64 -g -L /user/aolbrech/lib -I ../ -l TopTreeAnaContent53 -l TopTreeAna53 -l MLP -l TreePlayer -l TMVA -l XMLIO -I `root-config --incdir` `root-config --libs` AnomalousCouplingsTreeCreator.cc -o AnomalousCouplingsTreeCreator
-
 source /cvmfs/cms.cern.ch/slc6_amd64_gcc472/external/dcap/2.47.5.0-cms2/etc/profile.d/init.sh
+
+#For mtop:
+source /jefmount_mnt/jefmount/cmss/slc5_amd64_gcc462/external/dcap/2.47.5.0-cms/etc/profile.d/init.sh
+
+cp PersonalClasses/src/* ../TopTreeAnalysis/AnomCouplings/src/; cp PersonalClasses/interface/* ../TopTreeAnalysis/AnomCouplings/interface/
+
+g++ -m64 -g -L /user/aolbrech/lib -I ../ -l TopTreeAnaContent53 -l TopTreeAna53 -l MLP -l TreePlayer -l TMVA -l XMLIO -I `root-config --incdir` `root-config --libs` AnomalousCouplingsTreeCreator.cc -o AnomalousCouplingsTreeCreator
 
 ./AnomalousCouplingsTreeCreator
