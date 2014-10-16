@@ -25,11 +25,11 @@ class TFCreation{
         ~TFCreation();
 	void InitializeVariables();
 	void FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* hadrWJet2, TRootMCParticle* hadrBJet, TRootMCParticle* leptBJet, TRootMCParticle* lepton, TRootJet* selHadrWJet1, TRootJet* selHadrWJet2, TRootJet* selHadrBJet, TRootJet* selLeptBJet, TLorentzVector* selLepton, bool isSemiMu, bool isSemiEl);
-	void CalculateTF(bool, bool, bool, bool, bool);
+	void CalculateTF(bool, bool, bool, bool);
         void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], TFile*);
 	void FitSliceClassCode(TH2F*, int, const char*[]);
 	void SetStartValuesDoubleGaussian(int, bool);
-	void WriteTF(TFile*);
+	void WriteTF(TH2F*, ofstream &output, ofstream &card, TFile*);
 	void WritePlots(TFile*);
 
     private:
@@ -41,6 +41,7 @@ class TFCreation{
 	TF1 *doubleGaussianFit, *caloEnergyFit;
 	TH1D **hlist;
         float* startValuesArray;
+        TF1 AllCaloEnergyFits[6];
 };
 #endif
 //

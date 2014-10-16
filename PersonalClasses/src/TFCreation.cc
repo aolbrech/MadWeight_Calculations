@@ -10,7 +10,6 @@ TFCreation::TFCreation(){
 
     //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
     caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
-
 }
 
 TFCreation::~TFCreation(){
@@ -206,9 +205,7 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
     //Set parameter names
     const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
     const int npar = doubleGaussianFit->GetNpar();
-    for(int ii = 0; ii < npar; ii++){
-        doubleGaussianFit->SetParName(ii,parnames[ii]);
-    }
+    for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);    
 
     //Set range of fits
     doubleGaussianFit->SetRange( fitHisto->GetYaxis()->GetXmin(), fitHisto->GetYaxis()->GetXmin() );
@@ -233,33 +230,28 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
     //////////////////////////////////////////////////////////////////////////////////////////////
     for( int ipar = 0; ipar < npar; ipar++ ){
 
-        for(int ii = 0; ii < 3; ii++)
-    	    caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
+        for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 	hlist[ipar]->Fit(caloEnergyFit);
+        AllCaloEnergyFits[ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
 	hlist[ipar]->Write();            
     }
     hlist[npar]->Write();
-						
     delete [] hlist;
 }
 
-void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool useROOTClass, bool useStartValues){
+void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
 	TFile* file = new TFile("PlotsForTransferFunctions.root","RECREATE");
 	file->cd();
 
 	if(drawHistos == true) WritePlots(file);
-	if(writeTF == true) WriteTF(file);
 	if(doFits == true){
 
 	  //Set parameter names
 	  const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
 	  const int npar = doubleGaussianFit->GetNpar();
-	  for(int ii = 0; ii < npar; ii++){
-	    doubleGaussianFit->SetParName(ii,parnames[ii]);
-            if(ii <= 3) caloEnergyFit->SetParName(ii, ( string(parnames[ii])+tostr(ii)).c_str() );
-          }
+	  for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);
 
 	  ///////////////////////////////////////////
 	  //  Choose the correct histogram to fit  //
@@ -319,10 +311,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool us
 	    for( int ipar = 0; ipar < npar; ipar++ ){
 
 	  	//give names to the parameters		
-		caloEnergyFit->SetParName(0, ( string(parnames[ipar])+"0").c_str() );
-		caloEnergyFit->SetParName(1, ( string(parnames[ipar])+"1").c_str());
-		caloEnergyFit->SetParName(2, ( string(parnames[ipar])+"2").c_str());
-
+                for(int jj = 0; jj < 3; jj++) caloEnergyFit->SetParName(jj, ( string(parnames[ipar])+tostr(jj)).c_str() );
 		caloEnergyFit->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 		hlist[ipar]->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
@@ -350,7 +339,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 	const TArrayD *bins = histoForFit->GetXaxis()->GetXbins();
 	for(int ipar=0 ; ipar < npar; ipar++){
 
-	    hlist[ipar] = new TH1D( (string(histoForFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoForFit->GetName())+" : Fitted value of _"+parnames[ipar]).c_str(), histoForFit->GetXaxis()->GetNbins(), histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax());
+	    hlist[ipar] = new TH1D( (string(histoForFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoForFit->GetName())+" : Fitted value of "+parnames[ipar]).c_str(), histoForFit->GetXaxis()->GetNbins(), histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax());
 	    hlist[ipar]->GetXaxis()->SetTitle(histoForFit->GetXaxis()->GetTitle());
 	}
 	hlist[npar] = new TH1D( (string(histoForFit->GetName())+"_chi2").c_str(), (string(histoForFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoForFit->GetXaxis()->GetNbins(), histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax() );
@@ -358,7 +347,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 	//Loop on all bins in X, generate a projection along Y and fit each bin separately!
 	int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
 	int nbins = histoForFit->GetXaxis()->GetNbins();
-	cout << " ** Looking at histogram : " << histoForFit->GetName() << "                               ******************************* " << endl;
+	cout << "\n ** Looking at histogram : " << histoForFit->GetName() << "                               ******************************* " << endl;
 	for(int bin=1;bin <= nbins+1;bin ++) {
 	    cout << "   --  Looking at bin : " << bin << endl;
 	    string projection_title = string(histoForFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -423,154 +412,21 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(TFile* plotsFile){
+void TFCreation::WriteTF(TH2F* fitHisto, ofstream &myTFs, ofstream &myTFCard, TFile* file){
 
-	const int NrConsideredPlots = 9;
-	const int NrConsideredPars = 6;
-	const int NrConsideredCaloPars = 3;
+    const int NrConsideredPlots = 9, NrConsideredPars = 6, NrConsideredCaloPars = 3;
+    string ParamName[NrConsideredPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
 
-	string histonames[9] = {"BJet_DiffPtVsGenPt",                   //Why is order suddenly changed ... ?   + Still need to include electrons !!
-				"BJet_DiffThetaVsGenPt",
-				"BJet_DiffPhiVsGenPt",
-				"Light_DiffPtVsGenPt",
-				"Light_DiffThetaVsGenPt",
-				"Light_DiffPhiVsGenPt",
-				"Mu_DiffInvPtVsGenInvPt",
-				"Mu_DiffThetaVsGenInvPt",
-				"Mu_DiffPhiVsGenInvPt"};
-				
-	string histodescription[9] = {"b-jet momentum", "b-jet theta", "b-jet phi", "non-b jet momentum", "non-b jet theta", "non-b jet phi", "muon inv. pt", "muon theta", "muon phi",};
-				
-	ofstream myTFs;
-	myTFs.open("TransferFunctions_TABLE.txt");
+    for(int ipar = 0; ipar < NrConsideredPars; ipar++){
 
-	ofstream myTFsForMadWeight;
-	myTFsForMadWeight.open("transfer_card_user.dat");
+	for(int icalopar = 0; icalopar < NrConsideredCaloPars; icalopar++){
+	    if(icalopar == 0) myTFs<<ParamName[ipar]<<" & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[ipar].GetParError(icalopar);
+	    else              myTFs<<                 " & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[ipar].GetParError(icalopar);
 
-	plotsFile->cd();
-	string ParamName[NrConsideredPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
-	for(int iplot = 0; iplot < NrConsideredPlots; iplot++){
-
-	  myTFs<< endl;
-	  myTFs<<"\\begin{table}" << endl;
-	  myTFs<<"\\caption{Parameters of the transfer function for the " << histodescription[iplot]  << "}" << endl;
-	  myTFs<<"\\label{tab:}" << endl;
-	  myTFs<<"\\centering" << endl;
-	  myTFs<<"\\begin{tabular}{c|ccc}" << endl;
-	  myTFs<<"\\hline" << endl;
-	  myTFs << "Type	& $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
-	  myTFs<<"\\hline" << endl;
-	
-	  TF1 *TF_Created[6];                                                     //,*TF_par2,*TF_par3,*TF_par4,*TF_par5,*TF_par6;
-	  for(int ipar = 1; ipar <= NrConsideredPars; ipar++){
-		TF_Created[ipar-1] = (TF1*)plotsFile->Get( (histonames[iplot]+"_a"+tostr(ipar)+"_Fitted").c_str() );
-		if( !TF_Created[ipar-1]) continue;
-
-		for(int icalopar = 0; icalopar < NrConsideredCaloPars; icalopar++){
-		    if(icalopar == 0) myTFs <<ParamName[ipar-1] <<" & $a_{" <<ipar <<icalopar <<"}$ = " <<TF_Created[ipar-1]->GetParameter(icalopar) <<"$\\pm$" <<TF_Created[ipar-1]->GetParError(icalopar);
-		    else              myTFs <<                    " & $a_{" <<ipar <<icalopar <<"}$ = " <<TF_Created[ipar-1]->GetParameter(icalopar) <<"$\\pm$" <<TF_Created[ipar-1]->GetParError(icalopar);
-		}
-		myTFs << "\\\\" << endl;
-	  }
-	  //string name2 = histonames[i]+"_a2_Fitted";
-	  //string name3 = histonames[i]+"_a3_Fitted";
-	  //string name4 = histonames[i]+"_a4_Fitted";
-	  //string name5 = histonames[i]+"_a5_Fitted";
-	  //string name6 = histonames[i]+"_a6_Fitted";
-					
-	  //TF_par1 = (TF1*)plotsFile->Get(name1.c_str());
-	  //TF_par2 = (TF1*)plotsFile->Get(name2.c_str());
-	  //TF_par3 = (TF1*)plotsFile->Get(name3.c_str());
-	  //TF_par4 = (TF1*)plotsFile->Get(name4.c_str());
-	  //TF_par5 = (TF1*)plotsFile->Get(name5.c_str());
-	  //TF_par6 = (TF1*)plotsFile->Get(name6.c_str());
-
-	  //if (TF_par1 && TF_par2 && TF_par3 && TF_par4 && TF_par5 && TF_par6) {
-
-	    /*myTFs << "Mean broad gaussian & $a_{10}$ = " << TF_par1->GetParameter(0) << "$\\pm$" << TF_par1->GetParError(0);
-	    myTFs <<                    " & $a_{11}$ = " << TF_par1->GetParameter(1) << "$\\pm$" << TF_par1->GetParError(1);
-	    myTFs <<                    " & $a_{12}$ = " << TF_par1->GetParameter(2) << "$\\pm$" << TF_par1->GetParError(2) << "\\\\" << endl;
-	    myTFs << "Width broad gaussian & $a_{20}$ = " << TF_par2->GetParameter(0) << "$\\pm$" << TF_par2->GetParError(0);
-	    myTFs <<                     " & $a_{21}$ = " << TF_par2->GetParameter(1) << "$\\pm$" << TF_par2->GetParError(1);
-	    myTFs <<                     " & $a_{22}$ = " << TF_par2->GetParameter(2) << "$\\pm$" << TF_par2->GetParError(2) << "\\\\" << endl;
-	    myTFs << "Constant broad gaussian & $a_{30}$ = " << TF_par2->GetParameter(0) << "$\\pm$" << TF_par2->GetParError(0);
-	    myTFs <<                        " & $a_{31}$ = " << TF_par2->GetParameter(1) << "$\\pm$" << TF_par2->GetParError(1);
-	    myTFs <<                        " & $a_{32}$ = " << TF_par2->GetParameter(2) << "$\\pm$" << TF_par2->GetParError(2) << "\\\\" << endl;
-	    myTFs << "Mean narrow gaussian & $a_{40}$ = " << TF_par4->GetParameter(0) << "$\\pm$" << TF_par4->GetParError(0);
-	    myTFs <<                     " & $a_{41}$ = " << TF_par4->GetParameter(1) << "$\\pm$" << TF_par4->GetParError(1);
-	    myTFs <<                     " & $a_{42}$ = " << TF_par4->GetParameter(2) << "$\\pm$" << TF_par4->GetParError(2) << "\\\\" << endl;
-	    myTFs << "Width narrow gaussian & $a_{50}$ = " << TF_par5->GetParameter(0) << "$\\pm$" << TF_par5->GetParError(0);
-	    myTFs <<                      " & $a_{51}$ = " << TF_par5->GetParameter(1) << "$\\pm$" << TF_par5->GetParError(1);
-	    myTFs <<                      " & $a_{52}$ = " << TF_par5->GetParameter(2) << "$\\pm$" << TF_par5->GetParError(2) << "\\\\" << endl;
-	    myTFs << "Constant narrow gaussian & $a_{60}$ = " << TF_par6->GetParameter(0) << "$\\pm$" << TF_par6->GetParError(0);
-	    myTFs <<                         " & $a_{61}$ = " << TF_par6->GetParameter(1) << "$\\pm$" << TF_par6->GetParError(1);
-	    myTFs <<                         " & $a_{62}$ = " << TF_par6->GetParameter(2) << "$\\pm$" << TF_par6->GetParError(2) << "\\\\" << endl;
-	    */
-	    myTFs<<"\\hline" << endl;
-	    myTFs<<"\\end{tabular}"<<endl;
-	    myTFs<<"\\end{table}"<<endl;
-	    myTFs<< endl;
-						
-	    if(iplot==0){
-		myTFsForMadWeight<<"#+-----------------------------------------------------------------------+" << endl;
-		myTFsForMadWeight<<"#|    Parameter for particles: b                                         |" << endl;
-		myTFsForMadWeight<<"#+-----------------------------------------------------------------------+" << endl;
-		myTFsForMadWeight<<"BLOCK TF_bjet_E" << endl;
-	    }
-	    else if(iplot==3){
-		myTFsForMadWeight<<"#+-----------------------------------------------------------------------+" << endl;
-		myTFsForMadWeight<<"#|    Parameter for particles: nonb                                      |" << endl;
-		myTFsForMadWeight<<"#+-----------------------------------------------------------------------+" << endl;
-		myTFsForMadWeight<<"BLOCK TF_nonbjet_E" << endl;
-	    }
-	    else if(iplot==6){
-		myTFsForMadWeight<<"#+-----------------------------------------------------------------------+" << endl;
-		myTFsForMadWeight<<"#|    Parameter for particles: muon                                      |" << endl;
-		myTFsForMadWeight<<"#+-----------------------------------------------------------------------+" << endl;
-		myTFsForMadWeight<<"BLOCK TF_muon_InvPt" << endl;
-	    }
-	    else if(iplot==1) myTFsForMadWeight<<"BLOCK TF_bjet_THETA" << endl;
-	    else if(iplot==2) myTFsForMadWeight<<"BLOCK TF_bjet_PHI" << endl;
-	    else if(iplot==4) myTFsForMadWeight<<"BLOCK TF_nonbjet_THETA" << endl;
-	    else if(iplot==5) myTFsForMadWeight<<"BLOCK TF_nonbjet_PHI" << endl;
-	    else if(iplot==7) myTFsForMadWeight<<"BLOCK TF_muon_THETA" << endl;
-	    else if(iplot==8) myTFsForMadWeight<<"BLOCK TF_muon_PHI" << endl;
-
-	    /*
-	    if(iplot<6) { //for jets, should also work for electrons if we have them
-	      for(int j = 0; j<3; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par1->GetParameter(j) << "  # bias broad gaussian b1=#1+#2*sqrt(E)*#3*E" << endl;
-	      for(int j = 3; j<6; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par2->GetParameter(j-3) << "  # sigma broad gaussian s1=#4+#5*sqrt(E)*#6*E" << endl;
-	      for(int j = 6; j<9; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par3->GetParameter(j-6) << "  # constant broad gaussian c1=#7+#8*sqrt(E)*#9*E" << endl;
-	      for(int j = 9; j<12; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par4->GetParameter(j-9) << "  # bias narrow gaussian b2=#10+#11*sqrt(E)*#12*E" << endl;
-	      for(int j = 12; j<15; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par5->GetParameter(j-12) << "  # sigma narrow gaussian s2=#13+#14*sqrt(E)*#15*E" << endl;
-	      for(int j = 15; j<18; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par6->GetParameter(j-15) << "  # constant narrow gaussian c2=#16+#17*sqrt(E)*#18*E" << endl;
-	    }
-	    else{ //for muon (only difference: paramtrization according to InvPt instead of E -> something textual...)
-	      for(int j = 0; j<3; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par1->GetParameter(j) << "  # bias broad gaussian b1=#1+#2*sqrt(InvPt)*#3*InvPt" << endl;
-	      for(int j = 3; j<6; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par2->GetParameter(j-3) << "  # sigma broad gaussian s1=#4+#5*sqrt(InvPt)*#6*InvPt" << endl;
-	      for(int j = 6; j<9; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par3->GetParameter(j-6) << "  # constant broad gaussian c1=#7+#8*sqrt(InvPt)*#9*InvPt" << endl;
-	      for(int j = 9; j<12; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par4->GetParameter(j-9) << "  # bias narrow gaussian b2=#10+#11*sqrt(InvPt)*#12*InvPt" << endl;
-	      for(int j = 12; j<15; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par5->GetParameter(j-12) << "  # sigma narrow gaussian s2=#13+#14*sqrt(InvPt)*#15*InvPt" << endl;
-	      for(int j = 15; j<18; j++)
-		myTFsForMadWeight<<j+1 << " " << TF_par6->GetParameter(j-15) << "  # constant narrow gaussian c2=#16+#17*sqrt(InvPt)*#18*InvPt" << endl;
-	    }
-	    */
-	  //}
-	  //plotsFile->Close();
-	}//End of loop over the different considered plots for the TF!
-	myTFs.close();
-	myTFsForMadWeight.close();			
+            myTFCard<< (ipar*NrConsideredCaloPars)+icalopar+1 << "     " << AllCaloEnergyFits[ipar].GetParameter(icalopar)<< "     # " << ParamName[ipar] << endl;
+	}
+	myTFs << "\\\\" << endl;
+    }
 }
 
 void TFCreation::WritePlots(TFile* outfile){
@@ -585,16 +441,12 @@ void TFCreation::WritePlots(TFile* outfile){
 	      temp->SetBinContent(N+1,0);
 	      temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
 	      temp->Write();
-	      //TCanvas* tempCanvas = TCanvasCreator(temp, it->first);
-	      //tempCanvas->SaveAs( (it->first+".png").c_str() );
 	}
 	TDirectory* th2dir = outfile->mkdir("2D_histograms_graphs");
 	th2dir->cd();
 	for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){    
 	      TH2F *temp = it->second;
 	      temp->Write();
-	      //TCanvas* tempCanvas = TCanvasCreator(temp, it->first);
-	      //tempCanvas->SaveAs( (it->first+".png").c_str() );
 	}
 	outfile->cd(); //Step out from 2D_histograms_graphs directory!
 }

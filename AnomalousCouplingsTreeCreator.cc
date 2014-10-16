@@ -1720,7 +1720,7 @@ int main (int argc, char *argv[])
 
     // -------- Calculate TF MadWeight  --------//
     if(CalculateTF){
-      tfCreation.CalculateTF(true, false, true, false, true); //bool drawHistos, bool writeTF, bool doFits, bool useROOTClass, bool useStartValues);
+      tfCreation.CalculateTF(true, true, false, true); //bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues   --> Writing TF to file only possible using TFFit analyzer!
     }
     else{	
       //--------------------  Sigma for W Mass and Top Mass  --------------------

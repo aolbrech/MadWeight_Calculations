@@ -19,27 +19,80 @@ int main ()
     //Used classes
     TFCreation tfCreation;
 
-    //Define all variables!
+    /////////////////////////////
+    //  Define all variables!  //
+    /////////////////////////////
+    TFile* file = new TFile("PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
+    //Define all histograms which need to be fitted!
     const int NrFitHistos = 2;
+    std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
+    string Histo[NrFitHistos] = {"Mu_DiffPtVsGenPt","Light_DiffPtVsGenPt"};
+    float StartValues[NrFitHistos][6] = {{1,2,3,4,5,6},
+                                         {-10,0,500,0,10,10}};
+    //Set the booleans!
     bool useROOTClass = false;
     bool useStartValues = true;
     int histoNrForStartValues = 0;
     bool useStartArray = true;
-    TFile* file = new TFile("PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
 
-    //Define all histograms which need to be fitted!
-    std::cout << " Will look at " << NrFitHistos << " different histograms to fit! \n" << std::endl;
-    string Histo[NrFitHistos] = {"Mu_DiffPtVsGenPt","Light_DiffPtVsGenPt"};
+    ofstream myTF, myTFCard;
+    myTF.open("TFInformation/TransferFunctions_TABLE.txt");
+    myTFCard.open("TFInformation/transfer_card_user.dat");
 
-    float startValues[6] = {1,2,3,4,5,6};
-
-    for(int ii = 0; ii < NrFitHistos; ii++){
-        TH2F* histoForFit = (TH2F*) file->Get( ("2D_histograms_graphs/"+Histo[ii]).c_str() );    
+    float startValues[6];
+    for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
+        TH2F* histoForFit = (TH2F*) file->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );    
+    
+        //Set the correct startValues and fit the distribution
+        for(int jj = 0; jj < 6; jj++) startValues[jj] = StartValues[iHisto][jj];        
         tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, fout);
+
+        //Set the caption correct:
+        string CaptionName, BlockName, PartName, KinVarName;
+        // -- 1) which particle
+        if(Histo[iHisto].find("Light_") == 0)    {PartName = "light jets"; BlockName = "TF_nonbjet_";}
+        else if(Histo[iHisto].find("BJet") == 0) {PartName = "b-jets";     BlockName = "TF_bjet_";}
+        else if(Histo[iHisto].find("Mu_") == 0)  {PartName = "muons";      BlockName = "TF_muon_";}
+        else if(Histo[iHisto].find("El_") == 0)  {PartName = "electrons";  BlockName = "TF_electron_";}
+        // -- 2) which kinematic variable
+        if(Histo[iHisto].find("DiffPt") <= Histo[iHisto].size())         {CaptionName = PartName+" transverse momentum";            KinVarName += "PT";}
+        else if(Histo[iHisto].find("DiffTheta") <= Histo[iHisto].size()) {CaptionName = PartName+" polar angle \\theta";            KinVarName += "THETA";}
+        else if(Histo[iHisto].find("DiffPhi") <= Histo[iHisto].size())   {CaptionName = PartName+" azimuthal angle \\phi";          KinVarName += "PHI";}
+        else if(Histo[iHisto].find("DiffInvPt") <= Histo[iHisto].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName += "InvPt";}
+        BlockName = BlockName + KinVarName;
+
+        //Write the TF's in a table and in a MadWeight card!:
+        myTF<< endl;
+        myTF<<" \n \\begin{table}[h!]" << endl;
+        myTF<<"\\caption{Parameters of the transfer function for " << CaptionName << "}" << endl;
+        myTF<<"\\label{tab::" << Histo[iHisto] << "}" << endl;
+        myTF<<"\\centering" << endl;
+        myTF<<"\\begin{tabular}{c|ccc}" << endl;
+        myTF<<"\\hline" << endl;
+        myTF << "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
+        myTF<<"\\hline" << endl;
+
+        //Only write this for the Pt- or 1/Pt-parameters (= start of the TF Card!)
+        if(Histo[iHisto].find("DiffPt") <= Histo[iHisto].size() || Histo[iHisto].find("DiffInvPt") <= Histo[iHisto].size() ){
+            myTFCard<<"#+-----------------------------------------------------------------------------------+" <<endl;
+            myTFCard<<"#|     Parameter for particles: "<<PartName << endl; 
+            myTFCard<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
+            myTFCard<<"#|      --> Dependency defined as: A + B*sqrt("<<KinVarName<<") + C*"<<KinVarName<< endl;
+            myTFCard<<"#+-----------------------------------------------------------------------------------+" <<endl;
+        }
+        myTFCard<<"BLOCK "<<BlockName << endl;
+
+        tfCreation.WriteTF(histoForFit, myTF, myTFCard, fout);
+
+        myTF<<"\\hline" << endl;
+        myTF<<"\\end{tabular}"<<endl;
+        myTF<<"\\end{table} \n"<<endl;
     }
     
-    //Close the root file where all histograms are saved!
+    //Close the root file where all histograms are saved together with the output files!
     fout->Close();
+    myTF.close();
+    myTFCard.close();
 
     //Delete the used pointers:
     delete fout, file;
