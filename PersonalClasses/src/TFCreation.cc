@@ -166,18 +166,70 @@ void TFCreation::FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* had
 	    	histo2D["Mu_RecoPhiVsGenInvPt"]->Fill(  InvPtgenMu,     selLepton->Phi()   );
 		histo2D["Mu_RecoPhiVsGenPt"]->Fill(     lepton->Pt(),   selLepton->Phi()   );
 
-	    	histo2D["Mu_DiffInvPtVsGenInvPt"]->Fill(  InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
-		histo2D["Mu_DiffPtVsGenPt"]->Fill(        lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
-		histo2D["Mu_DiffThetaVsGenTheta"]->Fill(  lepton->Theta(),lepton->Theta() - selLepton->Theta() );
-	    	histo2D["Mu_DiffThetaVsGenInvPt"]->Fill(  InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
-		histo2D["Mu_DiffThetaVsGenPt"]->Fill(     lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
-	    	histo2D["Mu_DiffPhiVsGenPhi"]->Fill(      lepton->Phi(),  lepton->Phi()   - selLepton->Phi()   );
-	    	histo2D["Mu_DiffPhiVsGenPhi_All"]->Fill(  lepton->Phi(),  lepton->Phi()   - selLepton->Phi()   );
-	    	histo2D["Mu_DiffPhiVsGenInvPt"]->Fill(    InvPtgenMu,     lepton->Phi()   - selLepton->Phi()   );
-	    	histo2D["Mu_DiffPhiVsGenInvPt_All"]->Fill(InvPtgenMu,     lepton->Phi()   - selLepton->Phi()   );
-		histo2D["Mu_DiffPhiVsGenPt"]->Fill(       lepton->Pt(),   lepton->Phi()   - selLepton->Phi()   );
-		histo2D["Mu_DiffPhiVsGenPt_All"]->Fill(   lepton->Pt(),   lepton->Phi()   - selLepton->Phi()   );
+	    	histo2D["Mu_DiffInvPtVsGenInvPt"]->Fill(    InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
+		histo2D["Mu_DiffInvPtVsGenInvPt_All"]->Fill(InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
+		histo2D["Mu_DiffPtVsGenPt"]->Fill(          lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
+		histo2D["Mu_DiffThetaVsGenTheta"]->Fill(    lepton->Theta(),lepton->Theta() - selLepton->Theta() );
+	    	histo2D["Mu_DiffThetaVsGenInvPt"]->Fill(    InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
+		histo2D["Mu_DiffThetaVsGenPt"]->Fill(       lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+	    	histo2D["Mu_DiffPhiVsGenPhi"]->Fill(        lepton->Phi(),  lepton->Phi()   - selLepton->Phi()   );
+	    	histo2D["Mu_DiffPhiVsGenPhi_All"]->Fill(    lepton->Phi(),  lepton->Phi()   - selLepton->Phi()   );
+	    	histo2D["Mu_DiffPhiVsGenInvPt"]->Fill(      InvPtgenMu,     lepton->Phi()   - selLepton->Phi()   );
+	    	histo2D["Mu_DiffPhiVsGenInvPt_All"]->Fill(  InvPtgenMu,     lepton->Phi()   - selLepton->Phi()   );
+		histo2D["Mu_DiffPhiVsGenPt"]->Fill(         lepton->Pt(),   lepton->Phi()   - selLepton->Phi()   );
+		histo2D["Mu_DiffPhiVsGenPt_All"]->Fill(     lepton->Pt(),   lepton->Phi()   - selLepton->Phi()   );
 	}
+}
+
+void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, TFile* file){
+
+    TDirectory* histoFitDir = file->mkdir(fitHisto->GetName());
+    histoFitDir->cd();
+
+    ///////////////////////////////////////
+    //  Declare the used fit functions!  //
+    ///////////////////////////////////////
+    //
+    // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
+    doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[5]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");       
+    const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
+    const int npar = doubleGaussianFit->GetNpar();
+
+    //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
+    caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
+
+    for(int ii = 0; ii < npar; ii++){
+        doubleGaussianFit->SetParName(ii,parnames[ii]);
+	if(ii <= 3) caloEnergyFit->SetParName(ii, ( string(parnames[ii])+tostr(ii)).c_str() );
+    }
+    doubleGaussianFit->SetRange( fitHisto->GetYaxis()->GetXmin(), fitHisto->GetYaxis()->GetXmin() );
+    caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );						
+
+    if(useStartValues) SetStartValuesDoubleGaussian(histoNr);         //Can only be done after that doubleGaussianFit is initialized!
+
+    hlist = new TH1D*[npar];
+    TObjArray aSlices;
+    if(useROOTClass){
+	fitHisto->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
+	for(int ipar = 0; ipar <= npar; ipar++) hlist[ipar] = (TH1D*) aSlices[ipar];
+    }
+    else
+	FitSliceClassCode(fitHisto, npar, parnames);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    for( int ipar = 0; ipar < npar; ipar++ ){
+
+	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
+	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
+	hlist[ipar]->Fit(caloEnergyFit);
+	hlist[ipar]->Write();            
+    }
+    hlist[npar]->Write();
+						
+    delete caloEnergyFit, doubleGaussianFit;
+    delete [] hlist;
 }
 
 void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool useROOTClass, bool useStartValues){
