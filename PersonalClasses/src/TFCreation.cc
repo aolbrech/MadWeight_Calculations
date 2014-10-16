@@ -1,5 +1,22 @@
 #include "../interface/TFCreation.h"
 
+TFCreation::TFCreation(){
+    ///////////////////////////////////////
+    //  Declare the used fit functions!  //
+    ///////////////////////////////////////
+    //
+    // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
+    doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[5]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");       
+
+    //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
+    caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
+
+}
+
+TFCreation::~TFCreation(){
+    delete caloEnergyFit, doubleGaussianFit;
+}
+
 void TFCreation::InitializeVariables(){
         histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,1);
         histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,1);
@@ -181,32 +198,27 @@ void TFCreation::FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* had
 	}
 }
 
-void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, TFile* file){
+void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], TFile* file){
 
     TDirectory* histoFitDir = file->mkdir(fitHisto->GetName());
     histoFitDir->cd();
 
-    ///////////////////////////////////////
-    //  Declare the used fit functions!  //
-    ///////////////////////////////////////
-    //
-    // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
-    doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[5]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");       
+    //Set parameter names
     const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
     const int npar = doubleGaussianFit->GetNpar();
-
-    //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
-    caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
-
     for(int ii = 0; ii < npar; ii++){
         doubleGaussianFit->SetParName(ii,parnames[ii]);
-	if(ii <= 3) caloEnergyFit->SetParName(ii, ( string(parnames[ii])+tostr(ii)).c_str() );
     }
+
+    //Set range of fits
     doubleGaussianFit->SetRange( fitHisto->GetYaxis()->GetXmin(), fitHisto->GetYaxis()->GetXmin() );
     caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );						
 
-    if(useStartValues) SetStartValuesDoubleGaussian(histoNr);         //Can only be done after that doubleGaussianFit is initialized!
+    //Initialize the start values if asked
+    startValuesArray = startValues;
+    if(useStartValues) SetStartValuesDoubleGaussian(histoNr, useStartArray);         //Can only be done after that doubleGaussianFit is initialized!
 
+    //Choose the correct fit method:
     hlist = new TH1D*[npar];
     TObjArray aSlices;
     if(useROOTClass){
@@ -221,6 +233,8 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
     //////////////////////////////////////////////////////////////////////////////////////////////
     for( int ipar = 0; ipar < npar; ipar++ ){
 
+        for(int ii = 0; ii < 3; ii++)
+    	    caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 	hlist[ipar]->Fit(caloEnergyFit);
@@ -228,7 +242,6 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
     }
     hlist[npar]->Write();
 						
-    delete caloEnergyFit, doubleGaussianFit;
     delete [] hlist;
 }
 
@@ -239,28 +252,20 @@ void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool us
 	if(drawHistos == true) WritePlots(file);
 	if(writeTF == true) WriteTF(file);
 	if(doFits == true){
-  	  ///////////////////////////////////////
-	  //  Declare the used fit functions!  //
-	  ///////////////////////////////////////
-	  //
-	  // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
-	  doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[5]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");	
-	  //give names to the parameters
+
+	  //Set parameter names
 	  const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
 	  const int npar = doubleGaussianFit->GetNpar();
-
-	  for(int ii = 0; ii < npar; ii++)
+	  for(int ii = 0; ii < npar; ii++){
 	    doubleGaussianFit->SetParName(ii,parnames[ii]);
-
-	  //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
-	  caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");	
+            if(ii <= 3) caloEnergyFit->SetParName(ii, ( string(parnames[ii])+tostr(ii)).c_str() );
+          }
 
 	  ///////////////////////////////////////////
 	  //  Choose the correct histogram to fit  //
 	  ///////////////////////////////////////////
           TH2F* histoForFit;
 	  for (unsigned int f=0; f<12;f++) {				
-	    //if(f==2 || f==6 || f==10) continue; //electron plots not filled at the moment...
 				
 	    switch(f){
 	      case 0:
@@ -294,7 +299,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool us
  
 	    hlist = new TH1D*[npar];
 	    if(useStartValues)
-		SetStartValuesDoubleGaussian(f);
+		SetStartValuesDoubleGaussian(f, false);   //false means that normal start values are being used!
 
 	    doubleGaussianFit->SetRange( histoForFit->GetYaxis()->GetXmin(), histoForFit->GetYaxis()->GetXmin() );
 	    TObjArray aSlices;
@@ -327,7 +332,6 @@ void TFCreation::CalculateTF(bool drawHistos, bool writeTF, bool doFits, bool us
 	    hlist[npar]->Write();
 						
 	  }//Loop over f						
-	  delete caloEnergyFit, doubleGaussianFit;
 	  delete histoForFit;
 	  delete [] hlist;
 	}                               //Boolean doFits = true
@@ -388,11 +392,16 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 	}//loop over bins!
 }	
 
-void TFCreation::SetStartValuesDoubleGaussian(int whichHisto){
+void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray){
 
+    if(useStartArray == true){
+        for(int ii = 0; ii < 6; ii++)
+            doubleGaussianFit->SetParameter(ii, startValuesArray[ii]);
+    }
+    else{
 	if(whichHisto==0 || whichHisto==1 || whichHisto == 2){ // for E transfer function of JETS (and elec -- added as test ...)
-	    float StartValues[] = {-8,18,63,0,8.6,4.1};      //First three values are for the first broad gaussian (central, sigma and constant value respectively)
-							     //Second three values are the same for the second narrow gaussian
+	    float StartValues[] = {-8,18,63,0,8.6,4.1};        //First three values are for the first broad gaussian (central, sigma and constant value respectively)
+							       //Second three values are the same for the second narrow gaussian
 	    for(int ii = 0; ii < 6; ii++)
 		doubleGaussianFit->SetParameter(ii,StartValues[ii]);
 	}
@@ -411,6 +420,7 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto){
             for(int ii = 0; ii < 6; ii++)
                 doubleGaussianFit->SetParameter(ii, StartValues[ii]);
 	}
+    }
 } 
 
 void TFCreation::WriteTF(TFile* plotsFile){
