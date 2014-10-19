@@ -4,7 +4,7 @@
 #include<fstream>
 #include <sstream>
 
-void LHCOOutput::LHCOEventOutput(int LHCOIndex, ofstream &outputFile, unsigned int EventNumber, std::vector<TRootMCParticle*> vector, std::vector<int> MGId){
+void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TRootMCParticle*> vector, std::vector<int> MGId){
 
   if(LHCOIndex == 0 || LHCOIndex == 2)
     LeptonCharge =1;
@@ -37,7 +37,7 @@ void LHCOOutput::LHCOEventOutput(int LHCOIndex, ofstream &outputFile, unsigned i
   }
 }
 
-void LHCOOutput::LHCOEventRecoOutput(int LHCOIndex, ofstream &outputFile, unsigned int EventNumber, std::vector<TLorentzVector*> vector, std::vector<int> MGId){
+void LHCOOutput::LHCOEventRecoOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TLorentzVector*> vector, std::vector<int> MGId){
 
   if(LHCOIndex == 0 || LHCOIndex == 2)
     LeptonCharge =1;

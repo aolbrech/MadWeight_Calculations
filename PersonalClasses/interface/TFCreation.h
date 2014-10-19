@@ -15,8 +15,11 @@
 
 #include <fstream>
 #include <sstream>
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootJet.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootMCParticle.h"
 
 using namespace std;
+using namespace TopTree;
 
 class TFCreation{
 
@@ -29,7 +32,7 @@ class TFCreation{
         void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], TFile*);
 	void FitSliceClassCode(TH2F*, int, const char*[]);
 	void SetStartValuesDoubleGaussian(int, bool);
-	void WriteTF(TH2F*, ofstream &output, ofstream &card, TFile*);
+	void WriteTF(TH2F*, ostream &output, ostream &card, TFile*);
 	void WritePlots(TFile*);
 
     private:

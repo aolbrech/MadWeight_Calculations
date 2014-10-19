@@ -1,11 +1,12 @@
 #include "../interface/BTagStudy.h"
 
-//BTagStudy::BTagStudy(){
-//}
+BTagStudy::BTagStudy(){
+    BTagStudy::InitializeBegin();
+}
 
-//BTagStudy::~BTagStudy(){
+BTagStudy::~BTagStudy(){
 
-//}
+}
 
 void BTagStudy::InitializeBegin(){
 
@@ -45,7 +46,7 @@ void BTagStudy::InitializePerEvent(){
 
 void BTagStudy::CalculateJets(vector<TRootJet*> Jets, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr){
 
-     for(int ii = 0; ii<Jets.size();ii++){
+     for(unsigned int ii = 0; ii<Jets.size();ii++){
         if(Jets[ii]->btag_combinedSecondaryVertexBJetTags() >= BTagWorkingPoint){
           bTaggedJetNr[OptionNr].push_back(ii);
         }
@@ -156,7 +157,7 @@ void BTagStudy::CorrectJetCombi5Jets(int BHadrIndex, int BLeptIndex, int Quark1I
      }
 }
 
-void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest){
+void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, int NrOptionsConsidered, ostream &output, int OptionOfInterest){
 	
     //Values of WhichJets are the following:
 	// 0 = all 4 jets matched and compared

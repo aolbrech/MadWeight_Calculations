@@ -4,20 +4,21 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
-#include <fstream>
-#include <sstream>
 #include "TH1.h"
 #include "TFile.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootJet.h"
 
-//using namespace std;
+using namespace std;
+using namespace TopTree;
 
 class MlbStudy{
 
   public:
-   //MLbStudy();
-   //~MlbStudy();
+   MlbStudy();
+   ~MlbStudy();
 
    void calculateChiSquared(vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, TLorentzVector* lepton, vector<TRootJet*> Jets, float MassMlb, float SigmaMlb, float MassMqqb, float SigmaMqqb);
    void getIndices(int LowestChiSqIndex);

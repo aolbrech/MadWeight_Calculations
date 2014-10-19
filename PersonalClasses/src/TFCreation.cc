@@ -13,7 +13,8 @@ TFCreation::TFCreation(){
 }
 
 TFCreation::~TFCreation(){
-    delete caloEnergyFit, doubleGaussianFit;
+    delete caloEnergyFit;
+    delete doubleGaussianFit;
 }
 
 void TFCreation::InitializeVariables(){
@@ -117,7 +118,6 @@ void TFCreation::FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* had
 	histo2D["Light_RecoPhiVsGenPhi"]->Fill(    hadrWJet2->Phi(),  selHadrWJet2->Phi()   );
 	histo2D["Light_RecoPhiVsGenPt"]->Fill(     hadrWJet2->Pt(),   selHadrWJet2->Phi()   );
 
-	float DeltaPhi_nonbjet2 = ROOT::Math::VectorUtil::DeltaPhi((TLorentzVector)*hadrWJet2,(TLorentzVector)*selHadrWJet2);
 	histo2D["Light_DiffPtVsGenPt"]->Fill(      hadrWJet2->Pt(),   hadrWJet2->Pt()    - selHadrWJet2->Pt()    );
 	histo2D["Light_DiffThetaVsGenTheta"]->Fill(hadrWJet2->Theta(),hadrWJet2->Theta() - selHadrWJet2->Theta() );
 	histo2D["Light_DiffThetaVsGenPt"]->Fill(   hadrWJet2->Pt(),   hadrWJet2->Theta() - selHadrWJet2->Theta() );
@@ -132,7 +132,6 @@ void TFCreation::FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* had
 	histo2D["BJet_RecoPhiVsGenPhi"]->Fill(    hadrBJet->Phi(),   selHadrBJet->Phi());
 	histo2D["BJet_RecoPhiVsGenPt"]->Fill(     hadrBJet->Pt(),    selHadrBJet->Phi());
 
-	float DeltaPhi_bjet1 = ROOT::Math::VectorUtil::DeltaPhi((TLorentzVector)*hadrBJet,(TLorentzVector)*selLeptBJet);				
 	histo2D["BJet_DiffPtVsGenPt"]->Fill(      hadrBJet->Pt(),   hadrBJet->Pt()    - selHadrBJet->Pt()    );
 	histo2D["BJet_DiffThetaVsGenTheta"]->Fill(hadrBJet->Theta(),hadrBJet->Theta() - selHadrBJet->Theta() );
 	histo2D["BJet_DiffThetaVsGenPt"]->Fill(   hadrBJet->Pt(),   hadrBJet->Theta() - selHadrBJet->Theta() );
@@ -256,7 +255,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 	  ///////////////////////////////////////////
 	  //  Choose the correct histogram to fit  //
 	  ///////////////////////////////////////////
-          TH2F* histoForFit;
+          TH2F* histoForFit = new TH2F();
 	  for (unsigned int f=0; f<12;f++) {				
 				
 	    switch(f){
@@ -327,7 +326,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 	file->Close();
 }
 
-void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parnames[]){
+void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[]){
 	//------------------------------------------------------------------------------------------//
 	// Main difference with the Root class FitSlicesY() is the plotting of histograms !        
 	// In the Root class the distribution of each hlist histogram is not given!
@@ -336,25 +335,24 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 	// Other difference between the two codes have been removed!
 	// Originally the treatment of the overflow bin was different, but is now made similar!
 	//Create one histogram for each function parameter -> 6 histograms for each 2D plot
-	const TArrayD *bins = histoForFit->GetXaxis()->GetXbins();
 	for(int ipar=0 ; ipar < npar; ipar++){
 
-	    hlist[ipar] = new TH1D( (string(histoForFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoForFit->GetName())+" : Fitted value of "+parnames[ipar]).c_str(), histoForFit->GetXaxis()->GetNbins(), histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax());
-	    hlist[ipar]->GetXaxis()->SetTitle(histoForFit->GetXaxis()->GetTitle());
+	    hlist[ipar] = new TH1D( (string(histoFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoFit->GetName())+" : Fitted value of "+parnames[ipar]).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax());
+	    hlist[ipar]->GetXaxis()->SetTitle(histoFit->GetXaxis()->GetTitle());
 	}
-	hlist[npar] = new TH1D( (string(histoForFit->GetName())+"_chi2").c_str(), (string(histoForFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoForFit->GetXaxis()->GetNbins(), histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax() );
+	hlist[npar] = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
 
 	//Loop on all bins in X, generate a projection along Y and fit each bin separately!
 	int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
-	int nbins = histoForFit->GetXaxis()->GetNbins();
-	cout << "\n ** Looking at histogram : " << histoForFit->GetName() << "                               ******************************* " << endl;
+	int nbins = histoFit->GetXaxis()->GetNbins();
+	cout << "\n ** Looking at histogram : " << histoFit->GetName() << "                               ******************************* " << endl;
 	for(int bin=1;bin <= nbins+1;bin ++) {
 	    cout << "   --  Looking at bin : " << bin << endl;
-	    string projection_title = string(histoForFit->GetName())+"_sliceYbin"+tostr(bin);
+	    string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
 
-	    TH1D *hp = histoForFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
-	    //if(bin==nbins) hp = histoForFit->ProjectionY(projection_title.c_str(),bin,bin+1,"e"); //include overflow in last bin
-	    //if(bin==1) hp = histoForFit->ProjectionY(projection_title.c_str(),bin-1,bin,"e"); //include underflow in first bin
+	    TH1D *hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
+	    //if(bin==nbins) hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin+1,"e"); //include overflow in last bin
+	    //if(bin==1) hp = histoFit->ProjectionY(projection_title.c_str(),bin-1,bin,"e"); //include underflow in first bin
 
 	    //Histogram doesn't have any memory space ...
 	    if(hp == 0) continue;
@@ -369,12 +367,12 @@ void TFCreation::FitSliceClassCode(TH2F* histoForFit, int npar, const char* parn
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
-		    hlist[ipar]->Fill(histoForFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
+		    hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
                     hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
 
 	        }
 		//Save hchi2 histogram as extra hlist!
-	        hlist[npar]->Fill(histoForFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-npar));
+	        hlist[npar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-npar));
 	    }
 	    hp->Write();
 	    delete hp;
@@ -412,9 +410,9 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(TH2F* fitHisto, ofstream &myTFs, ofstream &myTFCard, TFile* file){
+void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard, TFile* file){
 
-    const int NrConsideredPlots = 9, NrConsideredPars = 6, NrConsideredCaloPars = 3;
+    const int NrConsideredPars = 6, NrConsideredCaloPars = 3;
     string ParamName[NrConsideredPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
 
     for(int ipar = 0; ipar < NrConsideredPars; ipar++){

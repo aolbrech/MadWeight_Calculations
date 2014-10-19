@@ -26,17 +26,13 @@
 #include "PersonalClasses/Style.C"                                                 //CHECK if this works!
 #include "TopTreeAnalysisBase/MCInformation/interface/LumiReWeighting.h"
 #include "TopTreeAnalysisBase/Tools/interface/LeptonTools.h"
+#include "TLorentzVector.h"
 
 //Specific code for anomalous couplings analysis:
-#include "TopTreeAnalysis/AnomCouplings/interface/LHCOOutput.h"
-#include "TopTreeAnalysis/AnomCouplings/src/LHCOOutput.cc"
-#include "TopTreeAnalysis/AnomCouplings/interface/BTagStudy.h"
-#include "TopTreeAnalysis/AnomCouplings/src/BTagStudy.cc"       //--> Need to fix the makefile (don't include .cc files ...)
-#include "TopTreeAnalysis/AnomCouplings/src/MlbStudy.cc"
-#include "TopTreeAnalysis/AnomCouplings/interface/MlbStudy.h"
-#include "TopTreeAnalysis/AnomCouplings/interface/TFCreation.h"
-#include "TopTreeAnalysis/AnomCouplings/src/TFCreation.cc"
-#include "TLorentzVector.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/MlbStudy.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
 
 using namespace std;
 using namespace reweight;
@@ -508,11 +504,9 @@ int main (int argc, char *argv[])
     //  Used classes   //
     /////////////////////  
     BTagStudy bTagStudy;  //--> Should only be called before the event loop (otherwise the counters will not give the correct result)
-    bTagStudy.InitializeBegin();
     MlbStudy mlbStudy;
-    mlbStudy.initializeBegin();
     TFCreation tfCreation;
-    tfCreation.InitializeVariables();
+    tfCreation.InitializeVariables();       //Should be called since constructor should work for both analyzers!
 
     ////////////////////////////////////
     //	loop on events

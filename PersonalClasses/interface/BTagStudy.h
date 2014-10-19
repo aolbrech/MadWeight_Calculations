@@ -6,23 +6,23 @@
 #include <iostream>
 #include <math.h>
 
-#include <fstream>
-#include <sstream>
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootJet.h"
 
-//using namespace std;
+using namespace std;
+using namespace TopTree;
 
 class BTagStudy{
 
   public:
-   //BTagStudy();
-   //~BTagStudy();
+   BTagStudy();
+   ~BTagStudy();
 
    void InitializePerEvent();
    void InitializeBegin();
    void CalculateJets(vector<TRootJet*>, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr);
    void CorrectJetCombi(int, int, int, int, int);
    void CorrectJetCombi5Jets(int, int, int, int, int);
-   void ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, int NrOptionsConsidered, ofstream &output, int OptionOfInterest);//Automatically writes everything out into a .tex file!
+   void ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, int NrOptionsConsidered, ostream &output, int OptionOfInterest);//Automatically writes everything out into a .tex file!
 
    vector<int> bTaggedJetNr[6];
    vector<int> NonbTaggedJetNr[6];

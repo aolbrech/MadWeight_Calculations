@@ -1,11 +1,35 @@
 //user code
-#include "TopTreeAnalysisBase/Tools/interface/AnalysisEnvironmentLoader.h"   //Needed to load TRootMCParticle & TRootJet, which is used in TFCreation.h
+//#include "TopTreeAnalysisBase/Tools/interface/AnalysisEnvironmentLoader.h"   //Needed to load TRootMCParticle & TRootJet, which is used in TFCreation.h
+#include "TFile.h"
+#include "TH2.h"
+#include <iostream>
+#include <fstream>
+
+#include "TROOT.h"
+#include "TH1F.h"
+#include "TFile.h"
+#include "TStyle.h"
+#include "TF2.h"
+#include "TGraphErrors.h"
+#include "TGraphAsymmErrors.h"
+#include "TBranch.h"
+#include "TTree.h"
+#include "TClonesArray.h"
+#include "TDirectory.h"
+
+//#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysisBase/Tools/interface/PlottingTools.h"
+//#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysisBase/Tools/interface/MultiSamplePlot.h"
+//#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysisBase/Tools/interface/LeptonTools.h"
+//#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysisBase/Content/interface/Dataset.h"
+//#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysisBase/MCInformation/interface/LumiReWeighting.h"
+//#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeAnalysisBase/MCInformation/interface/ResolutionFit.h"
 
 //Specific code for anomalous couplings analysis:
-#include "TopTreeAnalysis/AnomCouplings/interface/TFCreation.h"
-#include "TopTreeAnalysis/AnomCouplings/src/TFCreation.cc"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFTree.h"
 
 using namespace std;
+//using namespace TopTree;
 
 int main ()
 {
@@ -18,6 +42,12 @@ int main ()
   
     //Used classes
     TFCreation tfCreation;
+
+    enum PartType_t {light_jets,b_jets,muons,electrons};  //Will right out the integer belonging to this particleType
+    PartType_t partTypeTree;
+    partTypeTree = b_jets;
+    std::cout << " Value of partTypeTree enumerator : " << partTypeTree << endl;
+    std::cout << " Test of output! " << std::endl;
 
     /////////////////////////////
     //  Define all variables!  //

@@ -1,11 +1,12 @@
 #include "../interface/MlbStudy.h"
 
-//MlbStudy::MlbStudy(){
-//}
+MlbStudy::MlbStudy(){
+    MlbStudy::initializeBegin();
+}
 
-//MlbStudy::~MlbStudy(){
+MlbStudy::~MlbStudy(){
 
-//}
+}
 
 void MlbStudy::initializePerEvent(){
  
@@ -235,6 +236,8 @@ void MlbStudy::calculateEfficiency(int option, vector<int> CorrectValues, vector
   }//End of loop over events with at least two b-tagged jets and two light jets
 }
 
+typedef basic_ofstream<char> ofstream;
+
 void MlbStudy::saveNumbers(std::string NameOfOption[6], int LookAtBJets, int NrOptionsConsidered, int ChosenOption, std::string StrForChiSqCutValue){
 
    //Initialize and define the output files:
@@ -282,11 +285,11 @@ void MlbStudy::saveNumbers(std::string NameOfOption[6], int LookAtBJets, int NrO
          int CorrectOnes[2] = {CorrectEventChosen[ii],    CorrectBOptionChosen[ii] };
          int WrongOnes[2]   = {WrongEventChosen[ii],      WrongBOptionChosen[ii]};
          int LastOnes[2]    = {NumberNotMatchedEvents[ii],CorrectOptionAvailable[ii]}; 
-         int ThirdJetChosen[2] = {ThirdQuarkChosen[ii], 0};
-         int ThirdJetCorrectChosen[2] = {ThirdQuarkCorrectChosen[ii], 0};
-         int ThirdJetShouldBeChosen[2] = {ThirdQuarkShouldBeChosen[ii], 0};
-         float TimesThirdJetIsACorrectJet[2] = {((float)CorrectLightJetsWithThirdChosen[ii]*100.0/(float)CorrectLightJetsChosen[ii]), 0};
-         float TimesThirdJetIsChosenANDCorrect[2] = {((float)ThirdQuarkCorrectChosen[ii]*100.0/(float)ThirdQuarkChosen[ii]), 0};
+         //int ThirdJetChosen[2] = {ThirdQuarkChosen[ii], 0};
+         //int ThirdJetCorrectChosen[2] = {ThirdQuarkCorrectChosen[ii], 0};
+         //int ThirdJetShouldBeChosen[2] = {ThirdQuarkShouldBeChosen[ii], 0};
+         //float TimesThirdJetIsACorrectJet[2] = {((float)CorrectLightJetsWithThirdChosen[ii]*100.0/(float)CorrectLightJetsChosen[ii]), 0};
+         //float TimesThirdJetIsChosenANDCorrect[2] = {((float)ThirdQuarkCorrectChosen[ii]*100.0/(float)ThirdQuarkChosen[ii]), 0};
          float MatchingSOverB[2]      = {(float)(CorrectOptionAvailable[ii]*100.0)/(float)(CorrectMatchingNotExisting[ii]+NumberNotMatchedEvents[ii]),0};
          float MatchingExactSOverB[2] = {(float)(CorrectEventChosen[ii]*100.0)/(float)(WrongEventChosen[ii]+NumberNotMatchedEvents[ii])              ,0};
          float SqrtSInverse[2]        = {1/(float)(sqrt(CorrectOptionAvailable[ii]))                                                                 ,0};
