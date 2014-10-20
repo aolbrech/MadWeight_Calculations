@@ -18,12 +18,12 @@ TFCreation::~TFCreation(){
 }
 
 void TFCreation::InitializeVariables(){
-    histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,1);
-    histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,1);
-    histo1D["DeltaR_TFClass_HadrB"]  = new TH1F("DeltaR_TFClass_HadrB","DeltaR_TFClass_HadrB",200,0,1);
-    histo1D["DeltaR_TFClass_LeptB"]  = new TH1F("DeltaR_TFClass_LeptB","DeltaR_TFClass_LeptB",200,0,1);
-    histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,1);
-    histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,1);
+    histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,0.4);
+    histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,0.4);
+    histo1D["DeltaR_TFClass_HadrB"]  = new TH1F("DeltaR_TFClass_HadrB","DeltaR_TFClass_HadrB",200,0,0.4);
+    histo1D["DeltaR_TFClass_LeptB"]  = new TH1F("DeltaR_TFClass_LeptB","DeltaR_TFClass_LeptB",200,0,0.4);
+    histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,0.4);
+    histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,0.4);
 
     histo2D["Light_GenPtVsRecoPt"]         = new TH2F("Light_GenPtVsRecoPt",       "Transverse momentum of light quarks (gen vs reco)",                         150,     0,  300, 150,      0,  300);
     histo2D["Light_DiffPtVsRecoPt"]        = new TH2F("Light_DiffPtVsRecoPt",      "p_{T} difference (gen-reco) versus p_{T,reco} for light quarks",             10,    25,  180,  80,    -40,   40);
@@ -91,12 +91,12 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     // --> Both concepts are identical in the case of CaloJets, but not in the case of PF
     // --> PF uses massive objects to construct particles!
 
-    histo1D["DeltaR_TFClass_Light1"]->Fill( hadrWJet1->DeltaR(selHadrWJet1) );
-    histo1D["DeltaR_TFClass_Light2"]->Fill( hadrWJet2->DeltaR(selHadrWJet2) );
-    histo1D["DeltaR_TFClass_HadrB"]->Fill( hadrBJet->DeltaR(selHadrBJet) );
-    histo1D["DeltaR_TFClass_LeptB"]->Fill( leptBJet->DeltaR(selLeptBJet) );
-    if(isSemiMu) histo1D["DeltaR_TFClass_Mu"]->Fill( lepton->DeltaR(selLepton) );
-    if(isSemiEl) histo1D["DeltaR_TFClass_El"]->Fill( lepton->DeltaR(selLepton) );
+    histo1D["DeltaR_TFClass_Light1"]->Fill( hadrWJet1->DeltaR(*selHadrWJet1) );
+    histo1D["DeltaR_TFClass_Light2"]->Fill( hadrWJet2->DeltaR(*selHadrWJet2) );
+    histo1D["DeltaR_TFClass_HadrB"]->Fill( hadrBJet->DeltaR(*selHadrBJet) );
+    histo1D["DeltaR_TFClass_LeptB"]->Fill( leptBJet->DeltaR(*selLeptBJet) );
+    if(isSemiMu) histo1D["DeltaR_TFClass_Mu"]->Fill( lepton->DeltaR(*selLepton) );
+    if(isSemiEl) histo1D["DeltaR_TFClass_El"]->Fill( lepton->DeltaR(*selLepton) );
 	
     histo2D["Light_GenPtVsRecoPt"]->Fill(      selHadrWJet1->Pt(),   hadrWJet1->Pt()    );
     histo2D["Light_GenThetaVsRecoTheta"]->Fill(selHadrWJet1->Theta(),hadrWJet1->Theta() );
@@ -104,13 +104,13 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["Light_GenPhiVsRecoPhi"]->Fill(    selHadrWJet1->Phi(),  hadrWJet1->Phi()   );
     histo2D["Light_GenPhiVsRecoPt"]->Fill(     selHadrWJet1->Pt(),   hadrWJet1->Phi()   );
 
-    histo2D["Light_DiffPtVsRecoPt"]->Fill(      selHadrWJet1->Pt(),   (hadrWJet1 - selHadrWJet1)->Pt()    );
-    histo2D["Light_DiffThetaVsRecoTheta"]->Fill(selHadrWJet1->Theta(),(hadrWJet1 - selHadrWJet1)->Theta() );
-    histo2D["Light_DiffThetaVsRecoPt"]->Fill(   selHadrWJet1->Pt(),   (hadrWJet1 - selHadrWJet1)->Theta() );
-    histo2D["Light_DiffPhiVsRecoPhi"]->Fill(    selHadrWJet1->Phi(),  hadrWJet1->DeltaPhi(selHadrWJet1) );
-    histo2D["Light_DiffPhiVsRecoPhi_All"]->Fill(selHadrWJet1->Phi(),  hadrWJet1->DeltaPhi(selHadrWJet1) );
-    histo2D["Light_DiffPhiVsRecoPt"]->Fill(     selHadrWJet1->Pt(),   hadrWJet1->DeltaPhi(selHadrWJet1) );
-    histo2D["Light_DiffPhiVsRecoPt_All"]->Fill( selHadrWJet1->Pt(),   hadrWJet1->DeltaPhi(selHadrWJet1) );
+    histo2D["Light_DiffPtVsRecoPt"]->Fill(      selHadrWJet1->Pt(),   hadrWJet1->Pt() - selHadrWJet1->Pt()    );
+    histo2D["Light_DiffThetaVsRecoTheta"]->Fill(selHadrWJet1->Theta(),hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffThetaVsRecoPt"]->Fill(   selHadrWJet1->Pt(),   hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffPhiVsRecoPhi"]->Fill(    selHadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1) );
+    histo2D["Light_DiffPhiVsRecoPhi_All"]->Fill(selHadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1) );
+    histo2D["Light_DiffPhiVsRecoPt"]->Fill(     selHadrWJet1->Pt(),   hadrWJet1->DeltaPhi(*selHadrWJet1) );
+    histo2D["Light_DiffPhiVsRecoPt_All"]->Fill( selHadrWJet1->Pt(),   hadrWJet1->DeltaPhi(*selHadrWJet1) );
 
     histo2D["Light_GenPtVsRecoPt"]->Fill(      selHadrWJet2->Pt(),   hadrWJet2->Pt()    );
     histo2D["Light_GenThetaVsRecoTheta"]->Fill(selHadrWJet2->Theta(),hadrWJet2->Theta() );
@@ -118,13 +118,13 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["Light_GenPhiVsRecoPhi"]->Fill(    selHadrWJet2->Phi(),  hadrWJet2->Phi()   );
     histo2D["Light_GenPhiVsRecoPt"]->Fill(     selHadrWJet2->Pt(),   hadrWJet2->Phi()   );
 
-    histo2D["Light_DiffPtVsRecoPt"]->Fill(      selHadrWJet2->Pt(),   (hadrWJet2 - selHadrWJet2)->Pt()    );
-    histo2D["Light_DiffThetaVsRecoTheta"]->Fill(selHadrWJet2->Theta(),(hadrWJet2 - selHadrWJet2)->Theta() );
-    histo2D["Light_DiffThetaVsRecoPt"]->Fill(   selHadrWJet2->Pt(),   (hadrWJet2 - selHadrWJet2)->Theta() );
-    histo2D["Light_DiffPhiVsRecoPhi"]->Fill(    selHadrWJet2->Phi(),  hadrWJet2->DeltaPhi(selHadrWJet2)   );
-    histo2D["Light_DiffPhiVsRecoPhi_All"]->Fill(selHadrWJet2->Phi(),  hadrWJet2->DeltaPhi(selHadrWJet2)   );
-    histo2D["Light_DiffPhiVsRecoPt"]->Fill(     selHadrWJet2->Pt(),   hadrWJet2-Delta>Phi(selHadrWJet2)   );
-    histo2D["Light_DiffPhiVsRecoPt_All"]->Fill( selHadrWJet2->Pt(),   hadrWJet2-Delta>Phi(selHadrWJet2)   );
+    histo2D["Light_DiffPtVsRecoPt"]->Fill(      selHadrWJet2->Pt(),   hadrWJet2->Pt() - selHadrWJet2->Pt()    );
+    histo2D["Light_DiffThetaVsRecoTheta"]->Fill(selHadrWJet2->Theta(),hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffThetaVsRecoPt"]->Fill(   selHadrWJet2->Pt(),   hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffPhiVsRecoPhi"]->Fill(    selHadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsRecoPhi_All"]->Fill(selHadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsRecoPt"]->Fill(     selHadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsRecoPt_All"]->Fill( selHadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
 
     histo2D["BJet_GenPtVsRecoPt"]->Fill(      selHadrBJet->Pt(),    hadrBJet->Pt()    );
     histo2D["BJet_GenThetaVsRecoTheta"]->Fill(selHadrBJet->Theta(), hadrBJet->Theta() );
@@ -132,13 +132,13 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["BJet_GenPhiVsRecoPhi"]->Fill(    selHadrBJet->Phi(),   hadrBJet->Phi());
     histo2D["BJet_GenPhiVsRecoPt"]->Fill(     selHadrBJet->Pt(),    hadrBJet->Phi());
 
-    histo2D["BJet_DiffPtVsRecoPt"]->Fill(      selHadrBJet->Pt(),   (hadrBJet - selHadrBJet)->Pt()    );
-    histo2D["BJet_DiffThetaVsRecoTheta"]->Fill(selHadrBJet->Theta(),(hadrBJet - selHadrBJet)->Theta() );
-    histo2D["BJet_DiffThetaVsRecoPt"]->Fill(   selHadrBJet->Pt(),   (hadrBJet - selHadrBJet)->Theta() );
-    histo2D["BJet_DiffPhiVsRecoPhi"]->Fill(    selHadrBJet->Phi(),  hadrBJet->DeltaPhi(selHadrBJet)   );
-    histo2D["BJet_DiffPhiVsRecoPhi_All"]->Fill(selHadrBJet->Phi(),  hadrBJet->DeltaPhi(selHadrBJet)   );
-    histo2D["BJet_DiffPhiVsRecoPt"]->Fill(     selHadrBJet->Pt(),   hadrBJet->DeltaPhi(selHadrBJet)   );
-    histo2D["BJet_DiffPhiVsRecoPt_All"]->Fill( selHadrBJet->Pt(),   hadrBJet->DeltaPhi(selHadrBJet)   );
+    histo2D["BJet_DiffPtVsRecoPt"]->Fill(      selHadrBJet->Pt(),   hadrBJet->Pt() - selHadrBJet->Pt()    );
+    histo2D["BJet_DiffThetaVsRecoTheta"]->Fill(selHadrBJet->Theta(),hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffThetaVsRecoPt"]->Fill(   selHadrBJet->Pt(),   hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffPhiVsRecoPhi"]->Fill(    selHadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsRecoPhi_All"]->Fill(selHadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsRecoPt"]->Fill(     selHadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsRecoPt_All"]->Fill( selHadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
 
     histo2D["BJet_GenPtVsRecoPt"]->Fill(      selLeptBJet->Pt(),    selLeptBJet->Pt()    );
     histo2D["BJet_GenThetaVsRecoTheta"]->Fill(selLeptBJet->Theta(), selLeptBJet->Theta() );
@@ -146,13 +146,13 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["BJet_GenPhiVsRecoPhi"]->Fill(    selLeptBJet->Phi(),   selLeptBJet->Phi()   );
     histo2D["BJet_GenPhiVsRecoPt"]->Fill(     selLeptBJet->Pt(),    selLeptBJet->Phi()   );
 
-    histo2D["BJet_DiffPtVsRecoPt"]->Fill(      selLeptBJet->Pt(),   (leptBJet - selLeptBJet)->Pt()    );
-    histo2D["BJet_DiffThetaVsRecoTheta"]->Fill(selLeptBJet->Theta(),(leptBJet - selLeptBJet)->Theta() );
-    histo2D["BJet_DiffThetaVsRecoPt"]->Fill(   selLeptBJet->Pt(),   (leptBJet - selLeptBJet)->Theta() );
-    histo2D["BJet_DiffPhiVsRecoPhi"]->Fill(    selLeptBJet->Phi(),  leptBJet->DeltaPhi(selLeptBJet)   );
-    histo2D["BJet_DiffPhiVsRecoPhi_All"]->Fill(selLeptBJet->Phi(),  leptBJet->DeltaPhi(selLeptBJet)   );
-    histo2D["BJet_DiffPhiVsRecoPt"]->Fill(     selLeptBJet->Pt(),   leptBJet->DeltaPhi(selLeptBJet)   );
-    histo2D["BJet_DiffPhiVsRecoPt_All"]->Fill( selLeptBJet->Pt(),   leptBJet->DeltaPhi(selLeptBJet)   );
+    histo2D["BJet_DiffPtVsRecoPt"]->Fill(      selLeptBJet->Pt(),   leptBJet->Pt() - selLeptBJet->Pt()    );
+    histo2D["BJet_DiffThetaVsRecoTheta"]->Fill(selLeptBJet->Theta(),leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffThetaVsRecoPt"]->Fill(   selLeptBJet->Pt(),   leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffPhiVsRecoPhi"]->Fill(    selLeptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsRecoPhi_All"]->Fill(selLeptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsRecoPt"]->Fill(     selLeptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsRecoPt_All"]->Fill( selLeptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
 
     if(isSemiEl){
         histo2D["El_GenPtVsRecoPt"]->Fill(      selLepton->Pt(),   lepton->Pt()    );
@@ -161,13 +161,13 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     	histo2D["El_GenPhiVsRecoPt"]->Fill(     selLepton->Pt(),   lepton->Phi()   );
 	histo2D["El_GenPhiVsRecoPhi"]->Fill(    selLepton->Phi(),  lepton->Phi()   );
 
-    	histo2D["El_DiffPtVsRecoPt"]->Fill(      selLepton->Pt(),   (lepton - selLepton)->Pt()    );
-    	histo2D["El_DiffThetaVsRecoTheta"]->Fill(selLepton->Theta(),(lepton - selLepton)->Theta() );
-    	histo2D["El_DiffThetaVsRecoPt"]->Fill(   selLepton->Pt(),   (lepton - selLepton)->Theta() );
-    	histo2D["El_DiffPhiVsRecoPhi"]->Fill(    selLepton->Phi(),  lepton->DeltaPhi(selLepton)   );
-    	histo2D["El_DiffPhiVsRecoPt"]->Fill(     selLepton->Pt(),   lepton->DeltaPhi(selLepton)   );
-    	histo2D["El_DiffPhiVsRecoPhi_All"]->Fill(selLepton->Phi(),  lepton->DeltaPhi(selLepton)   );
-    	histo2D["El_DiffPhiVsRecoPt_All"]->Fill( selLepton->Pt(),   lepton->DeltaPhi(selLepton)   );
+    	histo2D["El_DiffPtVsRecoPt"]->Fill(      selLepton->Pt(),   lepton->Pt() - selLepton->Pt()    );
+    	histo2D["El_DiffThetaVsRecoTheta"]->Fill(selLepton->Theta(),lepton->Theta() - selLepton->Theta() );
+    	histo2D["El_DiffThetaVsRecoPt"]->Fill(   selLepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+    	histo2D["El_DiffPhiVsRecoPhi"]->Fill(    selLepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+    	histo2D["El_DiffPhiVsRecoPt"]->Fill(     selLepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+    	histo2D["El_DiffPhiVsRecoPhi_All"]->Fill(selLepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+    	histo2D["El_DiffPhiVsRecoPt_All"]->Fill( selLepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
     }
     if(isSemiMu){
 	float InvPtgenMu = 1./lepton->Pt();
@@ -183,16 +183,16 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 
     	histo2D["Mu_DiffInvPtVsRecoInvPt"]->Fill(    InvPtrecMu,        InvPtgenMu - InvPtrecMu       );
     	histo2D["Mu_DiffInvPtVsRecoInvPt_All"]->Fill(InvPtrecMu,        InvPtgenMu - InvPtrecMu       );
-    	histo2D["Mu_DiffPtVsRecoPt"]->Fill(          selLepton->Pt(),   (lepton - selLepton->Pt()     );
-    	histo2D["Mu_DiffThetaVsRecoTheta"]->Fill(    selLepton->Theta(),(lepton - selLepton)->Theta() );
-    	histo2D["Mu_DiffThetaVsRecoInvPt"]->Fill(    InvPtrecMu,        (lepton - selLepton)->Theta() );
-    	histo2D["Mu_DiffThetaVsRecoPt"]->Fill(       selLepton->Pt(),   (lepton - selLepton)->Theta() );
-    	histo2D["Mu_DiffPhiVsRecoPhi"]->Fill(        selLepton->Phi(),  lepton->DeltaPhi(selLepton)   );
-    	histo2D["Mu_DiffPhiVsRecoPhi_All"]->Fill(    selLepton->Phi(),  lepton->DeltaPhi(selLepton)   );
-    	histo2D["Mu_DiffPhiVsRecoInvPt"]->Fill(      InvPtrecMu,        lepton->DeltaPhi(selLepton)   );
-    	histo2D["Mu_DiffPhiVsRecoInvPt_All"]->Fill(  InvPtrecMu,        lepton->DeltaPhi(selLepton)   );
-	histo2D["Mu_DiffPhiVsRecoPt"]->Fill(         selLepton->Pt(),   lepton->DeltaPhi(selLepton)   );
-	histo2D["Mu_DiffPhiVsRecoPt_All"]->Fill(     selLepton->Pt(),   lepton->DeltaPhi(selLepton)   );
+    	histo2D["Mu_DiffPtVsRecoPt"]->Fill(          selLepton->Pt(),   lepton->Pt() - selLepton->Pt()     );
+    	histo2D["Mu_DiffThetaVsRecoTheta"]->Fill(    selLepton->Theta(),lepton->Theta() - selLepton->Theta() );
+    	histo2D["Mu_DiffThetaVsRecoInvPt"]->Fill(    InvPtrecMu,        lepton->Theta() - selLepton->Theta() );
+    	histo2D["Mu_DiffThetaVsRecoPt"]->Fill(       selLepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+    	histo2D["Mu_DiffPhiVsRecoPhi"]->Fill(        selLepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+    	histo2D["Mu_DiffPhiVsRecoPhi_All"]->Fill(    selLepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+    	histo2D["Mu_DiffPhiVsRecoInvPt"]->Fill(      InvPtrecMu,        lepton->DeltaPhi(*selLepton)   );
+    	histo2D["Mu_DiffPhiVsRecoInvPt_All"]->Fill(  InvPtrecMu,        lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsRecoPt"]->Fill(         selLepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsRecoPt_All"]->Fill(     selLepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
     }
 }
 
