@@ -15,11 +15,9 @@
 
 #include <fstream>
 #include <sstream>
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootJet.h"
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootMCParticle.h"
 
 using namespace std;
-using namespace TopTree;
+//using namespace TopTree;
 
 class TFCreation{
 
@@ -27,7 +25,7 @@ class TFCreation{
         TFCreation();
         ~TFCreation();
 	void InitializeVariables();
-	void FillHistograms(TRootMCParticle* hadrWJet1, TRootMCParticle* hadrWJet2, TRootMCParticle* hadrBJet, TRootMCParticle* leptBJet, TRootMCParticle* lepton, TRootJet* selHadrWJet1, TRootJet* selHadrWJet2, TRootJet* selHadrBJet, TRootJet* selLeptBJet, TLorentzVector* selLepton, bool isSemiMu, bool isSemiEl);
+	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, bool isSemiMu, bool isSemiEl);
 	void CalculateTF(bool, bool, bool, bool);
         void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], TFile*);
 	void FitSliceClassCode(TH2F*, int, const char*[]);
