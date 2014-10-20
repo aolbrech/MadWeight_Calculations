@@ -33,6 +33,7 @@
 #include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
 #include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/MlbStudy.h"
 #include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
+#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 
 using namespace std;
 using namespace reweight;
@@ -255,17 +256,6 @@ int main (int argc, char *argv[])
   histo1D["MlbMass"]= new TH1F("MlbMass","MlbMass",200,0,300);
   histo1D["MqqbMass"]= new TH1F("MqqbMass","MqqbMass",400,0,500);
 
-  histo1D["DeltaR_Ana_Muon"] = new TH1F("DeltaR_Ana_Muon","DeltaR_Ana_Muon",200,0,1);
-  histo1D["DeltaR_Ana_Elec"] = new TH1F("DeltaR_Ana_Elec","DeltaR_Ana_Elec",200,0,1);
-  histo1D["DeltaR_Ana_Light1_mcPartMatch"] = new TH1F("DeltaR_Ana_Light1_mcPartMatch","DeltaR_Ana_Light1_mcPartMatch",200,0,1);
-  histo1D["DeltaR_Ana_Light1_mcPart"] = new TH1F("DeltaR_Ana_Light1_mcPart","DeltaR_Ana_Light1_mcPart",200,0,10);
-  histo1D["DeltaR_Ana_Light2_mcPartMatch"] = new TH1F("DeltaR_Ana_Light2_mcPartMatch","DeltaR_Ana_Light2_mcMatching",200,0,1);
-  histo1D["DeltaR_Ana_Light2_mcPart"] = new TH1F("DeltaR_Ana_Light2_mcPart","DeltaR_Ana_Light2_mcPart",200,0,10);
-  histo1D["DeltaR_Ana_BHadr_mcPartMatch"] = new TH1F("DeltaR_Ana_BHadr_mcPartMatch","DeltaR_Ana_BHadr_mcPartMatch",200,0,1);
-  histo1D["DeltaR_Ana_BHadr_mcPart"] = new TH1F("DeltaR_Ana_BHadr_mcPart","DeltaR_Ana_BHadr_mcPart",200,0,10);
-  histo1D["DeltaR_Ana_BLept_mcPartMatch"] = new TH1F("DeltaR_Ana_BLept_mcPartMatch","DeltaR_Ana_BLept_mcPartMatch",200,0,1);
-  histo1D["DeltaR_Ana_BLept_mcPart"] = new TH1F("DeltaR_Ana_BLept_mcPart","DeltaR_Ana_BLept_mcPart",200,0,10);
-
   histo1D["genPt_Muon"] = new TH1F("genPt_Muon","genPt_Muon",400,0,200);
   histo1D["recoPt_Muon"] = new TH1F("recoPt_Muon","recoPt_Muon",400,0,200);
   histo1D["genPt_Elec"] = new TH1F("genPt_Elec","genPt_Elec",400,0,200);
@@ -359,9 +349,9 @@ int main (int argc, char *argv[])
 
   LumiReWeighting LumiWeights, LumiWeightsUp, LumiWeightsDown;
 
-  LumiWeights = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClassesCalibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
+  LumiWeights = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
   LumiWeightsUp = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
-  LumiWeightsDown = LumiReWeighting("PersonalClassesCalibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
+  LumiWeightsDown = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
   cout << " Initialized LumiReWeighting stuff" << endl;
 
   // initialize lepton SF
@@ -507,6 +497,12 @@ int main (int argc, char *argv[])
     MlbStudy mlbStudy;
     TFCreation tfCreation;
     tfCreation.InitializeVariables();       //Should be called since constructor should work for both analyzers!
+    TFnTuple* tfNTuple = 0;
+
+    //Initialize TFnTuple specific stuff:
+    TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
+    TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
+    TFile* TFTreeFile = new TFile("TFInformation/TransferFunctionTree.root","RECREATE");
 
     ////////////////////////////////////
     //	loop on events
@@ -517,8 +513,8 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-      //for (unsigned int ievt = 0; ievt < 2000000; ievt++){
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    for (unsigned int ievt = 0; ievt < 8000; ievt++){
 
       if(ievt > 20000) GenLHCOOutput = false;	
 
@@ -1321,28 +1317,34 @@ int main (int argc, char *argv[])
 	    }
 	  }//End of calculate Resolutions
 	  if(CalculateTF){
-	    tfCreation.FillHistograms(&mcParticlesMatching[hadronicWJet1_.second], &mcParticlesMatching[hadronicWJet2_.second], &mcParticlesMatching[hadronicBJet_.second], &mcParticlesMatching[leptonicBJet_.second], Lepton, selectedJets[hadronicWJet1_.first], selectedJets[hadronicWJet2_.first], selectedJets[hadronicBJet_.first], selectedJets[leptonicBJet_.first], selectedLepton, eventselectedSemiMu, eventselectedSemiEl);
+	    tfCreation.FillHistograms( (TLorentzVector*) &mcParticlesMatching[hadronicWJet1_.second], (TLorentzVector*) &mcParticlesMatching[hadronicWJet2_.second], (TLorentzVector*) &mcParticlesMatching[hadronicBJet_.second], (TLorentzVector*) &mcParticlesMatching[leptonicBJet_.second], (TLorentzVector*) Lepton, (TLorentzVector*) selectedJets[hadronicWJet1_.first], (TLorentzVector*) selectedJets[hadronicWJet2_.first], (TLorentzVector*) selectedJets[hadronicBJet_.first], (TLorentzVector*) selectedJets[leptonicBJet_.first], (TLorentzVector*) selectedLepton, eventselectedSemiMu, eventselectedSemiEl);
 
 	    //Check the DeltaR vlaue between the different partons and reconstructed particles!:
 	    if(eventselectedSemiMu == true){
-	      histo1D["DeltaR_Ana_Muon"]->Fill( sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
 	      histo1D["genPt_Muon"]->Fill( Lepton->Pt() );
 	      histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());
 	    }
             if(eventselectedSemiEl == true){
-	      histo1D["DeltaR_Ana_Elec"]->Fill(sqrt( pow((selectedLepton->Phi() - Lepton->Phi()),2) + pow((selectedLepton->Eta() - Lepton->Eta()),2) ) );
 	      histo1D["genPt_Elec"]->Fill( Lepton->Pt() );
 	      histo1D["recoPt_Elec"]->Fill( selectedLepton->Pt());
 	    }
-	    histo1D["DeltaR_Ana_Light1_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicWJet1_.first]->Phi() - mcParticlesMatching[hadronicWJet1_.second].Phi()),2) + pow((selectedJets[hadronicWJet1_.first]->Eta() - mcParticlesMatching[hadronicWJet1_.second].Eta()),2) ) );
-            histo1D["DeltaR_Ana_Light1_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicWJet1_.first]->Phi() - mcParticles[hadronicWJet1_.second]->Phi()),2) + pow((selectedJets[hadronicWJet1_.first]->Eta() - mcParticles[hadronicWJet1_.second]->Eta()),2) ) );
-            histo1D["DeltaR_Ana_Light2_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicWJet2_.first]->Phi() - mcParticlesMatching[hadronicWJet2_.second].Phi()),2) + pow((selectedJets[hadronicWJet2_.first]->Eta() - mcParticlesMatching[hadronicWJet2_.second].Eta()),2) ) );
-            histo1D["DeltaR_Ana_Light2_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicWJet2_.first]->Phi() - mcParticles[hadronicWJet2_.second]->Phi()),2) + pow((selectedJets[hadronicWJet2_.first]->Eta() - mcParticles[hadronicWJet2_.second]->Eta()),2) ) );
-	    histo1D["DeltaR_Ana_BHadr_mcPartMatch"]->Fill( sqrt( pow((selectedJets[hadronicBJet_.first]->Phi() - mcParticlesMatching[hadronicBJet_.second].Phi()),2) + pow((selectedJets[hadronicBJet_.first]->Eta() - mcParticlesMatching[hadronicBJet_.second].Eta()),2) ) );
-            histo1D["DeltaR_Ana_BHadr_mcPart"]->Fill( sqrt( pow((selectedJets[hadronicBJet_.first]->Phi() - mcParticles[hadronicBJet_.second]->Phi()),2) + pow((selectedJets[hadronicBJet_.first]->Eta() - mcParticles[hadronicBJet_.second]->Eta()),2) ) );
-            histo1D["DeltaR_Ana_BLept_mcPartMatch"]->Fill( sqrt( pow((selectedJets[leptonicBJet_.first]->Phi() - mcParticlesMatching[leptonicBJet_.second].Phi()),2) + pow((selectedJets[leptonicBJet_.first]->Eta() - mcParticlesMatching[leptonicBJet_.second].Eta()),2) ) );
-            histo1D["DeltaR_Ana_BLept_mcPart"]->Fill( sqrt( pow((selectedJets[leptonicBJet_.first]->Phi() - mcParticles[leptonicBJet_.second]->Phi()),2) + pow((selectedJets[leptonicBJet_.first]->Eta() - mcParticles[leptonicBJet_.second]->Eta()),2) ) );
 
+            //Fill the Transfer Function Tree file!
+            tfNTuple = new TFnTuple();
+            tfNTuple->setEventID( event->eventId() );
+            tfNTuple->setRecoVectorLight1( (TLorentzVector) *selectedJets[hadronicWJet1_.first] );
+            tfNTuple->setRecoVectorLight2( (TLorentzVector) *selectedJets[hadronicWJet2_.first] );
+            tfNTuple->setRecoVectorHadrB(  (TLorentzVector) *selectedJets[hadronicBJet_.first]  );
+            tfNTuple->setRecoVectorLeptB(  (TLorentzVector) *selectedJets[leptonicBJet_.first]  );
+            tfNTuple->setRecoVectorLepton( (TLorentzVector) *selectedLepton                     );
+            tfNTuple->setGenVectorLight1(  (TLorentzVector) mcParticlesMatching[hadronicWJet1_.second] );
+            tfNTuple->setGenVectorLight2(  (TLorentzVector) mcParticlesMatching[hadronicWJet2_.second] );
+            tfNTuple->setGenVectorHadrB(   (TLorentzVector) mcParticlesMatching[hadronicBJet_.second]  );
+            tfNTuple->setGenVectorLeptB(   (TLorentzVector) mcParticlesMatching[leptonicBJet_.second]  );
+            tfNTuple->setGenVectorLepton(  (TLorentzVector) *Lepton                                     );
+
+            TFTree->Fill();
+            delete tfNTuple;
 
 	  }//End of calculate Transfer Functions
         }//End of matched particles reconstructed
@@ -1714,7 +1716,24 @@ int main (int argc, char *argv[])
 
     // -------- Calculate TF MadWeight  --------//
     if(CalculateTF){
-      tfCreation.CalculateTF(true, true, false, true); //bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues   --> Writing TF to file only possible using TFFit analyzer!
+        tfCreation.CalculateTF(true, true, false, true); //bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues   --> Writing TF to file only possible using TFFit analyzer!
+
+        TFTreeFile->cd();
+      
+        TTree *configTreeTFFile = new TTree("configTreeTFFile","configuration Tree in Transfer Function Tree file");
+        TClonesArray* tcdatasetTFFile = new TClonesArray("Dataset",1);
+        configTreeTFFile->Branch("Dataset","TClonesArray",&tcdatasetTFFile);
+        TClonesArray* tcAnaEnvTFFile = new TClonesArray("AnalysisEnvironment",1);
+        configTreeTFFile->Branch("AnaEnv","TClonesArray",&tcAnaEnvTFFile);
+        new ((*tcdatasetTFFile)[0]) Dataset(*datasets[d]);
+        new ((*tcAnaEnvTFFile)[0]) AnalysisEnvironment(anaEnv);
+
+        configTreeTFFile->Fill();
+        configTreeTFFile->Write();
+        TFTree->Write();
+        TFTreeFile->Close();
+        delete TFTreeFile;
+
     }
     else{	
       //--------------------  Sigma for W Mass and Top Mass  --------------------
@@ -1930,13 +1949,13 @@ int main (int argc, char *argv[])
   mkdir((pathPNG+"/MSPlots").c_str(),0777);
  
   TDirectory* msdir = fout->mkdir("MSPlots");
-  msdir->cd(); 
+  /*msdir->cd(); 
   for(map<string,MultiSamplePlot*>::const_iterator it = MSPlot.begin(); it != MSPlot.end(); it++){    
     MultiSamplePlot *temp = it->second;
     string name = it->first;
-    temp->Draw(name); //, true, true, true, true, true, 1, false);
-    temp->Write(fout, name, true, "PlotsMacro/MSPlots/");
-  }
+    //temp->Draw(string("CMSPlot"), 0, false, false, false, 1, 0.45, 0.63, 0.97, 0.94, 1.3);  //name, true, true, true, true, true, 1, false);
+    temp->Write(fout, name, true, "PlotsMacro/MSPlots/", "png");
+  }*/
 
   TDirectory* th1dir = fout->mkdir("1D_histograms");
   th1dir->cd();
