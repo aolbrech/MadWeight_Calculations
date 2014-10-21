@@ -29,11 +29,11 @@
 #include "TLorentzVector.h"
 
 //Specific code for anomalous couplings analysis:
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/MlbStudy.h"
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
+#include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
+#include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
+#include "AnomalousCouplings/PersonalClasses/interface/MlbStudy.h"
+#include "AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
+#include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 
 using namespace std;
 using namespace reweight;
