@@ -196,7 +196,7 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     }
 }
 
-void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], TFile* file){
+void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float FitRangeDblGaus[], TFile* file){
 
     TDirectory* histoFitDir = file->mkdir(fitHisto->GetName());
     histoFitDir->cd();
@@ -207,8 +207,11 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
     for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);    
 
     //Set range of fits
-    doubleGaussianFit->SetRange( fitHisto->GetYaxis()->GetXmin(), fitHisto->GetYaxis()->GetXmin() );
-    caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );						
+    if(changeFitRange)
+        doubleGaussianFit->SetRange( FitRangeDblGaus[0], FitRangeDblGaus[1] );    
+    else    
+        doubleGaussianFit->SetRange( fitHisto->GetYaxis()->GetXmin(), fitHisto->GetYaxis()->GetXmin() );
+    caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );
 
     //Initialize the start values if asked
     startValuesArray = startValues;

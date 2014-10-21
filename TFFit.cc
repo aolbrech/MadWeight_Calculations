@@ -1,5 +1,5 @@
 //user code
-#include "TopTreeAnalysisBase/Tools/interface/AnalysisEnvironmentLoader.h"   //Needed to load TRootMCParticle & TRootJet, which is used in TFCreation.h
+//#include "TopTreeAnalysisBase/Tools/interface/AnalysisEnvironmentLoader.h"   //Needed to load TRootMCParticle & TRootJet, which is used in TFCreation.h
 #include "TFile.h"
 #include "TH2.h"
 #include <iostream>
@@ -71,27 +71,32 @@ int main ()
         TFile* file = new TFile("PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
         //Define all histograms which need to be fitted!
         const int NrFitHistos = 2;
+        const int NrParamsDblGaus = 6;
         std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
         string Histo[NrFitHistos] = {"Mu_DiffPtVsGenPt","Light_DiffPtVsGenPt"};
-        float StartValues[NrFitHistos][6] = {{1,2,3,4,5,6},
-                                            {-10,0,500,0,10,10}};
+        float StartValues[NrFitHistos][NrParamsDblGaus] = { {1,2,3,4,5,6},
+                                                            {-10,0,500,0,10,10}};
+        float FitRangeDblGaus[NrFitHistos][2] ={ {-10,10},{-5,5}};
+
         //Set the booleans!
         bool useROOTClass = false;
         bool useStartValues = true;
         int histoNrForStartValues = 0;
         bool useStartArray = true;
+        bool changeFitRange = true;
  
         ofstream myTF, myTFCard;
         myTF.open("TFInformation/TransferFunctions_TABLE.txt");
         myTFCard.open("TFInformation/transfer_card_user.dat");
     
-        float startValues[6];
+        float startValues[NrParamsDblGaus], fitRangeDblGaus[2];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
             TH2F* histoForFit = (TH2F*) file->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );    
         
             //Set the correct startValues and fit the distribution
-            for(int jj = 0; jj < 6; jj++) startValues[jj] = StartValues[iHisto][jj];        
-            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, fout);
+            for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = StartValues[iHisto][jj];
+            for(int jj = 0; jj < 2; jj++) fitRangeDblGaus[jj] = FitRangeDblGaus[iHisto][jj];
+            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRangeDblGaus, fout);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
