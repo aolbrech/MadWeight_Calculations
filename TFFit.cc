@@ -18,8 +18,8 @@
 #include "TDirectory.h"
 
 //Specific code for anomalous couplings analysis:
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
+#include "AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
+#include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 
 using namespace std;
 //using namespace TopTree;

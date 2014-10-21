@@ -2,7 +2,7 @@
 #define LHCOOutput_h
 
 #include <iostream>
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootMCParticle.h"
+#include "TopTreeProducer/interface/TRootMCParticle.h"
 #include "TLorentzVector.h"
 
 using namespace std;

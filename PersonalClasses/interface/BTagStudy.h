@@ -6,7 +6,7 @@
 #include <iostream>
 #include <math.h>
 
-#include "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/TopTreeProducer/interface/TRootJet.h"
+#include "TopTreeProducer/interface/TRootJet.h"
 
 using namespace std;
 using namespace TopTree;
