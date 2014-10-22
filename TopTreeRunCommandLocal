@@ -1,0 +1,10 @@
+
+#Use the correct analyzer:
+#     -- TopTree analyzer --
+g++ -m64 -g -L $HOME/lib -I ../ -I `root-config --incdir` AnomalousCouplingsTreeCreator.cc -o AnomalousCouplingsTreeCreator -l AnomCoupAnalysis53 -l TopTreeAnaContent53 -l TopTreeAna53 -l MLP -l TreePlayer -l XMLIO `root-config --libs`
+./AnomalousCouplingsTreeCreator
+
+#     --    TF analyzer   --
+g++ -m64 -g -L $HOME/lib -I ../ -I `root-config --incdir` TFFit.cc -o TFFit -l AnomCoupAnalysis53 -l TopTreeAnaContent53 -l TopTreeAna53 -l MLP -l TreePlayer -l XMLIO `root-config --libs`
+./TFFit
+
