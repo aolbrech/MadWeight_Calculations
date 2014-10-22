@@ -26,7 +26,7 @@ using namespace std;
 
 int main ()
 {
-    TFile *fout = new TFile ("TransferFunctionsFromFile.root", "RECREATE");
+    TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
     clock_t start = clock();
   
     cout << "***********************************************" << endl;  
