@@ -39,12 +39,12 @@ int main ()
     ////////////////////////////////////////////////////////////////////
     //  Choose whether created plots are used or Tree information !!  //
     ////////////////////////////////////////////////////////////////////
-    bool CreateTFFromTree = false;
+    bool CreateTFFromTree = true;
 
     if(CreateTFFromTree){
         //Load the TFTree information
         vector<string> inputTFRoot;
-        inputTFRoot.push_back("TFInformation/TransferFunctionTree.root");
+        inputTFRoot.push_back("TFInformation/TransferFunctionTree_AllEvts.root");
 
         for(unsigned int iDataSet = 0; iDataSet <inputTFRoot.size(); iDataSet++){
             TFile* inputTFFile = new TFile(inputTFRoot[iDataSet].c_str(),"READ");
@@ -54,7 +54,10 @@ int main ()
 
             int nEvent = inputTFTree->GetEntries(); 
             TFnTuple* tfNTuple = 0;
-            m_br->SetAddress(&tfNTuple);
+	std::cout << " Setting address ! " << std::endl;
+            //m_br->SetAddress(&tfNTuple);
+	std::cout << " Adress set! " << std::endl;
+	std::cout << " Number of events : " << nEvent << std::endl;
 
             //Get Pt of Quark1:
             for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
