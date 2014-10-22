@@ -244,7 +244,7 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
 }
 
 void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
-	TFile* file = new TFile("PlotsForTransferFunctions.root","RECREATE");
+	TFile* file = new TFile("TFInformation/PlotsForTransferFunctions.root","RECREATE");
 	file->cd();
 
 	if(drawHistos == true) WritePlots(file);
