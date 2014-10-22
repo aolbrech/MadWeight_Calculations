@@ -16,6 +16,7 @@
 #include "TTree.h"
 #include "TClonesArray.h"
 #include "TDirectory.h"
+#include <TApplication.h>
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
@@ -24,8 +25,10 @@
 using namespace std;
 //using namespace TopTree;
 
-int main ()
+int main (int argc, char **argv)
 {
+    TApplication theApp("App", &argc, argv);
+
     TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
     clock_t start = clock();
   
@@ -54,10 +57,7 @@ int main ()
 
             int nEvent = inputTFTree->GetEntries(); 
             TFnTuple* tfNTuple = 0;
-	std::cout << " Setting address ! " << std::endl;
-            //m_br->SetAddress(&tfNTuple);
-	std::cout << " Adress set! " << std::endl;
-	std::cout << " Number of events : " << nEvent << std::endl;
+            m_br->SetAddress(&tfNTuple);
 
             //Get Pt of Quark1:
             for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
