@@ -54,10 +54,7 @@ int main ()
 
             int nEvent = inputTFTree->GetEntries(); 
             TFnTuple* tfNTuple = 0;
-	std::cout << " Setting address ! " << std::endl;
-            //m_br->SetAddress(&tfNTuple);
-	std::cout << " Adress set! " << std::endl;
-	std::cout << " Number of events : " << nEvent << std::endl;
+            m_br->SetAddress(&tfNTuple);
 
             //Get Pt of Quark1:
             for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
