@@ -1,5 +1,5 @@
 //user code
-//#include "TopTreeAnalysisBase/Tools/interface/AnalysisEnvironmentLoader.h"   //Needed to load TRootMCParticle & TRootJet, which is used in TFCreation.h
+#include "TopTreeAnalysisBase/Tools/interface/AnalysisEnvironmentLoader.h"   //Needed to load TRootMCParticle & TRootJet, which is used in TFCreation.h
 #include "TFile.h"
 #include "TH2.h"
 #include <iostream>
@@ -39,7 +39,7 @@ int main ()
     ////////////////////////////////////////////////////////////////////
     //  Choose whether created plots are used or Tree information !!  //
     ////////////////////////////////////////////////////////////////////
-    bool CreateTFFromTree = true;
+    bool CreateTFFromTree = false;
 
     if(CreateTFFromTree){
         //Load the TFTree information
@@ -157,3 +157,4 @@ int main ()
   
     return 0;
 }
+
