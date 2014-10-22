@@ -27,7 +27,7 @@ using namespace std;
 
 int main (int argc, char **argv)
 {
-    TApplication theApp("App", &argc, argv);
+    TApplication theApp("App", &argc, argv); //Needed to run on local Linux!
 
     TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
     clock_t start = clock();
@@ -59,10 +59,29 @@ int main (int argc, char **argv)
             TFnTuple* tfNTuple = 0;
             m_br->SetAddress(&tfNTuple);
 
-            //Get Pt of Quark1:
+            //Read in the TLorenztVectors:
+            TLorentzVector genPart[5], recoPart[5];
+            enum DecayChannel_t {isSemiMu, isSemiEl};
+            DecayChannel_t decayChannel;
             for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
                 inputTFTree->GetEvent(iEvt);
-                std::cout << " Pt of Quark1 (gen,reco) = " << (tfNTuple->genVectorLight1()).Pt() << " , " << (tfNTuple->recoVectorLight1()).Pt() << std::endl;
+                genPart[0] = tfNTuple->genVectorLight1();
+                genPart[1] = tfNTuple->genVectorLight2();
+                genPart[2] = tfNTuple->genVectorHadrB();
+                genPart[3] = tfNTuple->genVectorLeptB();
+                genPart[4] = tfNTuple->genVectorLepton();
+
+                recoPart[0] = tfNTuple->recoVectorLight1();
+                recoPart[1] = tfNTuple->recoVectorLight2();
+                recoPart[2] = tfNTuple->recoVectorHadrB();
+                recoPart[3] = tfNTuple->recoVectorLeptB();
+                recoPart[4] = tfNTuple->recoVectorLepton();
+
+                if(genPart[4].M() <= 0.05) decayChannel = isSemiEl;
+                else                       decayChannel = isSemiMu;
+
+                //Electron channel --> decayChannel == 1
+                //Muon     channel --> decayChannel == 0
             }
 
             inputTFFile->Close();
