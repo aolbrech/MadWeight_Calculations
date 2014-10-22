@@ -16,6 +16,7 @@
 #include "TTree.h"
 #include "TClonesArray.h"
 #include "TDirectory.h"
+#include <TApplication.h>
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
@@ -24,8 +25,10 @@
 using namespace std;
 //using namespace TopTree;
 
-int main ()
+int main (int argc, char **argv)
 {
+    TApplication theApp("App", &argc, argv);
+
     TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
     clock_t start = clock();
   
