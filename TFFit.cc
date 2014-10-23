@@ -54,10 +54,16 @@ int main (int argc, char **argv)
 
             TTree* inputTFTree = (TTree*) inputTFFile->Get("TFTree");
             TBranch* m_br = (TBranch*) inputTFTree->GetBranch("TheTFTree");
-
-            int nEvent = inputTFTree->GetEntries(); 
             TFnTuple* tfNTuple = 0;
             m_br->SetAddress(&tfNTuple);
+
+            //Set the number of selected events:
+            int nEvent = inputTFTree->GetEntries(); 
+            //int nEvent = 1000;
+
+            //Initialize the TFCreation class (create all histograms):
+            TFCreation tfCreation;
+            tfCreation.InitializeVariables(); //Add option of nr eta bins here!
 
             //Read in the TLorenztVectors:
             TLorentzVector genPart[5], recoPart[5];
@@ -77,12 +83,16 @@ int main (int argc, char **argv)
                 recoPart[3] = tfNTuple->recoVectorLeptB();
                 recoPart[4] = tfNTuple->recoVectorLepton();
 
-                if(genPart[4].M() <= 0.05) decayChannel = isSemiEl;
-                else                       decayChannel = isSemiMu;
+                if(genPart[4].M() <= 0.05) decayChannel = isSemiEl; //Electron channel --> decayChannel == 1
+                else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
 
-                //Electron channel --> decayChannel == 1
-                //Muon     channel --> decayChannel == 0
-            }
+                //Fill the histograms of the TFCreation class!
+                tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
+            }//Loop on events
+
+            TFile* file = new TFile("PlotsForTransferFunctions.root","RECREATE");            
+            tfCreation.WritePlots(file);
+            file->Close();
 
             inputTFFile->Close();
             delete inputTFFile;
