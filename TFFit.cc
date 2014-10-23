@@ -43,6 +43,7 @@ int main (int argc, char **argv)
     //  Choose whether created plots are used or Tree information !!  //
     ////////////////////////////////////////////////////////////////////
     bool CreateTFFromTree = true;
+    bool RunFitForTF = true;
 
     if(CreateTFFromTree){
         //Load the TFTree information
@@ -90,17 +91,23 @@ int main (int argc, char **argv)
                 tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
             }//Loop on events
 
-            TFile* file = new TFile("PlotsForTransferFunctions.root","RECREATE");            
-            tfCreation.WritePlots(file);
-            file->Close();
+            TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions.root","RECREATE");
+            tfCreation.WritePlots(fillFile);
+            fillFile->Close();
+            delete fillFile;
 
             inputTFFile->Close();
             delete inputTFFile;
         }
-    }
-    else{
-        //Define all needed variables:
-        TFile* file = new TFile("PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
+    }//CreateTFFromTree = true loop
+
+    if(RunFitForTF == true){
+
+        //Set which TFFile should be used
+        TFile* readFile;
+        if(CreateTFFromTree == false) readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
+        else                          readFile = new TFile("TFInformation/PlotsForTransferFunctions.root","READ");
+
         //Define all histograms which need to be fitted!
         const int NrFitHistos = 2;
         const int NrParamsDblGaus = 6;
@@ -123,7 +130,8 @@ int main (int argc, char **argv)
     
         float startValues[NrParamsDblGaus], fitRangeDblGaus[2];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
-            TH2F* histoForFit = (TH2F*) file->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );    
+            TH2F* histoForFit = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );
+            std::cout << " Name of get histogram : " << histoForFit->GetName() << std::endl; 
         
             //Set the correct startValues and fit the distribution
             for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = StartValues[iHisto][jj];
@@ -178,7 +186,7 @@ int main (int argc, char **argv)
         myTFCard.close();
     
         //Delete the used pointers:
-        delete fout, file;
+        delete fout, readFile;
     }//End of TF calculation when ROOT file is used!
   
     cout << "It took us " << ((double)clock() - start) / CLOCKS_PER_SEC << " to run the program" << endl;
