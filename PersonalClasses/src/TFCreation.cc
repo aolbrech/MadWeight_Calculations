@@ -266,29 +266,29 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 				
 	    switch(f){
 	      case 0:
-		histoForFit=histo2D["Light_DiffPtVsGenPt"]; break;
+		histoForFit=histo2D["BJet_DiffPhiVsGenPt"]; break;
 	      case 1:
 		histoForFit=histo2D["BJet_DiffPtVsGenPt"]; break;
 	      case 2:
-		histoForFit=histo2D["El_DiffPtVsGenPt"]; break;
-	      case 3:
-		histoForFit=histo2D["Mu_DiffInvPtVsGenInvPt"]; break;
-	      case 4:
-		histoForFit=histo2D["Light_DiffThetaVsGenPt"]; break;
-	      case 5:
 		histoForFit=histo2D["BJet_DiffThetaVsGenPt"]; break;
-	      case 6:
-		histoForFit=histo2D["El_DiffThetaVsGenPt"]; break;
-	      case 7:
-		histoForFit=histo2D["Mu_DiffThetaVsGenInvPt"]; break;
-	      case 8:
-		histoForFit=histo2D["Light_DiffPhiVsGenPt"]; break;
-	      case 9:
-		histoForFit=histo2D["BJet_DiffPhiVsGenPt"]; break;
-	      case 10:
+	      case 3:
 		histoForFit=histo2D["El_DiffPhiVsGenPt"]; break;
-	      case 11:
+	      case 4:
+		histoForFit=histo2D["El_DiffPtVsGenPt"]; break;
+	      case 5:
+		histoForFit=histo2D["El_DiffThetaVsGenPt"]; break;
+	      case 6:
+		histoForFit=histo2D["Light_DiffPhiVsGenPt"]; break;
+	      case 7:
+		histoForFit=histo2D["Light_DiffPtVsGenPt"]; break;
+	      case 8:
+		histoForFit=histo2D["Light_DiffThetaVsGenPt"]; break;
+	      case 9:
 		histoForFit=histo2D["Mu_DiffPhiVsGenInvPt"]; break;
+	      case 10:
+		histoForFit=histo2D["Mu_DiffInvPtVsGenInvPt"]; break;
+	      case 11:
+		histoForFit=histo2D["Mu_DiffThetaVsGenInvPt"]; break;
 	    }					
 
             TDirectory* histoFitDir = file->mkdir(histoForFit->GetName());
@@ -392,23 +392,23 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
             doubleGaussianFit->SetParameter(ii, startValuesArray[ii]);
     }
     else{
-	if(whichHisto==0 || whichHisto==1 || whichHisto == 2){ // for E transfer function of JETS (and elec -- added as test ...)
+	if(whichHisto==1 || whichHisto==4 || whichHisto == 7){ // for Pt transfer function of JETS (and elec -- added as test ...)
 	    float StartValues[] = {-8,18,63,0,8.6,4.1};        //First three values are for the first broad gaussian (central, sigma and constant value respectively)
 							       //Second three values are the same for the second narrow gaussian
 	    for(int ii = 0; ii < 6; ii++)
 		doubleGaussianFit->SetParameter(ii,StartValues[ii]);
 	}
-	else if (whichHisto==4 || whichHisto==5 || whichHisto==8 || whichHisto==9 || whichHisto == 6 || whichHisto == 10) { //for theta and phi transfer functions of JETS (and elec)
+	else if (whichHisto==0 || whichHisto==2 || whichHisto==3 || whichHisto==5 || whichHisto == 6 || whichHisto == 8) { //for theta and phi transfer functions of JETS (and elec)
 	    float StartValues[] = {0,0.038,77,0.004,0.011,6.5};
 	    for(int ii = 0; ii < 6; ii++)
 		doubleGaussianFit->SetParameter(ii, StartValues[ii]);
 	}
-	else if (whichHisto==3){ //for 1/pt transfer function of muons
+	else if (whichHisto==10){ //for 1/pt transfer function of muons
             float StartValues[] = {-0.0008,0.001,24,-0.0001,0.0001,4};
             for(int ii = 0; ii < 6; ii++)
                 doubleGaussianFit->SetParameter(ii, StartValues[ii]);
 	}
-	else if (whichHisto==7 || whichHisto==11) { //for theta, phi transfer function of muons
+	else if (whichHisto==9 || whichHisto==11) { //for theta, phi transfer function of muons
             float StartValues[] = {0.0,0.01,24,0,0.001,4};
             for(int ii = 0; ii < 6; ii++)
                 doubleGaussianFit->SetParameter(ii, StartValues[ii]);
@@ -416,7 +416,7 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard, TFile* file){
+void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard){
 
     const int NrConsideredPars = 6, NrConsideredCaloPars = 3;
     string ParamName[NrConsideredPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};

@@ -30,7 +30,7 @@ class TFCreation{
         void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], bool, float[], TFile*);
 	void FitSliceClassCode(TH2F*, int, const char*[]);
 	void SetStartValuesDoubleGaussian(int, bool);
-	void WriteTF(TH2F*, ostream &output, ostream &card, TFile*);
+	void WriteTF(TH2F*, ostream &output, ostream &card);
 	void WritePlots(TFile*);
 
     private:

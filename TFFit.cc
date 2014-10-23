@@ -29,7 +29,7 @@ int main (int argc, char **argv)
 {
     TApplication theApp("App", &argc, argv); //Needed to run on local Linux!
 
-    TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
+    //TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
     clock_t start = clock();
   
     cout << "***********************************************" << endl;  
@@ -62,6 +62,10 @@ int main (int argc, char **argv)
             int nEvent = inputTFTree->GetEntries(); 
             //int nEvent = 1000;
 
+            std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
+            if(iEvt%1000 == 0)
+                std::cout<<"Processing the "<<iEvt<<"th event (" << ((double)iEvt/(double)inputTFRoot.size())*100  << "%)" << flush<<"\r";
+
             //Initialize the TFCreation class (create all histograms):
             TFCreation tfCreation;
             tfCreation.InitializeVariables(); //Add option of nr eta bins here!
@@ -91,7 +95,8 @@ int main (int argc, char **argv)
                 tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
             }//Loop on events
 
-            TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions.root","RECREATE");
+            TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions_FromTree.root","RECREATE");
+            std::cout << "    ----> Information writen in file : " << fillFile->GetName() << std::endl << std::endl;
             tfCreation.WritePlots(fillFile);
             fillFile->Close();
             delete fillFile;
@@ -103,40 +108,76 @@ int main (int argc, char **argv)
 
     if(RunFitForTF == true){
 
+        std::cout << " *** Starting to perform the double Gaussian fits  \n " << std::endl;
+
         //Set which TFFile should be used
-        TFile* readFile;
-        if(CreateTFFromTree == false) readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
-        else                          readFile = new TFile("TFInformation/PlotsForTransferFunctions.root","READ");
+        TFile *readFile, *writeFile;
+        if(CreateTFFromTree == false){
+		readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
+		writeFile = new TFile("TFInformation/CreatedTFFromDistributions_AllEvts_UpdatedElAndMu.root","RECREATE");
+	}
+        else{
+		readFile = new TFile("TFInformation/PlotsForTransferFunctions_FromTree.root","READ");
+		writeFile = new TFile("TFInformation/CreatedTFFromDistributions_FromTree.root","RECREATE");
+	}
+	//Also draw the 2D histograms!	
+        TDirectory* th2dir = writeFile->mkdir("2D_histograms_graphs");
 
         //Define all histograms which need to be fitted!
-        const int NrFitHistos = 2;
+        const int NrFitHistos = 12;
         const int NrParamsDblGaus = 6;
         std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-        string Histo[NrFitHistos] = {"Mu_DiffPtVsGenPt","Light_DiffPtVsGenPt"};
-        float StartValues[NrFitHistos][NrParamsDblGaus] = { {1,2,3,4,5,6},
-                                                            {-10,0,500,0,10,10}};
-        float FitRangeDblGaus[NrFitHistos][2] ={ {-10,10},{-5,5}};
+        string Histo[NrFitHistos] = { "BJet_DiffPhiVsGenPt",
+				      "BJet_DiffPtVsGenPt",
+				      "BJet_DiffThetaVsGenPt",
+				      "El_DiffPhiVsGenPt",
+				      "El_DiffPtVsGenPt",
+				      "El_DiffThetaVsGenPt",
+				      "Light_DiffPhiVsGenPt",
+				      "Light_DiffPtVsGenPt",
+				      "Light_DiffThetaVsGenPt",
+				      "Mu_DiffPhiVsGenInvPt",
+				      "Mu_DiffInvPtVsGenInvPt",
+				      "Mu_DiffThetaVsGenInvPt"};
+
+	//Meaning of the six different variables:                                                    
+        float StartValues[NrFitHistos][NrParamsDblGaus] = { {      0, 0.038, 77,   0.004,  0.011, 6.5},
+                                                            {     -8,    18, 63,       0,    8.6, 4.1},
+							    {      0, 0.038, 77,   0.004,  0.011, 6.5},
+                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
+                                                            {     -8,    18, 63,       0,    8.6, 4.1},
+                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
+                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
+                                                            {     -8,    18, 63,       0,    8.6, 4.1},
+                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
+							    {    0.0,  0.01, 24,       0,  0.001,   4},
+							    {-0.0008, 0.001, 24, -0.0001, 0.0001,   4} };
+        float FitRangeDblGaus[NrFitHistos][2] ={ {-.15,0.15},{-30,40},{-0.1,0.1},{-0.02,0.02},{-4,6},{-0.02,0.02},{-0.15,0.15},{-40,40},{-0.1,0.1},{-0.03,0.03},{-0.004,0.004},{-0.02,0.02}};
 
         //Set the booleans!
         bool useROOTClass = false;
         bool useStartValues = true;
-        int histoNrForStartValues = 0;
+        int histoNrForStartValues = NrFitHistos; //Not needed if useStartValues = false
         bool useStartArray = true;
         bool changeFitRange = true;
  
         ofstream myTF, myTFCard;
         myTF.open("TFInformation/TransferFunctions_TABLE.txt");
         myTFCard.open("TFInformation/transfer_card_user.dat");
-    
+    		
         float startValues[NrParamsDblGaus], fitRangeDblGaus[2];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
             TH2F* histoForFit = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );
-            std::cout << " Name of get histogram : " << histoForFit->GetName() << std::endl; 
-        
+
+            //Save the 2D histogram used for the fit!            	
+            th2dir->cd();
+            histoForFit->Write();
+            writeFile->cd();
+  
             //Set the correct startValues and fit the distribution
             for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = StartValues[iHisto][jj];
             for(int jj = 0; jj < 2; jj++) fitRangeDblGaus[jj] = FitRangeDblGaus[iHisto][jj];
-            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRangeDblGaus, fout);
+            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRangeDblGaus, writeFile);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
@@ -173,7 +214,7 @@ int main (int argc, char **argv)
             }
             myTFCard<<"BLOCK "<<BlockName << endl;
     
-            tfCreation.WriteTF(histoForFit, myTF, myTFCard, fout);
+            tfCreation.WriteTF(histoForFit, myTF, myTFCard);
     
             myTF<<"\\hline" << endl;
             myTF<<"\\end{tabular}"<<endl;
@@ -181,12 +222,13 @@ int main (int argc, char **argv)
         }
         
         //Close the root file where all histograms are saved together with the output files!
-        fout->Close();
+        readFile->Close();
+        writeFile->Close();
         myTF.close();
         myTFCard.close();
     
         //Delete the used pointers:
-        delete fout, readFile;
+        delete readFile,writeFile;
     }//End of TF calculation when ROOT file is used!
   
     cout << "It took us " << ((double)clock() - start) / CLOCKS_PER_SEC << " to run the program" << endl;
