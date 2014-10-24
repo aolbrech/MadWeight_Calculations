@@ -58,13 +58,10 @@ int main (int argc, char **argv)
             TFnTuple* tfNTuple = 0;
             m_br->SetAddress(&tfNTuple);
 
-            //Set the number of selected events:
+            //Set the number of selected events (for loop on events):
             int nEvent = inputTFTree->GetEntries(); 
-            //int nEvent = 1000;
-
+            //int nEvent = 10000;
             std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
-            if(iEvt%1000 == 0)
-                std::cout<<"Processing the "<<iEvt<<"th event (" << ((double)iEvt/(double)inputTFRoot.size())*100  << "%)" << flush<<"\r";
 
             //Initialize the TFCreation class (create all histograms):
             TFCreation tfCreation;
@@ -75,6 +72,9 @@ int main (int argc, char **argv)
             enum DecayChannel_t {isSemiMu, isSemiEl};
             DecayChannel_t decayChannel;
             for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
+                if(iEvt%10000 == 0)
+                    std::cout<<"Processing the "<<iEvt<<"th event (" << ((double)iEvt/(double)inputTFTree->GetEntries())*100  << "%)" << flush<<"\r";
+
                 inputTFTree->GetEvent(iEvt);
                 genPart[0] = tfNTuple->genVectorLight1();
                 genPart[1] = tfNTuple->genVectorLight2();
@@ -169,6 +169,11 @@ int main (int argc, char **argv)
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
             TH2F* histoForFit = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );
 
+            std::cout << " Updating y-axis range to : " << FitRangeDblGaus[iHisto][0] << " & " << FitRangeDblGaus[iHisto][1] << std::endl;
+            if(changeFitRange){
+                histoForFit->GetYaxis()->SetRangeUser(FitRangeDblGaus[iHisto][0],FitRangeDblGaus[iHisto][1]);
+            }
+
             //Save the 2D histogram used for the fit!            	
             th2dir->cd();
             histoForFit->Write();
@@ -176,8 +181,7 @@ int main (int argc, char **argv)
   
             //Set the correct startValues and fit the distribution
             for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = StartValues[iHisto][jj];
-            for(int jj = 0; jj < 2; jj++) fitRangeDblGaus[jj] = FitRangeDblGaus[iHisto][jj];
-            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRangeDblGaus, writeFile);
+            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, writeFile);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
