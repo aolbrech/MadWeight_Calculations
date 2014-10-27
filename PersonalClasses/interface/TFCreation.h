@@ -27,8 +27,8 @@ class TFCreation{
 	void InitializeVariables();
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel);
 	void CalculateTF(bool, bool, bool, bool);
-        void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], TFile*);
-	void FitSliceClassCode(TH2F*, int, const char*[]);
+        void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], bool, float[], TFile*);
+	void FitSliceClassCode(TH2F*, int, const char*[], float[]);
 	void SetStartValuesDoubleGaussian(int, bool);
 	void WriteTF(TH2F*, ostream &output, ostream &card);
 	void WritePlots(TFile*);

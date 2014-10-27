@@ -28,8 +28,6 @@ using namespace std;
 int main (int argc, char **argv)
 {
     TApplication theApp("App", &argc, argv); //Needed to run on local Linux!
-
-    //TFile *fout = new TFile ("TFInformation/CreatedTFFromDistributions.root", "RECREATE");
     clock_t start = clock();
   
     cout << "***********************************************" << endl;  
@@ -121,87 +119,71 @@ int main (int argc, char **argv)
 		writeFile = new TFile("TFInformation/CreatedTFFromDistributions_FromTree.root","RECREATE");
 	}
 	//Also draw the 2D histograms!	
-        TDirectory* th2dir = writeFile->mkdir("2D_histograms_graphs");
 
         //Define all histograms which need to be fitted!
-        const int NrFitHistos = 12;
+        const int NrFitHistos = 1;
+        int ConsHisto = 1;
         const int NrParamsDblGaus = 6;
         std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-        string Histo[NrFitHistos] = { "BJet_DiffPhiVsGenPt",
-				      "BJet_DiffPtVsGenPt",
-				      "BJet_DiffThetaVsGenPt",
-				      "El_DiffPhiVsGenPt",
-				      "El_DiffPtVsGenPt",
-				      "El_DiffThetaVsGenPt",
-				      "Light_DiffPhiVsGenPt",
-				      "Light_DiffPtVsGenPt",
-				      "Light_DiffThetaVsGenPt",
-				      "Mu_DiffPhiVsGenInvPt",
-				      "Mu_DiffInvPtVsGenInvPt",
-				      "Mu_DiffThetaVsGenInvPt"};
-
-	//Meaning of the six different variables:                                                    
-        float StartValues[NrFitHistos][NrParamsDblGaus] = { {      0, 0.038, 77,   0.004,  0.011, 6.5},
-                                                            {     -8,    18, 63,       0,    8.6, 4.1},
-							    {      0, 0.038, 77,   0.004,  0.011, 6.5},
-                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
-                                                            {     -8,    18, 63,       0,    8.6, 4.1},
-                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
-                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
-                                                            {     -8,    18, 63,       0,    8.6, 4.1},
-                                                            {      0, 0.038, 77,   0.004,  0.011, 6.5},
-							    {    0.0,  0.01, 24,       0,  0.001,   4},
-							    {-0.0008, 0.001, 24, -0.0001, 0.0001,   4} };
-        float FitRangeDblGaus[NrFitHistos][2] ={ {-.15,0.15},{-30,40},{-0.1,0.1},{-0.02,0.02},{-4,6},{-0.02,0.02},{-0.15,0.15},{-40,40},{-0.1,0.1},{-0.03,0.03},{-0.004,0.004},{-0.02,0.02}};
+        string HistoInfo[12][1+NrParamsDblGaus+2] = { "BJet_DiffPhiVsGenPt",         "0.002", "0.022", "8000",   "0.0002",  "0.06", "0.2",   "-0.15",   "0.15",
+                                                      "BJet_DiffPtVsGenPt",         "20",    "-8", "2000",       "10",    "3.5", "8",    "-30",    "40",
+				                      "BJet_DiffThetaVsGenPt",       "0", "0.038", "77",   "0.004",  "0.011", "6.5",   "-0.02",   "0.02",
+				                      "El_DiffPhiVsGenPt",           "0", "0.038", "77",   "0.004",  "0.011", "6.5",  "-0.002",  "0.002",
+				                      "El_DiffPtVsGenPt",           "-8",    "18", "63",       "0",    "8.6", "4.1",     "0.5",     "3",
+				                      "El_DiffThetaVsGenPt",         "0", "0.038", "77",   "0.004",  "0.011", "6.5",  "-0.003",  "0.003",
+				                      "Light_DiffPhiVsGenPt",        "0", "0.038", "77",   "0.004",  "0.011", "6.5",  "-0.15",  "0.15",
+				                      "Light_DiffPtVsGenPt",        "-8",    "18", "63",       "0",    "8.6", "4.1",    "-10",    "20",
+				                      "Light_DiffThetaVsGenPt",      "0", "0.038", "77",   "0.004",  "0.011", "6.5",   "-0.05",   "0.05",
+				                      "Mu_DiffPhiVsGenInvPt",        "0",  "0.01", "24",       "0",  "0.001",   "4",  "-0.002",  "0.002",
+				                      "Mu_DiffInvPtVsGenInvPt","-0.0008", "0.001", "24", "-0.0001", "0.0001",   "4", "-0.0001", "0.0001",
+				                      "Mu_DiffThetaVsGenInvPt",      "0",  "0.01", "24",       "0",  "0.001",   "4",  "-0.002",  "0.002"};
 
         //Set the booleans!
         bool useROOTClass = false;
         bool useStartValues = true;
         int histoNrForStartValues = NrFitHistos; //Not needed if useStartValues = false
         bool useStartArray = true;
-        bool changeFitRange = true;
+        bool changeFitRange = false;
+        TDirectory* th2dir = writeFile->mkdir("2D_histograms_graphs");
  
         ofstream myTF, myTFCard;
         myTF.open("TFInformation/TransferFunctions_TABLE.txt");
         myTFCard.open("TFInformation/transfer_card_user.dat");
     		
-        float startValues[NrParamsDblGaus], fitRangeDblGaus[2];
+        float startValues[NrParamsDblGaus], fitRanges[2];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
-            TH2F* histoForFit = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+Histo[iHisto]).c_str() );
+            if(NrFitHistos == 1) iHisto = ConsHisto;
+            TH2F* histoForFit = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+HistoInfo[iHisto][0]).c_str() );
 
-            std::cout << " Updating y-axis range to : " << FitRangeDblGaus[iHisto][0] << " & " << FitRangeDblGaus[iHisto][1] << std::endl;
-            if(changeFitRange){
-                histoForFit->GetYaxis()->SetRangeUser(FitRangeDblGaus[iHisto][0],FitRangeDblGaus[iHisto][1]);
-            }
-
-            //Save the 2D histogram used for the fit!            	
+            //Save the 2D histogram used for the fit!
             th2dir->cd();
             histoForFit->Write();
-            writeFile->cd();
-  
+            writeFile->cd();             
+
             //Set the correct startValues and fit the distribution
-            for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = StartValues[iHisto][jj];
-            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, writeFile);
+            for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = std::stof(HistoInfo[iHisto][1+jj]);
+            for(int jj = 0; jj < 2; jj++) fitRanges[jj] == std::stof(HistoInfo[iHisto][NrParamsDblGaus+1+jj]);
+            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRanges, writeFile);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
             // -- 1) which particle
-            if(Histo[iHisto].find("Light_") == 0)    {PartName = "light jets"; BlockName = "TF_nonbjet_";}
-            else if(Histo[iHisto].find("BJet") == 0) {PartName = "b-jets";     BlockName = "TF_bjet_";}
-            else if(Histo[iHisto].find("Mu_") == 0)  {PartName = "muons";      BlockName = "TF_muon_";}
-            else if(Histo[iHisto].find("El_") == 0)  {PartName = "electrons";  BlockName = "TF_electron_";}
+            if(HistoInfo[iHisto][0].find("Light_") == 0)    {PartName = "light jets"; BlockName = "TF_nonbjet_";}
+            else if(HistoInfo[iHisto][0].find("BJet") == 0) {PartName = "b-jets";     BlockName = "TF_bjet_";}
+            else if(HistoInfo[iHisto][0].find("Mu_") == 0)  {PartName = "muons";      BlockName = "TF_muon_";}
+            else if(HistoInfo[iHisto][0].find("El_") == 0)  {PartName = "electrons";  BlockName = "TF_electron_";}
             // -- 2) which kinematic variable
-            if(Histo[iHisto].find("DiffPt") <= Histo[iHisto].size())         {CaptionName = PartName+" transverse momentum";            KinVarName += "PT";}
-            else if(Histo[iHisto].find("DiffTheta") <= Histo[iHisto].size()) {CaptionName = PartName+" polar angle \\theta";            KinVarName += "THETA";}
-            else if(Histo[iHisto].find("DiffPhi") <= Histo[iHisto].size())   {CaptionName = PartName+" azimuthal angle \\phi";          KinVarName += "PHI";}
-            else if(Histo[iHisto].find("DiffInvPt") <= Histo[iHisto].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName += "InvPt";}
+            if(HistoInfo[iHisto][0].find("DiffPt") <= HistoInfo[iHisto][0].size())         {CaptionName = PartName+" transverse momentum";            KinVarName += "PT";}
+            else if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" polar angle \\theta";            KinVarName += "THETA";}
+            else if(HistoInfo[iHisto][0].find("DiffPhi") <= HistoInfo[iHisto][0].size())   {CaptionName = PartName+" azimuthal angle \\phi";          KinVarName += "PHI";}
+            else if(HistoInfo[iHisto][0].find("DiffInvPt") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName += "INVPT";}
             BlockName = BlockName + KinVarName;
     
             //Write the TF's in a table and in a MadWeight card!:
             myTF<< endl;
             myTF<<" \n \\begin{table}[h!]" << endl;
             myTF<<"\\caption{Parameters of the transfer function for " << CaptionName << "}" << endl;
-            myTF<<"\\label{tab::" << Histo[iHisto] << "}" << endl;
+            myTF<<"\\label{tab::" << HistoInfo[iHisto][0] << "}" << endl;
             myTF<<"\\centering" << endl;
             myTF<<"\\begin{tabular}{c|ccc}" << endl;
             myTF<<"\\hline" << endl;
@@ -209,7 +191,7 @@ int main (int argc, char **argv)
             myTF<<"\\hline" << endl;
     
             //Only write this for the Pt- or 1/Pt-parameters (= start of the TF Card!)
-            if(Histo[iHisto].find("DiffPt") <= Histo[iHisto].size() || Histo[iHisto].find("DiffInvPt") <= Histo[iHisto].size() ){
+            if(HistoInfo[iHisto][0].find("DiffPt") <= HistoInfo[iHisto][0].size() || HistoInfo[iHisto][0].find("DiffInvPt") <= HistoInfo[iHisto][0].size() ){
                 myTFCard<<"#+-----------------------------------------------------------------------------------+" <<endl;
                 myTFCard<<"#|     Parameter for particles: "<<PartName << endl; 
                 myTFCard<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
@@ -223,8 +205,7 @@ int main (int argc, char **argv)
             myTF<<"\\hline" << endl;
             myTF<<"\\end{tabular}"<<endl;
             myTF<<"\\end{table} \n"<<endl;
-        }
-        
+        }             
         //Close the root file where all histograms are saved together with the output files!
         readFile->Close();
         writeFile->Close();
@@ -243,4 +224,3 @@ int main (int argc, char **argv)
   
     return 0;
 }
-

@@ -6,7 +6,7 @@ TFCreation::TFCreation(){
     ///////////////////////////////////////
     //
     // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
-    doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[5]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");       
+    doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[5]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))",-10,10);       
 
     //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
     caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
@@ -18,16 +18,17 @@ TFCreation::~TFCreation(){
 }
 
 void TFCreation::InitializeVariables(){
-    histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,0.4);
-    histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,0.4);
-    histo1D["DeltaR_TFClass_HadrB"]  = new TH1F("DeltaR_TFClass_HadrB","DeltaR_TFClass_HadrB",200,0,0.4);
-    histo1D["DeltaR_TFClass_LeptB"]  = new TH1F("DeltaR_TFClass_LeptB","DeltaR_TFClass_LeptB",200,0,0.4);
-    histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,0.4);
-    histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,0.4);
+	histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,0.4);
+	histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,0.4);
+	histo1D["DeltaR_TFClass_HadrB"]  = new TH1F("DeltaR_TFClass_HadrB","DeltaR_TFClass_HadrB",200,0,0.4);
+	histo1D["DeltaR_TFClass_LeptB"]  = new TH1F("DeltaR_TFClass_LeptB","DeltaR_TFClass_LeptB",200,0,0.4);
+	histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,0.4);
+	histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,0.4);
+
 	histo2D["Light_RecoPtVsGenPt"]    = new TH2F("Light_RecoPtVsGenPt",   "Transverse momentum of light quarks (reco vs gen)",                        150,     0,  300, 150,      0,  300);
 	histo2D["Light_DiffPtVsGenPt"]    = new TH2F("Light_DiffPtVsGenPt",   "p_{T} difference (gen-reco) versus p_{T,gen} for light quarks",             10,    25,  160,  80,    -40,   40);
 	histo2D["BJet_RecoPtVsGenPt"]     = new TH2F("BJet_RecoPtVsGenPt",    "Transverse momentum of b-jets (reco vs gen level)",                        150,     0,  300, 150,      0,  300);
-	histo2D["BJet_DiffPtVsGenPt"]     = new TH2F("BJet_DiffPtVsGenPt",    "p_{T} difference (gen-reco) versus p_{T,gen} for b-jets",                   10,    25,  160, 100,    -50,   50);
+	histo2D["BJet_DiffPtVsGenPt"]     = new TH2F("BJet_DiffPtVsGenPt",    "p_{T} difference (gen-reco) versus p_{T,gen} for b-jets",                   10,    30,  160, 100,    -40,   40);
 	histo2D["El_RecoPtVsGenPt"]       = new TH2F("El_RecoPtVsGenPt",      "Transverse momentum of electron (reco vs gen)",                            100,     0,  200, 100,      0,  200);
 	histo2D["El_DiffPtVsGenPt"]       = new TH2F("El_DiffPtVsGenPt",      "p_{T} difference (gen-reco) versus p_{T,gen} for electron",                 10,    30,  150,  75,    -10,   10);
 	histo2D["Mu_RecoInvPtVsGenInvPt"] = new TH2F("Mu_RecoInvPtVsGenInvPt","Inverse of transverse momentum of muon (reco vs gen)",                     100,     0, 0.05, 100,      0, 0.05);
@@ -71,7 +72,7 @@ void TFCreation::InitializeVariables(){
 	histo2D["Light_DiffPhiVsGenPt"]      = new TH2F("Light_DiffPhiVsGenPt",     "#phi difference (gen-reco) versus p_{T,gen} for light quarks",                     10,    25,   160, 100, -0.15, 0.15);
         histo2D["Light_DiffPhiVsGenPt_All"]  = new TH2F("Light_DiffPhiVsGenPt_All", "#phi difference (gen-reco) versus p_{T,gen} for light quarks",                     10,     0,   250, 120,  -6.2,  6.2);
 	histo2D["BJet_RecoPhiVsGenPt"]       = new TH2F("BJet_RecoPhiVsGenPt",      "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for b-jets",      150,     0,   300,  60,  -3.2,  3.2);
-	histo2D["BJet_DiffPhiVsGenPt"]       = new TH2F("BJet_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,    25,   160, 100, -0.15, 0.15);
+	histo2D["BJet_DiffPhiVsGenPt"]       = new TH2F("BJet_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,    30,   160, 100, -0.15, 0.15);
         histo2D["BJet_DiffPhiVsGenPt_All"]   = new TH2F("BJet_DiffPhiVsGenPt_All",  "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,     0,   250, 120,  -6.2,  6.2);
 	histo2D["El_RecoPhiVsGenPt"]         = new TH2F("El_RecoPhiVsGenPt",        "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for electron",    150,     0,   250,  60,  -3.2,  3.2);
 	histo2D["El_DiffPhiVsGenPt"]         = new TH2F("El_DiffPhiVsGenPt",        "#phi difference (gen-reco) versus p_{T,gen} for electron",                         10,    30,   150,  80, -0.04, 0.04);
@@ -199,7 +200,7 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     }	
 }
 
-void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], TFile* file){
+void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file){
 
     TDirectory* histoFitDir = file->mkdir(fitHisto->GetName());
     histoFitDir->cd();
@@ -209,8 +210,17 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
     const int npar = doubleGaussianFit->GetNpar();
     for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);    
 
-    doubleGaussianFit->SetRange( fitHisto->GetYaxis()->GetXmin(), fitHisto->GetYaxis()->GetXmin() );
     caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );
+    float fullFitRange[2];
+    if(changeFitRange){
+        fullFitRange[0] = fitRangeValue[0];
+        fullFitRange[1] = fitRangeValue[1];
+    }
+    else{
+        fullFitRange[0] = (float) (fitHisto->GetYaxis())->GetXmin();
+        fullFitRange[1] = (float) (fitHisto->GetYaxis())->GetXmax();
+        std::cout << " Fit range set to : " << fullFitRange[0] << " & " << fullFitRange[1] << std::endl;
+    }
 
     //Initialize the start values if asked
     startValuesArray = startValues;
@@ -224,12 +234,20 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
 	for(int ipar = 0; ipar <= npar; ipar++) hlist[ipar] = (TH1D*) aSlices[ipar];
     }
     else
-	FitSliceClassCode(fitHisto, npar, parnames);
+	FitSliceClassCode(fitHisto, npar, parnames, fullFitRange);
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
     //////////////////////////////////////////////////////////////////////////////////////////////
     for( int ipar = 0; ipar < npar; ipar++ ){
+        if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
+            caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x");    //Cubic function as fit!
+            for(int ii = 0; ii < 4; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
+        }
+        else{
+            caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
+            for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
+        }
 
         for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
@@ -294,7 +312,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 	    if(useStartValues)
 		SetStartValuesDoubleGaussian(f, false);   //false means that normal start values are being used!
 
-	    doubleGaussianFit->SetRange( histoForFit->GetYaxis()->GetXmin(), histoForFit->GetYaxis()->GetXmin() );
+            float fullFitRange[2] = {(float) (histoForFit->GetYaxis())->GetXmin(), (float) (histoForFit->GetYaxis())->GetXmax()};
 	    TObjArray aSlices;
 	    if(useROOTClass){
 		//Fit using the FitSliceY function of TF1!
@@ -303,7 +321,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 		    hlist[ipar] = (TH1D*) aSlices[ipar];
 	    }
 	    else
-		FitSliceClassCode(histoForFit, npar, parnames);
+		FitSliceClassCode(histoForFit, npar, parnames,fullFitRange);
 
 	    //////////////////////////////////////////////////////////////////////////////////////////////
 	    //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
@@ -328,7 +346,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 	file->Close();
 }
 
-void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[]){
+void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], float fitRange[]){
 	//------------------------------------------------------------------------------------------//
 	// Main difference with the Root class FitSlicesY() is the plotting of histograms !        
 	// In the Root class the distribution of each hlist histogram is not given!
@@ -361,7 +379,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	    if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
 
 	    doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
-	    hp->Fit(doubleGaussianFit);
+            hp->Fit(doubleGaussianFit,"","",fitRange[0],fitRange[1]);
 
 	    int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
 	    if(npfits > npar && npfits >= cut) {
@@ -431,6 +449,7 @@ void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard){
 
 void TFCreation::WritePlots(TFile* outfile){
 	outfile->cd();
+	std::cout << " Insided WritePlots class ! " << std::endl;
 
 	TDirectory* th1dir = outfile->mkdir("1D_histograms");
 	th1dir->cd();
