@@ -5,7 +5,7 @@
   //ROOT file which should be considered:
   string Directory = "FromTree";
   //Parameters:
-  const int NrBins = 11;
+  int NrBins = 11;  //Also update on loop over bins!
   string HistoBin[NrBins] = {"1","2","3","4","5","6","7","8","9","10","11"};
   const int NrParams = 6;                                                   //Looking at doubleGaussian with 6 parameters!
   string Param[NrParams] = {"a1","a2","a3","a4","a5","a6"};                 //Names of the fit parameters  --> Check whether this is also correct for the ROOT class!
@@ -107,7 +107,9 @@
       ///////////////////////////////////////
       TCanvas* projCanvas = new TCanvas("projCanvas","Fit results of projectionY for each bin");
       projCanvas->Divide(3,4);
-      
+    
+      if(Title == "Mu_DiffInvPtVsGenInvPt") NrBins = 10;
+      else NrBins = 11;
       for(int iBin = 0; iBin <= NrBins; iBin++){
 	//Set name for .root file and for saving the histograms!
 	if(iBin < NrBins){
@@ -118,7 +120,7 @@
 	  histoName = "chi2";
 	  HistoName = "Chi2Distribution";
 	}
-	projHisto = (TH1D*) histoFile->Get( (Title+"/"+Title+"_"+histoName).c_str() );
+        projHisto = (TH1D*) histoFile->Get( (Title+"/"+Title+"_"+histoName).c_str() );
 	
 	//Set the Marker to a small dot
 	projHisto->SetMarkerStyle(8); //Only use a small dot!
