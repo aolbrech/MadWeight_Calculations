@@ -11,7 +11,7 @@
   string Param[NrParams] = {"a1","a2","a3","a4","a5","a6"};                 //Names of the fit parameters  --> Check whether this is also correct for the ROOT class!
   bool GetMkdirOutput = false;                                              //Output for directories which need to be created wanted ??
   const int NrFitHistos = 12;                                               //Number of histograms which need to be considered!
-  if(NrFitHistos == 1) int ChosenHisto = 0;                                 //Choose 1 specific histogram!
+  if(NrFitHistos == 1) int ChosenHisto = 1;                                 //Choose 1 specific histogram!
   //-------------------------------------------------------------------------------------//
   
   TFile* histoFile = new TFile( ("../CreatedTFFromDistributions_"+Directory+".root").c_str() ,"READ");

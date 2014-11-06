@@ -41,6 +41,7 @@ class TFCreation{
 
 	TF1 *doubleGaussianFit, *caloEnergyFit;
 	TH1D **hlist;
+        TH1D **hlistLim;
         float* startValuesArray;
         TF1 AllCaloEnergyFits[6];
 };

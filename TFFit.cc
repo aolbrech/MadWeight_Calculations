@@ -125,18 +125,18 @@ int main (int argc, char **argv)
         int ConsHisto = 1;
         const int NrParamsDblGaus = 6;
         std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-        string HistoInfo[12][1+NrParamsDblGaus+2] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "0.2",   "-0.1",   "0.1",
-                                                      "BJet_DiffPtVsGenPt",         "30",    "-8", "1000",       "2",     "10",   "8",    "-25",    "30",
-				                      "BJet_DiffThetaVsGenPt",       "0",  "0.04", "2000",       "0",  "0.013", "6.5",   "-0.1",   "0.1",
-				                      "El_DiffPhiVsGenPt",           "0", "0.008",  "900",       "0", "0.0015",   "5", "-0.012", "0.012",
-				                      "El_DiffPtVsGenPt",           "-8",    "18",   "63",       "0",    "8.6", "4.1",     "-3",     "4",
-				                      "El_DiffThetaVsGenPt",         "0", "0.038",   "77",   "0.004",  "0.011", "6.5", "-0.012", "0.012",
-				                      "Light_DiffPhiVsGenPt",        "0", "0.038",   "77",   "0.004",  "0.011", "6.5",  "-0.1",  "0.1",
-				                      "Light_DiffPtVsGenPt",         "0",    "12", "4000",       "0",    "8.6",   "3",    "-25",    "25",
-				                      "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0",  "0.014",   "5",  "-0.12",  "0.12",
-				                      "Mu_DiffPhiVsGenInvPt",        "0", "0.008", "1400",       "0", "0.0015",   "4",  "-0.01",  "0.01",
-				                      "Mu_DiffInvPtVsGenInvPt",      "0", "0.001",  "800",       "0", "0.0004",   "8", "-0.0015", "0.0015",
-				                      "Mu_DiffThetaVsGenInvPt",      "0",  "0.01",   "24",       "0",  "0.001",   "4",  "-0.01",  "0.01"};
+        string HistoInfo[12][1+NrParamsDblGaus+2] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "3000",  "-0.15",  "0.15",
+                                                      "BJet_DiffPtVsGenPt",         "10",   "-12","20000",      "13",    "10", "-5000",    "-30",    "45",
+				                      "BJet_DiffThetaVsGenPt",       "0",  "0.04", "2000",       "0",  "0.013", "6000",   "-0.1",   "0.1",
+				                      "El_DiffPhiVsGenPt",           "0", "0.006",  "600",       "0", "0.0012", "1500", "-0.012", "0.012",
+				                      "El_DiffPtVsGenPt",            "0",    "-2",  "600",       "0",    "0.9", "1500",     "-4",     "5",
+				                      "El_DiffThetaVsGenPt",         "0", "0.007",  "700",       "0", "0.0013", "2500", "-0.018", "0.018",
+				                      "Light_DiffPhiVsGenPt",        "0", "0.022", "8000",  "0.0004",  "0.002", "3000",  "-0.14",  "0.14",
+				                      "Light_DiffPtVsGenPt",         "0",     "8", "4000",       "0",     "12", "4000",    "-28",    "35",
+				                      "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",  "-0.12",  "0.12",
+				                      "Mu_DiffPhiVsGenInvPt",        "0", "0.008",  "700",       "0", "0.0015",  "600", "-0.004", "0.004",
+				                      "Mu_DiffInvPtVsGenInvPt",      "0","0.0003", "2000",       "0", "0.0006",  "500","-0.0015", "0.001",
+				                      "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500","-0.0035","0.0035"};
 
         //Set the booleans!
         bool useROOTClass = false;
