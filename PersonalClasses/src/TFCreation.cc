@@ -255,32 +255,12 @@ void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int hi
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
-        if(string(fitHisto->GetName()) == "Light_DiffPtVsGenpt"){
-            std::cout << " Looking at histogram : " << fitHisto->GetName() << std::endl;
-            std::cout << " Setting name : " << (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit_Lim").c_str() << std::endl;
-            std::cout << " Name set !" << std::endl;
-            //std::cout << " NBins considerd : " << hlist[ipar]->GetNbinsX() << std::endl;
-            for(int iBin = 1; iBin <= 11; iBin++){
-                if(iBin != 2){
-                    std::cout << " Bin " << iBin << " has content : " << std::endl;
-                    std::cout << "                              " << hlist[ipar]->GetBinContent(iBin) << " +- " << hlist[ipar]->GetBinError(iBin) << std::endl;
-                    hlistLim[ipar]->SetBinContent(iBin, hlist[ipar]->GetBinContent(iBin));
-                    hlistLim[ipar]->SetBinError(iBin, hlist[ipar]->GetBinError(iBin));
-                }
-                std::cout << " Setting name " << std::endl;
-                hlistLim[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit_Lim").c_str() );
-                std::cout << " Name set !" << std::endl;
-            }
-            //hlistLim[ipar]->Fit(caloEnergyFit);
-            hlistLim[ipar]->Write();
-        }
-        else{
-	    hlist[ipar]->Fit(caloEnergyFit, "","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
-            AllCaloEnergyFits[ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
-	    hlist[ipar]->Write();            
-        }
+	hlist[ipar]->Fit(caloEnergyFit, "","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
+        AllCaloEnergyFits[ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
+	hlist[ipar]->Write();                    
     }
     hlist[npar]->Write();
+    PlotDlbGaus(fitHisto,file);
 							  
     delete [] hlist;
     delete [] hlistLim;
@@ -436,9 +416,6 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             //Individual fit range for Light_DiffPhiVsGenPt:
             if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
             if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
-            //if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 3){ActualFitRange[0] = -0.07; ActualFitRange[1] = 0.07;}
-            //if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 5){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
-            //if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 9){ActualFitRange[0] = -0.04; ActualFitRange[1] = 0.04;}
 
             //Individual fit range for Mu_DiffPhiVsGenInvPt:
             if(string(histoFit->GetName()) == "Mu_DiffPhiVsGenInvPt" && bin < 3){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
@@ -457,18 +434,10 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
-                    if(string(histoFit->GetName()) != "Light_DiffPtVsGenPt" || (string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin != 2) ){
+                    if(string(histoFit->GetName()) != "Light_DiffPtVsGenPt" || (string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin != 2) ){  //Skip 2nd bin for LightPt!!
 		        hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
                         hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
                     }
-                    /*else{
-                        hlist[ipar]->SetMarkerColor(8);
-                        hlist[ipar]->SetMarkerStyle(33);
-                        std::cout << " Filling in else loop with color = " << hlist[ipar]->GetMarkerColor() << std::endl;
-                        hlist[ipar]->Fill( (int) (bin+1/2),doubleGaussianFit->GetParameter(ipar));
-                        hlist[ipar]->SetBinError( (int) (bin+1/2), doubleGaussianFit->GetParError(ipar)/10.);
-                        hlist[ipar]->SetMarkerColor(1);
-                    }*/                       
 	        }
 		//Save hchi2 histogram as extra hlist!
 	        hlist[npar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-npar));
@@ -509,12 +478,15 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard){
+void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard){  //Doesn't use fitHisto information here 
 
-    const int NrConsideredPars = 6, NrConsideredCaloPars = 3;
+    const int NrConsideredPars = 6;
     string ParamName[NrConsideredPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
 
     for(int ipar = 0; ipar < NrConsideredPars; ipar++){
+	int NrConsideredCaloPars;
+	if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5) NrConsideredCaloPars = 5;
+	else NrConsideredCaloPars = 3;
 
 	for(int icalopar = 0; icalopar < NrConsideredCaloPars; icalopar++){
 	    if(icalopar == 0) myTFs<<ParamName[ipar]<<" & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[ipar].GetParError(icalopar);
@@ -526,9 +498,39 @@ void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard){
     }
 }
 
+void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
+
+    const int NrParsDblGaus = 6;
+    const int PtPars = 15;
+    float PtGenValues[PtPars] = {10,15,20,30,40,55,70,85,100,115,130,145,160,180,200};
+    if( string(fitHisto->GetName()).find("VsGenInvPt") <= string(fitHisto->GetName()).size()){
+        float InvPtGenValues[PtPars] = {0.1,0.0667, 0.05, 0.033, 0.025, 0.01818, 0.014, 0.0118, 0.01, 0.00869, 0.00769, 0.00689, 0.00625, 0.00556, 0.005};
+        for(int ii = 0; ii < PtPars; ii++) PtGenValues[ii] = InvPtGenValues[ii];
+    }
+
+    for(int iGenPt = 0; iGenPt < PtPars; iGenPt++){
+        TH1F* DblGausPlot = new TH1F("DblGausPlot","Double Gaussian distribution using the fit parameters",200,(fitHisto->GetYaxis()->GetXmin())*2,(fitHisto->GetYaxis()->GetXmax())*2);
+        DblGausPlot->SetTitle( (string(DblGausPlot->GetTitle())+" (Pt of parton = "+tostr(PtGenValues[iGenPt])+")").c_str());
+        DblGausPlot->SetName( (string(fitHisto->GetName())+"_DblGausPlot_GenPt"+tostr(PtGenValues[iGenPt])).c_str());
+        
+        float CaloParGenPt[NrParsDblGaus]={0,0,0,0,0,0};
+        for(int ipar = 0; ipar < NrParsDblGaus; ipar++){
+            if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
+                for(int icalo = 0; icalo < 5; icalo++) CaloParGenPt[ipar] += AllCaloEnergyFits[ipar].GetParameter(icalo)*pow(PtGenValues[iGenPt],icalo);                
+            }
+            else{
+                for(int icalo = 0; icalo < 3; icalo++) CaloParGenPt[ipar] += AllCaloEnergyFits[ipar].GetParameter(icalo)*pow(PtGenValues[iGenPt],(double) (icalo/2.));
+            }
+        }
+        for(int iBin = 0; iBin <= 200; iBin++)
+            DblGausPlot->SetBinContent(iBin,CaloParGenPt[2]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[0]),2)/(2*pow(CaloParGenPt[1],2))))+CaloParGenPt[5]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[3]),2)/(2*pow(CaloParGenPt[4],2)))));
+        DblGausPlot->Write();
+    }
+}
+
 void TFCreation::WritePlots(TFile* outfile){
 	outfile->cd();
-	std::cout << " Insided WritePlots class ! " << std::endl;
+	std::cout << " Inside WritePlots class ! " << std::endl;
 
 	TDirectory* th1dir = outfile->mkdir("1D_histograms");
 	th1dir->cd();

@@ -8,6 +8,9 @@
   int NrBins = 11;  //Also update on loop over bins!
   string HistoBin[NrBins] = {"1","2","3","4","5","6","7","8","9","10","11"};
   const int NrParams = 6;                                                   //Looking at doubleGaussian with 6 parameters!
+  const int NrDblGaus = 15;                                                 //Number of different Pt-bins have been considered for creating separate double Gaussian distributions!
+  string GenPt[NrDblGaus] = {"10","15","20","30","40","55","70","85","100","115","130","145","160","180","200"};   
+  string GenInvPt[NrDblGaus] = {"0.1","0.0667", "0.05", "0.033", "0.025", "0.01818", "0.014", "0.0118", "0.01", "0.00869", "0.00769", "0.00689", "0.00625", "0.00556", "0.005"};
   string Param[NrParams] = {"a1","a2","a3","a4","a5","a6"};                 //Names of the fit parameters  --> Check whether this is also correct for the ROOT class!
   bool GetMkdirOutput = false;                                              //Output for directories which need to be created wanted ??
   const int NrFitHistos = 12;                                               //Number of histograms which need to be considered!
@@ -31,9 +34,9 @@
 			   "Mu_DiffInvPtVsGenInvPt",   // Number 3
 			   "Mu_DiffThetaVsGenInvPt",   // Number 7
 			   "Mu_DiffPhiVsGenInvPt"};    // Number 11
-  string HistoAxisName[5] ={"Difference (gen-reco) of transverse E","Difference (gen-reco) of inverse transverse p ",
+  string HistoAxisName[5] ={"Difference (gen-reco) of transverse E","Difference (gen-reco) of inverse transverse E ",
 			    "Difference (gen-reco) of transverse p","Difference (gen-reco) of #phi","Difference (gen-reco) of #theta"};
-  string ChiXAxisName[3] ={"Transverse energy of generator parton (GeV)","Inverse transverse momentum of generator parton (1/GeV)","Transverse momentum of generator parton (GeV)"};
+  string ChiXAxisName[3] ={"Transverse energy of generator parton (GeV)","Inverse transverse energy of generator parton (1/GeV)","Transverse momentum of generator parton (GeV)"};
   string HistoTitle[4] = {"light jets","b-jets","muon","electron"};
   
   if(GetMkdirOutput == true){
@@ -98,7 +101,7 @@
       TCanvas* indiv2DCanvas =  new TCanvas("indiv2DCanvas","title");
       indiv2DCanvas->cd();
       twoDHisto->Draw("colz");
-      indiv2DCanvas->SaveAs( (Directory+"/"+Title+".png").c_str() );
+      //indiv2DCanvas->SaveAs( (Directory+"/"+Title+".png").c_str() );
       indiv2DCanvas->SaveAs( (Directory+"/"+Title+".pdf").c_str() );
       delete indiv2DCanvas;
        
@@ -151,13 +154,13 @@
 	  projHisto->GetXaxis()->SetTitle(chiXAxisName.c_str() );	       
 	}
 	projHisto->Draw();	
-	projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".png").c_str() );    //Individual histograms!
+	//projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".png").c_str() );    //Individual histograms!
 	projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".pdf").c_str() );
 	delete projIndivCanvas;
 	
       }//End of loop over NrBins
 
-      projCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitDistributions.png").c_str() ); //Histograms together in one canvas!
+      //projCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitDistributions/.png").c_str() ); //Histograms together in one canvas!
       projCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitDistributions.pdf").c_str() );      
       delete projCanvas;
       delete projHisto;      
@@ -186,20 +189,50 @@
 	paramIndivCanvas->cd();
 	paramHisto->Draw("e");
 	string ParamHistoName = ("FitParameter_"+Param[iPar]).c_str();
-	paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".png").c_str() ); //Parameter histograms individual!
+	//paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".png").c_str() ); //Parameter histograms individual!
 	paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".pdf").c_str() );
 	delete paramIndivCanvas;
 	
       }//End of loop over NrParams
 
-      paramCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitParameters.png").c_str() ); //Parameter histograms together in one canvs!
+      //paramCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitParameters.png").c_str() ); //Parameter histograms together in one canvs!
       paramCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitParameters.pdf").c_str() );
       delete paramCanvas;
       delete paramHisto;
 
+      ///////////////////////////////////////////////////////////
+      //  Save the DblGaus distributions using the fit params  //
+      ///////////////////////////////////////////////////////////
+      TCanvas* dblGausCanvas = new TCanvas("DblGausCanvas","Double Gaussian distribution using the fitted parameters");
+      dblGausCanvas->Divide(4,4);
+
+      TH1D* dblGausHisto;
+      for(int iGaus = 0; iGaus < NrDblGaus; iGaus++){
+
+        if(Title.find("GenInvPt") <= Title.size()){
+            dblGausHisto = (TH1D*) histoFile->Get( (Title+"/"+Title+"_DblGausPlot_GenPt"+GenInvPt[iGaus]).c_str());
+            dblGausHisto->SetTitle( ("Double Gaussian distribution ("+histoTitle+") for InvGenPt "+GenInvPt[iGaus]).c_str());
+        }
+        else{
+            dblGausHisto = (TH1D*) histoFile->Get( (Title+"/"+Title+"_DblGausPlot_GenPt"+GenPt[iGaus]).c_str());
+            dblGausHisto->SetTitle( ("Double Gaussian distribution ("+histoTitle+") for GenPt "+GenPt[iGaus]).c_str());
+        }
+        dblGausHisto->GetXaxis()->SetTitle( histoAxisName.c_str() );
+        dblGausHisto->GetXaxis()->SetTitleOffset(0.85);
+        dblGausHisto->SetMarkerStyle(8);
+        dblGausHisto->SetMarkerSize(0.3);
+
+        //Draw the histograms in the different pads of the created canvas!
+        dblGausCanvas->cd(iGaus+1);
+        dblGausHisto->Draw("e");
+      }
+      dblGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_DblGausDistribution.pdf").c_str() );
+      delete dblGausCanvas;
+      delete dblGausHisto;
+
     }//End of loop over NrFitHistos
     
-    twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.png").c_str() );
+    //twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.png").c_str() );
     twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.pdf").c_str() ); 
     delete twoDCanvas;
     delete twoDHisto;    
