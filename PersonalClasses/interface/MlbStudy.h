@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "TH1.h"
+#include "TH2.h"
 #include "TFile.h"
 #include "TopTreeProducer/interface/TRootJet.h"
 
@@ -17,7 +18,7 @@ using namespace TopTree;
 class MlbStudy{
 
   public:
-   MlbStudy();
+   MlbStudy(int);
    ~MlbStudy();
 
    void calculateChiSquared(vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, TLorentzVector* lepton, vector<TRootJet*> Jets, float MassMlb, float SigmaMlb, float MassMqqb, float SigmaMqqb);
@@ -25,7 +26,8 @@ class MlbStudy{
    void calculateEfficiency(int option, vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, int NrConsideredBTagOptions, int ChiSqCutValue);
    void saveNumbers(std::string NameOfOption[6], int WhichJets, int NrOptionsConsidered, int ChosenOption, std::string StrForChiSqCutValue);
    void initializePerEvent();
-   void initializeBegin();
+   void initializeBegin(int);
+   void WritePlots(TFile*);
 
    int chosenBHadr, chosenBLept, chosenQuark1, chosenQuark2;
    int LowestChiSq, LowestChiSq4Jets, CorrectChiSq;           //Since Mqqb Values are set artificially high, only the first two chi-sq will be the lowest one in the case of only 4 jets!
@@ -71,6 +73,12 @@ class MlbStudy{
    int getNrCorrectOptionsAvailable(int OptionNr) {return CorrectOptionAvailable[OptionNr];};
    int getNrCorrectBOptionChosen(int OptionNr) {return CorrectBOptionChosen[OptionNr];};
    int getNrWrongBOptionChosen(int OptionNr) {return WrongBOptionChosen[OptionNr];};
+
+  private:
+    map<string,TH1F*> histo1D;
+    map<string,TH2F*> histo2D;
+    std::string Title[3], Name[3];
+
 };
 
 #endif
