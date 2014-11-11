@@ -553,6 +553,11 @@ int main (int argc, char *argv[])
       ////////////////
       
       TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  
+      
+      //Also need to load the init_jets info!
+      std::cout << " Size of init_jets and init_jets_corrected : " << init_jets.size() << " vs " << init_jets_corrected.size() << std::endl;
+      if(init_jets.size() > 0 && init_jets_corrected.size() > 0) std::cout << " Value of Px for init_jet and init_jets_corrected : " << (init_jets[0])->Px() << " vs " << (init_jets_corrected[0])->Px() << std::endl;
+
 
       if(! (dataSetName.find("Data")==0 || dataSetName.find("DATA")==0  || dataSetName.find("data")==0 ) ) {
         genjets = treeLoader.LoadGenJet(ievt,false);
@@ -1829,13 +1834,13 @@ int main (int argc, char *argv[])
   mkdir((pathPNG+"/MSPlots").c_str(),0777);
  
   TDirectory* msdir = fout->mkdir("MSPlots");
-  /*msdir->cd(); 
+  msdir->cd(); 
   for(map<string,MultiSamplePlot*>::const_iterator it = MSPlot.begin(); it != MSPlot.end(); it++){    
     MultiSamplePlot *temp = it->second;
     string name = it->first;
-    //temp->Draw(string("CMSPlot"), 0, false, false, false, 1, 0.45, 0.63, 0.97, 0.94, 1.3);  //name, true, true, true, true, true, 1, false);
+    temp->Draw(name, 0, false, false, false, 1);     //string label, unsigned int RatioType, bool addRatioErrorBand, bool addErrorBand, bool ErrorBandAroundTotalInput, int scaleNPSSignal 
     temp->Write(fout, name, true, "PlotsMacro/MSPlots/", "png");
-  }*/
+  }
 
   TDirectory* th1dir = fout->mkdir("1D_histograms");
   th1dir->cd();
