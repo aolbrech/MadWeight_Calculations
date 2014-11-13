@@ -1,4 +1,11 @@
 {
+  //----------------------------------//
+  //   Only draw specific histograms  //
+  //----------------------------------//
+  bool drawIndivHistos = false;
+  bool drawColorHistos = true;
+  bool drawDoubleGaus = false;
+
   //-------------------------------------------------------------------------------------//
   //  Values which need to be changed when a different directory should be accessed !!   //
   //-------------------------------------------------------------------------------------//
@@ -22,23 +29,40 @@
   std::cout <<         " //-----------  Used ROOT file : " << histoFile->GetName() << endl;
   std::cout <<         " //--------------------------------------------------------------------------------------------------------" << endl;
 
-  std::string Titles[12] ={"Light_DiffPtVsGenPt",      // Number 0
-			   "Light_DiffThetaVsGenPt",   // Number 4
-			   "Light_DiffPhiVsGenPt",     // Number 8
-			   "BJet_DiffPtVsGenPt",       // Number 1
-			   "BJet_DiffThetaVsGenPt",    // Number 5
-			   "BJet_DiffPhiVsGenPt",      // Number 9
-			   "El_DiffPtVsGenPt",         // Number 2
-			   "El_DiffThetaVsGenPt",      // Number 6
-			   "El_DiffPhiVsGenPt",        // Number 10
-			   "Mu_DiffInvPtVsGenInvPt",   // Number 3
-			   "Mu_DiffThetaVsGenInvPt",   // Number 7
-			   "Mu_DiffPhiVsGenInvPt"};    // Number 11
+  //Store the EtaBin Title and Name for the histograms!
+  nEtaBins = 4;
+  std::string EtaBin[5], EtaTitle[5];
+  float EtaValues[6];
+  std::string EtaValuesString[6];
+  EtaBin[0] = ""; EtaTitle[0] = " -- for all |#eta| values";
+  if(nEtaBins == 4){         
+        EtaValues[1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
+        EtaValuesString[1] = "0"; EtaValuesString[2] = "0.375"; EtaValuesString[3] = "0.75"; EtaValuesString[4] = "1.45"; EtaValuesString[5] = "2.5";
+        for(int ii = 1; ii <= nEtaBins; ii++){
+            EtaBin[ii] = "_Eta_"+EtaValuesString[ii]+"_"+EtaValuesString[ii+1];
+            EtaTitle[ii] = " -- "+EtaValuesString[ii]+" < |#eta| #leq "+EtaValuesString[ii+1];
+        }
+  }
+  int usedEta = 0;
+  Directory = Directory+EtaBin[usedEta];
+
+  std::string Titles[12] ={"Light_DiffPtVsGenPt"+EtaBin[usedEta],      // Number 0
+			   "Light_DiffThetaVsGenPt"+EtaBin[usedEta],   // Number 4
+			   "Light_DiffPhiVsGenPt"+EtaBin[usedEta],     // Number 8
+			   "BJet_DiffPtVsGenPt"+EtaBin[usedEta],       // Number 1
+			   "BJet_DiffThetaVsGenPt"+EtaBin[usedEta],    // Number 5
+			   "BJet_DiffPhiVsGenPt"+EtaBin[usedEta],      // Number 9
+			   "El_DiffPtVsGenPt"+EtaBin[usedEta],         // Number 2
+			   "El_DiffThetaVsGenPt"+EtaBin[usedEta],      // Number 6
+			   "El_DiffPhiVsGenPt"+EtaBin[usedEta],        // Number 10
+			   "Mu_DiffInvPtVsGenInvPt"+EtaBin[usedEta],   // Number 3
+			   "Mu_DiffThetaVsGenInvPt"+EtaBin[usedEta],   // Number 7
+			   "Mu_DiffPhiVsGenInvPt"+EtaBin[usedEta]};    // Number 11
   string HistoAxisName[5] ={"Difference (gen-reco) of transverse E","Difference (gen-reco) of inverse transverse E ",
 			    "Difference (gen-reco) of transverse p","Difference (gen-reco) of #phi","Difference (gen-reco) of #theta"};
   string ChiXAxisName[3] ={"Transverse energy of generator parton (GeV)","Inverse transverse energy of generator parton (1/GeV)","Transverse momentum of generator parton (GeV)"};
   string HistoTitle[4] = {"light jets","b-jets","muon","electron"};
-  
+
   if(GetMkdirOutput == true){
     //--------------------------------------------//
     //  First time: Create needed directories !!  //    
@@ -90,20 +114,23 @@
       //  Draw fitting histograms  //
       ///////////////////////////////
       twoDHisto = (TH1D*) histoFile->Get( ("2D_histograms_graphs/"+Title).c_str() );
+    std::cout << " Looking at histogram : " << ("2D_histograms_graphs/"+Title).c_str() <<std::endl;
       twoDHisto->GetXaxis()->SetTitle( chiXAxisName.c_str() );
       twoDHisto->GetYaxis()->SetTitle( histoAxisName.c_str() );
-      twoDHisto->SetTitle( ("Color plot for "+histoTitle).c_str() );
+      twoDHisto->SetTitle( ("Color plot for "+histoTitle+EtaTitle[usedEta]).c_str() );
       twoDHisto->GetXaxis()->SetTitleOffset(0.85);
       twoDHisto->GetYaxis()->SetTitleOffset(0.75);
       twoDCanvas->cd(iHisto+1);
       twoDHisto->Draw("colz");
 
+    if(drawIndivHistos == true && drawColorHistos == true){      
       TCanvas* indiv2DCanvas =  new TCanvas("indiv2DCanvas","title");
       indiv2DCanvas->cd();
       twoDHisto->Draw("colz");
       //indiv2DCanvas->SaveAs( (Directory+"/"+Title+".png").c_str() );
       indiv2DCanvas->SaveAs( (Directory+"/"+Title+".pdf").c_str() );
       delete indiv2DCanvas;
+    }
        
       ///////////////////////////////////////
       //  Save the ProjectionY histograms  //
@@ -141,6 +168,7 @@
 	}	
 	
 	//Save each histogram separately as well!
+      if(drawIndivHistos == true){
 	TCanvas* projIndivCanvas = new TCanvas("projIndivCanvas","title");;
 	projIndivCanvas->cd();
 	if(iBin < NrBins){
@@ -157,6 +185,7 @@
 	//projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".png").c_str() );    //Individual histograms!
 	projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".pdf").c_str() );
 	delete projIndivCanvas;
+      }
 	
       }//End of loop over NrBins
 
@@ -174,7 +203,7 @@
       TH1D* paramHisto;
       for(int iPar = 0; iPar < NrParams; iPar++){
 	paramHisto = (TH1D*) histoFile->Get( (Title+"/"+Title+"_"+Param[iPar]+"_PointsAndFit").c_str() );
-	paramHisto->SetTitle( ("Fitted value of parameter "+Param[iPar]).c_str());
+	paramHisto->SetTitle( ("Fitted value of parameter "+Param[iPar]+EtaTitle[usedEta]).c_str());
 	paramHisto->GetXaxis()->SetTitle( ChiXAxisName.c_str() );
 	paramHisto->GetXaxis()->SetTitleOffset(0.85);
 	paramHisto->SetMarkerStyle(8); //Only use a small dot!
@@ -185,6 +214,7 @@
 	paramHisto->Draw("e");
 
 	//Also draw the histograms individually
+        if(drawIndivHistos == true){
 	TCanvas* paramIndivCanvas = new TCanvas("paramIndivCanvas","title");
 	paramIndivCanvas->cd();
 	paramHisto->Draw("e");
@@ -192,6 +222,7 @@
 	//paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".png").c_str() ); //Parameter histograms individual!
 	paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".pdf").c_str() );
 	delete paramIndivCanvas;
+        }
 	
       }//End of loop over NrParams
 
@@ -203,6 +234,7 @@
       ///////////////////////////////////////////////////////////
       //  Save the DblGaus distributions using the fit params  //
       ///////////////////////////////////////////////////////////
+      if(drawDoubleGaus == true){
       TCanvas* dblGausCanvas = new TCanvas("DblGausCanvas","Double Gaussian distribution using the fitted parameters");
       dblGausCanvas->Divide(4,4);
 
@@ -229,6 +261,7 @@
       dblGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_DblGausDistribution.pdf").c_str() );
       delete dblGausCanvas;
       delete dblGausHisto;
+      }
 
     }//End of loop over NrFitHistos
     
