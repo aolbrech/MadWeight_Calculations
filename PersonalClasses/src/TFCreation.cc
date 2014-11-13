@@ -17,75 +17,96 @@ TFCreation::~TFCreation(){
     delete doubleGaussianFit;
 }
 
-void TFCreation::InitializeVariables(){
-	histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,0.4);
-	histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,0.4);
-	histo1D["DeltaR_TFClass_HadrB"]  = new TH1F("DeltaR_TFClass_HadrB","DeltaR_TFClass_HadrB",200,0,0.4);
-	histo1D["DeltaR_TFClass_LeptB"]  = new TH1F("DeltaR_TFClass_LeptB","DeltaR_TFClass_LeptB",200,0,0.4);
-	histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,0.4);
-	histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,0.4);
+void TFCreation::InitializeVariables(int nEtaBins){
+    histo1D["DeltaR_TFClass_Light1"] = new TH1F("DeltaR_TFClass_Light1","DeltaR_TFClass_Light1",200,0,0.4);
+    histo1D["DeltaR_TFClass_Light2"] = new TH1F("DeltaR_TFClass_Light2","DeltaR_TFClass_Light2",200,0,0.4);
+    histo1D["DeltaR_TFClass_HadrB"]  = new TH1F("DeltaR_TFClass_HadrB","DeltaR_TFClass_HadrB",200,0,0.4);
+    histo1D["DeltaR_TFClass_LeptB"]  = new TH1F("DeltaR_TFClass_LeptB","DeltaR_TFClass_LeptB",200,0,0.4);
+    histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,0.4);
+    histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,0.4);
 
-	histo2D["Light_RecoPtVsGenPt"]    = new TH2F("Light_RecoPtVsGenPt",   "Transverse momentum of light quarks (reco vs gen)",                        150,     0,  300, 150,      0,  300);
-	histo2D["Light_DiffPtVsGenPt"]    = new TH2F("Light_DiffPtVsGenPt",   "p_{T} difference (gen-reco) versus p_{T,gen} for light quarks",             10,    30,  115, 100,    -30,   35);
-	histo2D["BJet_RecoPtVsGenPt"]     = new TH2F("BJet_RecoPtVsGenPt",    "Transverse momentum of b-jets (reco vs gen level)",                        150,     0,  300, 150,      0,  300);
-	histo2D["BJet_DiffPtVsGenPt"]     = new TH2F("BJet_DiffPtVsGenPt",    "p_{T} difference (gen-reco) versus p_{T,gen} for b-jets",                   10,    30,  150, 100,    -35,   50);
-	histo2D["El_RecoPtVsGenPt"]       = new TH2F("El_RecoPtVsGenPt",      "Transverse momentum of electron (reco vs gen)",                            100,     0,  200, 100,      0,  200);
-	histo2D["El_DiffPtVsGenPt"]       = new TH2F("El_DiffPtVsGenPt",      "p_{T} difference (gen-reco) versus p_{T,gen} for electron",                 10,    30,  105, 100,     -6,    6);
-	histo2D["Mu_RecoInvPtVsGenInvPt"] = new TH2F("Mu_RecoInvPtVsGenInvPt","Inverse of transverse momentum of muon (reco vs gen)",                     100,     0, 0.05, 100,      0, 0.05);
-	histo2D["Mu_DiffInvPtVsGenInvPt"] = new TH2F("Mu_DiffInvPtVsGenInvPt","#frac{1}{p_{T}} difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon", 10, 0.005,0.035,  80,-0.0015, 0.001);
-        histo2D["Mu_DiffInvPtVsGenInvPt_All"] =new TH2F("Mu_DiffInvPtVsGenInvPt_All","#frac{1}{p_{T}} difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon", 20, 0.005, 0.05,    180,  -0.1, 0.1);
-	histo2D["Mu_RecoPtVsGenPt"]       = new TH2F("Mu_RecoPtVsGenPt",      "Transverse momentum of muon (reco vs gen)",                                150,     0,  200, 150,      0,  200);
-	histo2D["Mu_DiffPtVsGenPt"]       = new TH2F("Mu_DiffPtVsGenPt",      "p_{T} difference (gen-reco) versus p_{T,gen} for muon",                     10,    26,  150, 100,    -10,   10);
+    histo2D["Light_RecoPtVsGenPt"]    = new TH2F("Light_RecoPtVsGenPt",   "Transverse momentum of light quarks (reco vs gen)",                     150,     0,  300, 150,      0,  300);
+    histo2D["Light_DiffPtVsGenPt"]    = new TH2F("Light_DiffPtVsGenPt",   "p_{T} difference (gen-reco) versus p_{T,gen} for light quarks",             10,    30,  115, 100,    -30,   35);
+    histo2D["BJet_RecoPtVsGenPt"]     = new TH2F("BJet_RecoPtVsGenPt",    "Transverse momentum of b-jets (reco vs gen level)",                        150,     0,  300, 150,      0,  300);
+    histo2D["BJet_DiffPtVsGenPt"]     = new TH2F("BJet_DiffPtVsGenPt",    "p_{T} difference (gen-reco) versus p_{T,gen} for b-jets",                   10,    30,  150, 100,    -35,   50);
+    histo2D["El_RecoPtVsGenPt"]       = new TH2F("El_RecoPtVsGenPt",      "Transverse momentum of electron (reco vs gen)",                            100,     0,  200, 100,      0,  200);
+    histo2D["El_DiffPtVsGenPt"]       = new TH2F("El_DiffPtVsGenPt",      "p_{T} difference (gen-reco) versus p_{T,gen} for electron",                 10,    30,  105, 100,     -6,    6);
+    histo2D["Mu_RecoInvPtVsGenInvPt"] = new TH2F("Mu_RecoInvPtVsGenInvPt","Inverse of transverse momentum of muon (reco vs gen)",                     100,     0, 0.05, 100,      0, 0.05);
+    histo2D["Mu_DiffInvPtVsGenInvPt"] = new TH2F("Mu_DiffInvPtVsGenInvPt","#frac{1}{p_{T}} difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon", 10, 0.005,0.035,  80,-0.0015, 0.001);
+    histo2D["Mu_DiffInvPtVsGenInvPt_All"] =new TH2F("Mu_DiffInvPtVsGenInvPt_All","#frac{1}{p_{T}} difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon", 20, 0.005, 0.05,    180,  -0.1, 0.1);
+    histo2D["Mu_RecoPtVsGenPt"]       = new TH2F("Mu_RecoPtVsGenPt",      "Transverse momentum of muon (reco vs gen)",                                150,     0,  200, 150,      0,  200);
+    histo2D["Mu_DiffPtVsGenPt"]       = new TH2F("Mu_DiffPtVsGenPt",      "p_{T} difference (gen-reco) versus p_{T,gen} for muon",                     10,    26,  150, 100,    -10,   10);
 	
-	histo2D["Light_RecoThetaVsGenTheta"] = new TH2F("Light_RecoThetaVsGenTheta","Polar angle distribution of light quarks (reco vs gen)",                          60,    0,  3.15,  60,     0, 3.15);
-	histo2D["Light_DiffThetaVsGenTheta"] = new TH2F("Light_DiffThetaVsGenTheta","#theta difference (gen-reco) versus #theta_{gen} for light quarks",               10,  0.1,   3.1, 100, -0.15, 0.15);
-	histo2D["BJet_RecoThetaVsGenTheta"]  = new TH2F("BJet_RecoThetaVsGenTheta", "Polar angle distribution of b-jets (reco vs gen)",                                60,    0,  3.15,  60,     0, 3.15);
-	histo2D["BJet_DiffThetaVsGenTheta"]  = new TH2F("BJet_DiffThetaVsGenTheta", "#theta difference (gen-reco) versus #theta_{gen} for b-jets",                     10,  0.1,   3.1, 100, -0.15, 0.15);
-	histo2D["El_RecoThetaVsGenTheta"]    = new TH2F("El_RecoThetaVsGenTheta",   "Polar angle distribution of electron (reco vs gen)",                              60,    0,  3.15,  60,     0, 3.15);
-	histo2D["El_DiffThetaVsGenTheta"]    = new TH2F("El_DiffThetaVsGenTheta",   "#theta difference (gen-reco) versus #theta_{gen} for electron",                   10,    0,  3.15, 100, -0.15, 0.15);
-	histo2D["Mu_RecoThetaVsGenTheta"]    = new TH2F("Mu_RecoThetaVsGenTheta",   "Polar angle distribution of muon (reco vs gen)",                                  60,    0,  3.15,  60,     0, 3.15);
-	histo2D["Mu_DiffThetaVsGenTheta"]    = new TH2F("Mu_DiffThetaVsGenTheta",   "#theta difference (gen-reco) versus #theta_{gen} for muon",                       10,    0,  3.15, 100, -0.15, 0.15);
-	histo2D["Light_RecoThetaVsGenPt"]    = new TH2F("Light_RecoThetaVsGenPt",   "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for light quarks", 120,    0,   300,  60,     0, 3.15);
-	histo2D["Light_DiffThetaVsGenPt"]    = new TH2F("Light_DiffThetaVsGenPt",   "#theta difference (gen-reco) versus p_{T,gen} for light quarks",                  10,   30,   150, 150, -0.12, 0.12);
-	histo2D["BJet_RecoThetaVsGenPt"]     = new TH2F("BJet_RecoThetaVsGenPt",    "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for b-jets",       120,    0,   300,  60,     0, 3.15);
-	histo2D["BJet_DiffThetaVsGenPt"]     = new TH2F("BJet_DiffThetaVsGenPt",    "#theta difference (gen-reco) versus p_{T,gen} for b-jets",                        10,   30,   160, 150,  -0.1,  0.1);
-	histo2D["El_RecoThetaVsGenPt"]       = new TH2F("El_RecoThetaVsGenPt",      "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for electron",     100,    0,   200,  60,     0, 3.15);
-	histo2D["El_DiffThetaVsGenPt"]       = new TH2F("El_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for electron",                      10,   30,   130, 100, -0.02, 0.02);
-	histo2D["Mu_RecoThetaVsGenInvPt"]    = new TH2F("Mu_RecoThetaVsGenInvPt",   "Polar angle #theta_{rec} versus #frac{1}{p_{T,gen}} for muon",                   100,    0,  0.05,  60,     0, 3.15);
-        histo2D["Mu_RecoThetaVsGenPt"]       = new TH2F("Mu_RecoThetaVsGenPt",      "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for muon",         150,    0,   200,  60,     0, 3.15);
-	histo2D["Mu_DiffThetaVsGenInvPt"]    = new TH2F("Mu_DiffThetaVsGenInvPt",   "#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                10,0.005, 0.035, 100,-0.004,0.004);
-        histo2D["Mu_DiffThetaVsGenPt"]       = new TH2F("Mu_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for muon",                          10,   30,   150, 100,  -0.1,  0.1);
+    histo2D["Light_RecoThetaVsGenTheta"] = new TH2F("Light_RecoThetaVsGenTheta","Polar angle distribution of light quarks (reco vs gen)",                          60,    0,  3.15,  60,     0, 3.15);
+    histo2D["Light_DiffThetaVsGenTheta"] = new TH2F("Light_DiffThetaVsGenTheta","#theta difference (gen-reco) versus #theta_{gen} for light quarks",               10,  0.1,   3.1, 100, -0.15, 0.15);
+    histo2D["BJet_RecoThetaVsGenTheta"]  = new TH2F("BJet_RecoThetaVsGenTheta", "Polar angle distribution of b-jets (reco vs gen)",                                60,    0,  3.15,  60,     0, 3.15);
+    histo2D["BJet_DiffThetaVsGenTheta"]  = new TH2F("BJet_DiffThetaVsGenTheta", "#theta difference (gen-reco) versus #theta_{gen} for b-jets",                     10,  0.1,   3.1, 100, -0.15, 0.15);
+    histo2D["El_RecoThetaVsGenTheta"]    = new TH2F("El_RecoThetaVsGenTheta",   "Polar angle distribution of electron (reco vs gen)",                              60,    0,  3.15,  60,     0, 3.15);
+    histo2D["El_DiffThetaVsGenTheta"]    = new TH2F("El_DiffThetaVsGenTheta",   "#theta difference (gen-reco) versus #theta_{gen} for electron",                   10,    0,  3.15, 100, -0.15, 0.15);
+    histo2D["Mu_RecoThetaVsGenTheta"]    = new TH2F("Mu_RecoThetaVsGenTheta",   "Polar angle distribution of muon (reco vs gen)",                                  60,    0,  3.15,  60,     0, 3.15);
+    histo2D["Mu_DiffThetaVsGenTheta"]    = new TH2F("Mu_DiffThetaVsGenTheta",   "#theta difference (gen-reco) versus #theta_{gen} for muon",                       10,    0,  3.15, 100, -0.15, 0.15);
+    histo2D["Light_RecoThetaVsGenPt"]    = new TH2F("Light_RecoThetaVsGenPt",   "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for light quarks", 120,    0,   300,  60,     0, 3.15);
+    histo2D["Light_DiffThetaVsGenPt"]    = new TH2F("Light_DiffThetaVsGenPt",   "#theta difference (gen-reco) versus p_{T,gen} for light quarks",                  10,   30,   150, 150, -0.12, 0.12);
+    histo2D["BJet_RecoThetaVsGenPt"]     = new TH2F("BJet_RecoThetaVsGenPt",    "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for b-jets",       120,    0,   300,  60,     0, 3.15);
+    histo2D["BJet_DiffThetaVsGenPt"]     = new TH2F("BJet_DiffThetaVsGenPt",    "#theta difference (gen-reco) versus p_{T,gen} for b-jets",                        10,   30,   160, 150,  -0.1,  0.1);
+    histo2D["El_RecoThetaVsGenPt"]       = new TH2F("El_RecoThetaVsGenPt",      "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for electron",     100,    0,   200,  60,     0, 3.15);
+    histo2D["El_DiffThetaVsGenPt"]       = new TH2F("El_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for electron",                      10,   30,   130, 100, -0.02, 0.02);
+    histo2D["Mu_RecoThetaVsGenInvPt"]    = new TH2F("Mu_RecoThetaVsGenInvPt",   "Polar angle #theta_{rec} versus #frac{1}{p_{T,gen}} for muon",                   100,    0,  0.05,  60,     0, 3.15);
+    histo2D["Mu_RecoThetaVsGenPt"]       = new TH2F("Mu_RecoThetaVsGenPt",      "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for muon",         150,    0,   200,  60,     0, 3.15);
+    histo2D["Mu_DiffThetaVsGenInvPt"]    = new TH2F("Mu_DiffThetaVsGenInvPt",   "#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                10,0.005, 0.035, 100,-0.004,0.004);
+    histo2D["Mu_DiffThetaVsGenPt"]       = new TH2F("Mu_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for muon",                          10,   30,   150, 100,  -0.1,  0.1);
 	
-	histo2D["Light_RecoPhiVsGenPhi"]     = new TH2F("Light_RecoPhiVsGenPhi",    "Azimuthal angle distribution of light quarks (reco vs gen)",                       60,  -3.2,   3.2,  60,  -3.2,  3.2);
-	histo2D["Light_DiffPhiVsGenPhi"]     = new TH2F("Light_DiffPhiVsGenPhi",    "#phi difference (gen-reco) versus #phi_{gen} for light quarks",                    10,  -3.2,   3.2, 100,  -0.2,  0.2);
-        histo2D["Light_DiffPhiVsGenPhi_All"] = new TH2F("Light_DiffPhiVsGenPhi_All","#phi difference (gen-reco) versus #phi_{gen} for light quarks",                    10,  -3.2,   3.2, 120,  -6.2,  6.2);
-	histo2D["BJet_RecoPhiVsGenPhi"]      = new TH2F("BJet_RecoPhiVsGenPhi",     "Azimuthal angle distribution of b-jets (reco vs gen)",                             60,  -3.2,   3.2,  60,  -3.2,  3.2);
-	histo2D["BJet_DiffPhiVsGenPhi"]      = new TH2F("BJet_DiffPhiVsGenPhi",     "#phi difference (gen-reco) versus #phi_{gen} for b-jets",                          10,  -3.2,   3.2, 100,  -0.2,  0.2);
-        histo2D["BJet_DiffPhiVsGenPhi_All"]  = new TH2F("BJet_DiffPhiVsGenPhi_All", "#phi difference (gen-reco) versus #phi_{gen} for b-jets",                          10,  -3.2,   3.2, 120,  -6.2,  6.2);
-	histo2D["El_RecoPhiVsGenPhi"]        = new TH2F("El_RecoPhiVsGenPhi",       "Azimuthal angle distribution of electron (reco vs gen)", 			        60,  -3.2,   3.2,  60,  -3.2,  3.2);
-	histo2D["El_DiffPhiVsGenPhi"]        = new TH2F("El_DiffPhiVsGenPhi",       "#phi difference (gen-reco) versus #phi_{gen} for electron", 		        10,  -3.2,   3.2,  75, -0.15, 0.15);
-        histo2D["El_DiffPhiVsGenPhi_All"]    = new TH2F("El_DiffPhiVsGenPhi_All",   "#phi difference (gen-reco) versus #phi_{gen} for electron", 		        10,  -3.2,   3.2,  80,  -3.2,  3.2);
-	histo2D["Mu_RecoPhiVsGenPhi"]        = new TH2F("Mu_RecoPhiVsGenPhi",       "Azimuthal angle distribution of muon (reco vs gen)", 			        60,  -3.2,   3.2,  60,  -3.2,  3.2);
-	histo2D["Mu_DiffPhiVsGenPhi"]        = new TH2F("Mu_DiffPhiVsGenPhi",       "#phi difference (gen-reco) versus #phi_{gen} for muon", 			        10,  -3.2,   3.2,  75,  -0.2,  0.2);
-        histo2D["Mu_DiffPhiVsGenPhi_All"]    = new TH2F("Mu_DiffPhiVsGenPhi_All",   "#phi difference (gen-reco) versus #phi_{gen} for muon", 			        10,  -3.2,   3.2,  80,  -3.2,  3.2);
-	histo2D["Light_RecoPhiVsGenPt"]      = new TH2F("Light_RecoPhiVsGenPt",     "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for light quarks",150,     0,   300,  60,  -3.2,  3.2);
-	histo2D["Light_DiffPhiVsGenPt"]      = new TH2F("Light_DiffPhiVsGenPt",     "#phi difference (gen-reco) versus p_{T,gen} for light quarks",                     10,    30,   150, 100, -0.15, 0.15);
-        histo2D["Light_DiffPhiVsGenPt_All"]  = new TH2F("Light_DiffPhiVsGenPt_All", "#phi difference (gen-reco) versus p_{T,gen} for light quarks",                     10,     0,   250, 120,  -6.2,  6.2);
-	histo2D["BJet_RecoPhiVsGenPt"]       = new TH2F("BJet_RecoPhiVsGenPt",      "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for b-jets",      150,     0,   300,  60,  -3.2,  3.2);
-	histo2D["BJet_DiffPhiVsGenPt"]       = new TH2F("BJet_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,    30,   160, 100, -0.15, 0.15);
-        histo2D["BJet_DiffPhiVsGenPt_All"]   = new TH2F("BJet_DiffPhiVsGenPt_All",  "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,     0,   250, 120,  -6.2,  6.2);
-	histo2D["El_RecoPhiVsGenPt"]         = new TH2F("El_RecoPhiVsGenPt",        "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for electron",    150,     0,   250,  60,  -3.2,  3.2);
-	histo2D["El_DiffPhiVsGenPt"]         = new TH2F("El_DiffPhiVsGenPt",        "#phi difference (gen-reco) versus p_{T,gen} for electron",                         10,    30,   130, 120, -0.015, 0.015);
-        histo2D["El_DiffPhiVsGenPt_All"]     = new TH2F("El_DiffPhiVsGenPt_All",    "#phi difference (gen-reco) versus p_{T,gen} for electron",                         17,     0,   250, 120,  -6.2,  6.2);
-	histo2D["Mu_RecoPhiVsGenInvPt"]      = new TH2F("Mu_RecoPhiVsGenInvPt",     "Azimuthal angle #phi_{rec} versus #frac{1}{p_{T,gen}} for muon",                  100,     0,  0.05,  60,  -3.2,  3.2);
-        histo2D["Mu_RecoPhiVsGenPt"]         = new TH2F("Mu_RecoPhiVsGenPt",        "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for muon",        150,     0,   200,  60,  -3.2,  3.2);
-	histo2D["Mu_DiffPhiVsGenInvPt"]      = new TH2F("Mu_DiffPhiVsGenInvPt",     "#phi difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                   10, 0.005, 0.035, 120,-0.006,0.006);
-        histo2D["Mu_DiffPhiVsGenInvPt_All"]  = new TH2F("Mu_DiffPhiVsGenInvPt_All", "#phi difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                   10,     0,  0.05, 120,  -6.2,  6.2);
-        histo2D["Mu_DiffPhiVsGenPt"]         = new TH2F("Mu_DiffPhiVsGenPt",        "#phi difference (gen-reco) versus p_{T,gen} for muon",                             10,    26,   150, 100,  -0.2,  0.2);
-        histo2D["Mu_DiffPhiVsGenPt_All"]     = new TH2F("Mu_DiffPhiVsGenPt_All",    "#phi difference (gen-reco) versus p_{T,gen} for muon",                             14,     0,   200, 100,  -6.2,  6.2);
+    histo2D["Light_RecoPhiVsGenPhi"]     = new TH2F("Light_RecoPhiVsGenPhi",    "Azimuthal angle distribution of light quarks (reco vs gen)",                       60,  -3.2,   3.2,  60,  -3.2,  3.2);
+    histo2D["Light_DiffPhiVsGenPhi"]     = new TH2F("Light_DiffPhiVsGenPhi",    "#phi difference (gen-reco) versus #phi_{gen} for light quarks",                    10,  -3.2,   3.2, 100,  -0.2,  0.2);
+    histo2D["Light_DiffPhiVsGenPhi_All"] = new TH2F("Light_DiffPhiVsGenPhi_All","#phi difference (gen-reco) versus #phi_{gen} for light quarks",                    10,  -3.2,   3.2, 120,  -6.2,  6.2);
+    histo2D["BJet_RecoPhiVsGenPhi"]      = new TH2F("BJet_RecoPhiVsGenPhi",     "Azimuthal angle distribution of b-jets (reco vs gen)",                             60,  -3.2,   3.2,  60,  -3.2,  3.2);
+    histo2D["BJet_DiffPhiVsGenPhi"]      = new TH2F("BJet_DiffPhiVsGenPhi",     "#phi difference (gen-reco) versus #phi_{gen} for b-jets",                          10,  -3.2,   3.2, 100,  -0.2,  0.2);
+    histo2D["BJet_DiffPhiVsGenPhi_All"]  = new TH2F("BJet_DiffPhiVsGenPhi_All", "#phi difference (gen-reco) versus #phi_{gen} for b-jets",                          10,  -3.2,   3.2, 120,  -6.2,  6.2);
+    histo2D["El_RecoPhiVsGenPhi"]        = new TH2F("El_RecoPhiVsGenPhi",       "Azimuthal angle distribution of electron (reco vs gen)", 			    60,  -3.2,   3.2,  60,  -3.2,  3.2);
+    histo2D["El_DiffPhiVsGenPhi"]        = new TH2F("El_DiffPhiVsGenPhi",       "#phi difference (gen-reco) versus #phi_{gen} for electron", 		            10,  -3.2,   3.2,  75, -0.15, 0.15);
+    histo2D["El_DiffPhiVsGenPhi_All"]    = new TH2F("El_DiffPhiVsGenPhi_All",   "#phi difference (gen-reco) versus #phi_{gen} for electron", 		            10,  -3.2,   3.2,  80,  -3.2,  3.2);
+    histo2D["Mu_RecoPhiVsGenPhi"]        = new TH2F("Mu_RecoPhiVsGenPhi",       "Azimuthal angle distribution of muon (reco vs gen)", 			            60,  -3.2,   3.2,  60,  -3.2,  3.2);
+    histo2D["Mu_DiffPhiVsGenPhi"]        = new TH2F("Mu_DiffPhiVsGenPhi",       "#phi difference (gen-reco) versus #phi_{gen} for muon", 			    10,  -3.2,   3.2,  75,  -0.2,  0.2);
+    histo2D["Mu_DiffPhiVsGenPhi_All"]    = new TH2F("Mu_DiffPhiVsGenPhi_All",   "#phi difference (gen-reco) versus #phi_{gen} for muon", 			    10,  -3.2,   3.2,  80,  -3.2,  3.2);
+    histo2D["Light_RecoPhiVsGenPt"]      = new TH2F("Light_RecoPhiVsGenPt",     "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for light quarks",150,     0,   300,  60,  -3.2,  3.2);
+    histo2D["Light_DiffPhiVsGenPt"]      = new TH2F("Light_DiffPhiVsGenPt",     "#phi difference (gen-reco) versus p_{T,gen} for light quarks",                     10,    30,   150, 100, -0.15, 0.15);
+    histo2D["Light_DiffPhiVsGenPt_All"]  = new TH2F("Light_DiffPhiVsGenPt_All", "#phi difference (gen-reco) versus p_{T,gen} for light quarks",                     10,     0,   250, 120,  -6.2,  6.2);
+    histo2D["BJet_RecoPhiVsGenPt"]       = new TH2F("BJet_RecoPhiVsGenPt",      "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for b-jets",      150,     0,   300,  60,  -3.2,  3.2);
+    histo2D["BJet_DiffPhiVsGenPt"]       = new TH2F("BJet_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,    30,   160, 100, -0.15, 0.15);
+    histo2D["BJet_DiffPhiVsGenPt_All"]   = new TH2F("BJet_DiffPhiVsGenPt_All",  "#phi difference (gen-reco) versus p_{T,gen} for b-jets",                           10,     0,   250, 120,  -6.2,  6.2);
+    histo2D["El_RecoPhiVsGenPt"]         = new TH2F("El_RecoPhiVsGenPt",        "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for electron",    150,     0,   250,  60,  -3.2,  3.2);
+    histo2D["El_DiffPhiVsGenPt"]         = new TH2F("El_DiffPhiVsGenPt",        "#phi difference (gen-reco) versus p_{T,gen} for electron",                         10,    30,   130, 120, -0.015, 0.015);
+    histo2D["El_DiffPhiVsGenPt_All"]     = new TH2F("El_DiffPhiVsGenPt_All",    "#phi difference (gen-reco) versus p_{T,gen} for electron",                         17,     0,   250, 120,  -6.2,  6.2);
+    histo2D["Mu_RecoPhiVsGenInvPt"]      = new TH2F("Mu_RecoPhiVsGenInvPt",     "Azimuthal angle #phi_{rec} versus #frac{1}{p_{T,gen}} for muon",                  100,     0,  0.05,  60,  -3.2,  3.2);
+    histo2D["Mu_RecoPhiVsGenPt"]         = new TH2F("Mu_RecoPhiVsGenPt",        "Azimuthal angle #phi_{rec} versus transverse momentum p_{T,gen} for muon",        150,     0,   200,  60,  -3.2,  3.2);
+    histo2D["Mu_DiffPhiVsGenInvPt"]      = new TH2F("Mu_DiffPhiVsGenInvPt",     "#phi difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                   10, 0.005, 0.035, 120,-0.006,0.006);
+    histo2D["Mu_DiffPhiVsGenInvPt_All"]  = new TH2F("Mu_DiffPhiVsGenInvPt_All", "#phi difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                   10,     0,  0.05, 120,  -6.2,  6.2);
+    histo2D["Mu_DiffPhiVsGenPt"]         = new TH2F("Mu_DiffPhiVsGenPt",        "#phi difference (gen-reco) versus p_{T,gen} for muon",                             10,    26,   150, 100,  -0.2,  0.2);
+    histo2D["Mu_DiffPhiVsGenPt_All"]     = new TH2F("Mu_DiffPhiVsGenPt_All",    "#phi difference (gen-reco) versus p_{T,gen} for muon",                             14,     0,   200, 100,  -6.2,  6.2);
+
+    //Initialize the different eta bins! 
+    EtaBin[0] = ""; EtaTitle[0] = "";
+    if(nEtaBins == 6){         
+        EtaValues [1] = 0.; EtaValues[2] = 0.348; EtaValues[3] = 0.696; EtaValues[4] = 1.044; EtaValues[5] = 1.392; EtaValues[6] = 1.740; EtaValues[7] = 2.5;
+        for(int ii = 1; ii <= nEtaBins; ii++){
+            EtaBin[ii] = "_Eta_"+tostr(EtaValues[ii])+"_"+tostr(EtaValues[ii+1]);
+            EtaTitle[ii] = " -- "+tostr(EtaValues[ii])+" < |#eta| #leq "+tostr(EtaValues[ii+1]);
+        }
+        //Store all the existing histo2D's in a new collection!
+        map<string,TH2F*> histo2DCopy = histo2D;
+        for(int iEta = 1; iEta <= nEtaBins; iEta++){
+
+           	for(std::map<std::string,TH2F*>::const_iterator it = histo2DCopy.begin(); it != histo2DCopy.end(); it++){
+                TH2F *temp = it->second;
+                histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), temp->GetYaxis()->GetNbins(), temp->GetYaxis()->GetXmin(), temp->GetYaxis()->GetXmax() );
+	    }
+        }
+    }
+    else if(nEtaBins != 1)
+        std::cout << " nEtaBins should be equal to 1 or 6, current value " << nEtaBins << " is not allowed !" << std::endl; 
 }
 
-void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel){
+void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel, int NrEtaBins){
 
     bool isSemiMu = false, isSemiEl = false;
     if(enumDecayChannel == 0) isSemiMu = true;
@@ -102,11 +123,26 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     if(isSemiMu) histo1D["DeltaR_TFClass_Mu"]->Fill( lepton->DeltaR(*selLepton) );
     if(isSemiEl) histo1D["DeltaR_TFClass_El"]->Fill( lepton->DeltaR(*selLepton) );
 
+    int useEtaBinWJet1 = 9, useEtaBinWJet2 = 9, useEtaBinHadrB = 9, useEtaBinLeptB = 9, useEtaBinLepton = 9;
+    for(int iEta = 1; iEta <= NrEtaBins; iEta++){
+        if(abs(selHadrWJet1->Eta()) <= EtaValues[iEta+1] && abs(selHadrWJet1->Eta()) > EtaValues[iEta]) useEtaBinWJet1 = iEta;
+        if(abs(selHadrWJet2->Eta()) <= EtaValues[iEta+1] && abs(selHadrWJet2->Eta()) > EtaValues[iEta]) useEtaBinWJet2 = iEta;
+        if(abs(selHadrBJet->Eta()) <= EtaValues[iEta+1] && abs(selHadrBJet->Eta()) > EtaValues[iEta]) useEtaBinHadrB = iEta;
+        if(abs(selLeptBJet->Eta()) <= EtaValues[iEta+1] && abs(selLeptBJet->Eta()) > EtaValues[iEta]) useEtaBinLeptB = iEta;
+        if(abs(selLepton->Eta()) <= EtaValues[iEta+1] && abs(selLepton->Eta()) > EtaValues[iEta]) useEtaBinLepton = iEta;
+    }
+
+    //Fill histograms for first light jet!
     histo2D["Light_RecoPtVsGenPt"]->Fill(      hadrWJet1->Pt(),   selHadrWJet1->Pt()    );
     histo2D["Light_RecoThetaVsGenTheta"]->Fill(hadrWJet1->Theta(),selHadrWJet1->Theta() );
     histo2D["Light_RecoThetaVsGenPt"]->Fill(   hadrWJet1->Pt(),   selHadrWJet1->Theta() );
     histo2D["Light_RecoPhiVsGenPhi"]->Fill(    hadrWJet1->Phi(),  selHadrWJet1->Phi()   );
     histo2D["Light_RecoPhiVsGenPt"]->Fill(     hadrWJet1->Pt(),   selHadrWJet1->Phi()   );
+    histo2D["Light_RecoPtVsGenPt"+EtaBin[useEtaBinWJet1]]->Fill(      hadrWJet1->Pt(),   selHadrWJet1->Pt()    );
+    histo2D["Light_RecoThetaVsGenTheta"+EtaBin[useEtaBinWJet1]]->Fill(hadrWJet1->Theta(),selHadrWJet1->Theta() );
+    histo2D["Light_RecoThetaVsGenPt"+EtaBin[useEtaBinWJet1]]->Fill(   hadrWJet1->Pt(),   selHadrWJet1->Theta() );
+    histo2D["Light_RecoPhiVsGenPhi"+EtaBin[useEtaBinWJet1]]->Fill(    hadrWJet1->Phi(),  selHadrWJet1->Phi()   );
+    histo2D["Light_RecoPhiVsGenPt"+EtaBin[useEtaBinWJet1]]->Fill(     hadrWJet1->Pt(),   selHadrWJet1->Phi()   );
 
     histo2D["Light_DiffPtVsGenPt"]->Fill(      hadrWJet1->Pt(),   hadrWJet1->Pt()    - selHadrWJet1->Pt()    );
     histo2D["Light_DiffThetaVsGenTheta"]->Fill(hadrWJet1->Theta(),hadrWJet1->Theta() - selHadrWJet1->Theta() );
@@ -115,12 +151,25 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["Light_DiffPhiVsGenPhi_All"]->Fill(hadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1)   );
     histo2D["Light_DiffPhiVsGenPt"]->Fill(     hadrWJet1->Pt(),   hadrWJet1->DeltaPhi(*selHadrWJet1)   );
     histo2D["Light_DiffPhiVsGenPt_All"]->Fill( hadrWJet1->Pt(),   hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    histo2D["Light_DiffPtVsGenPt"+EtaBin[useEtaBinWJet1]]->Fill(      hadrWJet1->Pt(),   hadrWJet1->Pt()    - selHadrWJet1->Pt()    );
+    histo2D["Light_DiffThetaVsGenTheta"+EtaBin[useEtaBinWJet1]]->Fill(hadrWJet1->Theta(),hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffThetaVsGenPt"+EtaBin[useEtaBinWJet1]]->Fill(   hadrWJet1->Pt(),   hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffPhiVsGenPhi"+EtaBin[useEtaBinWJet1]]->Fill(    hadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    histo2D["Light_DiffPhiVsGenPhi_All"+EtaBin[useEtaBinWJet1]]->Fill(hadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    histo2D["Light_DiffPhiVsGenPt"+EtaBin[useEtaBinWJet1]]->Fill(     hadrWJet1->Pt(),   hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    histo2D["Light_DiffPhiVsGenPt_All"+EtaBin[useEtaBinWJet1]]->Fill( hadrWJet1->Pt(),   hadrWJet1->DeltaPhi(*selHadrWJet1)   );
 
+    //Fill histograms for second light jet!
     histo2D["Light_RecoPtVsGenPt"]->Fill(      hadrWJet2->Pt(),   selHadrWJet2->Pt()    );
     histo2D["Light_RecoThetaVsGenTheta"]->Fill(hadrWJet2->Theta(),selHadrWJet2->Theta() );
     histo2D["Light_RecoThetaVsGenPt"]->Fill(   hadrWJet2->Pt(),   selHadrWJet2->Theta() );
     histo2D["Light_RecoPhiVsGenPhi"]->Fill(    hadrWJet2->Phi(),  selHadrWJet2->Phi()   );
     histo2D["Light_RecoPhiVsGenPt"]->Fill(     hadrWJet2->Pt(),   selHadrWJet2->Phi()   );
+    histo2D["Light_RecoPtVsGenPt"+EtaBin[useEtaBinWJet2]]->Fill(      hadrWJet2->Pt(),   selHadrWJet2->Pt()    );
+    histo2D["Light_RecoThetaVsGenTheta"+EtaBin[useEtaBinWJet2]]->Fill(hadrWJet2->Theta(),selHadrWJet2->Theta() );
+    histo2D["Light_RecoThetaVsGenPt"+EtaBin[useEtaBinWJet2]]->Fill(   hadrWJet2->Pt(),   selHadrWJet2->Theta() );
+    histo2D["Light_RecoPhiVsGenPhi"+EtaBin[useEtaBinWJet2]]->Fill(    hadrWJet2->Phi(),  selHadrWJet2->Phi()   );
+    histo2D["Light_RecoPhiVsGenPt"+EtaBin[useEtaBinWJet2]]->Fill(     hadrWJet2->Pt(),   selHadrWJet2->Phi()   );
 
     histo2D["Light_DiffPtVsGenPt"]->Fill(      hadrWJet2->Pt(),   hadrWJet2->Pt()    - selHadrWJet2->Pt()    );
     histo2D["Light_DiffThetaVsGenTheta"]->Fill(hadrWJet2->Theta(),hadrWJet2->Theta() - selHadrWJet2->Theta() );
@@ -129,12 +178,25 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["Light_DiffPhiVsGenPhi_All"]->Fill(hadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
     histo2D["Light_DiffPhiVsGenPt"]->Fill(     hadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
     histo2D["Light_DiffPhiVsGenPt_All"]->Fill( hadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPtVsGenPt"+EtaBin[useEtaBinWJet2]]->Fill(      hadrWJet2->Pt(),   hadrWJet2->Pt()    - selHadrWJet2->Pt()    );
+    histo2D["Light_DiffThetaVsGenTheta"+EtaBin[useEtaBinWJet2]]->Fill(hadrWJet2->Theta(),hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffThetaVsGenPt"+EtaBin[useEtaBinWJet2]]->Fill(   hadrWJet2->Pt(),   hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffPhiVsGenPhi"+EtaBin[useEtaBinWJet2]]->Fill(    hadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsGenPhi_All"+EtaBin[useEtaBinWJet2]]->Fill(hadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsGenPt"+EtaBin[useEtaBinWJet2]]->Fill(     hadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsGenPt_All"+EtaBin[useEtaBinWJet2]]->Fill( hadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
 
+    //Fill histograms for hadronic b-jet
     histo2D["BJet_RecoPtVsGenPt"]->Fill(      hadrBJet->Pt(),    selHadrBJet->Pt()    );
     histo2D["BJet_RecoThetaVsGenTheta"]->Fill(hadrBJet->Theta(), selHadrBJet->Theta() );
     histo2D["BJet_RecoThetaVsGenPt"]->Fill(   hadrBJet->Pt(),    selHadrBJet->Theta() );
     histo2D["BJet_RecoPhiVsGenPhi"]->Fill(    hadrBJet->Phi(),   selHadrBJet->Phi());
     histo2D["BJet_RecoPhiVsGenPt"]->Fill(     hadrBJet->Pt(),    selHadrBJet->Phi());
+    histo2D["BJet_RecoPtVsGenPt"+EtaBin[useEtaBinHadrB]]->Fill(      hadrBJet->Pt(),    selHadrBJet->Pt()    );
+    histo2D["BJet_RecoThetaVsGenTheta"+EtaBin[useEtaBinHadrB]]->Fill(hadrBJet->Theta(), selHadrBJet->Theta() );
+    histo2D["BJet_RecoThetaVsGenPt"+EtaBin[useEtaBinHadrB]]->Fill(   hadrBJet->Pt(),    selHadrBJet->Theta() );
+    histo2D["BJet_RecoPhiVsGenPhi"+EtaBin[useEtaBinHadrB]]->Fill(    hadrBJet->Phi(),   selHadrBJet->Phi());
+    histo2D["BJet_RecoPhiVsGenPt"+EtaBin[useEtaBinHadrB]]->Fill(     hadrBJet->Pt(),    selHadrBJet->Phi());
 
     histo2D["BJet_DiffPtVsGenPt"]->Fill(      hadrBJet->Pt(),   hadrBJet->Pt()    - selHadrBJet->Pt()    );
     histo2D["BJet_DiffThetaVsGenTheta"]->Fill(hadrBJet->Theta(),hadrBJet->Theta() - selHadrBJet->Theta() );
@@ -143,12 +205,25 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["BJet_DiffPhiVsGenPhi_All"]->Fill(hadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
     histo2D["BJet_DiffPhiVsGenPt"]->Fill(     hadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
     histo2D["BJet_DiffPhiVsGenPt_All"]->Fill( hadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPtVsGenPt"+EtaBin[useEtaBinHadrB]]->Fill(      hadrBJet->Pt(),   hadrBJet->Pt()    - selHadrBJet->Pt()    );
+    histo2D["BJet_DiffThetaVsGenTheta"+EtaBin[useEtaBinHadrB]]->Fill(hadrBJet->Theta(),hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffThetaVsGenPt"+EtaBin[useEtaBinHadrB]]->Fill(   hadrBJet->Pt(),   hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffPhiVsGenPhi"+EtaBin[useEtaBinHadrB]]->Fill(    hadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsGenPhi_All"+EtaBin[useEtaBinHadrB]]->Fill(hadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsGenPt"+EtaBin[useEtaBinHadrB]]->Fill(     hadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsGenPt_All"+EtaBin[useEtaBinHadrB]]->Fill( hadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
 
+    //Fill histograms for leptonic b-jet
     histo2D["BJet_RecoPtVsGenPt"]->Fill(      leptBJet->Pt(),    selLeptBJet->Pt()    );
     histo2D["BJet_RecoThetaVsGenTheta"]->Fill(leptBJet->Theta(), selLeptBJet->Theta() );
     histo2D["BJet_RecoThetaVsGenPt"]->Fill(   leptBJet->Pt(),    selLeptBJet->Theta() );
     histo2D["BJet_RecoPhiVsGenPhi"]->Fill(    leptBJet->Phi(),   selLeptBJet->Phi()   );
     histo2D["BJet_RecoPhiVsGenPt"]->Fill(     leptBJet->Pt(),    selLeptBJet->Phi()   );
+    histo2D["BJet_RecoPtVsGenPt"+EtaBin[useEtaBinLeptB]]->Fill(      leptBJet->Pt(),    selLeptBJet->Pt()    );
+    histo2D["BJet_RecoThetaVsGenTheta"+EtaBin[useEtaBinLeptB]]->Fill(leptBJet->Theta(), selLeptBJet->Theta() );
+    histo2D["BJet_RecoThetaVsGenPt"+EtaBin[useEtaBinLeptB]]->Fill(   leptBJet->Pt(),    selLeptBJet->Theta() );
+    histo2D["BJet_RecoPhiVsGenPhi"+EtaBin[useEtaBinLeptB]]->Fill(    leptBJet->Phi(),   selLeptBJet->Phi()   );
+    histo2D["BJet_RecoPhiVsGenPt"+EtaBin[useEtaBinLeptB]]->Fill(     leptBJet->Pt(),    selLeptBJet->Phi()   );
 
     histo2D["BJet_DiffPtVsGenPt"]->Fill(      leptBJet->Pt(),   leptBJet->Pt()    - selLeptBJet->Pt()    );
     histo2D["BJet_DiffThetaVsGenTheta"]->Fill(leptBJet->Theta(),leptBJet->Theta() - selLeptBJet->Theta() );
@@ -157,13 +232,26 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     histo2D["BJet_DiffPhiVsGenPhi_All"]->Fill(leptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
     histo2D["BJet_DiffPhiVsGenPt"]->Fill(     leptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
     histo2D["BJet_DiffPhiVsGenPt_All"]->Fill( leptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPtVsGenPt"+EtaBin[useEtaBinLeptB]]->Fill(      leptBJet->Pt(),   leptBJet->Pt()    - selLeptBJet->Pt()    );
+    histo2D["BJet_DiffThetaVsGenTheta"+EtaBin[useEtaBinLeptB]]->Fill(leptBJet->Theta(),leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffThetaVsGenPt"+EtaBin[useEtaBinLeptB]]->Fill(   leptBJet->Pt(),   leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffPhiVsGenPhi"+EtaBin[useEtaBinLeptB]]->Fill(    leptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsGenPhi_All"+EtaBin[useEtaBinLeptB]]->Fill(leptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsGenPt"+EtaBin[useEtaBinLeptB]]->Fill(     leptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsGenPt_All"+EtaBin[useEtaBinLeptB]]->Fill( leptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
 
+    //Fill histograms for lepton!
     if(isSemiEl){
     	histo2D["El_RecoPtVsGenPt"]->Fill(      lepton->Pt(),   selLepton->Pt()    );
     	histo2D["El_RecoThetaVsGenTheta"]->Fill(lepton->Theta(),selLepton->Theta() );
         histo2D["El_RecoThetaVsGenPt"]->Fill(   lepton->Pt(),   selLepton->Theta() );
 	histo2D["El_RecoPhiVsGenPt"]->Fill(     lepton->Pt(),   selLepton->Phi()   );
 	histo2D["El_RecoPhiVsGenPhi"]->Fill(    lepton->Phi(),  selLepton->Phi()   );
+    	histo2D["El_RecoPtVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(      lepton->Pt(),   selLepton->Pt()    );
+    	histo2D["El_RecoThetaVsGenTheta"+EtaBin[useEtaBinLepton]]->Fill(lepton->Theta(),selLepton->Theta() );
+        histo2D["El_RecoThetaVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(   lepton->Pt(),   selLepton->Theta() );
+	histo2D["El_RecoPhiVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(     lepton->Pt(),   selLepton->Phi()   );
+	histo2D["El_RecoPhiVsGenPhi"+EtaBin[useEtaBinLepton]]->Fill(    lepton->Phi(),  selLepton->Phi()   );
 
 	histo2D["El_DiffPtVsGenPt"]->Fill(      lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
 	histo2D["El_DiffThetaVsGenTheta"]->Fill(lepton->Theta(),lepton->Theta() - selLepton->Theta() );
@@ -172,6 +260,13 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 	histo2D["El_DiffPhiVsGenPt"]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
 	histo2D["El_DiffPhiVsGenPhi_All"]->Fill(lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
 	histo2D["El_DiffPhiVsGenPt_All"]->Fill( lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+	histo2D["El_DiffPtVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(      lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
+	histo2D["El_DiffThetaVsGenTheta"+EtaBin[useEtaBinLepton]]->Fill(lepton->Theta(),lepton->Theta() - selLepton->Theta() );
+	histo2D["El_DiffThetaVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(   lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+	histo2D["El_DiffPhiVsGenPhi"+EtaBin[useEtaBinLepton]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+	histo2D["El_DiffPhiVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+	histo2D["El_DiffPhiVsGenPhi_All"+EtaBin[useEtaBinLepton]]->Fill(lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+	histo2D["El_DiffPhiVsGenPt_All"+EtaBin[useEtaBinLepton]]->Fill( lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
     }
     if(isSemiMu){
 	float InvPtgenMu = 1./lepton->Pt();
@@ -184,6 +279,14 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 	histo2D["Mu_RecoPhiVsGenPhi"]->Fill(    lepton->Phi(),  selLepton->Phi()   );
 	histo2D["Mu_RecoPhiVsGenInvPt"]->Fill(  InvPtgenMu,     selLepton->Phi()   );
 	histo2D["Mu_RecoPhiVsGenPt"]->Fill(     lepton->Pt(),   selLepton->Phi()   );
+	histo2D["Mu_RecoInvPtVsGenInvPt"+EtaBin[useEtaBinLepton]]->Fill(InvPtgenMu,     InvPtrecMu         );
+        histo2D["Mu_RecoPtVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(      lepton->Pt(),   selLepton->Pt()    );
+	histo2D["Mu_RecoThetaVsGenTheta"+EtaBin[useEtaBinLepton]]->Fill(lepton->Theta(),selLepton->Theta() );
+	histo2D["Mu_RecoThetaVsGenInvPt"+EtaBin[useEtaBinLepton]]->Fill(InvPtgenMu,     selLepton->Theta() );
+	histo2D["Mu_RecoThetaVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(   lepton->Pt(),   selLepton->Theta() );
+	histo2D["Mu_RecoPhiVsGenPhi"+EtaBin[useEtaBinLepton]]->Fill(    lepton->Phi(),  selLepton->Phi()   );
+	histo2D["Mu_RecoPhiVsGenInvPt"+EtaBin[useEtaBinLepton]]->Fill(  InvPtgenMu,     selLepton->Phi()   );
+	histo2D["Mu_RecoPhiVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(     lepton->Pt(),   selLepton->Phi()   );
 
 	histo2D["Mu_DiffInvPtVsGenInvPt"]->Fill(    InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
 	histo2D["Mu_DiffInvPtVsGenInvPt_All"]->Fill(InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
@@ -197,10 +300,22 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 	histo2D["Mu_DiffPhiVsGenInvPt_All"]->Fill(  InvPtgenMu,     lepton->DeltaPhi(*selLepton)   );
 	histo2D["Mu_DiffPhiVsGenPt"]->Fill(         lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
 	histo2D["Mu_DiffPhiVsGenPt_All"]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffInvPtVsGenInvPt"+EtaBin[useEtaBinLepton]]->Fill(    InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
+	histo2D["Mu_DiffInvPtVsGenInvPt_All"+EtaBin[useEtaBinLepton]]->Fill(InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
+	histo2D["Mu_DiffPtVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(          lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
+	histo2D["Mu_DiffThetaVsGenTheta"+EtaBin[useEtaBinLepton]]->Fill(    lepton->Theta(),lepton->Theta() - selLepton->Theta() );
+	histo2D["Mu_DiffThetaVsGenInvPt"+EtaBin[useEtaBinLepton]]->Fill(    InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
+	histo2D["Mu_DiffThetaVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(       lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+	histo2D["Mu_DiffPhiVsGenPhi"+EtaBin[useEtaBinLepton]]->Fill(        lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsGenPhi_All"+EtaBin[useEtaBinLepton]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsGenInvPt"+EtaBin[useEtaBinLepton]]->Fill(      InvPtgenMu,     lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsGenInvPt_All"+EtaBin[useEtaBinLepton]]->Fill(  InvPtgenMu,     lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsGenPt"+EtaBin[useEtaBinLepton]]->Fill(         lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+	histo2D["Mu_DiffPhiVsGenPt_All"+EtaBin[useEtaBinLepton]]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
     }	
 }
 
-void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file){
+void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file, int whichEtaBin){
 
     TDirectory* histoFitDir = file->mkdir(fitHisto->GetName());
     histoFitDir->cd();
@@ -391,39 +506,39 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             ActualFitRange[1] = fitRange[1];
 
             //Individual fit range for BJet_DiffPtVsGenPt:
-	    if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && bin == 1){ActualFitRange[0] = -18; ActualFitRange[1] = 10;}
-            if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 20;}	
-            if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 25;}
-            if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && (bin == 4 || bin == 5)){ActualFitRange[0] = -22; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && (bin == 6 || bin == 7)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && (bin == 8 || bin == 9 || bin == 10)){ActualFitRange[0] = -28; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()) == "BJet_DiffPtVsGenPt" && bin == 11){ActualFitRange[0] = -30; ActualFitRange[1] = 40;}
+	    if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -18; ActualFitRange[1] = 10;}
+            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 20;}	
+            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 25;}
+            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 4 || bin == 5)){ActualFitRange[0] = -22; ActualFitRange[1] = 30;}
+            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 6 || bin == 7)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
+            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 8 || bin == 9 || bin == 10)){ActualFitRange[0] = -28; ActualFitRange[1] = 30;}
+            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 11){ActualFitRange[0] = -30; ActualFitRange[1] = 40;}
 
             //Individual fit range for BJet_DiffPhiVsGenPt:
-            if(string(histoFit->GetName()) == "BJet_DiffPhiVsGenPt" && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
-            if(string(histoFit->GetName()) == "BJet_DiffPhiVsGenPt" && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(string(histoFit->GetName()) == "BJet_DiffPhiVsGenPt" && bin > 5){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
-            if(string(histoFit->GetName()) == "BJet_DiffPhiVsGenPt" && bin > 8){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
+            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
+            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
+            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 5){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
+            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 8){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
             
             //Individual fit range for Light_DiffPtVsGenPt:
-            if(string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin == 1){ActualFitRange[0] = -15; ActualFitRange[1] = 7;}
-            if(string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
-            if(string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
-            if(string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 22;}
-            if(string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && (bin == 5 || bin == 6)){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
-            if(string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin == 7){ActualFitRange[0] = -25; ActualFitRange[1] = 28;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -15; ActualFitRange[1] = 7;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 22;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 5 || bin == 6)){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 7){ActualFitRange[0] = -25; ActualFitRange[1] = 28;}
 
             //Individual fit range for Light_DiffPhiVsGenPt:
-            if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(string(histoFit->GetName()) == "Light_DiffPhiVsGenPt" && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
+            if(string(histoFit->GetName()).find("Light_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
+            if(string(histoFit->GetName()).find("Light_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
 
             //Individual fit range for Mu_DiffPhiVsGenInvPt:
-            if(string(histoFit->GetName()) == "Mu_DiffPhiVsGenInvPt" && bin < 3){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt") <= string(histoFit->GetName()).size() && bin < 3){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
 
             //Individual fit range for Mu_DiffThetaVsGenInvPt:
-            if(string(histoFit->GetName()) == "Mu_DiffThetaVsGenInvPt" && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
-            if(string(histoFit->GetName()) == "Mu_DiffThetaVsGenInvPt" && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
-            if(string(histoFit->GetName()) == "Mu_DiffThetaVsGenInvPt" && (bin >=4 && bin < 7)){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
+            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
+            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && (bin >=4 && bin < 7)){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
 
             //Do the actual fit:
             hp->Fit(doubleGaussianFit,"","",ActualFitRange[0],ActualFitRange[1]);

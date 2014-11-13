@@ -42,6 +42,7 @@ int main (int argc, char **argv)
     ////////////////////////////////////////////////////////////////////
     bool CreateTFFromTree = true;
     bool RunFitForTF = true;
+    int nEtaBins = 6;
 
     if(CreateTFFromTree){
         //Load the TFTree information
@@ -58,12 +59,12 @@ int main (int argc, char **argv)
 
             //Set the number of selected events (for loop on events):
             int nEvent = inputTFTree->GetEntries(); 
-            //int nEvent = 10000;
+            //int nEvent = 10;
             std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
             //Initialize the TFCreation class (create all histograms):
             TFCreation tfCreation;
-            tfCreation.InitializeVariables(); //Add option of nr eta bins here!
+            tfCreation.InitializeVariables(nEtaBins); //Add option of nr eta bins here!
 
             //Read in the TLorenztVectors:
             TLorentzVector genPart[5], recoPart[5];
@@ -90,7 +91,7 @@ int main (int argc, char **argv)
                 else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
 
                 //Fill the histograms of the TFCreation class!
-                tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
+                tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, nEtaBins);
             }//Loop on events
 
             TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions_FromTree.root","RECREATE");
@@ -165,7 +166,7 @@ int main (int argc, char **argv)
             for(int jj = 0; jj < 2; jj++) fitRanges[jj] = std::stof(HistoInfo[iHisto][NrParamsDblGaus+1+jj]);
             std::cout << " Values from HistoInfo : " << HistoInfo[iHisto][NrParamsDblGaus+1] << " & " << HistoInfo[iHisto][NrParamsDblGaus+2] << std::endl;
             std::cout << " Fit range set to : " << fitRanges[0] << " & " << fitRanges[1] << " --> in analyzer ! " << std::endl;	
-            tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRanges, writeFile);
+            //tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRanges, writeFile);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
@@ -202,7 +203,7 @@ int main (int argc, char **argv)
             }
             myTFCard<<"BLOCK "<<BlockName << endl;
     
-            tfCreation.WriteTF(histoForFit, myTF, myTFCard);
+            //tfCreation.WriteTF(histoForFit, myTF, myTFCard);
     
             myTF<<"\\hline" << endl;
             myTF<<"\\end{tabular}"<<endl;
