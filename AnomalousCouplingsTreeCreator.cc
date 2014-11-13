@@ -526,7 +526,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 8000; ievt++){
+    for (unsigned int ievt = 0; ievt < 50; ievt++){
 
       if(ievt > 200000) GenLHCOOutput = false;	
 
@@ -556,7 +556,7 @@ int main (int argc, char *argv[])
       
       //Also need to load the init_jets info!
       std::cout << " Size of init_jets and init_jets_corrected : " << init_jets.size() << " vs " << init_jets_corrected.size() << std::endl;
-      if(init_jets.size() > 0 && init_jets_corrected.size() > 0) std::cout << " Value of Px for init_jet and init_jets_corrected : " << (init_jets[0])->Px() << " vs " << (init_jets_corrected[0])->Px() << std::endl;
+      if(init_jets_corrected.size() > 0 || init_jets.size() ) std::cout << " Value of Px for init_jet and init_jets_corrected : " << /*(init_jets[0])->Px() << " vs " <<*/ (init_jets_corrected[0])->Px() << std::endl;
 
 
       if(! (dataSetName.find("Data")==0 || dataSetName.find("DATA")==0  || dataSetName.find("data")==0 ) ) {
@@ -630,12 +630,12 @@ int main (int argc, char *argv[])
       double lumiWeight = 1;
       if(dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA"){    //Does this mean that it will be applied on data ? (why not with .find method ) ???
 	// Apply the scraping veto. (Is it still needed?)
-	bool isBeamBG = true;
-	if(event->nTracks() > 10){
-	  if( ( (float) event->nHighPurityTracks() ) / ( (float) event->nTracks() ) > 0.25 )
-	    isBeamBG = false;
-	}
-	if(isBeamBG) continue;
+	//bool isBeamBG = true;
+	//if(event->nTracks() > 10){
+	  //if( ( (float) event->nHighPurityTracks() ) / ( (float) event->nTracks() ) > 0.25 )
+	    //isBeamBG = false;
+	//}
+	//if(isBeamBG) continue;
       }
       else{
 	lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
