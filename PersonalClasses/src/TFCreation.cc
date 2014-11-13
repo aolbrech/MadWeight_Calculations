@@ -1,6 +1,6 @@
 #include "../interface/TFCreation.h"
 
-TFCreation::TFCreation(){
+TFCreation::TFCreation(int nEtaBins){
     ///////////////////////////////////////
     //  Declare the used fit functions!  //
     ///////////////////////////////////////
@@ -10,6 +10,16 @@ TFCreation::TFCreation(){
 
     //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
     caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
+
+    //Store the EtaBin Title and Name for the histograms!
+    EtaBin[0] = ""; EtaTitle[0] = "";
+    if(nEtaBins == 4){         
+        EtaValues [1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
+        for(int ii = 1; ii <= nEtaBins; ii++){
+            EtaBin[ii] = "_Eta_"+tostr(EtaValues[ii])+"_"+tostr(EtaValues[ii+1]);
+            EtaTitle[ii] = " -- "+tostr(EtaValues[ii])+" < |#eta| #leq "+tostr(EtaValues[ii+1]);
+        }
+    }
 }
 
 TFCreation::~TFCreation(){
@@ -85,13 +95,7 @@ void TFCreation::InitializeVariables(int nEtaBins){
     histo2D["Mu_DiffPhiVsGenPt_All"]     = new TH2F("Mu_DiffPhiVsGenPt_All",    "#phi difference (gen-reco) versus p_{T,gen} for muon",                             14,     0,   200, 100,  -6.2,  6.2);
 
     //Initialize the different eta bins! 
-    EtaBin[0] = ""; EtaTitle[0] = "";
-    if(nEtaBins == 6){         
-        EtaValues [1] = 0.; EtaValues[2] = 0.348; EtaValues[3] = 0.696; EtaValues[4] = 1.044; EtaValues[5] = 1.392; EtaValues[6] = 1.740; EtaValues[7] = 2.5;
-        for(int ii = 1; ii <= nEtaBins; ii++){
-            EtaBin[ii] = "_Eta_"+tostr(EtaValues[ii])+"_"+tostr(EtaValues[ii+1]);
-            EtaTitle[ii] = " -- "+tostr(EtaValues[ii])+" < |#eta| #leq "+tostr(EtaValues[ii+1]);
-        }
+    if(nEtaBins == 4){         
         //Store all the existing histo2D's in a new collection!
         map<string,TH2F*> histo2DCopy = histo2D;
         for(int iEta = 1; iEta <= nEtaBins; iEta++){
@@ -133,7 +137,7 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     }
 
     int TimeFilling = 0;
-    if(NrEtaBins == 6) TimeFilling = 2;
+    if(NrEtaBins == 4) TimeFilling = 2;
     else if(NrEtaBins == 1) TimeFilling = 1;
     else{ TimeFilling = 0; std::cout << " Wrong choice for NrEtaBins!" <<std::endl;}
 
@@ -249,8 +253,22 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     }
 }
 
-void TFCreation::CalculateTFFromFile(TH2F* fitHisto, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file, int whichEtaBin){
+void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file, int whichEtaBin, TFile* readFile){
 
+    //Select the correct Eta-bin histogram!
+    std::cout << " EtaBin = " << EtaBin << " 0 : " << EtaBin[0] << " 1 : " << EtaBin[1] << " 2 : " << EtaBin[2] << " 3 : " << EtaBin[3] << " 4 : " << EtaBin[4] << " 5 : " << EtaBin[5] << " 6 : " << EtaBin[6] << std::endl;
+    std::cout << " Output of EtaBin[whichEtaBin] = " << EtaBin[whichEtaBin] << std::endl;
+    TH2F* fitHisto = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+fitHistoName+""+EtaBin[whichEtaBin]).c_str() );
+    std::cout << " Trying to access histogram : " << fitHisto->GetName() << " for EtaBin : " << whichEtaBin << std::endl;
+    
+    TDirectory* th2dir;
+    if(file->GetDirectory("2D_histograms_graphs") == 0) th2dir = file->mkdir("2D_histograms_graphs");
+    else{std::cout << " Directory exists already !" << std::endl;                                              th2dir = file->GetDirectory("2D_histograms_graphs");}
+    //Save the 2D histogram used for the fit!
+    th2dir->cd();
+    fitHisto->Write();
+    file->cd();             
+    
     TDirectory* histoFitDir = file->mkdir(fitHisto->GetName());
     histoFitDir->cd();
 
@@ -579,7 +597,7 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
 
 void TFCreation::WritePlots(TFile* outfile){
 	outfile->cd();
-	std::cout << " Inside WritePlots class ! " << std::endl;
+	std::cout << " Inside WritePlots class ! EtaBins = " << EtaBin << " , " << EtaBin[4] << std::endl;
 
 	TDirectory* th1dir = outfile->mkdir("1D_histograms");
 	th1dir->cd();

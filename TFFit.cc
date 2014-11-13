@@ -34,15 +34,14 @@ int main (int argc, char **argv)
     cout << " Beginning of the program for fitting the TF ! " << endl;
     cout << "*********************************************** \n" << endl;
   
-    //Used classes
-    TFCreation tfCreation;
-
     ////////////////////////////////////////////////////////////////////
     //  Choose whether created plots are used or Tree information !!  //
     ////////////////////////////////////////////////////////////////////
     bool CreateTFFromTree = true;
     bool RunFitForTF = true;
-    int nEtaBins = 6;
+    int nEtaBins = 4;
+    //Used classes
+    TFCreation tfCreation(nEtaBins);
 
     if(CreateTFFromTree){
         //Load the TFTree information
@@ -59,11 +58,10 @@ int main (int argc, char **argv)
 
             //Set the number of selected events (for loop on events):
             int nEvent = inputTFTree->GetEntries(); 
-            //int nEvent = 10;
+            //int nEvent = 1000;
             std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
             //Initialize the TFCreation class (create all histograms):
-            TFCreation tfCreation;
             tfCreation.InitializeVariables(nEtaBins); //Add option of nr eta bins here!
 
             //Read in the TLorenztVectors:
@@ -126,7 +124,7 @@ int main (int argc, char **argv)
         int ConsHisto = 1;
         const int NrParamsDblGaus = 6;
         std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-        string HistoInfo[12][1+NrParamsDblGaus+2] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "3000",  "-0.15",  "0.15",
+        string HistoInfo[12][1+NrParamsDblGaus+2] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "3000",  "-0.12",  "0.12",
                                                       "BJet_DiffPtVsGenPt",         "10",   "-12","20000",      "13",    "10", "-5000",    "-30",    "45",
 				                      "BJet_DiffThetaVsGenPt",       "0",  "0.04", "2000",       "0",  "0.013", "6000",   "-0.1",   "0.1",
 				                      "El_DiffPhiVsGenPt",           "0", "0.006",  "600",       "0", "0.0012", "1500", "-0.012", "0.012",
@@ -145,7 +143,6 @@ int main (int argc, char **argv)
         int histoNrForStartValues = NrFitHistos; //Not needed if useStartValues = false
         bool useStartArray = true;
         bool changeFitRange = true;
-        TDirectory* th2dir = writeFile->mkdir("2D_histograms_graphs");
  
         ofstream myTF, myTFCard;
         myTF.open("TFInformation/TransferFunctions_TABLE.txt");
@@ -154,19 +151,15 @@ int main (int argc, char **argv)
         float startValues[NrParamsDblGaus], fitRanges[2];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
             if(NrFitHistos == 1) iHisto = ConsHisto;
-            TH2F* histoForFit = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+HistoInfo[iHisto][0]).c_str() );
-
-            //Save the 2D histogram used for the fit!
-            th2dir->cd();
-            histoForFit->Write();
-            writeFile->cd();             
 
             //Set the correct startValues and fit the distribution
             for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = std::stof(HistoInfo[iHisto][1+jj]);
             for(int jj = 0; jj < 2; jj++) fitRanges[jj] = std::stof(HistoInfo[iHisto][NrParamsDblGaus+1+jj]);
             std::cout << " Values from HistoInfo : " << HistoInfo[iHisto][NrParamsDblGaus+1] << " & " << HistoInfo[iHisto][NrParamsDblGaus+2] << std::endl;
-            std::cout << " Fit range set to : " << fitRanges[0] << " & " << fitRanges[1] << " --> in analyzer ! " << std::endl;	
-            //tfCreation.CalculateTFFromFile(histoForFit, useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRanges, writeFile);
+            std::cout << " Fit range set to : " << fitRanges[0] << " & " << fitRanges[1] << " --> in analyzer ! " << std::endl;
+    
+            for(int iEtaBin = 0; iEtaBin <= nEtaBins; iEtaBin++)
+                tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRanges, writeFile, iEtaBin, readFile);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
@@ -203,7 +196,7 @@ int main (int argc, char **argv)
             }
             myTFCard<<"BLOCK "<<BlockName << endl;
     
-            //tfCreation.WriteTF(histoForFit, myTF, myTFCard);
+            //tfCreation.WriteTF(HistoInfo[iHisto][0], myTF, myTFCard, whichEtaBin);
     
             myTF<<"\\hline" << endl;
             myTF<<"\\end{tabular}"<<endl;

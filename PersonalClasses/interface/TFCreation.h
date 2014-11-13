@@ -22,12 +22,12 @@ using namespace std;
 class TFCreation{
 
     public:
-        TFCreation();
+        TFCreation(int);
         ~TFCreation();
 	void InitializeVariables(int);
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel, int NrEtaBins);
 	void CalculateTF(bool, bool, bool, bool);
-        void CalculateTFFromFile(TH2F*, bool, int, bool, bool, float[], bool, float[], TFile*, int);
+        void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, float[], TFile*, int, TFile*);
 	void FitSliceClassCode(TH2F*, int, const char*[], float[]);
 	void SetStartValuesDoubleGaussian(int, bool);
 	void WriteTF(TH2F*, ostream &output, ostream &card);
@@ -45,9 +45,9 @@ class TFCreation{
         TH1D **hlistLim;
         float* startValuesArray;
         TF1 AllCaloEnergyFits[6];
-        std::string EtaBin[7];    //6 eta bins and one extra for all events!
-        std::string EtaTitle[7];
-        double EtaValues[8];
+        std::string EtaBin[5];    //4 eta bins and one extra for all events!
+        std::string EtaTitle[5];
+        double EtaValues[6];
 };
 #endif
 //
