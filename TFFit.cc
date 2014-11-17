@@ -135,7 +135,7 @@ int main (int argc, char **argv)
 				                      "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",  "-0.12",  "0.12",
 				                      "Mu_DiffPhiVsGenInvPt",        "0", "0.008",  "700",       "0", "0.0015",  "600", "-0.004", "0.004",
 				                      "Mu_DiffInvPtVsGenInvPt",      "0","0.0003", "2000",       "0", "0.0006",  "500","-0.0015", "0.001",
-				                      "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500","-0.0035","0.0035"};
+				                      "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500","-0.01","0.01"};//"-0.0035","0.0035"};
 
         //Set the booleans!
         bool useROOTClass = false;

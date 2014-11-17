@@ -43,7 +43,7 @@
             EtaTitle[ii] = " -- "+EtaValuesString[ii]+" < |#eta| #leq "+EtaValuesString[ii+1];
         }
   }
-  int usedEta = 0;
+  int usedEta = 2;
   Directory = Directory+EtaBin[usedEta];
 
   std::string Titles[12] ={"Light_DiffPtVsGenPt"+EtaBin[usedEta],      // Number 0

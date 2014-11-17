@@ -29,7 +29,7 @@ class TFCreation{
 	void CalculateTF(bool, bool, bool, bool);
         void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, float[], TFile*, int, TFile*);
 	void FitSliceClassCode(TH2F*, int, const char*[], float[]);
-	void SetStartValuesDoubleGaussian(int, bool);
+	void SetStartValuesDoubleGaussian(int, bool, std::string);
 	void WriteTF(TH2F*, ostream &output, ostream &card);
         void PlotDlbGaus(TH2F*, TFile*);
 	void WritePlots(TFile*);

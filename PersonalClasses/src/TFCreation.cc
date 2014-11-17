@@ -35,7 +35,7 @@ void TFCreation::InitializeVariables(int nEtaBins){
     histo1D["DeltaR_TFClass_Mu"]     = new TH1F("DeltaR_TFClass_Mu","DeltaR_TFClass_Mu",200,0,0.4);
     histo1D["DeltaR_TFClass_El"]     = new TH1F("DeltaR_TFClass_El","DeltaR_TFClass_El",200,0,0.4);
 
-    histo2D["Light_RecoPtVsGenPt"]    = new TH2F("Light_RecoPtVsGenPt",   "Transverse momentum of light quarks (reco vs gen)",                     150,     0,  300, 150,      0,  300);
+    histo2D["Light_RecoPtVsGenPt"]    = new TH2F("Light_RecoPtVsGenPt",   "Transverse momentum of light quarks (reco vs gen)",                        150,     0,  300, 150,      0,  300);
     histo2D["Light_DiffPtVsGenPt"]    = new TH2F("Light_DiffPtVsGenPt",   "p_{T} difference (gen-reco) versus p_{T,gen} for light quarks",             10,    30,  115, 100,    -30,   35);
     histo2D["BJet_RecoPtVsGenPt"]     = new TH2F("BJet_RecoPtVsGenPt",    "Transverse momentum of b-jets (reco vs gen level)",                        150,     0,  300, 150,      0,  300);
     histo2D["BJet_DiffPtVsGenPt"]     = new TH2F("BJet_DiffPtVsGenPt",    "p_{T} difference (gen-reco) versus p_{T,gen} for b-jets",                   10,    30,  150, 100,    -35,   50);
@@ -63,7 +63,8 @@ void TFCreation::InitializeVariables(int nEtaBins){
     histo2D["El_DiffThetaVsGenPt"]       = new TH2F("El_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for electron",                      10,   30,   130, 100, -0.02, 0.02);
     histo2D["Mu_RecoThetaVsGenInvPt"]    = new TH2F("Mu_RecoThetaVsGenInvPt",   "Polar angle #theta_{rec} versus #frac{1}{p_{T,gen}} for muon",                   100,    0,  0.05,  60,     0, 3.15);
     histo2D["Mu_RecoThetaVsGenPt"]       = new TH2F("Mu_RecoThetaVsGenPt",      "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for muon",         150,    0,   200,  60,     0, 3.15);
-    histo2D["Mu_DiffThetaVsGenInvPt"]    = new TH2F("Mu_DiffThetaVsGenInvPt",   "#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                10,0.005, 0.035, 100,-0.004,0.004);
+    histo2D["Mu_DiffThetaVsGenInvPt"]    = new TH2F("Mu_DiffThetaVsGenInvPt",   "#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                10,0.005, 0.035, 150,-0.015,0.015);//0.004
+    histo2D["Mu_DiffThetaVsGenInvPt_All"]= new TH2F("Mu_DiffThetaVsGenInvPt_All","#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",               10,0.005, 0.035, 500,-0.2,0.2);
     histo2D["Mu_DiffThetaVsGenPt"]       = new TH2F("Mu_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for muon",                          10,   30,   150, 100,  -0.1,  0.1);
 	
     histo2D["Light_RecoPhiVsGenPhi"]     = new TH2F("Light_RecoPhiVsGenPhi",    "Azimuthal angle distribution of light quarks (reco vs gen)",                       60,  -3.2,   3.2,  60,  -3.2,  3.2);
@@ -102,12 +103,13 @@ void TFCreation::InitializeVariables(int nEtaBins){
 
            	for(std::map<std::string,TH2F*>::const_iterator it = histo2DCopy.begin(); it != histo2DCopy.end(); it++){
                 TH2F *temp = it->second;
-                histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), temp->GetYaxis()->GetNbins(), temp->GetYaxis()->GetXmin(), temp->GetYaxis()->GetXmax() );
+                histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()*0.75), temp->GetYaxis()->GetXmin(), temp->GetYaxis()->GetXmax() );
+                    
 	    }
         }
     }
     else if(nEtaBins != 1)
-        std::cout << " nEtaBins should be equal to 1 or 6, current value " << nEtaBins << " is not allowed !" << std::endl; 
+        std::cout << " nEtaBins should be equal to 1 or 4, current value " << nEtaBins << " is not allowed !" << std::endl; 
 }
 
 void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel, int NrEtaBins){
@@ -242,6 +244,8 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 	    histo2D["Mu_DiffPtVsGenPt"+EtaBin[iEtaBin]]->Fill(          lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
 	    histo2D["Mu_DiffThetaVsGenTheta"+EtaBin[iEtaBin]]->Fill(    lepton->Theta(),lepton->Theta() - selLepton->Theta() );
 	    histo2D["Mu_DiffThetaVsGenInvPt"+EtaBin[iEtaBin]]->Fill(    InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
+	    histo2D["Mu_DiffThetaVsGenInvPt_All"+EtaBin[iEtaBin]]->Fill(    InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
+            
 	    histo2D["Mu_DiffThetaVsGenPt"+EtaBin[iEtaBin]]->Fill(       lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
 	    histo2D["Mu_DiffPhiVsGenPhi"+EtaBin[iEtaBin]]->Fill(        lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
 	    histo2D["Mu_DiffPhiVsGenPhi_All"+EtaBin[iEtaBin]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
@@ -292,7 +296,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 
     //Initialize the start values if asked
     startValuesArray = startValues;
-    if(useStartValues) SetStartValuesDoubleGaussian(histoNr, useStartArray);         //Can only be done after that doubleGaussianFit is initialized!
+    if(useStartValues) SetStartValuesDoubleGaussian(histoNr, useStartArray, string(fitHisto->GetName()));         //Can only be done after that doubleGaussianFit is initialized!
 
     //Choose the correct fit method:
     hlist = new TH1D*[npar];
@@ -383,7 +387,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
  
 	    hlist = new TH1D*[npar];
 	    if(useStartValues)
-		SetStartValuesDoubleGaussian(f, false);   //false means that normal start values are being used!
+		SetStartValuesDoubleGaussian(f, false, string(histoForFit->GetName()));   //false means that normal start values are being used!
 
             float fullFitRange[2] = {(float) (histoForFit->GetYaxis())->GetXmin(), (float) (histoForFit->GetYaxis())->GetXmax()};
 	    TObjArray aSlices;
@@ -466,6 +470,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 8 || bin == 9 || bin == 10)){ActualFitRange[0] = -28; ActualFitRange[1] = 30;}
             if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 11){ActualFitRange[0] = -30; ActualFitRange[1] = 40;}
 
+            if( string(histoFit->GetName()).find("BJet_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -15;}
+
             //Individual fit range for BJet_DiffPhiVsGenPt:
             if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
             if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
@@ -480,17 +486,31 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 5 || bin == 6)){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
             if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 7){ActualFitRange[0] = -25; ActualFitRange[1] = 28;}
 
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -20; ActualFitRange[1] = 14;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 3 ){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 20;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && (bin == 5 || bin == 6) ){ActualFitRange[0] = -22; ActualFitRange[1] = 24;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 7){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && (bin ==8 || bin == 9)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
+            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && (bin == 10 || bin == 11)){ActualFitRange[0] = -30; ActualFitRange[1] = 35;}
+
             //Individual fit range for Light_DiffPhiVsGenPt:
             if(string(histoFit->GetName()).find("Light_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
             if(string(histoFit->GetName()).find("Light_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
 
             //Individual fit range for Mu_DiffPhiVsGenInvPt:
-            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt") <= string(histoFit->GetName()).size() && bin < 3){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.0015; ActualFitRange[1] = 0.0015;}
+            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+
+            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt_Eta_") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
 
             //Individual fit range for Mu_DiffThetaVsGenInvPt:
             if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
             if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
             if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && (bin >=4 && bin < 7)){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+
+            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt_Eta") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.008; ActualFitRange[1] = 0.008;}
+            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt_Eta") <= string(histoFit->GetName()).size() && bin > 1){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
 
             //Do the actual fit:
             hp->Fit(doubleGaussianFit,"","",ActualFitRange[0],ActualFitRange[1]);
@@ -501,7 +521,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
-                    if(string(histoFit->GetName()) != "Light_DiffPtVsGenPt" || (string(histoFit->GetName()) == "Light_DiffPtVsGenPt" && bin != 2) ){  //Skip 2nd bin for LightPt!!
+                    if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") > string(histoFit->GetName()) || ( ( (string(histoFit->GetName()) == "Light_DiffPtVsGenPt" || string(histoFit->GetName()) == "Light_DiffPtVsGenPt_Eta_0_0.375") && bin != 2) || string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta0.") <= string(histoFit->GetName()) ) ){  //Skip 2nd bin for LightPt!!
 		        hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
                         hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
                     }
@@ -514,11 +534,13 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	}//loop over bins!
 }	
 
-void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray){
+void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray, std::string histoName){
 
     if(useStartArray == true){
-        for(int ii = 0; ii < 6; ii++)
+        for(int ii = 0; ii < 6; ii++){
             doubleGaussianFit->SetParameter(ii, startValuesArray[ii]);
+            if(histoName.find("_Eta_") <= histoName.size() && (ii == 2 || ii == 5) ){ doubleGaussianFit->SetParameter(ii, startValuesArray[ii]/4.); }
+        }
     }
     else{
 	if(whichHisto==1 || whichHisto==4 || whichHisto == 7){ // for Pt transfer function of JETS (and elec -- added as test ...)
