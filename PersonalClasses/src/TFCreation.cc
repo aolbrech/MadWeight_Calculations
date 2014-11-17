@@ -461,56 +461,65 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             ActualFitRange[0] = fitRange[0];
             ActualFitRange[1] = fitRange[1];
 
+            std::string histoName = string(histoFit->GetName());
             //Individual fit range for BJet_DiffPtVsGenPt:
-	    if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -18; ActualFitRange[1] = 10;}
-            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 20;}	
-            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 25;}
-            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 4 || bin == 5)){ActualFitRange[0] = -22; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 6 || bin == 7)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 8 || bin == 9 || bin == 10)){ActualFitRange[0] = -28; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()).find("BJet_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 11){ActualFitRange[0] = -30; ActualFitRange[1] = 40;}
+	    if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -18; ActualFitRange[1] = 10;}
+            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 20;}	
+            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 25;}
+            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && (bin == 4 || bin == 5)){ActualFitRange[0] = -22; ActualFitRange[1] = 30;}
+            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && (bin == 6 || bin == 7)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
+            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && (bin == 8 || bin == 9 || bin == 10)){ActualFitRange[0] = -28; ActualFitRange[1] = 30;}
+            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 11){ActualFitRange[0] = -30; ActualFitRange[1] = 40;}
 
-            if( string(histoFit->GetName()).find("BJet_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -15;}
+            if( histoName.find("BJet_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 1){ActualFitRange[0] = -15;}
 
             //Individual fit range for BJet_DiffPhiVsGenPt:
-            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
-            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 5){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
-            if(string(histoFit->GetName()).find("BJet_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 8){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
+            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
+            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
+            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
+            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
             
             //Individual fit range for Light_DiffPtVsGenPt:
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -15; ActualFitRange[1] = 7;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 22;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && (bin == 5 || bin == 6)){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") <= string(histoFit->GetName()).size() && bin == 7){ActualFitRange[0] = -25; ActualFitRange[1] = 28;}
+            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -15; ActualFitRange[1] = 7;}
+            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
+            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
+            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 22;}
+            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && (bin == 5 || bin == 6)){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
+            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 7){ActualFitRange[0] = -25; ActualFitRange[1] = 28;}
 
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -20; ActualFitRange[1] = 14;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 3 ){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 20;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && (bin == 5 || bin == 6) ){ActualFitRange[0] = -22; ActualFitRange[1] = 24;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && bin == 7){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && (bin ==8 || bin == 9)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
-            if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta_") <= string(histoFit->GetName()).size() && (bin == 10 || bin == 11)){ActualFitRange[0] = -30; ActualFitRange[1] = 35;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 2){ActualFitRange[0] = -20; ActualFitRange[1] = 14;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 3 ){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 20;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin == 5 || bin == 6) ){ActualFitRange[0] = -22; ActualFitRange[1] = 24;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 7){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin ==8 || bin == 9)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin == 10 || bin == 11)){ActualFitRange[0] = -30; ActualFitRange[1] = 35;}
 
             //Individual fit range for Light_DiffPhiVsGenPt:
-            if(string(histoFit->GetName()).find("Light_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(string(histoFit->GetName()).find("Light_DiffPhiVsGenPt") <= string(histoFit->GetName()).size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
+            if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
+            if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
+
+            //Individual fit range for Mu_DiffInvPtVsGenInvPt:
+            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && histoName.find("375") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.001; ActualFitRange[1] = 0.005;}
+            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && histoName.find("375") <= histoName.size() &&bin == 2){ActualFitRange[0] = -0.0012; ActualFitRange[1] = 0.008;}
 
             //Individual fit range for Mu_DiffPhiVsGenInvPt:
-            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.0015; ActualFitRange[1] = 0.0015;}
-            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 2){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.0015; ActualFitRange[1] = 0.0015;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
 
-            if(string(histoFit->GetName()).find("Mu_DiffPhiVsGenInvPt_Eta_") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin > 4){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}
 
             //Individual fit range for Mu_DiffThetaVsGenInvPt:
-            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
-            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
-            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt") <= string(histoFit->GetName()).size() && (bin >=4 && bin < 7)){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
+            if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
+            if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && (bin >=4 && bin < 7)){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
 
-            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt_Eta") <= string(histoFit->GetName()).size() && bin == 1){ActualFitRange[0] = -0.008; ActualFitRange[1] = 0.008;}
-            if(string(histoFit->GetName()).find("Mu_DiffThetaVsGenInvPt_Eta") <= string(histoFit->GetName()).size() && bin > 1){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
+            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.008; ActualFitRange[1] = 0.008;}
+            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
 
             //Do the actual fit:
             hp->Fit(doubleGaussianFit,"","",ActualFitRange[0],ActualFitRange[1]);
@@ -521,7 +530,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
-                    if(string(histoFit->GetName()).find("Light_DiffPtVsGenPt") > string(histoFit->GetName()) || ( ( (string(histoFit->GetName()) == "Light_DiffPtVsGenPt" || string(histoFit->GetName()) == "Light_DiffPtVsGenPt_Eta_0_0.375") && bin != 2) || string(histoFit->GetName()).find("Light_DiffPtVsGenPt_Eta0.") <= string(histoFit->GetName()) ) ){  //Skip 2nd bin for LightPt!!
+                    if(histoName.find("Light_DiffPtVsGenPt") > histoName.size() ||  ( (histoName == "Light_DiffPtVsGenPt" || histoName == "Light_DiffPtVsGenPt_Eta_0_0.375" || histoName == "Light_DiffPtVsGenPt_Eta_0_0.375") && bin != 2) || histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size()  ){  //Skip 2nd bin for LightPt!!
 		        hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
                         hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
                     }
