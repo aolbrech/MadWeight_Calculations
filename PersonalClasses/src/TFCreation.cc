@@ -103,7 +103,10 @@ void TFCreation::InitializeVariables(int nEtaBins){
 
            	for(std::map<std::string,TH2F*>::const_iterator it = histo2DCopy.begin(); it != histo2DCopy.end(); it++){
                 TH2F *temp = it->second;
-                histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()*0.75), temp->GetYaxis()->GetXmin(), temp->GetYaxis()->GetXmax() );
+                if(iEta != nEtaBins)
+                    histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()*0.75), temp->GetYaxis()->GetXmin(), temp->GetYaxis()->GetXmax() );
+                else
+                    histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), temp->GetYaxis()->GetXmin()*1.2, temp->GetYaxis()->GetXmax()*1.2 );                     
                     
 	    }
         }
@@ -260,14 +263,11 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file, int whichEtaBin, TFile* readFile){
 
     //Select the correct Eta-bin histogram!
-    std::cout << " EtaBin = " << EtaBin << " 0 : " << EtaBin[0] << " 1 : " << EtaBin[1] << " 2 : " << EtaBin[2] << " 3 : " << EtaBin[3] << " 4 : " << EtaBin[4] << " 5 : " << EtaBin[5] << " 6 : " << EtaBin[6] << std::endl;
-    std::cout << " Output of EtaBin[whichEtaBin] = " << EtaBin[whichEtaBin] << std::endl;
     TH2F* fitHisto = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+fitHistoName+""+EtaBin[whichEtaBin]).c_str() );
-    std::cout << " Trying to access histogram : " << fitHisto->GetName() << " for EtaBin : " << whichEtaBin << std::endl;
     
     TDirectory* th2dir;
     if(file->GetDirectory("2D_histograms_graphs") == 0) th2dir = file->mkdir("2D_histograms_graphs");
-    else{std::cout << " Directory exists already !" << std::endl;                                              th2dir = file->GetDirectory("2D_histograms_graphs");}
+    else{                                               th2dir = file->GetDirectory("2D_histograms_graphs");}
     //Save the 2D histogram used for the fit!
     th2dir->cd();
     fitHisto->Write();
@@ -286,12 +286,10 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     if(changeFitRange){
         fullFitRange[0] = fitRangeValue[0];
         fullFitRange[1] = fitRangeValue[1];
-	std::cout << " Fit range set to : " << fullFitRange[0] << " & " << fullFitRange[1] << " (should be " << fitRangeValue[0] << " , " << fitRangeValue[1] << " ) " << std::endl;
     }
     else{
         fullFitRange[0] = (float) (fitHisto->GetYaxis())->GetXmin();
         fullFitRange[1] = (float) (fitHisto->GetYaxis())->GetXmax();
-        std::cout << " Fit range set to : " << fullFitRange[0] << " & " << fullFitRange[1] << std::endl;
     }
 
     //Initialize the start values if asked
@@ -315,7 +313,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     for( int ipar = 0; ipar < npar; ipar++ ){
         if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
             caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");    //Quartic function as fit!
-            for(int ii = 0; ii < 4; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
+            for(int ii = 0; ii < 5; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
         }
         else{
             caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
@@ -326,7 +324,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
-	hlist[ipar]->Fit(caloEnergyFit, "","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
+	hlist[ipar]->Fit(caloEnergyFit, "QN","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
         AllCaloEnergyFits[ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
 	hlist[ipar]->Write();                    
     }
@@ -337,91 +335,6 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     delete [] hlistLim;
 }
 
-void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
-	TFile* file = new TFile("TFInformation/PlotsForTransferFunctions.root","RECREATE");
-	file->cd();
-
-	if(drawHistos == true) WritePlots(file);
-	if(doFits == true){
-
-	  //Set parameter names
-	  const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
-	  const int npar = doubleGaussianFit->GetNpar();
-	  for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);
-
-	  ///////////////////////////////////////////
-	  //  Choose the correct histogram to fit  //
-	  ///////////////////////////////////////////
-          TH2F* histoForFit = new TH2F();
-	  for (unsigned int f=0; f<12;f++) {				
-				
-	    switch(f){
-	      case 0:
-		histoForFit=histo2D["BJet_DiffPhiVsGenPt"]; break;
-	      case 1:
-		histoForFit=histo2D["BJet_DiffPtVsGenPt"]; break;
-	      case 2:
-		histoForFit=histo2D["BJet_DiffThetaVsGenPt"]; break;
-	      case 3:
-		histoForFit=histo2D["El_DiffPhiVsGenPt"]; break;
-	      case 4:
-		histoForFit=histo2D["El_DiffPtVsGenPt"]; break;
-	      case 5:
-		histoForFit=histo2D["El_DiffThetaVsGenPt"]; break;
-	      case 6:
-		histoForFit=histo2D["Light_DiffPhiVsGenPt"]; break;
-	      case 7:
-		histoForFit=histo2D["Light_DiffPtVsGenPt"]; break;
-	      case 8:
-		histoForFit=histo2D["Light_DiffThetaVsGenPt"]; break;
-	      case 9:
-		histoForFit=histo2D["Mu_DiffPhiVsGenInvPt"]; break;
-	      case 10:
-		histoForFit=histo2D["Mu_DiffInvPtVsGenInvPt"]; break;
-	      case 11:
-		histoForFit=histo2D["Mu_DiffThetaVsGenInvPt"]; break;
-	    }					
-
-            TDirectory* histoFitDir = file->mkdir(histoForFit->GetName());
-            histoFitDir->cd();
- 
-	    hlist = new TH1D*[npar];
-	    if(useStartValues)
-		SetStartValuesDoubleGaussian(f, false, string(histoForFit->GetName()));   //false means that normal start values are being used!
-
-            float fullFitRange[2] = {(float) (histoForFit->GetYaxis())->GetXmin(), (float) (histoForFit->GetYaxis())->GetXmax()};
-	    TObjArray aSlices;
-	    if(useROOTClass){
-		//Fit using the FitSliceY function of TF1!
-		histoForFit->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
-	        for(int ipar = 0; ipar <= npar; ipar++)
-		    hlist[ipar] = (TH1D*) aSlices[ipar];
-	    }
-	    else
-		FitSliceClassCode(histoForFit, npar, parnames,fullFitRange);
-
-	    //////////////////////////////////////////////////////////////////////////////////////////////
-	    //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
-	    //////////////////////////////////////////////////////////////////////////////////////////////
-            caloEnergyFit->SetRange( histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax() );
-	    for( int ipar = 0; ipar < npar; ipar++ ){
-
-	  	//give names to the parameters		
-                for(int jj = 0; jj < 3; jj++) caloEnergyFit->SetParName(jj, ( string(parnames[ipar])+tostr(jj)).c_str() );
-		caloEnergyFit->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
-		hlist[ipar]->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
-
-		hlist[ipar]->Fit(caloEnergyFit);
-		hlist[ipar]->Write();            
-	    }
-	    hlist[npar]->Write();
-						
-	  }//Loop over f						
-	  delete histoForFit;
-	  delete [] hlist;
-	}                               //Boolean doFits = true
-	file->Close();
-}
 
 void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], float fitRange[]){
 	//------------------------------------------------------------------------------------------//
@@ -444,14 +357,20 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
 	int nbins = histoFit->GetXaxis()->GetNbins();
         float ActualFitRange[2] = {fitRange[0], fitRange[1]};
-	cout << "\n ** Looking at histogram : " << histoFit->GetName() << "                               ******************************* ( Fit between " << fitRange[0] << ", " << fitRange[1] << " ) " << endl;
 	for(int bin=1;bin <= nbins+1;bin ++) {
-	    cout << "   --  Looking at bin : " << bin << endl;
 	    string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
 
-	    TH1D *hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
-	    //if(bin==nbins) hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin+1,"e"); //include overflow in last bin
-	    //if(bin==1) hp = histoFit->ProjectionY(projection_title.c_str(),bin-1,bin,"e"); //include underflow in first bin
+            TH1D *hp;
+            if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
+                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
+            else if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)    //Temporary fix ... Need to figure out how to enlarge 1 bin!
+                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
+            else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
+                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
+            else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)
+                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
+            else
+	        hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
 
 	    //Histogram doesn't have any memory space ...
 	    if(hp == 0) continue;
@@ -473,11 +392,23 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 
             if( histoName.find("BJet_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 1){ActualFitRange[0] = -15;}
 
+            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin >=1){ActualFitRange[0] = -20;}
+            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[0] = -25;}
+            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 5){ActualFitRange[1] = 20;}
+            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 6){ActualFitRange[0] = -30;}
+            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -35;}
+
             //Individual fit range for BJet_DiffPhiVsGenPt:
             if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
             if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
             if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
             if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
+
+            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 1 || bin == 2) ){ActualFitRange[0] = -0.15; ActualFitRange[1] = 0.15;}
+            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 3 || bin == 4) ){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
+            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 5 || bin == 6) ){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
+            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 7 || bin == 8) ){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}    
+            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.06; ActualFitRange[1] = 0.06;}
             
             //Individual fit range for Light_DiffPtVsGenPt:
             if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -15; ActualFitRange[1] = 7;}
@@ -495,13 +426,37 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin ==8 || bin == 9)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
             if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin == 10 || bin == 11)){ActualFitRange[0] = -30; ActualFitRange[1] = 35;}
 
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin == 1){ActualFitRange[0] = -16;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin == 4){ActualFitRange[1] = 22;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && (bin == 5 || bin == 6 || bin == 7) ){ActualFitRange[1] = 27;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin > 7){ActualFitRange[0] = -30; ActualFitRange[1] = -35;}
+
+            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 1){ActualFitRange[0] = -15;}
+            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 2){ActualFitRange[0] = -17; ActualFitRange[1] = 12;}
+            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 17;}
+            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 4){ActualFitRange[0] = -18; ActualFitRange[1] = 15;}
+            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 4){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
+            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 7){ActualFitRange[0] = -24; ActualFitRange[1] = 20;}
+            if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 7){ActualFitRange[1] = 30;}
+
             //Individual fit range for Light_DiffPhiVsGenPt:
             if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
             if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
 
+            if(histoName.find("Light_DiffPhiVsGenPt_Eta_0.75") <= histoName.size() && (bin == 1 || bin == 2) ){ActualFitRange[0] = -0.12;}
+
+            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.15; ActualFitRange[1] = 0.15;}
+            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
+            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
+            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
+            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.07; ActualFitRange[1] = 0.07;}
+
             //Individual fit range for Mu_DiffInvPtVsGenInvPt:
-            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && histoName.find("375") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.001; ActualFitRange[1] = 0.005;}
-            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && histoName.find("375") <= histoName.size() &&bin == 2){ActualFitRange[0] = -0.0012; ActualFitRange[1] = 0.008;}
+            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.001; ActualFitRange[1] = 0.005;}
+            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.0012; ActualFitRange[1] = 0.008;}
+
+           if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.0017; ActualFitRange[1] = 0.0012;}
 
             //Individual fit range for Mu_DiffPhiVsGenInvPt:
             if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.0015; ActualFitRange[1] = 0.0015;}
@@ -513,6 +468,15 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
             if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin > 4){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}
 
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.004; ActualFitRange[1] = 0.004;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}	
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11){ActualFitRange[0] = -0.006; ActualFitRange[1] = 0.006;}
+
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.0026; ActualFitRange[1] = 0.0026;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin > 2){ActualFitRange[0] = -0.0039; ActualFitRange[1] = 0.0039;}
+            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin > 7){ActualFitRange[0] = -0.0045; ActualFitRange[1] = 0.0045;}
+
             //Individual fit range for Mu_DiffThetaVsGenInvPt:
             if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
             if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
@@ -521,8 +485,28 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
             if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.008; ActualFitRange[1] = 0.008;}
             if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
 
+            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 4){ActualFitRange[0] = -0.012; ActualFitRange[1] = 0.012;}
+            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 7){ActualFitRange[0] = -0.015; ActualFitRange[1] = 0.015;}
+
+            //Individual fit range for El_DiffPhiVsGenPt:
+            if(histoName.find("El_DiffPhiVsGenPt_Eta_0.75") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
+
+            if(histoName.find("El_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin >= 1){ActualFitRange[0] = -0.015; ActualFitRange[1] = 0.015;}
+
+            //Individual fit range for El_DiffPtVsGenPt:
+            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 1){ActualFitRange[0] = -6; ActualFitRange[1] = 4;}
+            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 1){ActualFitRange[0] = -6; ActualFitRange[1] = 5;}
+            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[1] = 6;}
+            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 6){ActualFitRange[0] = -6.5; ActualFitRange[1] = 6.5;}
+
+            //Individual fit range for El_DiffThetaVsGenPt:
+            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin >= 1){ActualFitRange[0] = -0.012; ActualFitRange[1] = 0.012;}
+            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
+            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.007; ActualFitRange[1] = 0.007;}
+            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}
+
             //Do the actual fit:
-            hp->Fit(doubleGaussianFit,"","",ActualFitRange[0],ActualFitRange[1]);
+            hp->Fit(doubleGaussianFit,"QN","",ActualFitRange[0],ActualFitRange[1]);
 
 	    int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
 	    if(npfits > npar && npfits >= cut) {
@@ -530,9 +514,15 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
-                    if(histoName.find("Light_DiffPtVsGenPt") > histoName.size() ||  ( (histoName == "Light_DiffPtVsGenPt" || histoName == "Light_DiffPtVsGenPt_Eta_0_0.375" || histoName == "Light_DiffPtVsGenPt_Eta_0_0.375") && bin != 2) || histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size()  ){  //Skip 2nd bin for LightPt!!
-		        hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar)); 
+                    if( (histoName.find("Light_DiffPtVsGenPt") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") > histoName.size() ) ||  ( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size()) && bin != 2) || (histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && bin !=11 && bin != 10) || (histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin !=7) ){  //Skip 2nd bin for LightPt!!
+		        //if(ChangeBinCenter == false){
+                        hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar));
                         hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
+                        //} 
+                        //else{
+                            //hlist[ipar]->Fill( (histoFit->GetXaxis()->GetBinCenter(bin+1/2)+histoFit->GetXaxis()->GetBinCenter(bin+1+1/2))/2,doubleGaussianFit->GetParameter(ipar)); 
+                            //hlist[ipar]->SetBinError( (int) (bin+1/2+bin+1+1/2)/2 ,doubleGaussianFit->GetParError(ipar));
+                        //}
                     }
 	        }
 		//Save hchi2 histogram as extra hlist!
@@ -647,4 +637,90 @@ void TFCreation::WritePlots(TFile* outfile){
 	      temp->Write();
 	}
 	outfile->cd(); //Step out from 2D_histograms_graphs directory!
+}
+
+void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
+	TFile* file = new TFile("TFInformation/PlotsForTransferFunctions.root","RECREATE");
+	file->cd();
+
+	if(drawHistos == true) WritePlots(file);
+	if(doFits == true){
+
+	  //Set parameter names
+	  const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
+	  const int npar = doubleGaussianFit->GetNpar();
+	  for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);
+
+	  ///////////////////////////////////////////
+	  //  Choose the correct histogram to fit  //
+	  ///////////////////////////////////////////
+          TH2F* histoForFit = new TH2F();
+	  for (unsigned int f=0; f<12;f++) {				
+				
+	    switch(f){
+	      case 0:
+		histoForFit=histo2D["BJet_DiffPhiVsGenPt"]; break;
+	      case 1:
+		histoForFit=histo2D["BJet_DiffPtVsGenPt"]; break;
+	      case 2:
+		histoForFit=histo2D["BJet_DiffThetaVsGenPt"]; break;
+	      case 3:
+		histoForFit=histo2D["El_DiffPhiVsGenPt"]; break;
+	      case 4:
+		histoForFit=histo2D["El_DiffPtVsGenPt"]; break;
+	      case 5:
+		histoForFit=histo2D["El_DiffThetaVsGenPt"]; break;
+	      case 6:
+		histoForFit=histo2D["Light_DiffPhiVsGenPt"]; break;
+	      case 7:
+		histoForFit=histo2D["Light_DiffPtVsGenPt"]; break;
+	      case 8:
+		histoForFit=histo2D["Light_DiffThetaVsGenPt"]; break;
+	      case 9:
+		histoForFit=histo2D["Mu_DiffPhiVsGenInvPt"]; break;
+	      case 10:
+		histoForFit=histo2D["Mu_DiffInvPtVsGenInvPt"]; break;
+	      case 11:
+		histoForFit=histo2D["Mu_DiffThetaVsGenInvPt"]; break;
+	    }					
+
+            TDirectory* histoFitDir = file->mkdir(histoForFit->GetName());
+            histoFitDir->cd();
+ 
+	    hlist = new TH1D*[npar];
+	    if(useStartValues)
+		SetStartValuesDoubleGaussian(f, false, string(histoForFit->GetName()));   //false means that normal start values are being used!
+
+            float fullFitRange[2] = {(float) (histoForFit->GetYaxis())->GetXmin(), (float) (histoForFit->GetYaxis())->GetXmax()};
+	    TObjArray aSlices;
+	    if(useROOTClass){
+		//Fit using the FitSliceY function of TF1!
+		histoForFit->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
+	        for(int ipar = 0; ipar <= npar; ipar++)
+		    hlist[ipar] = (TH1D*) aSlices[ipar];
+	    }
+	    else
+		FitSliceClassCode(histoForFit, npar, parnames,fullFitRange);
+
+	    //////////////////////////////////////////////////////////////////////////////////////////////
+	    //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
+	    //////////////////////////////////////////////////////////////////////////////////////////////
+            caloEnergyFit->SetRange( histoForFit->GetXaxis()->GetXmin(), histoForFit->GetXaxis()->GetXmax() );
+	    for( int ipar = 0; ipar < npar; ipar++ ){
+
+	  	//give names to the parameters		
+                for(int jj = 0; jj < 3; jj++) caloEnergyFit->SetParName(jj, ( string(parnames[ipar])+tostr(jj)).c_str() );
+		caloEnergyFit->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
+		hlist[ipar]->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
+
+		hlist[ipar]->Fit(caloEnergyFit);
+		hlist[ipar]->Write();            
+	    }
+	    hlist[npar]->Write();
+						
+	  }//Loop over f						
+	  delete histoForFit;
+	  delete [] hlist;
+	}                               //Boolean doFits = true
+	file->Close();
 }
