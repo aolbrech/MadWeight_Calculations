@@ -43,7 +43,10 @@
             EtaTitle[ii] = " -- "+EtaValuesString[ii]+" < |#eta| #leq "+EtaValuesString[ii+1];
         }
   }
+
+  //***********************//
   int usedEta = 2;
+  //***********************//
   Directory = Directory+EtaBin[usedEta];
 
   std::string Titles[12] ={"Light_DiffPtVsGenPt"+EtaBin[usedEta],      // Number 0
@@ -151,7 +154,8 @@
 	  HistoName = "Chi2Distribution";
 	}
         projHisto = (TH1D*) histoFile->Get( (Title+"/"+Title+"_"+histoName).c_str() );
-	
+	if(projHisto == 0) continue;
+
 	//Set the Marker to a small dot
 	projHisto->SetMarkerStyle(8); //Only use a small dot!
 	projHisto->SetMarkerSize(0.3);

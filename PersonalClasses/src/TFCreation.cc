@@ -260,7 +260,7 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
     }
 }
 
-void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, float fitRangeValue[], TFile* file, int whichEtaBin, TFile* readFile){
+void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, TFile* file, int whichEtaBin, TFile* readFile){
 
     //Select the correct Eta-bin histogram!
     TH2F* fitHisto = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+fitHistoName+""+EtaBin[whichEtaBin]).c_str() );
@@ -282,15 +282,6 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);    
 
     caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );
-    float fullFitRange[2];
-    if(changeFitRange){
-        fullFitRange[0] = fitRangeValue[0];
-        fullFitRange[1] = fitRangeValue[1];
-    }
-    else{
-        fullFitRange[0] = (float) (fitHisto->GetYaxis())->GetXmin();
-        fullFitRange[1] = (float) (fitHisto->GetYaxis())->GetXmax();
-    }
 
     //Initialize the start values if asked
     startValuesArray = startValues;
@@ -305,7 +296,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 	for(int ipar = 0; ipar <= npar; ipar++) hlist[ipar] = (TH1D*) aSlices[ipar];
     }
     else
-	FitSliceClassCode(fitHisto, npar, parnames, fullFitRange);
+	FitSliceClassCode(fitHisto, npar, parnames, changeFitRange);
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
@@ -324,7 +315,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
-	hlist[ipar]->Fit(caloEnergyFit, "QN","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
+	hlist[ipar]->Fit(caloEnergyFit, "Q","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
         AllCaloEnergyFits[ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
 	hlist[ipar]->Write();                    
     }
@@ -336,7 +327,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 }
 
 
-void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], float fitRange[]){
+void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], bool ChangeFitRange){
 	//------------------------------------------------------------------------------------------//
 	// Main difference with the Root class FitSlicesY() is the plotting of histograms !        
 	// In the Root class the distribution of each hlist histogram is not given!
@@ -356,7 +347,6 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	//Loop on all bins in X, generate a projection along Y and fit each bin separately!
 	int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
 	int nbins = histoFit->GetXaxis()->GetNbins();
-        float ActualFitRange[2] = {fitRange[0], fitRange[1]};
 	for(int bin=1;bin <= nbins+1;bin ++) {
 	    string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
 
@@ -375,138 +365,15 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	    //Histogram doesn't have any memory space ...
 	    if(hp == 0) continue;
 	    if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
+            std::string histoName = string(histoFit->GetName());
 
 	    doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
-            ActualFitRange[0] = fitRange[0];
-            ActualFitRange[1] = fitRange[1];
+            double ActualFitRange[2];
+            if(ChangeFitRange == false){                                    ActualFitRange[0] = (double) (histoFit->GetYaxis())->GetXmin(); ActualFitRange[1] = (double) (histoFit->GetYaxis())->GetXmax(); }
+            else{ std::vector<double> fitBin = SetFitRange(histoName, bin); ActualFitRange[0] = fitBin[0] ;                                 ActualFitRange[1] = fitBin[1];                                  }
 
-            std::string histoName = string(histoFit->GetName());
-            //Individual fit range for BJet_DiffPtVsGenPt:
-	    if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -18; ActualFitRange[1] = 10;}
-            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 20;}	
-            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 25;}
-            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && (bin == 4 || bin == 5)){ActualFitRange[0] = -22; ActualFitRange[1] = 30;}
-            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && (bin == 6 || bin == 7)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
-            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && (bin == 8 || bin == 9 || bin == 10)){ActualFitRange[0] = -28; ActualFitRange[1] = 30;}
-            if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() && bin == 11){ActualFitRange[0] = -30; ActualFitRange[1] = 40;}
-
-            if( histoName.find("BJet_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 1){ActualFitRange[0] = -15;}
-
-            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin >=1){ActualFitRange[0] = -20;}
-            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[0] = -25;}
-            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 5){ActualFitRange[1] = 20;}
-            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 6){ActualFitRange[0] = -30;}
-            if(histoName.find("BJet_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -35;}
-
-            //Individual fit range for BJet_DiffPhiVsGenPt:
-            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
-            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
-            if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.05; ActualFitRange[1] = 0.05;}
-
-            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 1 || bin == 2) ){ActualFitRange[0] = -0.15; ActualFitRange[1] = 0.15;}
-            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 3 || bin == 4) ){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
-            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 5 || bin == 6) ){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && (bin == 7 || bin == 8) ){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}    
-            if(histoName.find("BJet_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.06; ActualFitRange[1] = 0.06;}
-            
-            //Individual fit range for Light_DiffPtVsGenPt:
-            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -15; ActualFitRange[1] = 7;}
-            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
-            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
-            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 22;}
-            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && (bin == 5 || bin == 6)){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
-            if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() && bin == 7){ActualFitRange[0] = -25; ActualFitRange[1] = 28;}
-
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 2){ActualFitRange[0] = -20; ActualFitRange[1] = 14;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 3 ){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 4){ActualFitRange[0] = -20; ActualFitRange[1] = 20;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin == 5 || bin == 6) ){ActualFitRange[0] = -22; ActualFitRange[1] = 24;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && bin == 7){ActualFitRange[0] = -22; ActualFitRange[1] = 25;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin ==8 || bin == 9)){ActualFitRange[0] = -25; ActualFitRange[1] = 30;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_") <= histoName.size() && (bin == 10 || bin == 11)){ActualFitRange[0] = -30; ActualFitRange[1] = 35;}
-
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin == 1){ActualFitRange[0] = -16;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin == 2){ActualFitRange[0] = -18; ActualFitRange[1] = 12;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin == 4){ActualFitRange[1] = 22;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && (bin == 5 || bin == 6 || bin == 7) ){ActualFitRange[1] = 27;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_0.75") <= histoName.size() && bin > 7){ActualFitRange[0] = -30; ActualFitRange[1] = -35;}
-
-            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 1){ActualFitRange[0] = -15;}
-            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 2){ActualFitRange[0] = -17; ActualFitRange[1] = 12;}
-            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 3){ActualFitRange[0] = -20; ActualFitRange[1] = 17;}
-            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 4){ActualFitRange[0] = -18; ActualFitRange[1] = 15;}
-            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 4){ActualFitRange[0] = -20; ActualFitRange[1] = 18;}
-            //if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 7){ActualFitRange[0] = -24; ActualFitRange[1] = 20;}
-            if(histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 7){ActualFitRange[1] = 30;}
-
-            //Individual fit range for Light_DiffPhiVsGenPt:
-            if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() && bin > 2){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
-
-            if(histoName.find("Light_DiffPhiVsGenPt_Eta_0.75") <= histoName.size() && (bin == 1 || bin == 2) ){ActualFitRange[0] = -0.12;}
-
-            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.15; ActualFitRange[1] = 0.15;}
-            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.12; ActualFitRange[1] = 0.12;}
-            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.1; ActualFitRange[1] = 0.1;}
-            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 6){ActualFitRange[0] = -0.08; ActualFitRange[1] = 0.08;}
-            if(histoName.find("Light_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.07; ActualFitRange[1] = 0.07;}
-
-            //Individual fit range for Mu_DiffInvPtVsGenInvPt:
-            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.001; ActualFitRange[1] = 0.005;}
-            if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.0012; ActualFitRange[1] = 0.008;}
-
-           if(histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.0017; ActualFitRange[1] = 0.0012;}
-
-            //Individual fit range for Mu_DiffPhiVsGenInvPt:
-            if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.0015; ActualFitRange[1] = 0.0015;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
-
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
-
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.375") <= histoName.size() && bin > 4){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}
-
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.004; ActualFitRange[1] = 0.004;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}	
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11){ActualFitRange[0] = -0.006; ActualFitRange[1] = 0.006;}
-
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.0026; ActualFitRange[1] = 0.0026;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin == 2){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin > 2){ActualFitRange[0] = -0.0039; ActualFitRange[1] = 0.0039;}
-            if(histoName.find("Mu_DiffPhiVsGenInvPt_Eta_1.45") <= histoName.size() && bin > 7){ActualFitRange[0] = -0.0045; ActualFitRange[1] = 0.0045;}
-
-            //Individual fit range for Mu_DiffThetaVsGenInvPt:
-            if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.002; ActualFitRange[1] = 0.002;}
-            if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && (bin >1 && bin < 4)){ActualFitRange[0] = -0.0025; ActualFitRange[1] = 0.0025;}
-            if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() && (bin >=4 && bin < 7)){ActualFitRange[0] = -0.003; ActualFitRange[1] = 0.003;}
-
-            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta") <= histoName.size() && bin == 1){ActualFitRange[0] = -0.008; ActualFitRange[1] = 0.008;}
-            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta") <= histoName.size() && bin > 1){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
-
-            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 4){ActualFitRange[0] = -0.012; ActualFitRange[1] = 0.012;}
-            if(histoName.find("Mu_DiffThetaVsGenInvPt_Eta_0.75") <= histoName.size() && bin > 7){ActualFitRange[0] = -0.015; ActualFitRange[1] = 0.015;}
-
-            //Individual fit range for El_DiffPhiVsGenPt:
-            if(histoName.find("El_DiffPhiVsGenPt_Eta_0.75") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
-
-            if(histoName.find("El_DiffPhiVsGenPt_Eta_1.45") <= histoName.size() && bin >= 1){ActualFitRange[0] = -0.015; ActualFitRange[1] = 0.015;}
-
-            //Individual fit range for El_DiffPtVsGenPt:
-            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 1){ActualFitRange[0] = -6; ActualFitRange[1] = 4;}
-            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 1){ActualFitRange[0] = -6; ActualFitRange[1] = 5;}
-            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[1] = 6;}
-            if(histoName.find("El_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin > 6){ActualFitRange[0] = -6.5; ActualFitRange[1] = 6.5;}
-
-            //Individual fit range for El_DiffThetaVsGenPt:
-            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin >= 1){ActualFitRange[0] = -0.012; ActualFitRange[1] = 0.012;}
-            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin > 3){ActualFitRange[0] = -0.01; ActualFitRange[1] = 0.01;}
-            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin > 5){ActualFitRange[0] = -0.007; ActualFitRange[1] = 0.007;}
-            if(histoName.find("El_DiffThetaVsGenPt_Eta_1.45") <= histoName.size() && bin > 8){ActualFitRange[0] = -0.005; ActualFitRange[1] = 0.005;}
-
-            //Do the actual fit:
-            hp->Fit(doubleGaussianFit,"QN","",ActualFitRange[0],ActualFitRange[1]);
+             //Do the actual fit:
+            hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
 	    int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
 	    if(npfits > npar && npfits >= cut) {
@@ -515,14 +382,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
                     if( (histoName.find("Light_DiffPtVsGenPt") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") > histoName.size() ) ||  ( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size()) && bin != 2) || (histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && bin !=11 && bin != 10) || (histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin !=7) ){  //Skip 2nd bin for LightPt!!
-		        //if(ChangeBinCenter == false){
                         hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar));
                         hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
-                        //} 
-                        //else{
-                            //hlist[ipar]->Fill( (histoFit->GetXaxis()->GetBinCenter(bin+1/2)+histoFit->GetXaxis()->GetBinCenter(bin+1+1/2))/2,doubleGaussianFit->GetParameter(ipar)); 
-                            //hlist[ipar]->SetBinError( (int) (bin+1/2+bin+1+1/2)/2 ,doubleGaussianFit->GetParError(ipar));
-                        //}
                     }
 	        }
 		//Save hchi2 histogram as extra hlist!
@@ -531,7 +392,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 	    hp->Write();
 	    delete hp;
 	}//loop over bins!
-}	
+}
+
 
 void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray, std::string histoName){
 
@@ -618,7 +480,6 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
 
 void TFCreation::WritePlots(TFile* outfile){
 	outfile->cd();
-	std::cout << " Inside WritePlots class ! EtaBins = " << EtaBin << " , " << EtaBin[4] << std::endl;
 
 	TDirectory* th1dir = outfile->mkdir("1D_histograms");
 	th1dir->cd();
@@ -637,6 +498,156 @@ void TFCreation::WritePlots(TFile* outfile){
 	      temp->Write();
 	}
 	outfile->cd(); //Step out from 2D_histograms_graphs directory!
+}
+
+std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
+    
+    std::vector<double> BinnedFitRange;
+    BinnedFitRange.clear();
+    double FitRangeBinNeg = 0., FitRangeBinPos = 0.;
+
+    if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0") <= histoName.size() ){            //Same fit ranges for first three eta-bins and full distribution!
+            double FullFitRangeNeg[11] = {-0.12, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.12,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size()){
+            double FullFitRangeNeg[11] = {-0.15, -0.15, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.06, -0.06, -0.06}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.15,  0.15,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.06,  0.06,  0.06}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of BJet_DiffPhi histo
+
+    if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() ){
+            double FullFitRangeNeg[11] = {-18, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];    //Difference for first bin!
+            double FullFitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-20, -20, -20, -25, -25, -25, -30, -30, -35, -35, -35}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 10,  20,  25,  25,  30,  20,  20,  20,  20,  20,  20}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of BJet_DiffPt histo
+
+    if(histoName.find("BJet_DiffThetaVsGenPt") <= histoName.size() ){ FitRangeBinNeg = -0.1; FitRangeBinPos =  0.1; } //End of BJet_DiffTheta histo
+
+    if(histoName.find("El_DiffPhiVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){ FitRangeBinNeg = -0.012; FitRangeBinPos =  0.012; }
+        else if(histoName.find("Eta_0.75") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.01, -0.01, -0.01}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.01,  0.01,  0.01}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){ FitRangeBinNeg = -0.015; FitRangeBinPos = 0.015; }
+    } //End of El_DiffPhi histo
+
+    if(histoName.find("El_DiffPtVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -4; FitRangeBinPos = 5; }
+        else if( histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-6, -6, -6, -6, -6, -6, -6.5, -6.5, -6.5, -6.5, -6.5}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 4,  5,  5,  6,  6,  6,  6.5,  6.5,  6.5,  6.5,  6.5}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of El_DiffPt histo
+
+    if(histoName.find("El_DiffThetaVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -0.018; FitRangeBinPos = 0.018; }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.01, -0.01, -0.007, -0.007, -0.007, -0.005, -0.005, -0.005}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.012,  0.012,  0.012,  0.01,  0.01,  0.007,  0.007,  0.007,  0.005,  0.005,  0.005}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of El_DiffTheta
+
+    if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){ 
+            double FullFitRangeNeg[11] = {-0.14, -0.14, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.14,  0.14,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08};  FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_75") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.12, -0.12, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.12,  0.12,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.15, -0.15, -0.15, -0.12, -0.12, -0.1, -0.08, -0.08, -0.07, -0.07, -0.07}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.15,  0.15,  0.15,  0.12,  0.12,  0.1,  0.08,  0.08,  0.07,  0.07,  0.07}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of Light_DiffPhi
+
+    if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() ){
+            double FullFitRangeNeg[11] = {-15, -18, -20, -20, -22, -22, -25, -28, -28, -28, -28}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = {  7,  12,  18,  22,  25,  25,  28,  35,  35,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = {  7,  14,  18,  20,  24,  24,  25,  30,  30,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0.75") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-16, -18, -20, -20, -22, -22, -22, -30, -30, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = {  7,  12,  18,  22,  27,  27,  27,  35,  35,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];                //Check influence of fit (-35 was used in previous code ...)
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = {  7,  14,  18,  20,  24,  24,  30,  30,  30,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of Light_DiffPt
+
+    if(histoName.find("Light_DiffThetaVsGenPt") <= histoName.size() ){ FitRangeBinNeg = -0.12; FitRangeBinPos = 0.12; } //End of Light_DiffTheta
+
+    if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.0015, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.0015,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.003, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.003,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0.375") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.002, -0.0025, -0.003, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.002,  0.0025,  0.003,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0.75") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.005, -0.005, -0.006}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.005,  0.005,  0.006}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.0026, -0.003, -0.0039, -0.0039, -0.0039, -0.0039, -0.0039, -0.0045, -0.0045, -0.0045, -0.0045}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.0026,  0.003,  0.0039,  0.0039,  0.0039,  0.0039,  0.0039,  0.0045,  0.0045,  0.0045,  0.0045}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of Mu_DiffPhi
+
+    if(histoName.find("Mu_DiffInvPtVsGenInvPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.75") <= histoName.size() ){ FitRangeBinNeg = -0.0015; FitRangeBinPos = 0.001; }
+        else if(histoName.find("Eta_0.375") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.001, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.005,  0.008,   0.001,   0.001,   0.001,   0.001,   0.001,   0.001,   0.001,   0.001,   0.001 }; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.0015, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.001,   0.0012,  0.0012,  0.0012,  0.0012,  0.0012,  0.0012,  0.0012,  0.0012,  0.0012,  0.0012}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }        
+    } //End of Mu_DiffInvPt
+
+    if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() ){
+        if(histoName.find("Eta") > histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.002, -0.0025, -0.0025, -0.003, -0.003, -0.003, -0.0035, -0.0035, -0.0035, -0.0035, -0.0035}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.002,  0.0025,  0.0025,  0.003,  0.003,  0.003,  0.0035,  0.0035,  0.0035,  0.0035,  0.0035}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() || histoName.find("1.45") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+        else if(histoName.find("Eta_0.75") <= histoName.size() ){
+            double FullFitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.012, -0.012, -0.012, -0.015, -0.015, -0.015, -0.015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.012,  0.012,  0.012,  0.015,  0.015,  0.015,  0.015}; FitRangeBinPos = FullFitRangePos[iBin-1];
+        }
+    } //End of Mu_DiffTheta
+
+    BinnedFitRange.push_back(FitRangeBinNeg); BinnedFitRange.push_back(FitRangeBinPos);
+
+    return  BinnedFitRange;
 }
 
 void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
@@ -691,7 +702,6 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 	    if(useStartValues)
 		SetStartValuesDoubleGaussian(f, false, string(histoForFit->GetName()));   //false means that normal start values are being used!
 
-            float fullFitRange[2] = {(float) (histoForFit->GetYaxis())->GetXmin(), (float) (histoForFit->GetYaxis())->GetXmax()};
 	    TObjArray aSlices;
 	    if(useROOTClass){
 		//Fit using the FitSliceY function of TF1!
@@ -700,7 +710,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 		    hlist[ipar] = (TH1D*) aSlices[ipar];
 	    }
 	    else
-		FitSliceClassCode(histoForFit, npar, parnames,fullFitRange);
+		FitSliceClassCode(histoForFit, npar, parnames,false);
 
 	    //////////////////////////////////////////////////////////////////////////////////////////////
 	    //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
