@@ -137,6 +137,7 @@ int main (int argc, char *argv[])
   std::string doJESShift = "nominal"; // Other options are "minus" and "plus"
   std::string doJERShift = "nominal";
   std::string doLeptonSFShift = "Nominal";  //Other options are "Minus" and "Plus" (Capital letters are needed!
+  std::string doLumiWeightShift = "Nominal";  //Other options are "Minus" and "Plus"
  
   ////////////////////////////////////
   /// AnalysisEnvironment  
@@ -292,6 +293,8 @@ int main (int argc, char *argv[])
   histo1D["CosThetaReco"] = new TH1F("CosThetaReco","CosThetaReco",200,-1,1);
   histo1D["NeutrinoEta"] = new TH1F("NeutrinoEta","NeutrinoEta",200,-8,8);
 
+  histo1D["lumiWeights"] = new TH1F("lumiWeights","lumiWeights", 200,-100,100);
+
   //Mlb and Mqqb information:
   histo2D["MlbMqqbCorrectChosen"] = new TH2F("MlbMqqbCorrectChosen","MlbMqqbCorrectChosen",200,0,500,200,0,300);
   histo2D["MlbMqqbCorrectAll"] = new TH2F("MlbMqqbCorrectAll","MlbMqqbCorrectAll",200,0,500,200,0,300);
@@ -302,10 +305,18 @@ int main (int argc, char *argv[])
   /// MultiSamplePlot
   ////////////////////////////////////
   map<string,MultiSamplePlot*> MSPlot;
-  MSPlot["Init_Events_pT_jet1_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet1_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
-  MSPlot["Init_Events_pT_jet2_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet2_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
-  MSPlot["Init_Events_pT_jet3_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet3_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
-  MSPlot["Init_Events_pT_jet4_beforeEvtSel"] = new MultiSamplePlot(datasets, "Init_Events_pT_jet4_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet1_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet1_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet2_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet2_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet3_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet3_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet4_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet4_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+
+  MSPlot["InitJets_METPt"] = new MultiSamplePlot(datasetsPlot, "InitJets_METPt", 60,0,300,"p_{T} (GeV) ");
+  MSPlot["InitJets_Pt_jet1"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet1",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_Pt_jet2"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet2",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_Pt_jet3"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet3",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_Pt_jet4"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet4",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_METPt_METTypeOneCorrected"] = new MultiSamplePlot(datasetsPlot, "InitJets_METPt_METTypeOneCorrected", 60,0,300, "p_{T} (GeV)");
+  MSPlot["InitJets_METPt_JerSmearingApplied"] = new MultiSamplePlot(datasetsPlot, "InitJets_METPt_JerSmearingApplied", 60,0,300, "p_{T} (GeV)");
 
   string leptFlavs[3]={"_other","_mu","_el"};
   for(int ii = 0; ii < 3; ii++){
@@ -552,13 +563,9 @@ int main (int argc, char *argv[])
       // LOAD EVENT //
       ////////////////
       
-      TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  
+      //TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  //Use uncorrected jets ...
+      TRootEvent* event = treeLoader.LoadEvent(ievt, vertex, init_muons, init_electrons, init_jets, mets);
       
-      //Also need to load the init_jets info!
-      std::cout << " Size of init_jets and init_jets_corrected : " << init_jets.size() << " vs " << init_jets_corrected.size() << std::endl;
-      if(init_jets_corrected.size() > 0 || init_jets.size() ) std::cout << " Value of Px for init_jet and init_jets_corrected : " << /*(init_jets[0])->Px() << " vs " <<*/ (init_jets_corrected[0])->Px() << std::endl;
-
-
       if(! (dataSetName.find("Data")==0 || dataSetName.find("DATA")==0  || dataSetName.find("data")==0 ) ) {
         genjets = treeLoader.LoadGenJet(ievt,false);
         sort(genjets.begin(),genjets.end(),HighestPt()); // HighestPt() is included from the Selection class
@@ -596,8 +603,7 @@ int main (int argc, char *argv[])
       float scaleFactor = 1.;
       
       // Load the GenEvent and calculate the branching ratio correction
-      /*if(dataSetName.find("TTbarJets") == 0)
-	{
+      if(dataSetName.find("TTbarJets") == 0){
 	//cout << "LOADING GenEvent" << endl;
 	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
 	if( genEvt->isSemiLeptonic() )
@@ -606,45 +612,38 @@ int main (int argc, char *argv[])
 	scaleFactor *= (0.676*1.5)*(0.676*1.5);
 	else if( genEvt->isFullLeptonic() )
 	scaleFactor *= (0.108*9.)*(0.108*9.);
-	}*/
+      }
+      MSPlot["InitJets_METPt"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      if(init_jets.size() > 0) MSPlot["InitJets_Pt_jet1"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      if(init_jets.size() > 1) MSPlot["InitJets_Pt_jet2"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      if(init_jets.size() > 2) MSPlot["InitJets_Pt_jet3"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      if(init_jets.size() > 3) MSPlot["InitJets_Pt_jet4"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       
       //////////////////////////////////////
       // Apply Jet Corrections on-the-fly //   
       //////////////////////////////////////
-      if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 )
-	{
+      if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){
 	  jetTools->unCorrectMETTypeOne(init_jets, mets[0], true);
 	  jetTools->correctJets(init_jets, event->kt6PFJets_rho(), true);
 	  jetTools->correctMETTypeOne(init_jets, mets[0], true);
-	}
-      else
-	{
+      }
+      else{
 	  jetTools->unCorrectMETTypeOne(init_jets, mets[0], false);
 	  jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
 	  jetTools->correctMETTypeOne(init_jets, mets[0], false);
-	}
+      }
+      MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 
       ////////////////////////////////////////
       //  Beam scraping and PU reweighting
       ////////////////////////////////////////
       double lumiWeight = 1;
-      if(dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA"){    //Does this mean that it will be applied on data ? (why not with .find method ) ???
-	// Apply the scraping veto. (Is it still needed?)
-	//bool isBeamBG = true;
-	//if(event->nTracks() > 10){
-	  //if( ( (float) event->nHighPurityTracks() ) / ( (float) event->nTracks() ) > 0.25 )
-	    //isBeamBG = false;
-	//}
-	//if(isBeamBG) continue;
+      if(! (dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA") ){   
+	 if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
+         else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
+         else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
       }
-      else{
-	lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-	if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0){   //Loop will never get here ...
-	  lumiWeight=1;
-	}
-	//scaleFactor = scaleFactor*lumiWeight;  //Correct to do this immediately ?? (Is not the case in analyzer code Stijn ...)
-      }
-      //histo1D["lumiWeights"]->Fill(scaleFactor);	
+      histo1D["lumiWeights"]->Fill(lumiWeight);	
 
       // up syst -> lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
       // down syst -> lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
@@ -734,6 +733,7 @@ int main (int argc, char *argv[])
 	if (doJESShift != "nominal")
 	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //1 = nSigma
       }
+      MSPlot["InitJets_METPt_JerSmearingApplied"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 
       ////////////////////////////////////////////////////////
       // Access particle information before event selection //
@@ -923,14 +923,14 @@ int main (int argc, char *argv[])
       /////////////////////
 
       if(init_jets_corrected.size() >=4){ // MSPlots before 'basic' event selection (no b-tag)
-	MSPlot["Init_Events_pT_jet1_beforeEvtSel"]->Fill(init_jets_corrected[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	MSPlot["Init_Events_pT_jet2_beforeEvtSel"]->Fill(init_jets_corrected[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	MSPlot["Init_Events_pT_jet3_beforeEvtSel"]->Fill(init_jets_corrected[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	MSPlot["Init_Events_pT_jet4_beforeEvtSel"]->Fill(init_jets_corrected[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["InitJets_pT_jet1_beforeEvtSel"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["InitJets_pT_jet2_beforeEvtSel"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["InitJets_pT_jet3_beforeEvtSel"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["InitJets_pT_jet4_beforeEvtSel"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       }
       
       //Declare selection instance    
-      Selection selection(init_jets_corrected, init_muons, init_electrons, mets, event->kt6PFJets_rho());
+      Selection selection(init_jets, init_muons, init_electrons, mets, event->kt6PFJets_rho());
       selection.setJetCuts(30,2.5,0.01,1.,0.98,0.3,0.1);     
       selection.setMuonCuts(26,2.1,0.12,0.2,0.3,1,0.5,5,0); 
       selection.setElectronCuts(32,2.5,0.1,0.02,0.5,0.3,0); 
