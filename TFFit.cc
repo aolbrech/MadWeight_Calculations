@@ -105,7 +105,7 @@ int main (int argc, char **argv)
 
     if(RunFitForTF == true){
 
-        std::cout << " *** Starting to perform the double Gaussian fits  \n " << std::endl;
+        std::cout << " *** Starting to perform the double Gaussian fits  " << std::endl;
 
         //Set which TFFile should be used
         TFile *readFile, *writeFile;
@@ -123,19 +123,19 @@ int main (int argc, char **argv)
         const int NrFitHistos = 12;
         int ConsHisto = 1;
         const int NrParamsDblGaus = 6;
-        std::cout << " Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-        string HistoInfo[12][1+NrParamsDblGaus+2] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "3000",  "-0.12",  "0.12",
-                                                      "BJet_DiffPtVsGenPt",         "10",   "-12","20000",      "13",    "10", "-5000",    "-30",    "45",
-				                      "BJet_DiffThetaVsGenPt",       "0",  "0.04", "2000",       "0",  "0.013", "6000",   "-0.1",   "0.1",
-				                      "El_DiffPhiVsGenPt",           "0", "0.006",  "600",       "0", "0.0012", "1500", "-0.012", "0.012",
-				                      "El_DiffPtVsGenPt",            "0",    "-2",  "600",       "0",    "0.9", "1500",     "-4",     "5",
-				                      "El_DiffThetaVsGenPt",         "0", "0.007",  "700",       "0", "0.0013", "2500", "-0.018", "0.018",
-				                      "Light_DiffPhiVsGenPt",        "0", "0.022", "8000",  "0.0004",  "0.002", "3000",  "-0.14",  "0.14",
-				                      "Light_DiffPtVsGenPt",         "0",     "8", "4000",       "0",     "12", "4000",    "-28",    "35",
-				                      "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",  "-0.12",  "0.12",
-				                      "Mu_DiffPhiVsGenInvPt",        "0", "0.008",  "700",       "0", "0.0015",  "600", "-0.004", "0.004",
-				                      "Mu_DiffInvPtVsGenInvPt",      "0","0.0003", "2000",       "0", "0.0006",  "500","-0.0015", "0.001",
-				                      "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500","-0.0035","0.0035"};
+        std::cout << " --> Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
+        string HistoInfo[12][1+NrParamsDblGaus] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "3000",
+                                                    "BJet_DiffPtVsGenPt",         "10",   "-12","20000",      "13",    "10", "-5000",
+				                    "BJet_DiffThetaVsGenPt",       "0",  "0.04", "2000",       "0",  "0.013", "6000",
+				                    "El_DiffPhiVsGenPt",           "0", "0.006",  "600",       "0", "0.0012", "1500",
+				                    "El_DiffPtVsGenPt",            "0",    "-2",  "600",       "0",    "0.9", "1500",
+				                    "El_DiffThetaVsGenPt",         "0", "0.007",  "700",       "0", "0.0013", "2500",
+				                    "Light_DiffPhiVsGenPt",        "0", "0.022", "8000",  "0.0004",  "0.002", "3000",
+				                    "Light_DiffPtVsGenPt",         "0",     "8", "4000",       "0",     "12", "4000",
+				                    "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",
+				                    "Mu_DiffPhiVsGenInvPt",        "0", "0.008",  "700",       "0", "0.0015",  "600",
+				                    "Mu_DiffInvPtVsGenInvPt",      "0","0.0003", "2000",       "0", "0.0006",  "500",
+				                    "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500"};
 
         //Set the booleans!
         bool useROOTClass = false;
@@ -148,18 +148,15 @@ int main (int argc, char **argv)
         myTF.open("TFInformation/TransferFunctions_TABLE.txt");
         myTFCard.open("TFInformation/transfer_card_user.dat");
     		
-        float startValues[NrParamsDblGaus], fitRanges[2];
+        float startValues[NrParamsDblGaus];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
             if(NrFitHistos == 1) iHisto = ConsHisto;
 
             //Set the correct startValues and fit the distribution
             for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = std::stof(HistoInfo[iHisto][1+jj]);
-            for(int jj = 0; jj < 2; jj++) fitRanges[jj] = std::stof(HistoInfo[iHisto][NrParamsDblGaus+1+jj]);
-            std::cout << " Values from HistoInfo : " << HistoInfo[iHisto][NrParamsDblGaus+1] << " & " << HistoInfo[iHisto][NrParamsDblGaus+2] << std::endl;
-            std::cout << " Fit range set to : " << fitRanges[0] << " & " << fitRanges[1] << " --> in analyzer ! " << std::endl;
     
             for(int iEtaBin = 0; iEtaBin <= nEtaBins; iEtaBin++)
-                tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, fitRanges, writeFile, iEtaBin, readFile);
+                tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, writeFile, iEtaBin, readFile);
     
             //Set the caption correct:
             string CaptionName, BlockName, PartName, KinVarName;
