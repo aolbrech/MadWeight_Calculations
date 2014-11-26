@@ -164,10 +164,10 @@ int main (int argc, char *argv[])
   vector < Dataset* > datasetsPlot;
 
   treeLoader.LoadDatasets (datasets, xmlfile);
+
   for(unsigned int i=0;i<datasets.size();i++) new ((*tcdatasets)[i]) Dataset(*datasets[i]);
   
   float Luminosity = oldLuminosity;
-
   float LuminosityMu = oldLuminosity;
   float LuminosityEl = oldLuminosity;
 
@@ -305,36 +305,36 @@ int main (int argc, char *argv[])
   /// MultiSamplePlot
   ////////////////////////////////////
   map<string,MultiSamplePlot*> MSPlot;
-  MSPlot["InitJets_pT_jet1_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet1_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
-  MSPlot["InitJets_pT_jet2_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet2_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
-  MSPlot["InitJets_pT_jet3_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet3_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
-  MSPlot["InitJets_pT_jet4_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet4_beforeEvtSel", 60, 0, 600, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet1_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet1_beforeEvtSel", 60, -150, 650, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet2_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet2_beforeEvtSel", 60, -150, 650, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet3_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet3_beforeEvtSel", 60, -150, 650, "p_{T} (GeV)");
+  MSPlot["InitJets_pT_jet4_beforeEvtSel"] = new MultiSamplePlot(datasets, "InitJets_pT_jet4_beforeEvtSel", 60, -150, 650, "p_{T} (GeV)");
 
-  MSPlot["InitJets_METPt"] = new MultiSamplePlot(datasetsPlot, "InitJets_METPt", 60,0,300,"p_{T} (GeV) ");
-  MSPlot["InitJets_Pt_jet1"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet1",60,0,400,"p_{T} (GeV)");
-  MSPlot["InitJets_Pt_jet2"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet2",60,0,400,"p_{T} (GeV)");
-  MSPlot["InitJets_Pt_jet3"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet3",60,0,400,"p_{T} (GeV)");
-  MSPlot["InitJets_Pt_jet4"] = new MultiSamplePlot(datasetsPlot, "InitJets_Pt_jet4",60,0,400,"p_{T} (GeV)");
-  MSPlot["InitJets_METPt_METTypeOneCorrected"] = new MultiSamplePlot(datasetsPlot, "InitJets_METPt_METTypeOneCorrected", 60,0,300, "p_{T} (GeV)");
-  MSPlot["InitJets_METPt_JerSmearingApplied"] = new MultiSamplePlot(datasetsPlot, "InitJets_METPt_JerSmearingApplied", 60,0,300, "p_{T} (GeV)");
+  MSPlot["InitJets_METPt"] = new MultiSamplePlot(datasets, "InitJets_METPt", 60,0,300,"p_{T} (GeV) ");
+  MSPlot["InitJets_Pt_jet1"] = new MultiSamplePlot(datasets, "InitJets_Pt_jet1",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_Pt_jet2"] = new MultiSamplePlot(datasets, "InitJets_Pt_jet2",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_Pt_jet3"] = new MultiSamplePlot(datasets, "InitJets_Pt_jet3",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_Pt_jet4"] = new MultiSamplePlot(datasets, "InitJets_Pt_jet4",60,0,400,"p_{T} (GeV)");
+  MSPlot["InitJets_METPt_METTypeOneCorrected"] = new MultiSamplePlot(datasets, "InitJets_METPt_METTypeOneCorrected", 60,0,300, "p_{T} (GeV)");
+  MSPlot["InitJets_METPt_JerSmearingApplied"] = new MultiSamplePlot(datasets, "InitJets_METPt_JerSmearingApplied", 60,0,300, "p_{T} (GeV)");
 
   string leptFlavs[3]={"_other","_mu","_el"};
   for(int ii = 0; ii < 3; ii++){
       string leptFlav = leptFlavs[ii];
-      MSPlot["Selected_Events_pT_jet1"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet1"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_jet2"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet2"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_jet3"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet3"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_jet4"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_jet4"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_4leadingjets"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_4leadingjets"+leptFlav,60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_alljets"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_alljets"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_lepton"+leptFlav] = new MultiSamplePlot(datasetsPlot, "Selected_Events_pT_lepton"+leptFlav,150,0,300,"p_{t} (GeV)");
+      MSPlot["Selected_Events_pT_jet1"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet1"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+      MSPlot["Selected_Events_pT_jet2"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet2"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+      MSPlot["Selected_Events_pT_jet3"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet3"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+      MSPlot["Selected_Events_pT_jet4"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet4"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+      MSPlot["Selected_Events_pT_4leadingjets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_4leadingjets"+leptFlav,60, 0, 600, "p_{T} (GeV)");
+      MSPlot["Selected_Events_pT_alljets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_alljets"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
+      MSPlot["Selected_Events_pT_lepton"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_lepton"+leptFlav,150,-100,350,"p_{t} (GeV)");
           
-      MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasetsPlot, "nSelectedJets_BeforeBTag"+leptFlav,11, -0.5, 10.5, "# selected jets");
-      MSPlot["nSelectedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasetsPlot, "nSelectedJets_AfterBTag"+leptFlav,11, -0.5, 10.5, "# selected jets");
-      MSPlot["nBTaggedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasetsPlot, "nBTaggedJets_BeforeBTag"+leptFlav,11, -0.5, 10.5, "# b-tagged jets");
-      MSPlot["nBTaggedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasetsPlot, "nBTaggedJets_AfterBTag"+leptFlav,11, -0.5, 10.5, "# b-tagged jets");
-      MSPlot["nLightJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasetsPlot, "nLightJets_BeforeBTag"+leptFlav,11, -0.5, 10.5, "# light jets");
-      MSPlot["nLightJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasetsPlot, "nLightJets_AfterBTag"+leptFlav,11, -0.5, 10.5, "# light jets");
+      MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
+      MSPlot["nSelectedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
+      MSPlot["nBTaggedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
+      MSPlot["nBTaggedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
+      MSPlot["nLightJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
+      MSPlot["nLightJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
   }
 
   /////////////////////////////
@@ -537,7 +537,7 @@ int main (int argc, char *argv[])
       cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 50; ievt++){
+    for (unsigned int ievt = 0; ievt < 50000; ievt++){
 
       if(ievt > 200000) GenLHCOOutput = false;	
 
@@ -922,7 +922,7 @@ int main (int argc, char *argv[])
       // EVENT SELECTION //
       /////////////////////
 
-      if(init_jets_corrected.size() >=4){ // MSPlots before 'basic' event selection (no b-tag)
+      if(init_jets.size() >=4){ // MSPlots before 'basic' event selection (no b-tag)
 	MSPlot["InitJets_pT_jet1_beforeEvtSel"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 	MSPlot["InitJets_pT_jet2_beforeEvtSel"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 	MSPlot["InitJets_pT_jet3_beforeEvtSel"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
