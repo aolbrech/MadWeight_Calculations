@@ -57,8 +57,8 @@ int main (int argc, char **argv)
             m_br->SetAddress(&tfNTuple);
 
             //Set the number of selected events (for loop on events):
-            int nEvent = inputTFTree->GetEntries(); 
-            //int nEvent = 1000;
+            //int nEvent = inputTFTree->GetEntries(); 
+            int nEvent = 1000;
             std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
             //Initialize the TFCreation class (create all histograms):
@@ -144,9 +144,30 @@ int main (int argc, char **argv)
         bool useStartArray = true;
         bool changeFitRange = true;
  
-        ofstream myTF, myTFCard;
-        myTF.open("TFInformation/TransferFunctions_TABLE.txt");
-        myTFCard.open("TFInformation/transfer_card_user.dat");
+        ofstream myTFTable, myTransferCard[2], myTF;
+        myTFTable.open("TFInformation/TransferFunctions_TABLE.txt");
+        myTF.open("TFInformation/TF_user.dat");
+	myTransferCard[0].open("TFInformation/transfer_card_user.dat");
+	myTransferCard[1].open("TFInformation/transfer_card_user_etaBins.dat");
+
+	for(int ii = 0; ii < 2; ii++){
+            myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
+	    myTransferCard[ii]<<"#|                         TRANSFER_CARD.DAT                             |"<<endl;
+	    myTransferCard[ii]<<"#|                                                                       |"<<endl;
+            myTransferCard[ii]<<"#|     Author: Annik Olbrechts (VUB)                                     |"<<endl;
+    	    myTransferCard[ii]<<"#|             27 November 2014                                          |"<<endl;
+    	    myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
+	    myTransferCard[ii]<<"#|     This file is generated automaticly by MADWEIGHT                   |"<<endl;
+            myTransferCard[ii]<<"#|     card generation version: 1.0.0                                    |"<<endl;
+	    myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
+	    myTransferCard[ii]<<"#|                                                                       |"<<endl;
+	    myTransferCard[ii]<<"#|    To change the transfer function run ./bin/change_tf.py             |"<<endl;
+	    myTransferCard[ii]<<"#|    Current parametrization :dbl_gauss_pt_jet                          |"<<endl;
+	    myTransferCard[ii]<<"#|    Contains full double Gaussian for all kinematics and particles     |"<<endl;
+            if(ii == 0) myTransferCard[ii]<<"#|    ** Information for all eta-bins **                                 |"<<endl;
+            if(ii == 1) myTransferCard[ii]<<"#|    ** Information for the "<<nEtaBins<<" considered eta-bins separately **         |"<<endl;
+	    myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
+	}
     		
         float startValues[NrParamsDblGaus];
         for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
@@ -173,37 +194,42 @@ int main (int argc, char **argv)
             BlockName = BlockName + KinVarName;
     
             //Write the TF's in a table and in a MadWeight card!:
-            myTF<< endl;
-            myTF<<" \n \\begin{table}[h!]" << endl;
-            myTF<<"\\caption{Parameters of the transfer function for " << CaptionName << "}" << endl;
-            myTF<<"\\label{tab::" << HistoInfo[iHisto][0] << "}" << endl;
-            myTF<<"\\centering" << endl;
-            myTF<<"\\begin{tabular}{c|ccc}" << endl;
-            myTF<<"\\hline" << endl;
-            myTF << "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
-            myTF<<"\\hline" << endl;
+            myTFTable<< endl;
+            myTFTable<<" \n \\begin{table}[h!]" << endl;
+            myTFTable<<"\\caption{Parameters of the transfer function for " << CaptionName << "}" << endl;
+            myTFTable<<"\\label{tab::" << HistoInfo[iHisto][0] << "}" << endl;
+            myTFTable<<"\\centering" << endl;
+            myTFTable<<"\\begin{tabular}{c|ccc}" << endl;
+            myTFTable<<"\\hline" << endl;
+            myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
+            myTFTable<<"\\hline" << endl;
     
             //Only write this for the Pt- or 1/Pt-parameters (= start of the TF Card!)
             if(HistoInfo[iHisto][0].find("DiffPt") <= HistoInfo[iHisto][0].size() || HistoInfo[iHisto][0].find("DiffInvPt") <= HistoInfo[iHisto][0].size() ){
-                myTFCard<<"#+-----------------------------------------------------------------------------------+" <<endl;
-                myTFCard<<"#|     Parameter for particles: "<<PartName << endl; 
-                myTFCard<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
-                myTFCard<<"#|      --> Dependency defined as: A + B*sqrt("<<KinVarName<<") + C*"<<KinVarName<< endl;
-                myTFCard<<"#+-----------------------------------------------------------------------------------+" <<endl;
+                for(int ii = 0; ii < 2; ii++){
+                    myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
+                    myTransferCard[ii]<<"#|     Parameter for particles: "<<PartName << endl; 
+                    myTransferCard[ii]<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
+                    myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt("<<KinVarName<<") + C*"<<KinVarName << " for width of gaussians "<< endl;
+		    myTransferCard[ii]<<"#|      -->                        A + B*"<<KinVarName<<" + C*"<<KinVarName<<"² + D*"<<KinVarName<<"³ + E*"<<KinVarName<<"^4"<< endl;
+                    myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
+                }
             }
-            myTFCard<<"BLOCK "<<BlockName << endl;
+            myTransferCard[0]<<"BLOCK "<<BlockName << endl; myTransferCard[1]<<"BLOCK "<<BlockName << endl;
     
-            //tfCreation.WriteTF(HistoInfo[iHisto][0], myTF, myTFCard, whichEtaBin);
+            tfCreation.WriteTF(myTFTable, myTransferCard[0], myTransferCard[1], nEtaBins);  //Try to get all information for all eta-bins in one go! (Still need to add TF output!)
     
-            myTF<<"\\hline" << endl;
-            myTF<<"\\end{tabular}"<<endl;
-            myTF<<"\\end{table} \n"<<endl;
+            myTFTable<<"\\hline" << endl;
+            myTFTable<<"\\end{tabular}"<<endl;
+            myTFTable<<"\\end{table} \n"<<endl;
         }             
         //Close the root file where all histograms are saved together with the output files!
         readFile->Close();
         writeFile->Close();
         myTF.close();
-        myTFCard.close();
+        myTransferCard[0].close();
+        myTransferCard[1].close();
+	myTFTable.close();
     
         //Delete the used pointers:
         delete readFile,writeFile;

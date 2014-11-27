@@ -31,7 +31,7 @@ class TFCreation{
 	void FitSliceClassCode(TH2F*, int, const char*[], bool);
         std::vector<double> SetFitRange(std::string, int);
 	void SetStartValuesDoubleGaussian(int, bool, std::string);
-	void WriteTF(TH2F*, ostream &output, ostream &card);
+	void WriteTF(ostream &output, ostream &card, ostream &cardEta, int);
         void PlotDlbGaus(TH2F*, TFile*);
 	void WritePlots(TFile*);
 
@@ -43,9 +43,8 @@ class TFCreation{
 
 	TF1 *doubleGaussianFit, *caloEnergyFit;
 	TH1D **hlist;
-        TH1D **hlistLim;
         float* startValuesArray;
-        TF1 AllCaloEnergyFits[6];
+        TF1 AllCaloEnergyFits[30];
         std::string EtaBin[5];    //4 eta bins and one extra for all events!
         std::string EtaTitle[5];
         double EtaValues[6];

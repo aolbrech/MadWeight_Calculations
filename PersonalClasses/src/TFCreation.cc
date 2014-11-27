@@ -289,7 +289,6 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 
     //Choose the correct fit method:
     hlist = new TH1D*[npar];
-    hlistLim = new TH1D*[npar];
     TObjArray aSlices;
     if(useROOTClass){
 	fitHisto->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
@@ -301,6 +300,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     //////////////////////////////////////////////////////////////////////////////////////////////
     //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
     //////////////////////////////////////////////////////////////////////////////////////////////
+    std::cout << " Title of histogram : " << fitHisto->GetName() << std::endl;
     for( int ipar = 0; ipar < npar; ipar++ ){
         if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
             caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");    //Quartic function as fit!
@@ -316,14 +316,13 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
 	hlist[ipar]->Fit(caloEnergyFit, "Q","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
-        AllCaloEnergyFits[ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
+        AllCaloEnergyFits[npar*whichEtaBin+ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
 	hlist[ipar]->Write();                    
     }
     hlist[npar]->Write();
     PlotDlbGaus(fitHisto,file);
 							  
     delete [] hlist;
-    delete [] hlistLim;
 }
 
 
@@ -428,23 +427,36 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(TH2F* fitHisto, ostream &myTFs, ostream &myTFCard){  //Doesn't use fitHisto information here 
+void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTransferCardEta, int nEtaBins){ 
 
-    const int NrConsideredPars = 6;
-    string ParamName[NrConsideredPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
+    const int NrPars = 6;
+    string ParamName[NrPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
 
-    for(int ipar = 0; ipar < NrConsideredPars; ipar++){
-	int NrConsideredCaloPars;
-	if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5) NrConsideredCaloPars = 5;
-	else NrConsideredCaloPars = 3;
+    ostream *TransferCard;
+    for(int iEta = 0; iEta <= nEtaBins; iEta++){
+        if(iEta == 0) TransferCard = &myTransferCard;               //So if nEtaBins == 0 the output file is also set correctly!
+        else          TransferCard = &myTransferCardEta;
 
-	for(int icalopar = 0; icalopar < NrConsideredCaloPars; icalopar++){
-	    if(icalopar == 0) myTFs<<ParamName[ipar]<<" & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[ipar].GetParError(icalopar);
-	    else              myTFs<<                 " & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[ipar].GetParError(icalopar);
+        int dummyCounter;
+        if(iEta == 0 || iEta == 1) dummyCounter = 0;
+        for(int ipar = 0; ipar < NrPars; ipar++){
+	    int NrConsideredCaloPars;
+	    if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5) NrConsideredCaloPars = 5;
+	    else NrConsideredCaloPars = 3;
+            
+            //if(iEta == 1) myTFCard << "IF( ABS(eta(pexp) .LT. 0.375) THEN    --> should be added tot he TF_user.dat file!
 
-            myTFCard<< (ipar*NrConsideredCaloPars)+icalopar+1 << "     " << AllCaloEnergyFits[ipar].GetParameter(icalopar)<< "     # " << ParamName[ipar] << endl;
-	}
-	myTFs << "\\\\" << endl;
+	    for(int icalopar = 0; icalopar < NrConsideredCaloPars; icalopar++){
+                dummyCounter++;
+	        if(icalopar == 0) myTFTable<<ParamName[ipar]<<" & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParError(icalopar);
+	        else              myTFTable<<                 " & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParError(icalopar);
+
+                *TransferCard<< dummyCounter << "     " << AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<< "     # " << ParamName[ipar] << endl;
+	    }
+    	    myTFTable << "\\\\" << endl;
+        }
+        myTFTable << " \\hline" << endl;
+        *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
     }
 }
 
