@@ -300,7 +300,6 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     //////////////////////////////////////////////////////////////////////////////////////////////
     //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
     //////////////////////////////////////////////////////////////////////////////////////////////
-    std::cout << " Title of histogram : " << fitHisto->GetName() << std::endl;
     for( int ipar = 0; ipar < npar; ipar++ ){
         if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
             caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");    //Quartic function as fit!
@@ -427,37 +426,85 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTransferCardEta, int nEtaBins){ 
+void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTransferCardEta, ostream &myTF, ostream &myTFEta, int nEtaBins){ 
 
     const int NrPars = 6;
     string ParamName[NrPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
+    string TFDependencyWidth[3] = {"","*dsqrt(p(0))","*p(0))"};
+    string TFDependency[5] = {"","*p(0)","*p(0)*p(0)","*p(0)*p(0)*p(0)","*p(0)*p(0)*p(0)*p(0))"};
+    string WidthDependency[3] = {"","*dsqrt(pexp(0))","*pexp(0))"};
 
-    ostream *TransferCard;
+    string WidthText[90];
+    WidthText[0] = "\n    <\\tf> \n";
+    WidthText[1] = "    <width>";
+    WidthText[9] = "\n \n        width = max(prov2, prov6) ";
+    WidthText[17] = "\n    <\\width> \n  <\\variable>";                   //No ENDIF for the iEta = 0 case!
+    WidthText[25] = "\n      ENDIF \n    <\\width> \n  <\\variable>>";
+
+    ostream *TransferCard, *TF;
     for(int iEta = 0; iEta <= nEtaBins; iEta++){
-        if(iEta == 0) TransferCard = &myTransferCard;               //So if nEtaBins == 0 the output file is also set correctly!
-        else          TransferCard = &myTransferCardEta;
+        if(iEta == 0){ TransferCard = &myTransferCard;    TF = &myTF;   }           //So if nEtaBins == 0 the output file is also set correctly!
+        else{          TransferCard = &myTransferCardEta; TF = &myTFEta;}
 
         int dummyCounter;
-        if(iEta == 0 || iEta == 1) dummyCounter = 0;
+        if(iEta == 0 || iEta == 1) dummyCounter = 0;    //Counter should continue for the splitted eta-bins case!
+
+        if(iEta == 1)     { WidthText[10] =  "\n      IF( ABS(eta(p(0))) .LE. 0.375) THEN ";                                                *TF << WidthText[10];}
+        else if(iEta == 2){ WidthText[18] = "\n      ENDIF \n \n      IF( ABS(eta(p(0))) .GT. 0.375 .AND. ABS(eta(p(0))) .LE. 0.75) THEN "; *TF << WidthText[18];}
+        else if(iEta == 3){ WidthText[26] = "\n      ENDIF \n \n      IF( ABS(eta(p(0))) .GT. 0.75 .AND. ABS(eta(p(0))) .LE. 1.45) THEN ";  *TF << WidthText[26];}
+        else if(iEta == 4){ WidthText[34] = "\n      ENDIF \n \n      IF( ABS(eta(p(0))) .GT. 1.45 .AND. ABS(eta(p(0))) .LE. 2.5) THEN ";   *TF << WidthText[34];}
+        
         for(int ipar = 0; ipar < NrPars; ipar++){
 	    int NrConsideredCaloPars;
 	    if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5) NrConsideredCaloPars = 5;
 	    else NrConsideredCaloPars = 3;
-            
-            //if(iEta == 1) myTFCard << "IF( ABS(eta(pexp) .LT. 0.375) THEN    --> should be added tot he TF_user.dat file!
 
+            int w = 0+iEta*8;  //Variable which changes the number of lines for the Width part (1 for ipar = 0 and 2 for other since the last one is filled twice because of icalopar loop!!)
 	    for(int icalopar = 0; icalopar < NrConsideredCaloPars; icalopar++){
                 dummyCounter++;
 	        if(icalopar == 0) myTFTable<<ParamName[ipar]<<" & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParError(icalopar);
 	        else              myTFTable<<                 " & $a_{" <<ipar <<icalopar <<"}$ = "<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*NrPars+ipar].GetParError(icalopar);
 
                 *TransferCard<< dummyCounter << "     " << AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<< "     # " << ParamName[ipar] << endl;
+
+                if(icalopar == 0){*TF << "\n        prov"<<ipar+1<<"=(#"<<dummyCounter; if(ipar == 1 || ipar == 4){if(ipar == 4) w++; WidthText[3+w] = "\n        prov"+tostr(ipar+1)+"=(#"+tostr(dummyCounter); }}
+                if(icalopar != 0 && (ipar == 0||ipar == 2||ipar == 3||ipar == 5)) *TF << " + #"<<dummyCounter<<TFDependency[icalopar];
+                if(icalopar != 0 && (ipar == 1||ipar == 4)){*TF <<" + #"<<dummyCounter<<TFDependencyWidth[icalopar]; if(ipar==4 && icalopar==1)w++; WidthText[5+w+icalopar-1]=" + #"+tostr(dummyCounter)+WidthDependency[icalopar];}
 	    }
     	    myTFTable << "\\\\" << endl;
         }
+
         myTFTable << " \\hline" << endl;
         *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
+
+        if(iEta == 0){
+            *TF << WidthText[0];
+            *TF << WidthText[1];
+            *TF << WidthText[3] << WidthText[5] << WidthText[6];
+            *TF << WidthText[4] << WidthText[7] << WidthText[8];
+            *TF << WidthText[9];
+            *TF << WidthText[17];
+        }
     }
+    *TF << WidthText[0];
+    *TF << WidthText[1];
+    *TF << WidthText[10];
+    *TF << WidthText[11] << WidthText[13] << WidthText[14];
+    *TF << WidthText[12] << WidthText[15] << WidthText[16];
+    *TF << WidthText[9];
+    *TF << WidthText[18];
+    *TF << WidthText[19] + WidthText[21] + WidthText[22];
+    *TF << WidthText[20] + WidthText[23] + WidthText[24];
+    *TF << WidthText[9];
+    *TF << WidthText[26];
+    *TF << WidthText[27] << WidthText[29] << WidthText[30];
+    *TF << WidthText[28] << WidthText[31] << WidthText[32];
+    *TF << WidthText[9];
+    *TF << WidthText[34];
+    *TF << WidthText[35] << WidthText[37] << WidthText[38];
+    *TF << WidthText[36] << WidthText[39] << WidthText[40];
+    *TF << WidthText[9];
+    *TF << WidthText[25];
 }
 
 void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){

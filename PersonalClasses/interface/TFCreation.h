@@ -31,7 +31,7 @@ class TFCreation{
 	void FitSliceClassCode(TH2F*, int, const char*[], bool);
         std::vector<double> SetFitRange(std::string, int);
 	void SetStartValuesDoubleGaussian(int, bool, std::string);
-	void WriteTF(ostream &output, ostream &card, ostream &cardEta, int);
+	void WriteTF(ostream &output, ostream &card, ostream &cardEta, ostream &TF, ostream &TFEta, int);
         void PlotDlbGaus(TH2F*, TFile*);
 	void WritePlots(TFile*);
 
