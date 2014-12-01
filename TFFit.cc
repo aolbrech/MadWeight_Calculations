@@ -57,8 +57,8 @@ int main (int argc, char **argv)
             m_br->SetAddress(&tfNTuple);
 
             //Set the number of selected events (for loop on events):
-            int nEvent = inputTFTree->GetEntries(); 
-            //int nEvent = 100000;
+            //int nEvent = inputTFTree->GetEntries(); 
+            int nEvent = 100000;
             std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
             //Initialize the TFCreation class (create all histograms):
@@ -287,9 +287,9 @@ int main (int argc, char **argv)
                     myTF[ii]<<"##                "<<TFName<<"                                      "<<endl;
                     myTF[ii]<<"##**********************************************************************##"<<endl;
                     myTF[ii]<<"<block name='"<<PartName<<"'>   #name can be anything"<<endl;
-                    myTF[ii]<<"  <info> double gaussian with parameter depending on the energy <\\info>"<<endl;
-                    myTF[ii]<<"  <particles> "<<particles<<" <\\particles>"<<endl;
-                    myTF[ii]<<"  <width_type> "<<widthType<<" <\\width type>"<<endl;
+                    myTF[ii]<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
+                    myTF[ii]<<"  <particles> "<<particles<<" </particles>"<<endl;
+                    myTF[ii]<<"  <width_type> "<<widthType<<" </width_type>"<<endl;
                     myTF[ii]<<"  #width type should be thin or large (thin is for energy accurate up to 5-10%)";
                 }
                 //Output for all variables!
@@ -301,7 +301,7 @@ int main (int argc, char **argv)
             }
     
             tfCreation.WriteTF(myTFTable, myTransferCard[0], myTransferCard[1], myTF[0], myTF[1], nEtaBins);  
-            if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size() ){ myTF[0] << "\n<\\block>"; myTF[1] << "\n<\\block>";}
+            if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size() ){ myTF[0] << "\n</block>"; myTF[1] << "\n</block>";}
     
             myTFTable<<"\\hline" << endl;
             myTFTable<<"\\end{tabular}"<<endl;

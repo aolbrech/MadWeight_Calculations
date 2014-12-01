@@ -435,11 +435,12 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     string WidthDependency[3] = {"","*dsqrt(pexp(0))","*pexp(0))"};
 
     string WidthText[90];
-    WidthText[0] = "\n    <\\tf> \n";
+    WidthText[0] = "\n    </tf> \n";
     WidthText[1] = "    <width>";
     WidthText[9] = "\n \n        width = max(prov2, prov6) ";
-    WidthText[17] = "\n    <\\width> \n  <\\variable>";                   //No ENDIF for the iEta = 0 case!
-    WidthText[25] = "\n      ENDIF \n    <\\width> \n  <\\variable>>";
+    WidthText[17] = "\n    </width> \n  </variable>";                   //No ENDIF for the iEta = 0 case!
+    WidthText[25] = "\n      ENDIF \n    </width> \n  </variable>";
+    WidthText[33] = "\n        tf = prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian \n        tf = tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian"; 
 
     ostream *TransferCard, *TF;
     for(int iEta = 0; iEta <= nEtaBins; iEta++){
@@ -468,14 +469,16 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
                 *TransferCard<< dummyCounter << "     " << AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<< "     # " << ParamName[ipar] << endl;
 
                 if(icalopar == 0){*TF << "\n        prov"<<ipar+1<<"=(#"<<dummyCounter; if(ipar == 1 || ipar == 4){if(ipar == 4) w++; WidthText[3+w] = "\n        prov"+tostr(ipar+1)+"=(#"+tostr(dummyCounter); }}
-                if(icalopar != 0 && (ipar == 0||ipar == 2||ipar == 3||ipar == 5)) *TF << " + #"<<dummyCounter<<TFDependency[icalopar];
-                if(icalopar != 0 && (ipar == 1||ipar == 4)){*TF <<" + #"<<dummyCounter<<TFDependencyWidth[icalopar]; if(ipar==4 && icalopar==1)w++; WidthText[5+w+icalopar-1]=" + #"+tostr(dummyCounter)+WidthDependency[icalopar];}
+                if(icalopar != 0 && (ipar == 0||ipar == 2||ipar == 3||ipar == 5)) *TF << "+#"<<dummyCounter<<TFDependency[icalopar];
+                if(icalopar != 0 && (ipar == 1||ipar == 4)){*TF <<"+#"<<dummyCounter<<TFDependencyWidth[icalopar]; if(ipar==4 && icalopar==1)w++; WidthText[5+w+icalopar-1]="+#"+tostr(dummyCounter)+WidthDependency[icalopar];}
 	    }
     	    myTFTable << "\\\\" << endl;
         }
 
         myTFTable << " \\hline" << endl;
         *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
+        
+        *TF << "\n \n        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian \n        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian";
 
         if(iEta == 0){
             *TF << WidthText[0];
