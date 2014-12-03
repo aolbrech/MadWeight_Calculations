@@ -665,8 +665,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
 
     if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() ){
         if(histoName.find("Eta") > histoName.size() ){
-            double FullFitRangeNeg[11] = {-0.0015, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-            double FullFitRangePos[11] = { 0.0015,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+            double FullFitRangeNeg[11] = {-0.0025, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
+            double FullFitRangePos[11] = { 0.0025,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
         }
         else if(histoName.find("Eta_0") <= histoName.size() ){
             double FullFitRangeNeg[11] = {-0.003, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];

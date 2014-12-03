@@ -133,7 +133,7 @@ int main (int argc, char **argv)
 				                    "Light_DiffPhiVsGenPt",        "0", "0.022", "8000",  "0.0004",  "0.002", "3000",
 				                    "Light_DiffPtVsGenPt",         "0",     "8", "4000",       "0",     "12", "4000",
 				                    "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",
-				                    "Mu_DiffPhiVsGenInvPt",        "0", "0.008",  "700",       "0", "0.0015",  "600",
+				                    "Mu_DiffPhiVsGenInvPt",        "0","-0.003",  "700",       "0", "0.0004",  "700",
 				                    "Mu_DiffInvPtVsGenInvPt",      "0","0.0003", "2000",       "0", "0.0006",  "500",
 				                    "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500"};
 
@@ -145,7 +145,7 @@ int main (int argc, char **argv)
         bool changeFitRange = true;
  
         ofstream myTFTable, myTransferCard[2], myTF[2];
-        myTFTable.open("TFInformation/TransferFunctions_TABLE.txt");
+        myTFTable.open("TFInformation/TransferFunctions_TABLE.tex");
         myTF[0].open("TFInformation/TF_user.dat");
         myTF[1].open("TFInformation/TF_user_etaBins.dat");
 	myTransferCard[0].open("TFInformation/transfer_card_user.dat");
