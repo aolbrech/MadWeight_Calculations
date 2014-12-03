@@ -63,7 +63,7 @@ void TFCreation::InitializeVariables(int nEtaBins){
     histo2D["El_DiffThetaVsGenPt"]       = new TH2F("El_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for electron",                      10,   30,   130, 100, -0.02, 0.02);
     histo2D["Mu_RecoThetaVsGenInvPt"]    = new TH2F("Mu_RecoThetaVsGenInvPt",   "Polar angle #theta_{rec} versus #frac{1}{p_{T,gen}} for muon",                   100,    0,  0.05,  60,     0, 3.15);
     histo2D["Mu_RecoThetaVsGenPt"]       = new TH2F("Mu_RecoThetaVsGenPt",      "Polar angle #theta_{rec} versus transverse momentum p_{T,gen} for muon",         150,    0,   200,  60,     0, 3.15);
-    histo2D["Mu_DiffThetaVsGenInvPt"]    = new TH2F("Mu_DiffThetaVsGenInvPt",   "#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                10,0.005, 0.035, 150,-0.015,0.015);//0.004
+    histo2D["Mu_DiffThetaVsGenInvPt"]    = new TH2F("Mu_DiffThetaVsGenInvPt",   "#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",                10,0.005, 0.035, 150,-0.004,0.004);//0.015 for eta!
     histo2D["Mu_DiffThetaVsGenInvPt_All"]= new TH2F("Mu_DiffThetaVsGenInvPt_All","#theta difference (gen-reco) versus #frac{1}{p_{T,gen}} for muon",               10,0.005, 0.035, 500,-0.2,0.2);
     histo2D["Mu_DiffThetaVsGenPt"]       = new TH2F("Mu_DiffThetaVsGenPt",      "#theta difference (gen-reco) versus p_{T,gen} for muon",                          10,   30,   150, 100,  -0.1,  0.1);
 	
@@ -103,10 +103,16 @@ void TFCreation::InitializeVariables(int nEtaBins){
 
            	for(std::map<std::string,TH2F*>::const_iterator it = histo2DCopy.begin(); it != histo2DCopy.end(); it++){
                 TH2F *temp = it->second;
-                if(iEta != nEtaBins)
-                    histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()*0.75), temp->GetYaxis()->GetXmin(), temp->GetYaxis()->GetXmax() );
+	
+		//Need different Ymax and Ymin for Mu_DiffThetaVsGenInvPt histogram!
+		double YMax = temp->GetYaxis()->GetXmax();
+		double YMin = temp->GetYaxis()->GetXmin();
+		if( string(temp->GetName()) == "Mu_DiffThetaVsGenInvPt"){ YMax = 0.015; YMin = -0.015;}
+
+                if(iEta != nEtaBins)  //Last eta-bins should have fewer bins to take into account the lower statistics!
+                    histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()*0.75), YMin, YMax);
                 else
-                    histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), temp->GetYaxis()->GetXmin()*1.2, temp->GetYaxis()->GetXmax()*1.2 );                     
+                    histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin*1.2, YMax*1.2 );                     
                     
 	    }
         }

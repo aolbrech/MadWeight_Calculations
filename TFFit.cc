@@ -57,8 +57,8 @@ int main (int argc, char **argv)
             m_br->SetAddress(&tfNTuple);
 
             //Set the number of selected events (for loop on events):
-            //int nEvent = inputTFTree->GetEntries(); 
-            int nEvent = 100000;
+            int nEvent = inputTFTree->GetEntries(); 
+            //int nEvent = 100000;
             std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
             //Initialize the TFCreation class (create all histograms):
