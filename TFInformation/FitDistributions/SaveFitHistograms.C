@@ -5,6 +5,7 @@
   bool drawIndivHistos = false;
   bool drawColorHistos = true;
   bool drawDoubleGaus = false;
+  bool drawPNG = true;
 
   //-------------------------------------------------------------------------------------//
   //  Values which need to be changed when a different directory should be accessed !!   //
@@ -45,7 +46,7 @@
   }
 
   //***********************//
-  int usedEta = 2;
+  int usedEta = 0;
   //***********************//
   Directory = Directory+EtaBin[usedEta];
 
@@ -130,7 +131,7 @@
       TCanvas* indiv2DCanvas =  new TCanvas("indiv2DCanvas","title");
       indiv2DCanvas->cd();
       twoDHisto->Draw("colz");
-      //indiv2DCanvas->SaveAs( (Directory+"/"+Title+".png").c_str() );
+      if(drawPNG) indiv2DCanvas->SaveAs( (Directory+"/"+Title+".png").c_str() );
       indiv2DCanvas->SaveAs( (Directory+"/"+Title+".pdf").c_str() );
       delete indiv2DCanvas;
     }
@@ -186,14 +187,14 @@
 	  projHisto->GetXaxis()->SetTitle(chiXAxisName.c_str() );	       
 	}
 	projHisto->Draw();	
-	//projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".png").c_str() );    //Individual histograms!
+	if(drawPNG) projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".png").c_str() );    //Individual histograms!
 	projIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+HistoName+".pdf").c_str() );
 	delete projIndivCanvas;
       }
 	
       }//End of loop over NrBins
 
-      //projCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitDistributions/.png").c_str() ); //Histograms together in one canvas!
+      if(drawPNG) projCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitDistributions.png").c_str() ); //Histograms together in one canvas!
       projCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitDistributions.pdf").c_str() );      
       delete projCanvas;
       delete projHisto;      
@@ -223,14 +224,14 @@
 	paramIndivCanvas->cd();
 	paramHisto->Draw("e");
 	string ParamHistoName = ("FitParameter_"+Param[iPar]).c_str();
-	//paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".png").c_str() ); //Parameter histograms individual!
+	if(drawPNG) paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".png").c_str() ); //Parameter histograms individual!
 	paramIndivCanvas->SaveAs( (Directory+"/"+Title+"/"+ParamHistoName+".pdf").c_str() );
 	delete paramIndivCanvas;
         }
 	
       }//End of loop over NrParams
 
-      //paramCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitParameters.png").c_str() ); //Parameter histograms together in one canvs!
+      if(drawPNG) paramCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitParameters.png").c_str() ); //Parameter histograms together in one canvs!
       paramCanvas->SaveAs( (Directory+"/"+Title+"/Overview_FitParameters.pdf").c_str() );
       delete paramCanvas;
       delete paramHisto;
@@ -269,7 +270,7 @@
 
     }//End of loop over NrFitHistos
     
-    //twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.png").c_str() );
+    if(drawPNG) twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.png").c_str() );
     twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.pdf").c_str() ); 
     delete twoDCanvas;
     delete twoDHisto;    
