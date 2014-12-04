@@ -316,11 +316,19 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
             for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
         }
 
+        double FitMax = fitHisto->GetXaxis()->GetXmax();
+        double FitMin = fitHisto->GetXaxis()->GetXmin();
+	if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){
+            for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
+                if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
+            }
+        }
+ 
         for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
-	hlist[ipar]->Fit(caloEnergyFit, "Q","",fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax());
+	hlist[ipar]->Fit(caloEnergyFit, "Q","",FitMin, FitMax);
         AllCaloEnergyFits[npar*whichEtaBin+ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
 	hlist[ipar]->Write();                    
     }
@@ -385,7 +393,12 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
 	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
 	        for(int ipar=0; ipar<npar; ipar++ ){
-                    if( (histoName.find("Light_DiffPtVsGenPt") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") > histoName.size() ) ||  ( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size()) && bin != 2) || (histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && bin !=11 && bin != 10) || (histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin !=7) ){  //Skip 2nd bin for LightPt!!
+                    if( (histoName.find("Light_DiffPtVsGenPt") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") > histoName.size())
+			|| ( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size()) && bin != 2) //Skip specific bins!
+			|| ( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && bin !=11 && bin != 10) 
+			|| ( histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin !=7) 
+			|| ( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin != 11) ){  
+
                         hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar));
                         hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
                     }

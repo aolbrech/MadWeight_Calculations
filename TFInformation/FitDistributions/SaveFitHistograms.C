@@ -4,7 +4,7 @@
   //----------------------------------//
   bool drawIndivHistos = false;
   bool drawColorHistos = true;
-  bool drawDoubleGaus = false;
+  bool drawDoubleGaus = true; 
   bool drawPNG = true;
 
   //-------------------------------------------------------------------------------------//
@@ -263,6 +263,7 @@
         dblGausCanvas->cd(iGaus+1);
         dblGausHisto->Draw("e");
       }
+      if(drawPNG) dblGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_DblGausDistribution.png").c_str() );
       dblGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_DblGausDistribution.pdf").c_str() );
       delete dblGausCanvas;
       delete dblGausHisto;
