@@ -12,6 +12,9 @@
 #include "TLorentzVector.h"
 #include "TFile.h"
 #include "TObjArray.h"
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TStyle.h"
 
 #include <fstream>
 #include <sstream>
@@ -48,6 +51,8 @@ class TFCreation{
         std::string EtaBin[5];    //4 eta bins and one extra for all events!
         std::string EtaTitle[5];
         double EtaValues[6];
+        int NarrowGaus[3];
+        int WideGaus[3];
 };
 #endif
 //

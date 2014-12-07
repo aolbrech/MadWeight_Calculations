@@ -133,8 +133,8 @@ int main (int argc, char **argv)
 				                    "Light_DiffPhiVsGenPt",        "0", "0.022", "8000",  "0.0004",  "0.002", "3000",
 				                    "Light_DiffPtVsGenPt",         "0",     "8", "4000",       "0",     "12", "4000",
 				                    "Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",
-				                    "Mu_DiffPhiVsGenInvPt",        "0","-0.003",  "700",       "0", "0.0004",  "700",
-				                    "Mu_DiffInvPtVsGenInvPt",      "0","0.0003", "2000",       "0", "0.0006",  "500",
+				                    "Mu_DiffPhiVsGenInvPt",        "0","0.0026",  "600",       "0", "0.0004",  "800",
+				                    "Mu_DiffInvPtVsGenInvPt",      "0", "0.0006", "500",       "0", "0.0003", "2000",
 				                    "Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500"};
 
         //Set the booleans!

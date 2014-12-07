@@ -323,7 +323,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
                 if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
             }
         }
- 
+		
         for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
 	caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
@@ -340,75 +340,81 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 
 
 void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], bool ChangeFitRange){
-	//------------------------------------------------------------------------------------------//
-	// Main difference with the Root class FitSlicesY() is the plotting of histograms !        
-	// In the Root class the distribution of each hlist histogram is not given!
-	// --> Useful to use the own code when needing control histograms
-	//
-	// Other difference between the two codes have been removed!
-	// Originally the treatment of the overflow bin was different, but is now made similar!
-	//Create one histogram for each function parameter -> 6 histograms for each 2D plot
-	for(int ipar=0 ; ipar < npar; ipar++){
+    //------------------------------------------------------------------------------------------//
+    // Main difference with the Root class FitSlicesY() is the plotting of histograms !        
+    // In the Root class the distribution of each hlist histogram is not given!
+    // --> Useful to use the own code when needing control histograms
+    //
+    // Other difference between the two codes have been removed!
+    // Originally the treatment of the overflow bin was different, but is now made similar!
+    //Create one histogram for each function parameter -> 6 histograms for each 2D plot
+    for(int ipar=0 ; ipar < npar; ipar++){
 
-            float hlistMax = histoFit->GetXaxis()->GetXmax() + ((histoFit->GetXaxis()->GetXmax()-histoFit->GetXaxis()->GetXmin())/histoFit->GetXaxis()->GetNbins());	
-	    hlist[ipar] = new TH1D( (string(histoFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoFit->GetName())+" : Fitted value of "+parnames[ipar]).c_str(), histoFit->GetXaxis()->GetNbins()+1, histoFit->GetXaxis()->GetXmin(), hlistMax);
-	    hlist[ipar]->GetXaxis()->SetTitle(histoFit->GetXaxis()->GetTitle());
-	}
-	hlist[npar] = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
+        float hlistMax = histoFit->GetXaxis()->GetXmax() + ((histoFit->GetXaxis()->GetXmax()-histoFit->GetXaxis()->GetXmin())/histoFit->GetXaxis()->GetNbins());	
+	hlist[ipar] = new TH1D( (string(histoFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoFit->GetName())+" : Fitted value of "+parnames[ipar]).c_str(), histoFit->GetXaxis()->GetNbins()+1, histoFit->GetXaxis()->GetXmin(), hlistMax);
+	hlist[ipar]->GetXaxis()->SetTitle(histoFit->GetXaxis()->GetTitle());
+    }
+    hlist[npar] = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
 
-	//Loop on all bins in X, generate a projection along Y and fit each bin separately!
-	int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
-	int nbins = histoFit->GetXaxis()->GetNbins();
-	for(int bin=1;bin <= nbins+1;bin ++) {
-	    string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
+    //Loop on all bins in X, generate a projection along Y and fit each bin separately!
+    int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
+    int nbins = histoFit->GetXaxis()->GetNbins();
+    for(int bin=1;bin <= nbins+1;bin ++) {
+	string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
 
-            TH1D *hp;
-            if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
-                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
-            else if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)    //Temporary fix ... Need to figure out how to enlarge 1 bin!
-                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
-            else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
-                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
-            else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)
-                hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
-            else
-	        hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
+        TH1D *hp;
+        if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
+            hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
+        else if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)    //Temporary fix ... Need to figure out how to enlarge 1 bin!
+            hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
+        else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
+            hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
+        else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)
+            hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
+        else
+	    hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
 
-	    //Histogram doesn't have any memory space ...
-	    if(hp == 0) continue;
-	    if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
-            std::string histoName = string(histoFit->GetName());
+	//Histogram doesn't have any memory space ...
+	if(hp == 0) continue;
+	if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
+        std::string histoName = string(histoFit->GetName());
 
-	    doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
-            double ActualFitRange[2];
-            if(ChangeFitRange == false){                                    ActualFitRange[0] = (double) (histoFit->GetYaxis())->GetXmin(); ActualFitRange[1] = (double) (histoFit->GetYaxis())->GetXmax(); }
-            else{ std::vector<double> fitBin = SetFitRange(histoName, bin); ActualFitRange[0] = fitBin[0] ;                                 ActualFitRange[1] = fitBin[1];                                  }
+	doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
+        double ActualFitRange[2];
+        if(ChangeFitRange == false){                                    ActualFitRange[0] = (double) (histoFit->GetYaxis())->GetXmin(); ActualFitRange[1] = (double) (histoFit->GetYaxis())->GetXmax(); }
+        else{ std::vector<double> fitBin = SetFitRange(histoName, bin); ActualFitRange[0] = fitBin[0] ;                                 ActualFitRange[1] = fitBin[1];                                  }
 
-             //Do the actual fit:
-            hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
+        //Do the actual fit:
+        hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
-	    int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
-	    if(npfits > npar && npfits >= cut) {
+	int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
+	if(npfits > npar && npfits >= cut) {
 
-		//Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
-	        //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
-	        for(int ipar=0; ipar<npar; ipar++ ){
-                    if( (histoName.find("Light_DiffPtVsGenPt") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") > histoName.size())
-			|| ( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size()) && bin != 2) //Skip specific bins!
-			|| ( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && bin !=11 && bin != 10) 
-			|| ( histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin !=7) 
-			|| ( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin != 11) ){  
+	    //Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
+	    //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
+	    for(int ipar=0; ipar<npar; ipar++ ){
+                if( (histoName.find("Light_DiffPtVsGenPt") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") > histoName.size() && histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") > histoName.size())
+		    || ( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size()) && bin != 2) //Skip specific bins!
+		    || ( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && bin !=11 && bin != 10) 
+		    || ( histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin !=7) 
+		    || ( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin != 11) ){  
 
-                        hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar));
-                        hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
-                    }
-	        }
-		//Save hchi2 histogram as extra hlist!
-	        hlist[npar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-npar));
+                    hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar));
+                    hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
+                }
 	    }
-	    hp->Write();
-	    delete hp;
-	}//loop over bins!
+	    //Save hchi2 histogram as extra hlist!
+	    hlist[npar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-npar));
+    
+            if( bin == nbins/2 ){
+                if(abs(doubleGaussianFit->GetParameter(1)) < abs(doubleGaussianFit->GetParameter(4))){ NarrowGaus[0] = 0; NarrowGaus[1] = 1; NarrowGaus[2] = 2; WideGaus[0] = 3; WideGaus[1] = 4; WideGaus[2] = 5;}
+                else{  NarrowGaus[0] = 3; NarrowGaus[1] = 4; NarrowGaus[2] = 5; WideGaus[0] = 0; WideGaus[1] = 1; WideGaus[2] = 2;}
+            }
+        
+	}
+	hp->Write();
+	delete hp;
+    }//loop over bins!
 }
 
 
@@ -534,6 +540,12 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
     const int NrParsDblGaus = 6;
     const int PtPars = 15;
     float PtGenValues[PtPars] = {10,15,20,30,40,55,70,85,100,115,130,145,160,180,200};
+
+    TCanvas* canvasSame = new TCanvas((string(fitHisto->GetName())+"stackCanvas_WideAndNarrowGaussian").c_str(),"Stacked canvas for wide and narrow gaussian (only fitted p_{T} values)");
+    TLegend* sameLegend = new TLegend(0.55,0.7,0.95,0.9);
+    canvasSame->Divide(2,3);
+    int ptCounter=0;
+
     if( string(fitHisto->GetName()).find("VsGenInvPt") <= string(fitHisto->GetName()).size()){
         float InvPtGenValues[PtPars] = {0.1,0.0667, 0.05, 0.033, 0.025, 0.01818, 0.014, 0.0118, 0.01, 0.00869, 0.00769, 0.00689, 0.00625, 0.00556, 0.005};
         for(int ii = 0; ii < PtPars; ii++) PtGenValues[ii] = InvPtGenValues[ii];
@@ -556,6 +568,40 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
         for(int iBin = 0; iBin <= 200; iBin++)
             DblGausPlot->SetBinContent(iBin,CaloParGenPt[2]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[0]),2)/(2*pow(CaloParGenPt[1],2))))+CaloParGenPt[5]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[3]),2)/(2*pow(CaloParGenPt[4],2)))));
         DblGausPlot->Write();
+
+        if(iGenPt > 3 && iGenPt < 10){
+            ptCounter++;    //Counter needed for the divide option of the canvas!
+
+            TH1F* GausNarrow = new TH1F("GausNarrow","Gaussian distribution of the narrow fit",200,(fitHisto->GetYaxis()->GetXmin())*2,(fitHisto->GetYaxis()->GetXmax())*2);
+            GausNarrow->SetTitle( (string(GausNarrow->GetTitle())+" (Pt of parton = "+tostr(PtGenValues[iGenPt])+")").c_str());
+            GausNarrow->SetName( (string(GausNarrow->GetName())+"_NarrowGausPlot_GenPt"+tostr(PtGenValues[iGenPt])).c_str());
+            TH1F* GausWide = new TH1F("GausWide","Gaussian distribution of the second fit",200,(fitHisto->GetYaxis()->GetXmin())*2,(fitHisto->GetYaxis()->GetXmax())*2);
+            GausWide->SetTitle( (string(GausWide->GetTitle())+" (Pt of parton = "+tostr(PtGenValues[iGenPt])+")").c_str());
+            GausWide->SetName( (string(GausWide->GetName())+"_WideGausPlot_GenPt"+tostr(PtGenValues[iGenPt])).c_str());
+ 
+            for(int iBin = 0; iBin <= 200; iBin++){
+                GausNarrow->SetBinContent(iBin,CaloParGenPt[NarrowGaus[2]]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[NarrowGaus[0]]),2)/(2*pow(CaloParGenPt[NarrowGaus[1]],2)))));
+                GausWide->SetBinContent(iBin,CaloParGenPt[WideGaus[2]]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[WideGaus[0]]),2)/(2*pow(CaloParGenPt[WideGaus[1]],2)))));                
+            }
+            double GausMax = GausNarrow->GetMaximum();
+            if(GausWide->GetMaximum() > GausNarrow->GetMaximum()){ GausMax = GausWide->GetMaximum(); std::cout << "Wrong maximum for histogram " << fitHisto->GetName() << " ! " << std::endl;}
+
+            gStyle->SetOptStat(0);
+            canvasSame->cd(ptCounter);
+            GausNarrow->SetLineColor(kRed);
+            GausNarrow->SetMaximum(GausMax);
+            GausNarrow->Draw();
+            GausWide->SetLineColor(kGreen);
+            GausWide->Draw("same");
+
+            sameLegend->Clear();
+            sameLegend->SetHeader(fitHisto->GetName());
+            sameLegend->AddEntry(GausNarrow, ("Narrow gaussian (mean a_{"+tostr(NarrowGaus[0])+"}, sigma a_{"+tostr(NarrowGaus[1])+"} and amplitude a_{"+tostr(NarrowGaus[2])+"})").c_str(), "l");
+            sameLegend->AddEntry(GausWide,   ("Wide gaussian   (mean a_{"+tostr(WideGaus[0])+"}, sigma a_{"+tostr(WideGaus[1])+"} and amplitude a_{"+tostr(WideGaus[2])+"})").c_str(), "l");
+            sameLegend->Draw();
+
+            if(iGenPt == 9) canvasSame->Write();            
+        }
     }
 }
 
