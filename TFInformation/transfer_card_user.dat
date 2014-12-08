@@ -16,8 +16,8 @@
 #+--------------------------------------------------------------------------------------+
 #|     Parameter for particles: bjet
 #|      --> Used formula: Double Gaussian fit with parameters depending on momentum
-#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians 
-#|      -->                        A + B*E + C*E² + D*E³ + F*E^4
+#|      --> Dependency defined as: A + B*sqrt(pT) + C*pT  for width of gaussians 
+#|      -->                        A + B*pT + C*pT² + D*pT³ + F*pT^4
 #+--------------------------------------------------------------------------------------+
 BLOCK TF_bjet_PHI
 1     -0.00214726     # Mean broad gaussian
@@ -106,8 +106,8 @@ BLOCK TF_bjet_THETA
 #+--------------------------------------------------------------------------------------+
 #|     Parameter for particles: electron
 #|      --> Used formula: Double Gaussian fit with parameters depending on momentum
-#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians 
-#|      -->                        A + B*E + C*E² + D*E³ + F*E^4
+#|      --> Dependency defined as: A + B*sqrt(pT) + C*pT  for width of gaussians 
+#|      -->                        A + B*pT + C*pT² + D*pT³ + F*pT^4
 #+--------------------------------------------------------------------------------------+
 BLOCK TF_electron_PHI
 1     -0.00105798     # Mean broad gaussian
@@ -196,8 +196,8 @@ BLOCK TF_electron_THETA
 #+--------------------------------------------------------------------------------------+
 #|     Parameter for particles: nonbjet
 #|      --> Used formula: Double Gaussian fit with parameters depending on momentum
-#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians 
-#|      -->                        A + B*E + C*E² + D*E³ + F*E^4
+#|      --> Dependency defined as: A + B*sqrt(pT) + C*pT  for width of gaussians 
+#|      -->                        A + B*pT + C*pT² + D*pT³ + F*pT^4
 #+--------------------------------------------------------------------------------------+
 BLOCK TF_nonbjet_PHI
 1     -0.00207191     # Mean broad gaussian
@@ -286,90 +286,90 @@ BLOCK TF_nonbjet_THETA
 #+--------------------------------------------------------------------------------------+
 #|     Parameter for particles: muon
 #|      --> Used formula: Double Gaussian fit with parameters depending on momentum
-#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians 
-#|      -->                        A + B*E + C*E² + D*E³ + F*E^4
+#|      --> Dependency defined as: A + B*sqrt(1/pT) + C*1/pT  for width of gaussians 
+#|      -->                        A + B*1/pT + C*1/pT² + D*1/pT³ + F*1/pT^4
 #+--------------------------------------------------------------------------------------+
 BLOCK TF_muon_PHI
-1     -1.79208e-05     # Mean broad gaussian
-2     0.0210197     # Mean broad gaussian
-3     -3.5447     # Mean broad gaussian
-4     183.842     # Mean broad gaussian
-5     -2888.55     # Mean broad gaussian
-6     -0.00245338     # Width broad gaussian
-7     0.0674118     # Width broad gaussian
-8     -0.213213     # Width broad gaussian
-9     -1124.55     # Constant broad gaussian
-10     422428     # Constant broad gaussian
-11     -3.03736e+07     # Constant broad gaussian
-12     8.55203e+08     # Constant broad gaussian
-13     -8.63172e+09     # Constant broad gaussian
-14     3.39267e-05     # Mean narrow gaussian
-15     -0.00942638     # Mean narrow gaussian
-16     0.915685     # Mean narrow gaussian
-17     -38.3562     # Mean narrow gaussian
-18     561.143     # Mean narrow gaussian
-19     -0.000414642     # Width narrow gaussian
-20     0.0115506     # Width narrow gaussian
-21     -0.0372041     # Width narrow gaussian
-22     -2062.85     # Constant narrow gaussian
-23     726346     # Constant narrow gaussian
-24     -5.5433e+07     # Constant narrow gaussian
-25     1.65031e+09     # Constant narrow gaussian
-26     -1.73598e+10     # Constant narrow gaussian
+1     -1.79046e-05     # Mean broad gaussian
+2     0.0210162     # Mean broad gaussian
+3     -3.54442     # Mean broad gaussian
+4     183.833     # Mean broad gaussian
+5     -2888.44     # Mean broad gaussian
+6     -0.0024533     # Width broad gaussian
+7     0.0674107     # Width broad gaussian
+8     -0.213209     # Width broad gaussian
+9     -1124.57     # Constant broad gaussian
+10     422433     # Constant broad gaussian
+11     -3.0374e+07     # Constant broad gaussian
+12     8.55214e+08     # Constant broad gaussian
+13     -8.63183e+09     # Constant broad gaussian
+14     3.39513e-05     # Mean narrow gaussian
+15     -0.00943186     # Mean narrow gaussian
+16     0.916113     # Mean narrow gaussian
+17     -38.3702     # Mean narrow gaussian
+18     561.305     # Mean narrow gaussian
+19     -0.000414606     # Width narrow gaussian
+20     0.0115501     # Width narrow gaussian
+21     -0.0372022     # Width narrow gaussian
+22     -2062.82     # Constant narrow gaussian
+23     726341     # Constant narrow gaussian
+24     -5.54327e+07     # Constant narrow gaussian
+25     1.65029e+09     # Constant narrow gaussian
+26     -1.73597e+10     # Constant narrow gaussian
  
 BLOCK TF_muon_INVPT
-1     -0.000171593     # Mean broad gaussian
-2     -0.0157413     # Mean broad gaussian
-3     -0.5162     # Mean broad gaussian
-4     75.8242     # Mean broad gaussian
-5     -1419.98     # Mean broad gaussian
-6     0.00025691     # Width broad gaussian
-7     0.00145656     # Width broad gaussian
-8     0.00816608     # Width broad gaussian
-9     -1378.63     # Constant broad gaussian
-10     408615     # Constant broad gaussian
-11     -2.77644e+07     # Constant broad gaussian
-12     7.81483e+08     # Constant broad gaussian
-13     -8.19566e+09     # Constant broad gaussian
-14     -6.16582e-05     # Mean narrow gaussian
-15     -0.00377553     # Mean narrow gaussian
-16     0.0279953     # Mean narrow gaussian
-17     9.20843     # Mean narrow gaussian
-18     -186.673     # Mean narrow gaussian
-19     0.000142894     # Width narrow gaussian
-20     -5.18667e-05     # Width narrow gaussian
-21     0.00717143     # Width narrow gaussian
-22     -8068.66     # Constant narrow gaussian
-23     2.58571e+06     # Constant narrow gaussian
-24     -1.93313e+08     # Constant narrow gaussian
-25     5.64181e+09     # Constant narrow gaussian
-26     -5.81192e+10     # Constant narrow gaussian
+1     -0.059789     # Mean broad gaussian
+2     9.65413     # Mean broad gaussian
+3     -579.684     # Mean broad gaussian
+4     15264.8     # Mean broad gaussian
+5     -148663     # Mean broad gaussian
+6     -0.00938227     # Width broad gaussian
+7     0.118319     # Width broad gaussian
+8     -0.398436     # Width broad gaussian
+9     5441.27     # Constant broad gaussian
+10     -1.4577e+06     # Constant broad gaussian
+11     1.34359e+08     # Constant broad gaussian
+12     -4.83403e+09     # Constant broad gaussian
+13     5.93023e+10     # Constant broad gaussian
+14     -6.06757e-05     # Mean narrow gaussian
+15     -0.0103229     # Mean narrow gaussian
+16     0.302551     # Mean narrow gaussian
+17     16.4734     # Mean narrow gaussian
+18     -484.065     # Mean narrow gaussian
+19     5.50886e-05     # Width narrow gaussian
+20     0.00255226     # Width narrow gaussian
+21     -0.00563848     # Width narrow gaussian
+22     -9609.09     # Constant narrow gaussian
+23     3.00604e+06     # Constant narrow gaussian
+24     -2.25677e+08     # Constant narrow gaussian
+25     6.61511e+09     # Constant narrow gaussian
+26     -6.82828e+10     # Constant narrow gaussian
  
 BLOCK TF_muon_THETA
-1     -0.000248834     # Mean broad gaussian
-2     0.0675331     # Mean broad gaussian
-3     -6.02076     # Mean broad gaussian
-4     214.717     # Mean broad gaussian
-5     -2665.03     # Mean broad gaussian
-6     -0.000447675     # Width broad gaussian
-7     0.0300627     # Width broad gaussian
-8     -0.0717372     # Width broad gaussian
-9     -921.083     # Constant broad gaussian
-10     308116     # Constant broad gaussian
-11     -2.2079e+07     # Constant broad gaussian
-12     6.24638e+08     # Constant broad gaussian
-13     -6.32825e+09     # Constant broad gaussian
-14     0.000101539     # Mean narrow gaussian
-15     -0.0179103     # Mean narrow gaussian
-16     0.864053     # Mean narrow gaussian
-17     -7.05685     # Mean narrow gaussian
-18     -170.682     # Mean narrow gaussian
-19     -0.000199024     # Width narrow gaussian
-20     -0.00172262     # Width narrow gaussian
-21     0.0021444     # Width narrow gaussian
-22     -848.696     # Constant narrow gaussian
-23     300164     # Constant narrow gaussian
+1     -0.000263564     # Mean broad gaussian
+2     0.0707939     # Mean broad gaussian
+3     -6.27357     # Mean broad gaussian
+4     222.927     # Mean broad gaussian
+5     -2760.09     # Mean broad gaussian
+6     -0.000448862     # Width broad gaussian
+7     0.03008     # Width broad gaussian
+8     -0.0717985     # Width broad gaussian
+9     -921.879     # Constant broad gaussian
+10     308278     # Constant broad gaussian
+11     -2.20907e+07     # Constant broad gaussian
+12     6.24989e+08     # Constant broad gaussian
+13     -6.33205e+09     # Constant broad gaussian
+14     0.000103918     # Mean narrow gaussian
+15     -0.0184331     # Mean narrow gaussian
+16     0.904323     # Mean narrow gaussian
+17     -8.35692     # Mean narrow gaussian
+18     -155.712     # Mean narrow gaussian
+19     -0.000199224     # Width narrow gaussian
+20     -0.00171973     # Width narrow gaussian
+21     0.00213428     # Width narrow gaussian
+22     -848.702     # Constant narrow gaussian
+23     300165     # Constant narrow gaussian
 24     -2.21899e+07     # Constant narrow gaussian
-25     6.45848e+08     # Constant narrow gaussian
-26     -6.70891e+09     # Constant narrow gaussian
+25     6.45846e+08     # Constant narrow gaussian
+26     -6.70886e+09     # Constant narrow gaussian
  

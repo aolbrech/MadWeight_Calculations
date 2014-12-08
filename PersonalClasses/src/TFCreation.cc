@@ -417,7 +417,6 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
     }//loop over bins!
 }
 
-
 void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray, std::string histoName){
 
     if(useStartArray == true){
@@ -451,13 +450,18 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
     }
 } 
 
-void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTransferCardEta, ostream &myTF, ostream &myTFEta, int nEtaBins){ 
+void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTransferCardEta, ostream &myTF, ostream &myTFEta, int nEtaBins, std::string kinVar, std::string partName){ 
 
     const int NrPars = 6;
     string ParamName[NrPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
-    string TFDependencyWidth[3] = {"","*dsqrt(p(0))","*p(0))"};
-    string TFDependency[5] = {"","*p(0)","*p(0)*p(0)","*p(0)*p(0)*p(0)","*p(0)*p(0)*p(0)*p(0))"};
+    string TFDependencyWidth[3]  = {"","*dsqrt(p(0))","*p(0))"};
+    string TFDependency[5] = {"","*p(0)","*p(0)**2","*p(0)**3","*p(0)**4)"};
     string WidthDependency[3] = {"","*dsqrt(pexp(0))","*pexp(0))"};
+    if(partName == "muon"){
+        TFDependencyWidth[1] = "*dsqrt(1d0/p(0))";    TFDependencyWidth[2] = "*1d0/p(0))";
+        TFDependency[1]      = "*1d0/p(0)";           TFDependency[2] = "*1d0/p(0)**2";    TFDependency[3] = "*1d0/p(0)**3"; TFDependency[4] = "*1d0/p(0)**4)";
+        WidthDependency[1]   = "*dsqrt(1d0/pexp(0))"; WidthDependency[2] = "*1d0/pexp(0))";
+    }
 
     string WidthText[90];
     WidthText[0] = "\n    </tf> \n";
@@ -465,7 +469,6 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     WidthText[9] = "\n \n        width = max(prov2, prov6) ";
     WidthText[17] = "\n    </width> \n  </variable>";                   //No ENDIF for the iEta = 0 case!
     WidthText[25] = "\n      ENDIF \n    </width> \n  </variable>";
-    WidthText[33] = "\n        tf = prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian \n        tf = tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian"; 
 
     ostream *TransferCard, *TF;
     for(int iEta = 0; iEta <= nEtaBins; iEta++){
@@ -475,10 +478,10 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
         int dummyCounter;
         if(iEta == 0 || iEta == 1) dummyCounter = 0;    //Counter should continue for the splitted eta-bins case!
 
-        if(iEta == 1)     { WidthText[10] =  "\n      IF( ABS(eta(p(0))) .LE. 0.375) THEN ";                                                *TF << WidthText[10];}
-        else if(iEta == 2){ WidthText[18] = "\n      ENDIF \n \n      IF( ABS(eta(p(0))) .GT. 0.375 .AND. ABS(eta(p(0))) .LE. 0.75) THEN "; *TF << WidthText[18];}
-        else if(iEta == 3){ WidthText[26] = "\n      ENDIF \n \n      IF( ABS(eta(p(0))) .GT. 0.75 .AND. ABS(eta(p(0))) .LE. 1.45) THEN ";  *TF << WidthText[26];}
-        else if(iEta == 4){ WidthText[34] = "\n      ENDIF \n \n      IF( ABS(eta(p(0))) .GT. 1.45 .AND. ABS(eta(p(0))) .LE. 2.5) THEN ";   *TF << WidthText[34];}
+        if(iEta == 1)     { WidthText[10] = "\n      IF( ABS(eta(pexp))) .LE. 0.375) THEN ";                                                *TF << WidthText[10];}
+        else if(iEta == 2){ WidthText[18] = "\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN "; *TF << WidthText[18];}
+        else if(iEta == 3){ WidthText[26] = "\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN ";  *TF << WidthText[26];}
+        else if(iEta == 4){ WidthText[34] = "\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN ";   *TF << WidthText[34];}
         
         for(int ipar = 0; ipar < NrPars; ipar++){
 	    int NrConsideredCaloPars;
@@ -503,7 +506,10 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
         myTFTable << " \\hline" << endl;
         *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
         
-        *TF << "\n \n        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian \n        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian";
+        if(kinVar == "PT")   *TF << "\n\n        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian";
+        if(kinVar == "THETA")*TF << "\n\n        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
+        if(kinVar == "PHI")  *TF << "\n\n        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian\n        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian";
+        if(kinVar == "INVPT")*TF << "\n\n        tf=prov2*(exp(-(1d0/p(0)-1d0/pexp(0)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/p(0)-1d0/pexp(0)-prov4)**2/2d0/prov5**2)) !second gaussian";
 
         if(iEta == 0){
             *TF << WidthText[0];
@@ -541,7 +547,7 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
     const int PtPars = 15;
     float PtGenValues[PtPars] = {10,15,20,30,40,55,70,85,100,115,130,145,160,180,200};
 
-    TCanvas* canvasSame = new TCanvas((string(fitHisto->GetName())+"stackCanvas_WideAndNarrowGaussian").c_str(),"Stacked canvas for wide and narrow gaussian (only fitted p_{T} values)");
+    TCanvas* canvasSame = new TCanvas((string(fitHisto->GetName())+"_StackCanvas_WideAndNarrowGaussian").c_str(),"Stacked canvas for wide and narrow gaussian (only fitted p_{T} values)");
     TLegend* sameLegend = new TLegend(0.55,0.7,0.95,0.9);
     canvasSame->Divide(2,3);
     int ptCounter=0;

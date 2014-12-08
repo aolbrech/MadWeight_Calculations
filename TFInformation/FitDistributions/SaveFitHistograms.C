@@ -3,9 +3,10 @@
   //   Only draw specific histograms  //
   //----------------------------------//
   bool drawIndivHistos = false;
-  bool drawColorHistos = true;
-  bool drawDoubleGaus = true; 
-  bool drawPNG = true;
+  bool drawColorHistos = false;
+  bool drawDoubleGaus = false; 
+  bool drawStackedGaus = true;
+  bool drawPNG = false;
 
   //-------------------------------------------------------------------------------------//
   //  Values which need to be changed when a different directory should be accessed !!   //
@@ -118,7 +119,6 @@
       //  Draw fitting histograms  //
       ///////////////////////////////
       twoDHisto = (TH1D*) histoFile->Get( ("2D_histograms_graphs/"+Title).c_str() );
-    std::cout << " Looking at histogram : " << ("2D_histograms_graphs/"+Title).c_str() <<std::endl;
       twoDHisto->GetXaxis()->SetTitle( chiXAxisName.c_str() );
       twoDHisto->GetYaxis()->SetTitle( histoAxisName.c_str() );
       twoDHisto->SetTitle( ("Color plot for "+histoTitle+EtaTitle[usedEta]).c_str() );
@@ -236,9 +236,9 @@
       delete paramCanvas;
       delete paramHisto;
 
-      ///////////////////////////////////////////////////////////
-      //  Save the DblGaus distributions using the fit params  //
-      ///////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+      //  Save the DblGaus & StackedGaus distributions using the fit params  //
+      /////////////////////////////////////////////////////////////////////////
       if(drawDoubleGaus == true){
       TCanvas* dblGausCanvas = new TCanvas("DblGausCanvas","Double Gaussian distribution using the fitted parameters");
       dblGausCanvas->Divide(4,4);
@@ -267,6 +267,14 @@
       dblGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_DblGausDistribution.pdf").c_str() );
       delete dblGausCanvas;
       delete dblGausHisto;
+      }
+
+      if(drawStackedGaus == true){
+        TCanvas* stackedGausCanvas;// = new TCanvas("stackedGausCanvas","Gaussian distribution for narrow and wide fit function");
+        stackedGausCanvas = (TCanvas*) histoFile->Get( (Title+"/"+Title+"_StackCanvas_WideAndNarrowGaussian").c_str() );
+        if(drawPNG) stackedGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_WideAndNarrowGaussian.png").c_str() );
+        stackedGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_WideAndNarrowGaussian.pdf").c_str());
+        delete stackedGausCanvas;
       }
 
     }//End of loop over NrFitHistos

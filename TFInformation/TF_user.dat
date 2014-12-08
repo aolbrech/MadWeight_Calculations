@@ -67,24 +67,24 @@
 ###########################################################################
 
 ##**********************************************************************##
-##                                                      
+##             TF for bjet                                      
 ##**********************************************************************##
 <block name='bjet'>   #name can be anything
-  <info> double gaussian with parameter depending on the energy </info>
+  <info> double gaussian with parameter depending on the transverse energy </info>
   <particles> b </particles>
   <width_type> thin </width_type>
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
+        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -95,15 +95,15 @@
   </variable>
   <variable name='PT'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian
+        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -114,15 +114,15 @@
   </variable>
   <variable name='THETA'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
+        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -133,24 +133,24 @@
   </variable>
 </block>
 ##**********************************************************************##
-##                                                      
+##             TF for electron                                      
 ##**********************************************************************##
 <block name='electron'>   #name can be anything
-  <info> double gaussian with parameter depending on the energy </info>
+  <info> double gaussian with parameter depending on the transverse energy </info>
   <particles> el </particles>
   <width_type> thin </width_type>
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
+        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -161,15 +161,15 @@
   </variable>
   <variable name='PT'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian
+        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -180,15 +180,15 @@
   </variable>
   <variable name='THETA'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
+        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -199,24 +199,24 @@
   </variable>
 </block>
 ##**********************************************************************##
-##                                                      
+##             TF for nonbjet                                      
 ##**********************************************************************##
 <block name='nonbjet'>   #name can be anything
-  <info> double gaussian with parameter depending on the energy </info>
+  <info> double gaussian with parameter depending on the transverse energy </info>
   <particles> u,d,s,c,g </particles>
   <width_type> thin </width_type>
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
+        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -227,15 +227,15 @@
   </variable>
   <variable name='PT'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian
+        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -246,15 +246,15 @@
   </variable>
   <variable name='THETA'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4)
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov6=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4)
+
+        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
+        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
     </tf> 
     <width>
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
@@ -265,66 +265,66 @@
   </variable>
 </block>
 ##**********************************************************************##
-##                                                      
+##             TF for muon                                      
 ##**********************************************************************##
 <block name='muon'>   #name can be anything
-  <info> double gaussian with parameter depending on the energy </info>
+  <info> double gaussian with parameter depending on the inverse of transverse energy </info>
   <particles> mu </particles>
   <width_type> thin </width_type>
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
-        prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
-        prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
+        prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
+        prov3=(#9+#10*1d0/p(0)+#11*1d0/p(0)**2+#12*1d0/p(0)**3+#13*1d0/p(0)**4)
+        prov4=(#14+#15*1d0/p(0)+#16*1d0/p(0)**2+#17*1d0/p(0)**3+#18*1d0/p(0)**4)
+        prov5=(#19+#20*dsqrt(1d0/p(0))+#21*1d0/p(0))
+        prov6=(#22+#23*1d0/p(0)+#24*1d0/p(0)**2+#25*1d0/p(0)**3+#26*1d0/p(0)**4)
+
+        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
+        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
     </tf> 
     <width>
-        prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
-        prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
+        prov2=(#6+#7*dsqrt(1d0/pexp(0))+#8*1d0/pexp(0))
+        prov5=(#19+#20*dsqrt(1d0/pexp(0))+#21*1d0/pexp(0))
  
         width = max(prov2, prov6) 
     </width> 
   </variable>
   <variable name='INVPT'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
-        prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
-        prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
+        prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
+        prov3=(#9+#10*1d0/p(0)+#11*1d0/p(0)**2+#12*1d0/p(0)**3+#13*1d0/p(0)**4)
+        prov4=(#14+#15*1d0/p(0)+#16*1d0/p(0)**2+#17*1d0/p(0)**3+#18*1d0/p(0)**4)
+        prov5=(#19+#20*dsqrt(1d0/p(0))+#21*1d0/p(0))
+        prov6=(#22+#23*1d0/p(0)+#24*1d0/p(0)**2+#25*1d0/p(0)**3+#26*1d0/p(0)**4)
+
+        tf=prov2*(exp(-(1d0/p(0)-1d0/pexp(0)-prov1)**2/2d0/prov2**2))    !first gaussian
+        tf=tf+prov5*(exp(-(1d0/p(0)-1d0/pexp(0)-prov4)**2/2d0/prov5**2)) !second gaussian
     </tf> 
     <width>
-        prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
-        prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
+        prov2=(#6+#7*dsqrt(1d0/pexp(0))+#8*1d0/pexp(0))
+        prov5=(#19+#20*dsqrt(1d0/pexp(0))+#21*1d0/pexp(0))
  
         width = max(prov2, prov6) 
     </width> 
   </variable>
   <variable name='THETA'>
     <tf>
-        prov1=(#1+#2*p(0)+#3*p(0)*p(0)+#4*p(0)*p(0)*p(0)+#5*p(0)*p(0)*p(0)*p(0))
-        prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
-        prov3=(#9+#10*p(0)+#11*p(0)*p(0)+#12*p(0)*p(0)*p(0)+#13*p(0)*p(0)*p(0)*p(0))
-        prov4=(#14+#15*p(0)+#16*p(0)*p(0)+#17*p(0)*p(0)*p(0)+#18*p(0)*p(0)*p(0)*p(0))
-        prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
-        prov6=(#22+#23*p(0)+#24*p(0)*p(0)+#25*p(0)*p(0)*p(0)+#26*p(0)*p(0)*p(0)*p(0))
- 
-        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))          !first (narrow) gaussian 
-        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))          !second (broad) gaussian
+        prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
+        prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
+        prov3=(#9+#10*1d0/p(0)+#11*1d0/p(0)**2+#12*1d0/p(0)**3+#13*1d0/p(0)**4)
+        prov4=(#14+#15*1d0/p(0)+#16*1d0/p(0)**2+#17*1d0/p(0)**3+#18*1d0/p(0)**4)
+        prov5=(#19+#20*dsqrt(1d0/p(0))+#21*1d0/p(0))
+        prov6=(#22+#23*1d0/p(0)+#24*1d0/p(0)**2+#25*1d0/p(0)**3+#26*1d0/p(0)**4)
+
+        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
+        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
     </tf> 
     <width>
-        prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
-        prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
+        prov2=(#6+#7*dsqrt(1d0/pexp(0))+#8*1d0/pexp(0))
+        prov5=(#19+#20*dsqrt(1d0/pexp(0))+#21*1d0/pexp(0))
  
         width = max(prov2, prov6) 
     </width> 

@@ -29,6 +29,8 @@ int main (int argc, char **argv)
 {
     TApplication theApp("App", &argc, argv); //Needed to run on local Linux!
     clock_t start = clock();
+
+    gROOT->SetBatch();
   
     cout << "***********************************************" << endl;  
     cout << " Beginning of the program for fitting the TF ! " << endl;
@@ -249,7 +251,7 @@ int main (int argc, char **argv)
                 tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, writeFile, iEtaBin, readFile);
     
             //Set the caption correct:
-            string CaptionName, BlockName, PartName, KinVarName, TFName, particles, widthType, VarName;
+            string CaptionName, BlockName, PartName, KinVarName, particles, widthType, VarName;
             // -- 1) which particle
             if(HistoInfo[iHisto][0].find("Light_") == 0)    {PartName = "nonbjet";  BlockName = "TF_nonbjet_";  particles = "u,d,s,c,g"; widthType = "thin";}
             else if(HistoInfo[iHisto][0].find("BJet") == 0) {PartName = "bjet";     BlockName = "TF_bjet_";     particles = "b";         widthType = "thin";}
@@ -270,7 +272,8 @@ int main (int argc, char **argv)
             myTFTable<<"\\centering" << endl;
             myTFTable<<"\\begin{tabular}{c|ccc}" << endl;
             myTFTable<<"\\hline" << endl;
-            myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
+            if(PartName != "muon") myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{p_{T}}$) & $a_{i2}$ ($p_{T}$)" << "\\\\" << endl;
+            else                   myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{\\frac{1}{p_{T}}}$) & $a_{i2}$ ($\\frac{1}{p_{T}}$)" << "\\\\" << endl;
             myTFTable<<"\\hline" << endl;
     
             for(int ii = 0; ii < 2; ii++){
@@ -279,15 +282,18 @@ int main (int argc, char **argv)
                     myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
                     myTransferCard[ii]<<"#|     Parameter for particles: "<<PartName << endl; 
                     myTransferCard[ii]<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
-                    myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
-		    myTransferCard[ii]<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
+                    if(PartName != "muon") myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(pT) + C*pT  for width of gaussians "<< endl;
+                    else                   myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(1/pT) + C*1/pT  for width of gaussians "<< endl;
+		    if(PartName != "muon") myTransferCard[ii]<<"#|      -->                        A + B*pT + C*pT² + D*pT³ + F*pT^4"<< endl;
+                    else                   myTransferCard[ii]<<"#|      -->                        A + B*1/pT + C*1/pT² + D*1/pT³ + F*1/pT^4"<< endl;
                     myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
 
                     myTF[ii]<<"\n##**********************************************************************##"<<endl;
-                    myTF[ii]<<"##                "<<TFName<<"                                      "<<endl;
+                    myTF[ii]<<"##             TF for "<<PartName<<"                                      "<<endl;
                     myTF[ii]<<"##**********************************************************************##"<<endl;
                     myTF[ii]<<"<block name='"<<PartName<<"'>   #name can be anything"<<endl;
-                    myTF[ii]<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
+                    if(PartName != "muon") myTF[ii]<<"  <info> double gaussian with parameter depending on the transverse energy </info>"<<endl;
+                    else                   myTF[ii]<<"  <info> double gaussian with parameter depending on the inverse of transverse energy </info>"<<endl;
                     myTF[ii]<<"  <particles> "<<particles<<" </particles>"<<endl;
                     myTF[ii]<<"  <width_type> "<<widthType<<" </width_type>"<<endl;
                     myTF[ii]<<"  #width type should be thin or large (thin is for energy accurate up to 5-10%)";
@@ -300,7 +306,7 @@ int main (int argc, char **argv)
                 myTF[ii]<<"    <tf>";
             }
     
-            tfCreation.WriteTF(myTFTable, myTransferCard[0], myTransferCard[1], myTF[0], myTF[1], nEtaBins);  
+            tfCreation.WriteTF(myTFTable, myTransferCard[0], myTransferCard[1], myTF[0], myTF[1], nEtaBins, KinVarName, PartName);  
             if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size() ){ myTF[0] << "\n</block>"; myTF[1] << "\n</block>";}
     
             myTFTable<<"\\hline" << endl;
