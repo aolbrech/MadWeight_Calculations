@@ -251,17 +251,17 @@ int main (int argc, char **argv)
                 tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, writeFile, iEtaBin, readFile);
     
             //Set the caption correct:
-            string CaptionName, BlockName, PartName, KinVarName, particles, widthType, VarName;
+            string CaptionName, BlockName, PartName, KinVarName, particles, widthType;
             // -- 1) which particle
             if(HistoInfo[iHisto][0].find("Light_") == 0)    {PartName = "nonbjet";  BlockName = "TF_nonbjet_";  particles = "u,d,s,c,g"; widthType = "thin";}
             else if(HistoInfo[iHisto][0].find("BJet") == 0) {PartName = "bjet";     BlockName = "TF_bjet_";     particles = "b";         widthType = "thin";}
             else if(HistoInfo[iHisto][0].find("Mu_") == 0)  {PartName = "muon";     BlockName = "TF_muon_";     particles = "mu";        widthType = "thin";}
             else if(HistoInfo[iHisto][0].find("El_") == 0)  {PartName = "electron"; BlockName = "TF_electron_"; particles = "el";        widthType = "thin";}
             // -- 2) which kinematic variable
-            if(HistoInfo[iHisto][0].find("DiffPt") <= HistoInfo[iHisto][0].size())         {CaptionName = PartName+" transverse momentum";            KinVarName += "PT";   VarName = "PT";}
-            else if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" polar angle \\theta";            KinVarName += "THETA";VarName = "THETA";}
-            else if(HistoInfo[iHisto][0].find("DiffPhi") <= HistoInfo[iHisto][0].size())   {CaptionName = PartName+" azimuthal angle \\phi";          KinVarName += "PHI";  VarName = "PHI";}
-            else if(HistoInfo[iHisto][0].find("DiffInvPt") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName += "INVPT";VarName = "INVPT";}
+            if(HistoInfo[iHisto][0].find("DiffPt") <= HistoInfo[iHisto][0].size())         {CaptionName = PartName+" transverse momentum";            KinVarName = "PT";   }
+            else if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" polar angle \\theta";            KinVarName = "THETA";}
+            else if(HistoInfo[iHisto][0].find("DiffPhi") <= HistoInfo[iHisto][0].size())   {CaptionName = PartName+" azimuthal angle \\phi";          KinVarName = "PHI";  }
+            else if(HistoInfo[iHisto][0].find("DiffInvPt") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName = "PT";   } //MadWeight only knows 'PT'
             BlockName = BlockName + KinVarName;
     
             //Write the TF's in a table and in a MadWeight card!:
@@ -301,13 +301,15 @@ int main (int argc, char **argv)
                 //Output for all variables!
                 myTransferCard[ii]<<"BLOCK "<<BlockName << endl;
                 
-                //if(VarName != "PHI") myTF[ii] << "\n  <\\variable>"<<endl;
-                myTF[ii]<<"\n  <variable name='"<<VarName<<"'>"<<endl;
+                myTF[ii]<<"\n  <variable name='"<<KinVarName<<"'>"<<endl;
                 myTF[ii]<<"    <tf>";
             }
     
             tfCreation.WriteTF(myTFTable, myTransferCard[0], myTransferCard[1], myTF[0], myTF[1], nEtaBins, KinVarName, PartName);  
-            if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size() ){ myTF[0] << "\n</block>"; myTF[1] << "\n</block>";}
+            if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size() ){
+                if(HistoInfo[iHisto][0].find("Mu_") <= HistoInfo[iHisto][0].size() ){ myTF[0] << "\n</block>\n</file>"; myTF[1] << "\n</block>\n</file>";}
+                else{                                                                 myTF[0] << "\n</block>";          myTF[1] << "\n</block>";}
+            }
     
             myTFTable<<"\\hline" << endl;
             myTFTable<<"\\end{tabular}"<<endl;

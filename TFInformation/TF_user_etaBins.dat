@@ -76,7 +76,7 @@
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -122,9 +122,10 @@
 
         tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
         tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -155,7 +156,7 @@
   </variable>
   <variable name='PT'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -201,9 +202,10 @@
 
         tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian
         tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -234,7 +236,7 @@
   </variable>
   <variable name='THETA'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -280,9 +282,10 @@
 
         tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
         tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -322,7 +325,7 @@
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -368,9 +371,10 @@
 
         tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
         tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -401,7 +405,7 @@
   </variable>
   <variable name='PT'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -447,9 +451,10 @@
 
         tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian
         tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -480,7 +485,7 @@
   </variable>
   <variable name='THETA'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -526,9 +531,10 @@
 
         tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
         tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -568,7 +574,7 @@
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -614,9 +620,10 @@
 
         tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
         tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -647,7 +654,7 @@
   </variable>
   <variable name='PT'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -693,9 +700,10 @@
 
         tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian
         tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -726,7 +734,7 @@
   </variable>
   <variable name='THETA'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4)
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
         prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4)
@@ -772,9 +780,10 @@
 
         tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
         tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(pexp(0))+#8*pexp(0))
         prov5=(#19+#20*dsqrt(pexp(0))+#21*pexp(0))
  
@@ -814,7 +823,7 @@
   #width type should be thin or large (thin is for energy accurate up to 5-10%)
   <variable name='PHI'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
         prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
         prov3=(#9+#10*1d0/p(0)+#11*1d0/p(0)**2+#12*1d0/p(0)**3+#13*1d0/p(0)**4)
@@ -860,9 +869,10 @@
 
         tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian
         tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(1d0/pexp(0))+#8*1d0/pexp(0))
         prov5=(#19+#20*dsqrt(1d0/pexp(0))+#21*1d0/pexp(0))
  
@@ -891,9 +901,9 @@
       ENDIF 
     </width> 
   </variable>
-  <variable name='INVPT'>
+  <variable name='PT'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
         prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
         prov3=(#9+#10*1d0/p(0)+#11*1d0/p(0)**2+#12*1d0/p(0)**3+#13*1d0/p(0)**4)
@@ -939,9 +949,10 @@
 
         tf=prov2*(exp(-(1d0/p(0)-1d0/pexp(0)-prov1)**2/2d0/prov2**2))    !first gaussian
         tf=tf+prov5*(exp(-(1d0/p(0)-1d0/pexp(0)-prov4)**2/2d0/prov5**2)) !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(1d0/pexp(0))+#8*1d0/pexp(0))
         prov5=(#19+#20*dsqrt(1d0/pexp(0))+#21*1d0/pexp(0))
  
@@ -972,7 +983,7 @@
   </variable>
   <variable name='THETA'>
     <tf>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
         prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
         prov3=(#9+#10*1d0/p(0)+#11*1d0/p(0)**2+#12*1d0/p(0)**3+#13*1d0/p(0)**4)
@@ -1018,9 +1029,10 @@
 
         tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian
         tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian
+      ENDIF 
     </tf> 
     <width>
-      IF( ABS(eta(pexp))) .LE. 0.375) THEN 
+      IF( ABS(eta(pexp)) .LE. 0.375) THEN 
         prov2=(#6+#7*dsqrt(1d0/pexp(0))+#8*1d0/pexp(0))
         prov5=(#19+#20*dsqrt(1d0/pexp(0))+#21*1d0/pexp(0))
  
@@ -1050,3 +1062,4 @@
     </width> 
   </variable>
 </block>
+</file>

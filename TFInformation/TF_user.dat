@@ -291,7 +291,7 @@
         width = max(prov2, prov6) 
     </width> 
   </variable>
-  <variable name='INVPT'>
+  <variable name='PT'>
     <tf>
         prov1=(#1+#2*1d0/p(0)+#3*1d0/p(0)**2+#4*1d0/p(0)**3+#5*1d0/p(0)**4)
         prov2=(#6+#7*dsqrt(1d0/p(0))+#8*1d0/p(0))
@@ -330,3 +330,4 @@
     </width> 
   </variable>
 </block>
+</file>

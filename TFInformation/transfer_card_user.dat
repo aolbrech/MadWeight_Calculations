@@ -317,7 +317,7 @@ BLOCK TF_muon_PHI
 25     1.65029e+09     # Constant narrow gaussian
 26     -1.73597e+10     # Constant narrow gaussian
  
-BLOCK TF_muon_INVPT
+BLOCK TF_muon_PT
 1     -0.059789     # Mean broad gaussian
 2     9.65413     # Mean broad gaussian
 3     -579.684     # Mean broad gaussian

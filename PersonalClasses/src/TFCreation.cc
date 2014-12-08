@@ -464,8 +464,8 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     }
 
     string WidthText[90];
-    WidthText[0] = "\n    </tf> \n";
-    WidthText[1] = "    <width>";
+    WidthText[0] = "\n    </tf> \n    <width>";
+    WidthText[1] = "\n      ENDIF \n    </tf> \n    <width>";           //No ENDIF for the iEta = 0 case!
     WidthText[9] = "\n \n        width = max(prov2, prov6) ";
     WidthText[17] = "\n    </width> \n  </variable>";                   //No ENDIF for the iEta = 0 case!
     WidthText[25] = "\n      ENDIF \n    </width> \n  </variable>";
@@ -478,7 +478,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
         int dummyCounter;
         if(iEta == 0 || iEta == 1) dummyCounter = 0;    //Counter should continue for the splitted eta-bins case!
 
-        if(iEta == 1)     { WidthText[10] = "\n      IF( ABS(eta(pexp))) .LE. 0.375) THEN ";                                                *TF << WidthText[10];}
+        if(iEta == 1)     { WidthText[10] = "\n      IF( ABS(eta(pexp)) .LE. 0.375) THEN ";                                                *TF << WidthText[10];}
         else if(iEta == 2){ WidthText[18] = "\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN "; *TF << WidthText[18];}
         else if(iEta == 3){ WidthText[26] = "\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN ";  *TF << WidthText[26];}
         else if(iEta == 4){ WidthText[34] = "\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN ";   *TF << WidthText[34];}
@@ -506,21 +506,21 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
         myTFTable << " \\hline" << endl;
         *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
         
-        if(kinVar == "PT")   *TF << "\n\n        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian";
-        if(kinVar == "THETA")*TF << "\n\n        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
-        if(kinVar == "PHI")  *TF << "\n\n        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian\n        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian";
-        if(kinVar == "INVPT")*TF << "\n\n        tf=prov2*(exp(-(1d0/p(0)-1d0/pexp(0)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/p(0)-1d0/pexp(0)-prov4)**2/2d0/prov5**2)) !second gaussian";
+        if(kinVar == "PT"){
+            if(partName != "muon") *TF << "\n\n        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian";
+            else                   *TF << "\n\n        tf=prov2*(exp(-(1d0/p(0)-1d0/pexp(0)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/p(0)-1d0/pexp(0)-prov4)**2/2d0/prov5**2)) !second gaussian";
+        }
+        if(kinVar == "THETA")      *TF << "\n\n        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
+        if(kinVar == "PHI")        *TF << "\n\n        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian\n        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian";
 
         if(iEta == 0){
             *TF << WidthText[0];
-            *TF << WidthText[1];
             *TF << WidthText[3] << WidthText[5] << WidthText[6];
             *TF << WidthText[4] << WidthText[7] << WidthText[8];
             *TF << WidthText[9];
             *TF << WidthText[17];
         }
     }
-    *TF << WidthText[0];
     *TF << WidthText[1];
     *TF << WidthText[10];
     *TF << WidthText[11] << WidthText[13] << WidthText[14];
