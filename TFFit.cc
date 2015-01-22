@@ -165,7 +165,8 @@ int main (int argc, char **argv)
 	    myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
 	    myTransferCard[ii]<<"#|                                                                       |"<<endl;
 	    myTransferCard[ii]<<"#|    To change the transfer function run ./bin/change_tf.py             |"<<endl;
-	    myTransferCard[ii]<<"#|    Current parametrization :dbl_gauss_pt_jet                          |"<<endl;
+	    if(ii ==0 ) myTransferCard[ii]<<"#|    Current parametrization : DblGaus_PT                               |"<<endl;
+	    if(ii ==1 ) myTransferCard[ii]<<"#|    Current parametrization : DblGausEtaBins_PT                        |"<<endl;
 	    myTransferCard[ii]<<"#|    Contains full double Gaussian for all kinematics and particles     |"<<endl;
             if(ii == 0) myTransferCard[ii]<<"#|    ** Information for all eta-bins **                                 |"<<endl;
             if(ii == 1) myTransferCard[ii]<<"#|    ** Information for the "<<nEtaBins<<" considered eta-bins separately **         |"<<endl;

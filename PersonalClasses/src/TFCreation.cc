@@ -454,13 +454,13 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
 
     const int NrPars = 6;
     string ParamName[NrPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
-    string TFDependencyWidth[3]  = {"","*dsqrt(p(0))","*p(0))"};
-    string TFDependency[5] = {"","*p(0)","*p(0)**2","*p(0)**3","*p(0)**4)"};
-    string WidthDependency[3] = {"","*dsqrt(pexp(0))","*pexp(0))"};
+    string TFDependencyWidth[3]  = {"","*dsqrt(pt(p))","*pt(p))"};
+    string TFDependency[5] = {"","*pt(p)","*pt(p)**2","*pt(p)**3","*pt(p)**4)"};
+    string WidthDependency[3] = {"","*dsqrt(pt(pexp))","*pt(pexp))"};
     if(partName == "muon"){
-        TFDependencyWidth[1] = "*dsqrt(1d0/p(0))";    TFDependencyWidth[2] = "*1d0/p(0))";
-        TFDependency[1]      = "*1d0/p(0)";           TFDependency[2] = "*1d0/p(0)**2";    TFDependency[3] = "*1d0/p(0)**3"; TFDependency[4] = "*1d0/p(0)**4)";
-        WidthDependency[1]   = "*dsqrt(1d0/pexp(0))"; WidthDependency[2] = "*1d0/pexp(0))";
+        TFDependencyWidth[1] = "*dsqrt(1d0/pt(p))";    TFDependencyWidth[2] = "*1d0/pt(p))";
+        TFDependency[1]      = "*1d0/pt(p)";           TFDependency[2] = "*1d0/pt(p)**2";    TFDependency[3] = "*1d0/pt(p)**3"; TFDependency[4] = "*1d0/pt(p)**4)";
+        WidthDependency[1]   = "*dsqrt(1d0/pt(pexp))"; WidthDependency[2] = "*1d0/pt(pexp))";
     }
 
     string WidthText[90];
@@ -507,8 +507,8 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
         *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
         
         if(kinVar == "PT"){
-            if(partName != "muon") *TF << "\n\n        tf=prov2*(exp(-(p(0)-pexp(0)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov5*(exp(-(p(0)-pexp(0)-prov4)**2/2d0/prov5**2))         !second gaussian";
-            else                   *TF << "\n\n        tf=prov2*(exp(-(1d0/p(0)-1d0/pexp(0)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/p(0)-1d0/pexp(0)-prov4)**2/2d0/prov5**2)) !second gaussian";
+            if(partName != "muon") *TF << "\n\n        tf=prov2*(exp(-(pt(p)-pt(pexp)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov5*(exp(-(pt(p)-pt(pexp)-prov4)**2/2d0/prov5**2))         !second gaussian";
+            else                   *TF << "\n\n        tf=prov2*(exp(-(1d0/pt(p)-1d0/pt(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/pt(p)-1d0/pt(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
         }
         if(kinVar == "THETA")      *TF << "\n\n        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
         if(kinVar == "PHI")        *TF << "\n\n        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian\n        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian";
