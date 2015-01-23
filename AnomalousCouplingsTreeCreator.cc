@@ -92,8 +92,8 @@ int main (int argc, char *argv[])
   bool FinalEventSelectionChoiceIsMade = false;
 
   bool CalculateResolutions = false; // If false, the resolutions will be loaded from a previous calculation
-  bool CalculateTF = true;
-  bool CalculateBTag = true;
+  bool CalculateTF = false;
+  bool CalculateBTag = false;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   const int NrConsideredBTagOptions = 1;   //Make sure this number is also the same in the bTagStudy class!!
@@ -536,10 +536,10 @@ int main (int argc, char *argv[])
     if (verbose > 1)
       cout << "	Loop over events " << endl;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 50000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 500000; ievt++){
 
-      if(ievt > 200000) GenLHCOOutput = false;	
+      //if(ievt > 200000) GenLHCOOutput = false;	
 
       //Initialize all values:
       bTagStudy.InitializePerEvent();
@@ -746,6 +746,7 @@ int main (int argc, char *argv[])
 	if( mcParticles[i]->status() != 3) continue;
 	
 	int partType=mcParticles[i]->type(); if(verbosity>4)cout<<"-->Type of mcParticle : "<<partType<<endl;
+        //if( fabs(partType) == 4) std::cout << " Mass of c-quark : " << mcParticles[i]->M() << " with mother : " << mcParticles[i]->motherType() << std::endl; --> Almost lways 1.5
 	
 	if(fabs(partType)<7 || fabs(partType)==24 || (fabs(partType)<=14 && fabs(partType)>=11) ){ //Considering only the semileptonic particles
 	  int motherType=mcParticles[i]->motherType(); 
@@ -803,6 +804,7 @@ int main (int argc, char *argv[])
 	FalseEventContent = false;
 	vector<TRootMCParticle*> LHCOVector(6);
 	vector<int> MadGraphId(6,4);
+        vector<float> MGBtag(6,0.0);
 	
 	NumberCorrectEvents++;
 	if(verbosity>3){
@@ -823,12 +825,13 @@ int main (int argc, char *argv[])
 	  LHCOVector[3] = BottomBar;
 	  LHCOVector[4] = Lepton;
 	  LHCOVector[5] = NeutrinoMC;
+          MGBtag[0] = 2.0; MGBtag[3] = 2.0;
 	  if(Lepton->type() == 11){           //Looking at negative electron events (index 3 for LHCO file)
-	    MadGraphId[4] = 1; //MadGraphId of e = 1
-	    MadGraphId[5] = 6; 
+	    MadGraphId[4] = 1; //MadGraph Id of e = 1
+	    MadGraphId[5] = 6; //MadGraph Id of MET = 6
 	    NumberNegativeElectrons++;
 	    if(GenLHCOOutput == true){
-	      lhcoOutput.LHCOEventOutput(3, outFile[3], NumberNegativeElectrons,LHCOVector,MadGraphId);
+	      lhcoOutput.LHCOEventOutput(3, outFile[3], NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
 	      EventInfoFile << "  0      0       0       1        " << NumberNegativeElectrons << "     ";
 	    }
 	  }//Negative electron
@@ -837,7 +840,7 @@ int main (int argc, char *argv[])
 	    MadGraphId[5] = 6; 
 	    NumberNegativeMuons++;
 	    if(GenLHCOOutput == true){
-	      lhcoOutput.LHCOEventOutput(1, outFile[1], NumberNegativeMuons,LHCOVector,MadGraphId);
+	      lhcoOutput.LHCOEventOutput(1, outFile[1], NumberNegativeMuons,LHCOVector,MadGraphId, MGBtag);
 	      EventInfoFile << "  0      1       0       0        " << NumberNegativeMuons << "     ";
 	    }
 	  }//Negative muon
@@ -860,12 +863,13 @@ int main (int argc, char *argv[])
 	  LHCOVector[3] = BottomBar;
 	  LHCOVector[4] = Light;
 	  LHCOVector[5] = LightBar;
+          MGBtag[0] = 2.0; MGBtag[3] = 2.0;
 	  if(Lepton->type() == -11){            //Looking at positive electron events (index 2 for LHCO file)
 	    MadGraphId[1] = 1; //MadGraphId of electron = 1
 	    MadGraphId[2] = 6; 
 	    NumberPositiveElectrons++;
 	    if(GenLHCOOutput == true){
-	      lhcoOutput.LHCOEventOutput(2, outFile[2], NumberPositiveElectrons,LHCOVector,MadGraphId);
+	      lhcoOutput.LHCOEventOutput(2, outFile[2], NumberPositiveElectrons,LHCOVector,MadGraphId, MGBtag);
 	      EventInfoFile << "  0      0       1       0        " << NumberPositiveElectrons << "     ";
 	    }
 	  }//Positive electron
@@ -874,7 +878,7 @@ int main (int argc, char *argv[])
 	    MadGraphId[2] = 6; 
 	    NumberPositiveMuons++;
 	    if(GenLHCOOutput == true){
-	      lhcoOutput.LHCOEventOutput(0, outFile[0], NumberPositiveMuons,LHCOVector,MadGraphId);
+	      lhcoOutput.LHCOEventOutput(0, outFile[0], NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
 	      EventInfoFile << "  1      0       0       0        " << NumberPositiveMuons << "     ";
 	    }
 	  }//Positive muon
@@ -1609,12 +1613,15 @@ int main (int argc, char *argv[])
 					     selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark2()]]};
       TLorentzVector* Quark2Array[NrCombi] ={selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark2()]], 
 					     selectedJets[(bTagStudy.getLightJets(ChosenBTagOption))[mlbStudy.getChosenQuark1()]]}; 
+      float LeptBCSV = selectedJets[(bTagStudy.getbTaggedJets(ChosenBTagOption))[mlbStudy.getChosenBLept()]]->btag_combinedSecondaryVertexBJetTags();
+      float HadrBCSV = selectedJets[(bTagStudy.getbTaggedJets(ChosenBTagOption))[mlbStudy.getChosenBHadr()]]->btag_combinedSecondaryVertexBJetTags();
 
       /////////////////////////////////////////////
       //  Filling of LHCO files for reco events  //
       /////////////////////////////////////////////
       vector<TLorentzVector*> LHCORecoVector(6);
       vector<int> MadGraphRecoId(6,4);
+      vector<float> MGRecoBtagId(6,0.0);
       //Need to distinguish between charge and lepton type
       for(int ConsideredCombi = 0; ConsideredCombi <NrCombi; ConsideredCombi++){  
 	string JetCombiString = static_cast<ostringstream*>( &(ostringstream() << ConsideredCombi) )->str();
@@ -1639,6 +1646,10 @@ int main (int argc, char *argv[])
 	  LHCORecoVector[3] = LeptBArray[ConsideredCombi];
 	  LHCORecoVector[4] = selectedLepton;
 	  LHCORecoVector[5] = &Neutrino;
+
+          //Add CSV b-tag information:
+          MGRecoBtagId[0] = HadrBCSV; MGRecoBtagId[3] = LeptBCSV;
+
 	  if(eventselectedSemiEl){//Negative electron
 	    MadGraphRecoId[1] = 1;
 	    MadGraphRecoId[2] = 6;
@@ -1646,7 +1657,7 @@ int main (int argc, char *argv[])
 	      if(ConsideredCombi == 0) NumberNegRecoEl++;  //Only need to raise the eventNumber for one combination of the 4!!
 	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoEl << " sent to LHCO Reco output (Negative electron) " << endl;
 	      if(NumberNegRecoEl==1)outFileReco[3*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeElectron_JetCombi"+JetCombiString+".lhco").c_str());
-	      lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId);
+	      lhcoOutput.LHCOEventRecoOutput(3,outFileReco[3*4+ConsideredCombi], NumberNegRecoEl, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
 	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoEl << endl;  //Only need the output once!
 	    }
 	  }
@@ -1657,7 +1668,7 @@ int main (int argc, char *argv[])
 	      if(ConsideredCombi == 0) NumberNegRecoMu++;
 	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberNegRecoMu << " sent to LHCO Reco output (Negative muon) " << endl;
 	      if(NumberNegRecoMu==1) outFileReco[1*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeMuon_JetCombi"+JetCombiString+".lhco").c_str());
-	      lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId);
+	      lhcoOutput.LHCOEventRecoOutput(1, outFileReco[1*4+ConsideredCombi], NumberNegRecoMu, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
 	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberNegRecoMu << endl;
 	    }	
 	  }
@@ -1671,6 +1682,10 @@ int main (int argc, char *argv[])
 	  LHCORecoVector[3] = HadrBArray[ConsideredCombi];
 	  LHCORecoVector[4] = Quark1Array[ConsideredCombi];
 	  LHCORecoVector[5] = Quark2Array[ConsideredCombi];
+
+          //Add CSV b-tag information:
+          MGRecoBtagId[0] = HadrBCSV; MGRecoBtagId[3] = LeptBCSV;
+
 	  if(eventselectedSemiEl){//Positive electron
 	    MadGraphRecoId[1] = 1;
 	    MadGraphRecoId[2] = 6;
@@ -1678,7 +1693,7 @@ int main (int argc, char *argv[])
 	      if(ConsideredCombi == 0) NumberPosRecoEl++;
 	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoEl << " sent to LHCO Reco output (Positive electron) " << endl;
 	      if(NumberPosRecoEl==1)outFileReco[2*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElectron_JetCombi"+JetCombiString+".lhco").c_str());
-	      lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId);	 
+	      lhcoOutput.LHCOEventRecoOutput(2,outFileReco[2*4+ConsideredCombi], NumberPosRecoEl, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);	 
 	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoEl << endl;
 	    }
 	  }
@@ -1689,7 +1704,7 @@ int main (int argc, char *argv[])
 	      if(ConsideredCombi == 0) NumberPosRecoMu++;
 	      if(verbosity > 4) cout << " Event : " << ievt << " with Number " << NumberPosRecoMu << " sent to LHCO Reco output (Positive muon) " << endl;
 	      if(NumberPosRecoMu==1)outFileReco[0*4+ConsideredCombi].open(("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveMuon_JetCombi"+JetCombiString+".lhco").c_str());
-	      lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId);
+	      lhcoOutput.LHCOEventRecoOutput(0, outFileReco[0*4+ConsideredCombi], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
 	      if(ConsideredCombi == 0) EventInfoFile << "     " << NumberPosRecoMu << endl;
 	    }	
 	  }

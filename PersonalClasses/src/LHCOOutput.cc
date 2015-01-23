@@ -4,7 +4,7 @@
 #include<fstream>
 #include <sstream>
 
-void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TRootMCParticle*> vector, std::vector<int> MGId){
+void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TRootMCParticle*> vector, std::vector<int> MGId, std::vector<float> MGBtag){
 
   if(LHCOIndex == 0 || LHCOIndex == 2)
     LeptonCharge =1;
@@ -30,14 +30,15 @@ void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned in
     cout.setf(ios::fixed,ios::floatfield);  //Add zero to obtain the asked number of digits
     cout.precision(4);
     if(vector[ii]->M() > 0.0) outputFile << "  " << fixed << showpoint << setprecision(3) << vector[ii]->M();
+    //if(vector[ii]->M() == 1.5) std::cout << " Particle Id of particle is : " << vector[ii]->type() << std::endl; --> Always c-quark (=4)
     else outputFile << "  " << fixed << showpoint << setprecision(3) << " 0.00";
-    if(ii == 1) outputFile << "   " << setprecision(3) << LeptonCharge;
+    if(MGId[ii] == 2 || MGId[ii] == 1) outputFile << "   " << setprecision(3) << LeptonCharge << "   ";
     else outputFile << "    0.00";
-    outputFile << "  0.00     0.00  0.00  0.00" << endl;
+    outputFile << " " << MGBtag[ii] << "     0.00  0.00  0.00" << endl;
   }
 }
 
-void LHCOOutput::LHCOEventRecoOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TLorentzVector*> vector, std::vector<int> MGId){
+void LHCOOutput::LHCOEventRecoOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TLorentzVector*> vector, std::vector<int> MGId, std::vector<float> MGBtag){
 
   if(LHCOIndex == 0 || LHCOIndex == 2)
     LeptonCharge =1;
@@ -64,9 +65,9 @@ void LHCOOutput::LHCOEventRecoOutput(int LHCOIndex, ostream &outputFile, unsigne
     cout.precision(4);
     if(vector[ii]->M() > 0.0) outputFile << "  " << fixed << showpoint << setprecision(3) << vector[ii]->M();
     else outputFile << "  " << fixed << showpoint << setprecision(3) << " 0.00";
-    if(ii == 1) outputFile << "   " << setprecision(3) << LeptonCharge;
+    if(ii == 1) outputFile << "   " << setprecision(3) << LeptonCharge << "   ";
     else outputFile << "    0.00";
-    outputFile << "  0.00     0.00  0.00  0.00" << endl;
+    outputFile << " " << MGBtag[ii] << "     0.00  0.00  0.00" << endl;
   }
 }
 
