@@ -466,7 +466,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     string WidthText[90];
     WidthText[0] = "\n    </tf> \n    <width>";
     WidthText[1] = "\n      ENDIF \n    </tf> \n    <width>";           //No ENDIF for the iEta = 0 case!
-    WidthText[9] = "\n \n        width = max(prov2, prov6) ";
+    WidthText[9] = "\n \n        width = max(prov2, prov5) ";
     WidthText[17] = "\n    </width> \n  </variable>";                   //No ENDIF for the iEta = 0 case!
     WidthText[25] = "\n      ENDIF \n    </width> \n  </variable>";
 
@@ -507,11 +507,11 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
         *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
         
         if(kinVar == "PT"){
-            if(partName != "muon") *TF << "\n\n        tf=prov2*(exp(-(pt(p)-pt(pexp)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov5*(exp(-(pt(p)-pt(pexp)-prov4)**2/2d0/prov5**2))         !second gaussian";
-            else                   *TF << "\n\n        tf=prov2*(exp(-(1d0/pt(p)-1d0/pt(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/pt(p)-1d0/pt(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
+            if(partName != "muon") *TF << "\n\n        tf=prov3*(exp(-(pt(p)-pt(pexp)-prov1)**2/2d0/prov2**2))            !first gaussian\n        tf=tf+prov6*(exp(-(pt(p)-pt(pexp)-prov4)**2/2d0/prov5**2))         !second gaussian\n        tf=tf*(1d0/dsqrt(2d0*pi))/(prov2*prov3+prov5*prov6))         !normalisation";
+            else                   *TF << "\n\n        tf=prov2*(exp(-(1d0/pt(p)-1d0/pt(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(1d0/pt(p)-1d0/pt(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian\n        tf=tf*(1d0/dsqrt(2d0*pi))/(prov2*prov3+prov5*prov6))         !normalisation";
         }
-        if(kinVar == "THETA")      *TF << "\n\n        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
-        if(kinVar == "PHI")        *TF << "\n\n        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian\n        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian";
+        if(kinVar == "THETA")      *TF << "\n\n        tf=prov2*(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))    !first gaussian\n        tf=tf+prov5*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian\n        tf=tf*(1d0/dsqrt(2d0*pi))/(prov2*prov3+prov5*prov6))         !normalisation";
+        if(kinVar == "PHI")        *TF << "\n\n        tf=prov2*(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))        !first gaussian\n        tf=tf+prov5*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))     !second gaussian\n        tf=tf*(1d0/dsqrt(2d0*pi))/(prov2*prov3+prov5*prov6))         !normalisation";
 
         if(iEta == 0){
             *TF << WidthText[0];
