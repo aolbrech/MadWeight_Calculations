@@ -1,11 +1,13 @@
 #include "../interface/BTagStudy.h"
 
-BTagStudy::BTagStudy(){
+BTagStudy::BTagStudy(int outputVerbose){
     BTagStudy::InitializeBegin();
+    verbose = outputVerbose;
+    eventSelectionOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
 }
 
 BTagStudy::~BTagStudy(){
-
+    eventSelectionOutput.close();
 }
 
 void BTagStudy::InitializeBegin(){
@@ -33,6 +35,22 @@ void BTagStudy::InitializeBegin(){
       NonbTaggedJetNr[ii].clear();
       LightJetNr[ii].clear();
    }
+
+  //Try to include this in a more cleaner way ....
+  float bjetWP[6] = {0.244,0.679,0.679,0.898,0.898,0.898};
+  float lightjetWP[6] = {0.244,0.679,0.244,0.898,0.679,0.244};
+  
+  std::string optionName[6] = {"2 L b-tags             ",  //#0
+  	                       "2 M b-tags             ",  //#1
+	                       "2 M b-tags, light L-veto", //#2
+	                       "2 T b-tags             ",  //#3
+                               "2 T b-tags, light M-veto", //#4
+	                       "2 T b-tags, light L-veto"};//#5
+    for(int ii = 0; ii < 6; ii++){
+        BJetWP[ii] = bjetWP[ii];
+        LightJetWP[ii] = lightjetWP[ii];
+        OptionName[ii] = optionName[ii];
+    }
 }
 
 void BTagStudy::InitializePerEvent(){
@@ -44,172 +62,197 @@ void BTagStudy::InitializePerEvent(){
    }
 }
 
-void BTagStudy::CalculateJets(vector<TRootJet*> Jets, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr){
+void BTagStudy::CalculateJets(vector<TRootJet*> Jets, vector<int> jetCombi){      //, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr){
 
-     for(unsigned int ii = 0; ii<Jets.size();ii++){
-        if(Jets[ii]->btag_combinedSecondaryVertexBJetTags() >= BTagWorkingPoint){
-          bTaggedJetNr[OptionNr].push_back(ii);
+    for (unsigned int bTagOption = 0; bTagOption < 6; bTagOption++){
+
+        for(unsigned int ii = 0; ii<Jets.size();ii++){
+            if(Jets[ii]->btag_combinedSecondaryVertexBJetTags() >= BJetWP[bTagOption])
+                bTaggedJetNr[bTagOption].push_back(ii);            
+            else
+                NonbTaggedJetNr[bTagOption].push_back(ii);            
+
+	    //Calculate the light jets when an additional working point is required for these:
+	    if(BJetWP[bTagOption] != LightJetWP[bTagOption] && Jets[ii]->btag_combinedSecondaryVertexBJetTags() < LightJetWP[bTagOption])
+	        LightJetNr[bTagOption].push_back(ii);	
         }
-        else{
-          NonbTaggedJetNr[OptionNr].push_back(ii);
+
+        //Copy the Nonbtagged vector into the light one in case the two b-tags are the same!	
+        if(BJetWP[bTagOption] == LightJetWP[bTagOption])
+	    LightJetNr[bTagOption] = NonbTaggedJetNr[bTagOption];     
+
+        //Count how often an event has three or two light jets (for comparison of 4- and 5-jet case)
+        if( LightJetNr[bTagOption].size() >1 ){
+	    EventWithTwoLightJets[bTagOption]++;
+            if(bTaggedJetNr[bTagOption].size() >1)
+	        EventWithTwoLightJetsAndBTagged[bTagOption]++;
         }
+        if( LightJetNr[bTagOption].size() >2 ){
+	    EventWithThreeLightJets[bTagOption]++;
+	    if(bTaggedJetNr[bTagOption].size() >1)
+	        EventWithThreeLightJetsAndBTagged[bTagOption]++;
+        } 
 
-	//Calculate the light jets when an additional working point is required for these:
-	if(BTagWorkingPoint != LightWorkingPoint && Jets[ii]->btag_combinedSecondaryVertexBJetTags() < LightWorkingPoint){
-	  LightJetNr[OptionNr].push_back(ii);
-	}
-     }
+        //--- Go to CorrectJetCombi class  ---//
+        if( bTaggedJetNr[bTagOption].size() >= 2 && LightJetNr[bTagOption].size() >=2 ){
+            if( LightJetNr[bTagOption].size() >= 2)
+                CorrectJetCombi(jetCombi, bTagOption);      //4-jet case
+            if( LightJetNr[bTagOption].size() > 2)
+                CorrectJetCombi5Jets(jetCombi, bTagOption); //5-jet case
+        }
+        else
+            if(verbose > 3) std::cout << " Event doesn't have two b-tagged jets and/or two light jets ! " << std::endl;
 
-     //Copy the Nonbtagged vector into the light one in case the two b-tags are the same!	
-     if(BTagWorkingPoint == LightWorkingPoint){
-	LightJetNr[OptionNr] = NonbTaggedJetNr[OptionNr];
-     }
-
-     //Count how often an event has three or two light jets (for comparison of 4- and 5-jet case)
-     if( LightJetNr[OptionNr].size() >1 ){
-	EventWithTwoLightJets[OptionNr]++;
-        if(bTaggedJetNr[OptionNr].size() >1)
-	   EventWithTwoLightJetsAndBTagged[OptionNr]++;
-     }
-     if( LightJetNr[OptionNr].size() >2 ){
-	EventWithThreeLightJets[OptionNr]++;
-	if(bTaggedJetNr[OptionNr].size() >1)
-	   EventWithThreeLightJetsAndBTagged[OptionNr]++;
-     } 
+        //--- Additional output for debugging --//
+        if(verbose > 3)
+	    cout<<"(BTagStudy class) -- Size of bTaggedJets: "<<bTaggedJetNr[bTagOption].size()<<", of NonbTaggedJets: "<<NonbTaggedJetNr[bTagOption].size()<<" & of lightJets: "<<LightJetNr[bTagOption].size()<<endl;
+    }//Loop over all btag options!
 }
 
-void BTagStudy::CorrectJetCombi(int BHadrIndex, int BLeptIndex, int Quark1Index, int Quark2Index, int OptionNr){
+void BTagStudy::CorrectJetCombi(vector<int> jetCombi, int OptionNr){
+    //jet combi order is : (0 = BLeptonic, 1 = BHadronic, 2 = Quark1 & 3 =  Quark2)
 
-     if(BHadrIndex == 9999 || BLeptIndex == 9999 || Quark1Index == 9999 || Quark2Index == 9999){
+     if(jetCombi[1] == 9999 || jetCombi[0] == 9999 || jetCombi[2] == 9999 || jetCombi[3] == 9999){
 	NotReconstructedEvent[OptionNr]++;
      }
      else{
-        if( (BLeptIndex == bTaggedJetNr[OptionNr][0] || BLeptIndex == bTaggedJetNr[OptionNr][1]) &&
-            (BHadrIndex == bTaggedJetNr[OptionNr][0] || BHadrIndex == bTaggedJetNr[OptionNr][1]) &&
-            (Quark1Index == LightJetNr[OptionNr][0] || Quark1Index == LightJetNr[OptionNr][1]) &&
-            (Quark2Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][1])){
+        if( (jetCombi[0] == bTaggedJetNr[OptionNr][0] || jetCombi[0] == bTaggedJetNr[OptionNr][1]) &&
+            (jetCombi[1] == bTaggedJetNr[OptionNr][0] || jetCombi[1] == bTaggedJetNr[OptionNr][1]) &&
+            (jetCombi[2] == LightJetNr[OptionNr][0] || jetCombi[2] == LightJetNr[OptionNr][1]) &&
+            (jetCombi[3] == LightJetNr[OptionNr][0] || jetCombi[3] == LightJetNr[OptionNr][1])){
                 allFourJetsCorrectlyMatched[OptionNr]++;
         }
-        if( (BLeptIndex != bTaggedJetNr[OptionNr][0] && BLeptIndex != bTaggedJetNr[OptionNr][1]) ||
-            (BHadrIndex != bTaggedJetNr[OptionNr][0] && BHadrIndex != bTaggedJetNr[OptionNr][1]) ||
-            (Quark1Index != LightJetNr[OptionNr][0] && Quark1Index != LightJetNr[OptionNr][1]) ||
-            (Quark2Index != LightJetNr[OptionNr][0] && Quark2Index != LightJetNr[OptionNr][1])){
+        if( (jetCombi[0] != bTaggedJetNr[OptionNr][0] && jetCombi[0] != bTaggedJetNr[OptionNr][1]) ||
+            (jetCombi[1] != bTaggedJetNr[OptionNr][0] && jetCombi[1] != bTaggedJetNr[OptionNr][1]) ||
+            (jetCombi[2] != LightJetNr[OptionNr][0] && jetCombi[2] != LightJetNr[OptionNr][1]) ||
+            (jetCombi[3] != LightJetNr[OptionNr][0] && jetCombi[3] != LightJetNr[OptionNr][1])){
 	 	atLeastOneWronglyMatched[OptionNr]++;
         }
-	if( (BLeptIndex == bTaggedJetNr[OptionNr][0] || BLeptIndex == bTaggedJetNr[OptionNr][1]) &&
-            (BHadrIndex == bTaggedJetNr[OptionNr][0] || BHadrIndex == bTaggedJetNr[OptionNr][1])){
+	if( (jetCombi[0] == bTaggedJetNr[OptionNr][0] || jetCombi[0] == bTaggedJetNr[OptionNr][1]) &&
+            (jetCombi[1] == bTaggedJetNr[OptionNr][0] || jetCombi[1] == bTaggedJetNr[OptionNr][1])){
 		twoBTagsCorrectlyMatched[OptionNr]++;
 	}
-	if( (BLeptIndex != bTaggedJetNr[OptionNr][0] && BLeptIndex != bTaggedJetNr[OptionNr][1]) ||
-            (BHadrIndex != bTaggedJetNr[OptionNr][0] && BHadrIndex != bTaggedJetNr[OptionNr][1])){
+	if( (jetCombi[0] != bTaggedJetNr[OptionNr][0] && jetCombi[0] != bTaggedJetNr[OptionNr][1]) ||
+            (jetCombi[1] != bTaggedJetNr[OptionNr][0] && jetCombi[1] != bTaggedJetNr[OptionNr][1])){
 		atLeastOneBTagWronglyMatched[OptionNr]++;
 	}
-	if( (Quark1Index == LightJetNr[OptionNr][0] || Quark1Index == LightJetNr[OptionNr][1]) &&
-            (Quark2Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][1])){
+	if( (jetCombi[2] == LightJetNr[OptionNr][0] || jetCombi[2] == LightJetNr[OptionNr][1]) &&
+            (jetCombi[3] == LightJetNr[OptionNr][0] || jetCombi[3] == LightJetNr[OptionNr][1])){
 		twoLightJetsCorrectlyMatched[OptionNr]++;
 	}
-	if( (Quark1Index != LightJetNr[OptionNr][0] && Quark1Index != LightJetNr[OptionNr][1]) ||
-            (Quark2Index != LightJetNr[OptionNr][0] && Quark2Index != LightJetNr[OptionNr][1])){
+	if( (jetCombi[2] != LightJetNr[OptionNr][0] && jetCombi[2] != LightJetNr[OptionNr][1]) ||
+            (jetCombi[3] != LightJetNr[OptionNr][0] && jetCombi[3] != LightJetNr[OptionNr][1])){
 		atLeastOneLightJetWronglyMatched[OptionNr]++;
 	}
      }
 }
 
-void BTagStudy::CorrectJetCombi5Jets(int BHadrIndex, int BLeptIndex, int Quark1Index, int Quark2Index, int OptionNr){
+void BTagStudy::CorrectJetCombi5Jets(vector<int> jetCombi, int OptionNr){
 
-     if(BHadrIndex == 9999 || BLeptIndex == 9999 || Quark1Index == 9999 || Quark2Index == 9999){
-	NotReconstructedEvent5Jets[OptionNr]++;
-     }
-     else{
-        if( (BLeptIndex == bTaggedJetNr[OptionNr][0] || BLeptIndex == bTaggedJetNr[OptionNr][1]) &&
-            (BHadrIndex == bTaggedJetNr[OptionNr][0] || BHadrIndex == bTaggedJetNr[OptionNr][1]) &&
-            (Quark1Index == LightJetNr[OptionNr][0] || Quark1Index == LightJetNr[OptionNr][1] || Quark1Index == LightJetNr[OptionNr][2] ) &&
-            (Quark2Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][1] || Quark2Index == LightJetNr[OptionNr][2] ) ){
+    if(jetCombi[1] == 9999 || jetCombi[0] == 9999 || jetCombi[2] == 9999 || jetCombi[3] == 9999){
+        NotReconstructedEvent5Jets[OptionNr]++;
+    }
+    else{
+        if( (jetCombi[0] == bTaggedJetNr[OptionNr][0] || jetCombi[0] == bTaggedJetNr[OptionNr][1]) &&
+            (jetCombi[1] == bTaggedJetNr[OptionNr][0] || jetCombi[1] == bTaggedJetNr[OptionNr][1]) &&
+            (jetCombi[2] == LightJetNr[OptionNr][0] || jetCombi[2] == LightJetNr[OptionNr][1] || jetCombi[2] == LightJetNr[OptionNr][2] ) &&
+            (jetCombi[3] == LightJetNr[OptionNr][0] || jetCombi[3] == LightJetNr[OptionNr][1] || jetCombi[3] == LightJetNr[OptionNr][2] ) ){
                 allFourJetsCorrectlyMatched5Jets[OptionNr]++;
- 		if(Quark1Index == LightJetNr[OptionNr][2] || Quark2Index == LightJetNr[OptionNr][2]) thirdJetIsActualQuark[OptionNr]++;
-		if(Quark1Index == LightJetNr[OptionNr][1] || Quark2Index == LightJetNr[OptionNr][1]) secondJetIsActualQuark[OptionNr]++;
-		if(Quark1Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][0]) firstJetIsActualQuark[OptionNr]++;
+ 		if(jetCombi[2] == LightJetNr[OptionNr][2] || jetCombi[3] == LightJetNr[OptionNr][2]) thirdJetIsActualQuark[OptionNr]++;
+		if(jetCombi[2] == LightJetNr[OptionNr][1] || jetCombi[3] == LightJetNr[OptionNr][1]) secondJetIsActualQuark[OptionNr]++;
+		if(jetCombi[2] == LightJetNr[OptionNr][0] || jetCombi[3] == LightJetNr[OptionNr][0]) firstJetIsActualQuark[OptionNr]++;
         }
-        if( (BLeptIndex != bTaggedJetNr[OptionNr][0] && BLeptIndex != bTaggedJetNr[OptionNr][1]) ||
-            (BHadrIndex != bTaggedJetNr[OptionNr][0] && BHadrIndex != bTaggedJetNr[OptionNr][1]) ||
-            (Quark1Index != LightJetNr[OptionNr][0] && Quark1Index != LightJetNr[OptionNr][1] && Quark1Index != LightJetNr[OptionNr][2] ) ||
-            (Quark2Index != LightJetNr[OptionNr][0] && Quark2Index != LightJetNr[OptionNr][1] && Quark2Index != LightJetNr[OptionNr][2] ) ){
+        if( (jetCombi[0] != bTaggedJetNr[OptionNr][0] && jetCombi[0] != bTaggedJetNr[OptionNr][1]) ||
+            (jetCombi[1] != bTaggedJetNr[OptionNr][0] && jetCombi[1] != bTaggedJetNr[OptionNr][1]) ||
+            (jetCombi[2] != LightJetNr[OptionNr][0] && jetCombi[2] != LightJetNr[OptionNr][1] && jetCombi[2] != LightJetNr[OptionNr][2] ) ||
+            (jetCombi[3] != LightJetNr[OptionNr][0] && jetCombi[3] != LightJetNr[OptionNr][1] && jetCombi[3] != LightJetNr[OptionNr][2] ) ){
 	 	atLeastOneWronglyMatched5Jets[OptionNr]++;
         }
-	if( (BLeptIndex == bTaggedJetNr[OptionNr][0] || BLeptIndex == bTaggedJetNr[OptionNr][1]) &&
-            (BHadrIndex == bTaggedJetNr[OptionNr][0] || BHadrIndex == bTaggedJetNr[OptionNr][1])){
+	if( (jetCombi[0] == bTaggedJetNr[OptionNr][0] || jetCombi[0] == bTaggedJetNr[OptionNr][1]) &&
+            (jetCombi[1] == bTaggedJetNr[OptionNr][0] || jetCombi[1] == bTaggedJetNr[OptionNr][1])){
 		twoBTagsCorrectlyMatched5Jets[OptionNr]++;
-		if(Quark1Index == LightJetNr[OptionNr][2] || Quark2Index == LightJetNr[OptionNr][2]) thirdJetIsGoodQuark[OptionNr]++;
+		//if(jetCombi[2] == LightJetNr[OptionNr][2] || jetCombi[3] == LightJetNr[OptionNr][2]) thirdJetIsGoodQuark[OptionNr]++;
 	}
-	if( (BLeptIndex != bTaggedJetNr[OptionNr][0] && BLeptIndex != bTaggedJetNr[OptionNr][1]) ||
-            (BHadrIndex != bTaggedJetNr[OptionNr][0] && BHadrIndex != bTaggedJetNr[OptionNr][1])){
+	if( (jetCombi[0] != bTaggedJetNr[OptionNr][0] && jetCombi[0] != bTaggedJetNr[OptionNr][1]) ||
+            (jetCombi[1] != bTaggedJetNr[OptionNr][0] && jetCombi[1] != bTaggedJetNr[OptionNr][1])){
 		atLeastOneBTagWronglyMatched5Jets[OptionNr]++;
 	}
-	if( (Quark1Index == LightJetNr[OptionNr][0] || Quark1Index == LightJetNr[OptionNr][1] || Quark1Index == LightJetNr[OptionNr][2] ) &&
-            (Quark2Index == LightJetNr[OptionNr][0] || Quark2Index == LightJetNr[OptionNr][1] || Quark2Index == LightJetNr[OptionNr][2] ) ){
+	if( (jetCombi[2] == LightJetNr[OptionNr][0] || jetCombi[2] == LightJetNr[OptionNr][1] || jetCombi[2] == LightJetNr[OptionNr][2] ) &&
+            (jetCombi[3] == LightJetNr[OptionNr][0] || jetCombi[3] == LightJetNr[OptionNr][1] || jetCombi[3] == LightJetNr[OptionNr][2] ) ){
 		twoLightJetsCorrectlyMatched5Jets[OptionNr]++;
- 		if(Quark1Index == LightJetNr[OptionNr][2] || Quark2Index == LightJetNr[OptionNr][2]) thirdJetIsCorrectQuark[OptionNr]++;
+ 		//if(jetCombi[2] == LightJetNr[OptionNr][2] || jetCombi[3] == LightJetNr[OptionNr][2]) thirdJetIsCorrectQuark[OptionNr]++;
 	}
-	if( (Quark1Index != LightJetNr[OptionNr][0] && Quark1Index != LightJetNr[OptionNr][1] && Quark1Index != LightJetNr[OptionNr][2] ) ||
-            (Quark2Index != LightJetNr[OptionNr][0] && Quark2Index != LightJetNr[OptionNr][1] && Quark2Index != LightJetNr[OptionNr][2] ) ){
+	if( (jetCombi[2] != LightJetNr[OptionNr][0] && jetCombi[2] != LightJetNr[OptionNr][1] && jetCombi[2] != LightJetNr[OptionNr][2] ) ||
+            (jetCombi[3] != LightJetNr[OptionNr][0] && jetCombi[3] != LightJetNr[OptionNr][1] && jetCombi[3] != LightJetNr[OptionNr][2] ) ){
 		atLeastOneLightJetWronglyMatched5Jets[OptionNr]++;
 	}
      }
 }
 
-void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, int NrOptionsConsidered, ostream &output, int OptionOfInterest){
+void BTagStudy::ReturnTable(){ //std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets){
+
+    std::string OptionName4Jets[6], OptionName5Jets[6];
+    for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case, "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case, "+OptionName[ii];}
 	
-    //Values of WhichJets are the following:
-	// 0 = all 4 jets matched and compared
-	// 1 = only the b-jets matched and compared
-	// 2 = only the light jets matched and compared
+    std::string Title[3]= {"   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
+			   "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's correct & $\\geq$ 1 b wrong & b's correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\", 
+			   "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\"};
 
-//    std::string Title[3]= {"\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & chosen jets are correct ($\\%$)       & $\\frac{s}{b}$ & 3rd jet is correct ($\\%$) \\\\", 
-//			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's chosen correctly ($\\%$)        & $\\frac{s}{b}$ & 3rd jet is correct ($\\%$) \\\\", 
-//			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & chosen light jets are correct ($\\%$) & $\\frac{s}{b}$ & 3rd jet is correct ($\\%$) \\\\"};
-    std::string Title[3]= {"\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
-			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's correct & $\\geq$ 1 b wrong & b's correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\", 
-			   "\\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\"};
+    std::string Caption[3] = {"   \\caption{Overview of correct and wrong reconstructed events for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} ", 
+			      "   \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} ", 
+			      "   \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} "};
 
-    std::string Caption[3] = {"\\caption{Overview of correct and wrong reconstructed events for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
-			      "\\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} ", 
-			      "\\caption{Overview of correct and wrong reconstructed light jets for the different b-tags without the use of a $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ method} "};
+    std::string Title5Jets[3]= {"   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$, 5 jets) & all 4 correct & $\\geq$ 1 wrong & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
+			        "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$, 5 jets) & 2 b's correct & $\\geq$ 1 b wrong & b's correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\", 
+			        "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$, 5 jets) & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\"};
 
-    output << " \\begin{table}[!h] \n \\begin{tabular}{c|c|c|c|c} " << endl;
-    output << Title[WhichJets] << " \\hline " << endl;
-    for(int ii = 0; ii < NrOptionsConsidered; ii++){
+    std::string Caption5Jets[3] = {"   \\caption{Overview of correct and wrong reconstructed events for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} ", 
+			           "   \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} ", 
+			           "   \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} "};
 
-	if(NrOptionsConsidered == 1){
-	  ii = OptionOfInterest;
-          int CorrectOnes5Jets[3] = {allFourJetsCorrectlyMatched5Jets[OptionOfInterest], twoBTagsCorrectlyMatched5Jets[OptionOfInterest] , twoLightJetsCorrectlyMatched5Jets[OptionOfInterest]};
-          int WrongOnes5Jets[3] = {atLeastOneWronglyMatched5Jets[OptionOfInterest], atLeastOneBTagWronglyMatched5Jets[OptionOfInterest], atLeastOneLightJetWronglyMatched5Jets[OptionOfInterest]};
-    	  int Correct3rdJet[3] = {thirdJetIsActualQuark[OptionOfInterest],thirdJetIsGoodQuark[OptionOfInterest], thirdJetIsCorrectQuark[OptionOfInterest]};
-	  float sOverSqrtB5Jets[3], sOverB5Jets[3], CorrectPercentage5Jets[3], ThirdJetPercentage[3];
-	  for(int jj = 0; jj < 3; jj++){
-	     sOverSqrtB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(sqrt(WrongOnes5Jets[jj]));
-	     sOverB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(WrongOnes5Jets[jj]);
-	     CorrectPercentage5Jets[jj] = (float)(CorrectOnes5Jets[jj]*100.0)/(float)(CorrectOnes5Jets[jj]+WrongOnes5Jets[jj]);
-	     ThirdJetPercentage[jj] = (float)(Correct3rdJet[jj]*100.0)/(float)(CorrectOnes5Jets[jj]);
-	  }
+
+    //Maybe create a separate output file for 4 and 5 jet case?
+    //--> This avoids creating a double bTag loop!
+
+    for(int itNrJets = 0; itNrJets < 3; itNrJets++){      //Replacing loop over whichJets! (for 5jet case)
+
+        for(int itBTag = 0; itBTag < 6; itBTag++){
+
+            //---  Store 5 jet information  ---//
+            if(itBTag == 0) eventSelectionOutput << " \\begin{table}[!h] \n  \\begin{tabular}{c|c|c|c|c} " << endl;
+            eventSelectionOutput << Title5Jets[itNrJets] << " \\hline " << endl;
+
+            int CorrectOnes5Jets[3] = {allFourJetsCorrectlyMatched5Jets[itBTag], twoBTagsCorrectlyMatched5Jets[itBTag] ,    twoLightJetsCorrectlyMatched5Jets[itBTag]};
+            int WrongOnes5Jets[3]   = {atLeastOneWronglyMatched5Jets[itBTag],    atLeastOneBTagWronglyMatched5Jets[itBTag], atLeastOneLightJetWronglyMatched5Jets[itBTag]};
+            //int Correct3rdJet[3]    = {thirdJetIsActualQuark[itBTag],            thirdJetIsGoodQuark[OptionOfInterest], thirdJetIsCorrectQuark[OptionOfInterest]};
+	    //float sOverSqrtB5Jets[3], sOverB5Jets[3], CorrectPercentage5Jets[3], ThirdJetPercentage[3];
+	    /*for(int jj = 0; jj < 3; jj++){
+	        sOverSqrtB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(sqrt(WrongOnes5Jets[jj]));
+	        sOverB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(WrongOnes5Jets[jj]);
+	        CorrectPercentage5Jets[jj] = (float)(CorrectOnes5Jets[jj]*100.0)/(float)(CorrectOnes5Jets[jj]+WrongOnes5Jets[jj]);
+	        ThirdJetPercentage[jj] = (float)(Correct3rdJet[jj]*100.0)/(float)(CorrectOnes5Jets[jj]);
+	    }*/
 	
-	  //Print some additional output:	 
-	  //cout << "\n Values for first, second and third light jet (Compared to total number of correctly matched events of " << allFourJetsCorrectlyMatched5Jets[OptionOfInterest] << " ) " << endl;
-	  //cout << "    * First jet : " << firstJetIsActualQuark[OptionOfInterest] << endl;
-	  //cout << "    * Second jet: " << secondJetIsActualQuark[OptionOfInterest] << endl;
-	  //cout << "    * Third jet : " << thirdJetIsActualQuark[OptionOfInterest] << endl;
+            eventSelectionOutput << OptionName5Jets[itNrJets]     << 
+	    " & " << CorrectOnes5Jets[itNrJets]       << 
+	    " & " << WrongOnes5Jets[itNrJets]         << 
+	    //" & " << CorrectPercentage5Jets[WhichJets] << 
+	    //" & " << sOverB5Jets[WhichJets]            << 
+	    //" & " << NotReconstructedEvent5Jets[ii]    << 
+	    //" & " << Correct3rdJet[WhichJets]          << 
+	    //" & " << ThirdJetPercentage[WhichJets]     << 
+	    "\\\\ " << endl;
 
-          // 5-jet output
-          output << NameOfOption5Jets[ii]            << 
-	  //" & " << CorrectOnes5Jets[WhichJets]       << 
-	  //" & " << WrongOnes5Jets[WhichJets]         << 
-	  " & " << CorrectPercentage5Jets[WhichJets] << 
-	  " & " << sOverB5Jets[WhichJets]            << 
-	  //" & " << NotReconstructedEvent5Jets[ii]    << 
-	  //" & " << Correct3rdJet[WhichJets]          << 
-	  " & " << ThirdJetPercentage[WhichJets]     << 
-	  "\\\\ " << endl;
-	} 
-	int CorrectOnes[3] = {allFourJetsCorrectlyMatched[ii], twoBTagsCorrectlyMatched[ii]    , twoLightJetsCorrectlyMatched[ii]};
+            if(itBTag == 5){
+                eventSelectionOutput << "  \\end{tabular} " << endl;
+                eventSelectionOutput << Caption5Jets[itNrJets] << endl;
+                eventSelectionOutput << " \\end{table} \n " << endl;
+            }
+	}
+        
+
+        //---  Store 4 jet information  ---//         
+	/*int CorrectOnes[3] = {allFourJetsCorrectlyMatched[ii], twoBTagsCorrectlyMatched[ii]    , twoLightJetsCorrectlyMatched[ii]};
 	int WrongOnes[3]   = {atLeastOneWronglyMatched[ii],    atLeastOneBTagWronglyMatched[ii], atLeastOneLightJetWronglyMatched[ii]};
         float sOverSqrtB[3], sOverB[3], CorrectPercentage[3];
         for(int jj = 0; jj < 3; jj++){
@@ -218,16 +261,13 @@ void BTagStudy::ReturnTable(std::string NameOfOption4Jets[6], std::string NameOf
            CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOnes[jj]+WrongOnes[jj]);
         }
 
-        output << NameOfOption4Jets[ii]       << 
+        eventSelectionOutput << OptionName4Jets[ii]       << 
 	" & " << CorrectOnes[WhichJets]       << 
 	" & " << WrongOnes[WhichJets]         << 
 	" & " << CorrectPercentage[WhichJets] << 
 	" & " << sOverB[WhichJets]            << 
 	" & " << NotReconstructedEvent[ii]    << 
-	" & X \\\\ " << endl;
+	" & X \\\\ " << endl;*/
     }
-    output << " \\end{tabular} " << endl;
-    output << Caption[WhichJets] << endl;
-    output << " \\end{table} \n " << endl;
 
 }

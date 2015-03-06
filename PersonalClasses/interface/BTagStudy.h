@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <math.h>
 
 #include "TopTreeProducer/interface/TRootJet.h"
@@ -14,15 +16,16 @@ using namespace TopTree;
 class BTagStudy{
 
   public:
-   BTagStudy();
+   BTagStudy(int);
    ~BTagStudy();
 
    void InitializePerEvent();
    void InitializeBegin();
-   void CalculateJets(vector<TRootJet*>, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr);
-   void CorrectJetCombi(int, int, int, int, int);
-   void CorrectJetCombi5Jets(int, int, int, int, int);
-   void ReturnTable(std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, int NrOptionsConsidered, ostream &output, int OptionOfInterest);//Automatically writes everything out into a .tex file!
+   void CalculateJets(vector<TRootJet*>, vector<int> jetCombi);    //, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr);
+   void CorrectJetCombi(vector<int> jetCombi, int);
+   void CorrectJetCombi5Jets(vector<int> jetCombi, int);
+   void ReturnTable();//std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets, ostream &output);//Automatically writes everything out into a .tex file!
+   int verbose;
 
    vector<int> bTaggedJetNr[6];
    vector<int> NonbTaggedJetNr[6];
@@ -44,6 +47,11 @@ class BTagStudy{
    int atLeastOneBTagWronglyMatched[6];
    int twoLightJetsCorrectlyMatched[6];
    int atLeastOneLightJetWronglyMatched[6];
+
+   float BJetWP[6];
+   float LightJetWP[6];  
+   std::string OptionName[6];
+   ofstream eventSelectionOutput;
 
    //Functions to ask everything inside the analyzer code!
    vector<int> getbTaggedJets(int OptionNr)   {return bTaggedJetNr[OptionNr];};
