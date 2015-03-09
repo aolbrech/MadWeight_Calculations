@@ -3,11 +3,13 @@
 BTagStudy::BTagStudy(int outputVerbose){
     BTagStudy::InitializeBegin();
     verbose = outputVerbose;
-    eventSelectionOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables.tex");
+    evtSelOutput.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables4JetCase.tex");
+    evtSelOutput5Jets.open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables5JetCase.tex");
 }
 
 BTagStudy::~BTagStudy(){
-    eventSelectionOutput.close();
+    evtSelOutput.close();
+    evtSelOutput5Jets.close();
 }
 
 void BTagStudy::InitializeBegin(){
@@ -191,83 +193,82 @@ void BTagStudy::CorrectJetCombi5Jets(vector<int> jetCombi, int OptionNr){
 
 void BTagStudy::ReturnTable(){ //std::string NameOfOption4Jets[6], std::string NameOfOption5Jets[6], int WhichJets){
 
-    std::string OptionName4Jets[6], OptionName5Jets[6];
-    for(int ii = 0; ii < 6; ii++){OptionName4Jets[ii] = " 4 jet case, "+OptionName[ii]; OptionName5Jets[ii] = " 5 jet case, "+OptionName[ii];}
-	
-    std::string Title[3]= {"   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & all 4 correct & $\\geq$ 1 wrong & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
-			   "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 b's correct & $\\geq$ 1 b wrong & b's correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\", 
-			   "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$) & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\"};
+    string Title[3]= {"   \\textbf{Option} & all 4 correct & $\\geq$ 1 wrong       & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
+		      "   \\textbf{Option} & 2 b's correct & $\\geq$ 1 b wrong     & b's correct ($\\%$)   & $\\frac{s}{b}$ & non-matched \\\\", 
+		      "   \\textbf{Option} & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\"};
 
-    std::string Caption[3] = {"   \\caption{Overview of correct and wrong reconstructed events for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} ", 
-			      "   \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} ", 
-			      "   \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} "};
+    string Caption[3] = {"   \\caption{Overview of correct and wrong reconstructed events for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} ", 
+			 "   \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} ", 
+			 "   \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied)} "};
 
-    std::string Title5Jets[3]= {"   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$, 5 jets) & all 4 correct & $\\geq$ 1 wrong & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
-			        "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$, 5 jets) & 2 b's correct & $\\geq$ 1 b wrong & b's correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\", 
-			        "   \\textbf{Option} (no $\\chi^{2}$ $m_{lb}$, 5 jets) & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ & non-matched \\\\"};
+    string Title5Jets[3]= {"   \\textbf{Option} & all 4 correct & $\\geq$ 1 wrong       & correct ($\\%$)       & $\\frac{s}{b}$ & $3^{rd}$ jet = light & $3^{rd}$ jet gain($\\%s$) \\\\",
+			   "   \\textbf{Option} & 2 b's correct & $\\geq$ 1 b wrong     & b's correct ($\\%$)   & $\\frac{s}{b}$ &                      &                           \\\\", 
+			   "   \\textbf{Option} & 2 light good  & $\\geq$ 1 light wrong & light correct ($\\%$) & $\\frac{s}{b}$ &                      &                           \\\\"};
 
-    std::string Caption5Jets[3] = {"   \\caption{Overview of correct and wrong reconstructed events for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} ", 
-			           "   \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} ", 
-			           "   \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} "};
-
-
-    //Maybe create a separate output file for 4 and 5 jet case?
-    //--> This avoids creating a double bTag loop!
+    string Caption5Jets[3] = {"   \\caption{Overview of correct and wrong reconstructed events for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} ", 
+			      "   \\caption{Overview of correct and wrong reconstructed b-jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} ", 
+			      "   \\caption{Overview of correct and wrong reconstructed light jets for the different b-tags (no $\\chi^{2}$ $m_{lb}$ - $m_{qqb}$ applied, 5 jets considered)} "};
 
     for(int itNrJets = 0; itNrJets < 3; itNrJets++){      //Replacing loop over whichJets! (for 5jet case)
 
         for(int itBTag = 0; itBTag < 6; itBTag++){
 
             //---  Store 5 jet information  ---//
-            if(itBTag == 0) eventSelectionOutput << " \\begin{table}[!h] \n  \\begin{tabular}{c|c|c|c|c} " << endl;
-            eventSelectionOutput << Title5Jets[itNrJets] << " \\hline " << endl;
+            if(itBTag == 0) evtSelOutput5Jets << " \\begin{table}[!h] \n  \\begin{tabular}{c|c|c|c|c|c|c} \n " << Title5Jets[itNrJets] << " \\hline " << endl;
 
             int CorrectOnes5Jets[3] = {allFourJetsCorrectlyMatched5Jets[itBTag], twoBTagsCorrectlyMatched5Jets[itBTag] ,    twoLightJetsCorrectlyMatched5Jets[itBTag]};
             int WrongOnes5Jets[3]   = {atLeastOneWronglyMatched5Jets[itBTag],    atLeastOneBTagWronglyMatched5Jets[itBTag], atLeastOneLightJetWronglyMatched5Jets[itBTag]};
-            //int Correct3rdJet[3]    = {thirdJetIsActualQuark[itBTag],            thirdJetIsGoodQuark[OptionOfInterest], thirdJetIsCorrectQuark[OptionOfInterest]};
-	    //float sOverSqrtB5Jets[3], sOverB5Jets[3], CorrectPercentage5Jets[3], ThirdJetPercentage[3];
-	    /*for(int jj = 0; jj < 3; jj++){
+            int Correct3rdJet[3]    = {thirdJetIsActualQuark[itBTag],            0,                                         0 };
+	    float sOverSqrtB5Jets[3], sOverB5Jets[3], CorrectPercentage5Jets[3], ThirdJetPercentage[3];
+	    for(int jj = 0; jj < 3; jj++){
 	        sOverSqrtB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(sqrt(WrongOnes5Jets[jj]));
 	        sOverB5Jets[jj] = (float)(CorrectOnes5Jets[jj])/(float)(WrongOnes5Jets[jj]);
 	        CorrectPercentage5Jets[jj] = (float)(CorrectOnes5Jets[jj]*100.0)/(float)(CorrectOnes5Jets[jj]+WrongOnes5Jets[jj]);
 	        ThirdJetPercentage[jj] = (float)(Correct3rdJet[jj]*100.0)/(float)(CorrectOnes5Jets[jj]);
-	    }*/
+	    }
 	
-            eventSelectionOutput << OptionName5Jets[itNrJets]     << 
-	    " & " << CorrectOnes5Jets[itNrJets]       << 
-	    " & " << WrongOnes5Jets[itNrJets]         << 
-	    //" & " << CorrectPercentage5Jets[WhichJets] << 
-	    //" & " << sOverB5Jets[WhichJets]            << 
-	    //" & " << NotReconstructedEvent5Jets[ii]    << 
-	    //" & " << Correct3rdJet[WhichJets]          << 
-	    //" & " << ThirdJetPercentage[WhichJets]     << 
+            evtSelOutput5Jets << OptionName[itBTag] << 
+	    " & " << CorrectOnes5Jets[itNrJets]          << 
+	    " & " << WrongOnes5Jets[itNrJets]            << 
+	    " & " << CorrectPercentage5Jets[itNrJets]    << 
+	    " & " << sOverB5Jets[itNrJets]               << 
+	    //" & " << NotReconstructedEvent5Jets[ii]      << 
+	    " & " << Correct3rdJet[itNrJets]             << 
+	    " & " << ThirdJetPercentage[itNrJets]        << 
 	    "\\\\ " << endl;
 
+            if(itNrJets == 0) std::cout << " Value of not-reconstructed events (for 5 jets) : " << NotReconstructedEvent5Jets[itBTag] << " -- for option " << OptionName[itBTag] << std::endl;
             if(itBTag == 5){
-                eventSelectionOutput << "  \\end{tabular} " << endl;
-                eventSelectionOutput << Caption5Jets[itNrJets] << endl;
-                eventSelectionOutput << " \\end{table} \n " << endl;
+                evtSelOutput5Jets << "  \\end{tabular} " << endl;
+                evtSelOutput5Jets << Caption5Jets[itNrJets] << endl;
+                evtSelOutput5Jets << " \\end{table} \n " << endl;
             }
-	}
-        
+            
+            //---  Store 4 jet information  ---//         
+            if(itBTag == 0) evtSelOutput << " \\begin{table}[!h] \n  \\begin{tabular}{c|c|c|c|c|c} \n " << Title[itNrJets] << " \\hline " << endl;
 
-        //---  Store 4 jet information  ---//         
-	/*int CorrectOnes[3] = {allFourJetsCorrectlyMatched[ii], twoBTagsCorrectlyMatched[ii]    , twoLightJetsCorrectlyMatched[ii]};
-	int WrongOnes[3]   = {atLeastOneWronglyMatched[ii],    atLeastOneBTagWronglyMatched[ii], atLeastOneLightJetWronglyMatched[ii]};
-        float sOverSqrtB[3], sOverB[3], CorrectPercentage[3];
-        for(int jj = 0; jj < 3; jj++){
-           sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
-           sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[jj]);
-           CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOnes[jj]+WrongOnes[jj]);
-        }
+    	    int CorrectOnes[3] = {allFourJetsCorrectlyMatched[itBTag], twoBTagsCorrectlyMatched[itBTag]    , twoLightJetsCorrectlyMatched[itBTag]};
+	    int WrongOnes[3]   = {atLeastOneWronglyMatched[itBTag],    atLeastOneBTagWronglyMatched[itBTag], atLeastOneLightJetWronglyMatched[itBTag]};
+            float sOverSqrtB[3], sOverB[3], CorrectPercentage[3];
+            for(int jj = 0; jj < 3; jj++){
+                sOverSqrtB[jj] = (float)(CorrectOnes[jj])/(float)(sqrt(WrongOnes[jj]));
+                sOverB[jj] = (float)(CorrectOnes[jj])/(float)(WrongOnes[jj]);
+                CorrectPercentage[jj] = (float)(CorrectOnes[jj]*100.0)/(float)(CorrectOnes[jj]+WrongOnes[jj]);
+            }
 
-        eventSelectionOutput << OptionName4Jets[ii]       << 
-	" & " << CorrectOnes[WhichJets]       << 
-	" & " << WrongOnes[WhichJets]         << 
-	" & " << CorrectPercentage[WhichJets] << 
-	" & " << sOverB[WhichJets]            << 
-	" & " << NotReconstructedEvent[ii]    << 
-	" & X \\\\ " << endl;*/
-    }
+            evtSelOutput << OptionName[itBTag] << 
+	    " & " << CorrectOnes[itNrJets]          << 
+	    " & " << WrongOnes[itNrJets]            << 
+	    " & " << CorrectPercentage[itNrJets]    << 
+	    " & " << sOverB[itNrJets]               << 
+	    " & " << NotReconstructedEvent[itBTag]  << 
+	    " \\\\ " << endl;
 
+            if(itBTag == 5){
+                evtSelOutput << "  \\end{tabular} " << endl;
+                evtSelOutput << Caption[itNrJets] << endl;
+                evtSelOutput << " \\end{table} \n " << endl;
+            }
+        }            	
+    }        
 }

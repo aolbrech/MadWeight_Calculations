@@ -51,7 +51,8 @@ class BTagStudy{
    float BJetWP[6];
    float LightJetWP[6];  
    std::string OptionName[6];
-   ofstream eventSelectionOutput;
+   ofstream evtSelOutput;
+   ofstream evtSelOutput5Jets;
 
    //Functions to ask everything inside the analyzer code!
    vector<int> getbTaggedJets(int OptionNr)   {return bTaggedJetNr[OptionNr];};
