@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "TopTreeProducer/interface/TRootMCParticle.h"
+#include "TopTreeProducer/interface/TRootJet.h"
 #include "TLorentzVector.h"
 
 using namespace std;
@@ -12,14 +13,12 @@ using namespace TopTree;
 
 class LHCOOutput{
 
-  int LeptonCharge;
 public:
-  LHCOOutput();
+  LHCOOutput(int, bool, bool);
   ~LHCOOutput();
 
-  void LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TRootMCParticle*> vector, std::vector<int> MGId, std::vector<float> MGBtag);
-  void LHCOEventRecoOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TLorentzVector*> vector, std::vector<int> MGId, std::vector<float> MGBtag);
-  void StoreGenInfo(vector<TRootMCParticle*> mcParticles, bool GenLHCOOutput, int verbosity);
+  void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
+  void StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge); 
 
   bool GenEventContentCorrect()    {return CorrectGenEvtContent;};
   int getLeptonType()              {return leptonType;};
@@ -31,16 +30,20 @@ public:
   //TLorentzVector* getGenHadrW()    {return GenHadronicW;}; 
 
 private:
+  void LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned int EventNumber, std::vector<TLorentzVector*> vector, std::vector<int> MGId, std::vector<float> MGBtag);
+
   TRootMCParticle *Top,*TopBar,*Bottom, *BottomBar,*Lepton,*NeutrinoMC,*WPlus,*WMinus,*Light,*LightBar;
   TLorentzVector *GenLeptonicTop, *GenLeptonicW, *GenLepton, *GenNeutrino;
   //TLorentzVector *GenHadronicTop, *GenHadronicW;
   unsigned int NumberNegativeElectrons, NumberNegativeMuons, NumberPositiveElectrons, NumberPositiveMuons;
+  unsigned int NumberNegRecoEl, NumberNegRecoMu, NumberPosRecoEl, NumberPosRecoMu;
   bool CorrectGenEvtContent;
-  ofstream GenOutFile[4];
+  ofstream GenOutFile[4], RecoOutFile[4];
+  int verbose_, LeptonCharge;
+  bool genOutput_, recoOutput_;
 
   enum LeptonType_t {muPlus, muMinus, elPlus, elMinus};
   LeptonType_t leptonType;
-  //static std::string leptonTypeString[4];// = {"muPlus","muMinus","elPlus","elMinus"};
 };
 
 #endif
