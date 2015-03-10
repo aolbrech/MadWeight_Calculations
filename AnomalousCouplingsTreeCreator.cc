@@ -924,7 +924,7 @@ int main (int argc, char *argv[]){
 	}
 	
 	for(unsigned int itJPPair=0; itJPPair<JetPartonPair.size(); itJPPair++){
-	  unsigned int mcPartNr = JetPartonPair[i].second;
+	  unsigned int mcPartNr = JetPartonPair[itJPPair].second;
 	  
 	  if(verbosity > 3){ 
 	    std::cout <<" Jet number " << JetPartonPair[itJPPair].first << " can be matched with the mcParticle number " << JetPartonPair[itJPPair].second << " which is of the type : " << mcParticlesMatching[mcPartNr].type() << std::endl;
@@ -944,12 +944,12 @@ int main (int argc, char *argv[]){
 
           //--- Recover the b-jets ---//
 	  if( fabs(mcParticlesMatching[mcPartNr].type()) == 5 ){
-	    if( ( (muPlusFromTop  || elPlusFromTop)  && mcParticlesMatching[j].motherType() == -6 ) || 
-                ( (muMinusFromTop || elMinusFromTop) && mcParticlesMatching[j].motherType() == 6  ) )
+	    if( ( (muPlusFromTop  || elPlusFromTop)  && mcParticlesMatching[mcPartNr].motherType() == -6 ) || 
+                ( (muMinusFromTop || elMinusFromTop) && mcParticlesMatching[mcPartNr].motherType() == 6  ) )
 	      hadronicBJet_ = JetPartonPair[itJPPair];
 	    
-	    else if( ( (muPlusFromTop  || elPlusFromTop)  && mcParticlesMatching[j].motherType() == 6 ) || 
-                     ( (muMinusFromTop || elMinusFromTop) && mcParticlesMatching[j].motherType() == -6) )
+	    else if( ( (muPlusFromTop  || elPlusFromTop)  && mcParticlesMatching[mcPartNr].motherType() == 6 ) || 
+                     ( (muMinusFromTop || elMinusFromTop) && mcParticlesMatching[mcPartNr].motherType() == -6) )
 	      leptonicBJet_ = JetPartonPair[itJPPair];
 	  }
 	}
