@@ -496,9 +496,10 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
 
                 *TransferCard<< dummyCounter << "     " << AllCaloEnergyFits[iEta*NrPars+ipar].GetParameter(icalopar)<< "     # " << ParamName[ipar] << endl;
 
-                if(icalopar == 0){*TF << "\n        prov"<<ipar+1<<"=(#"<<dummyCounter; if(ipar == 1 || ipar == 4){if(ipar == 4) w++; WidthText[3+w] = "\n        prov"+tostr(ipar+1)+"=(#"+tostr(dummyCounter); }}
+                if(icalopar==0){*TF << "\n        prov"<<ipar+1<<"=(#"<<dummyCounter; if(ipar == 1||ipar == 4){if(ipar == 4)w++; WidthText[3+w]="\n        prov"+tostr(ipar+1)+"=(#"+tostr(dummyCounter);}}
                 if(icalopar != 0 && (ipar == 0||ipar == 2||ipar == 3||ipar == 5)) *TF << "+#"<<dummyCounter<<TFDependency[icalopar];
                 if(icalopar != 0 && (ipar == 1||ipar == 4)){*TF <<"+#"<<dummyCounter<<TFDependencyWidth[icalopar]; if(ipar==4 && icalopar==1)w++; WidthText[5+w+icalopar-1]="+#"+tostr(dummyCounter)+WidthDependency[icalopar];}
+		if(icalopar==NrConsideredCaloPars-1 && (ipar == 2 || ipar == 5)) *TF << "\n        prov"<<ipar+1<<"=max(0,prov"<<ipar+1<<")";
 	    }
     	    myTFTable << "\\\\" << endl;
         }
@@ -571,8 +572,13 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
                 for(int icalo = 0; icalo < 3; icalo++) CaloParGenPt[ipar] += AllCaloEnergyFits[ipar].GetParameter(icalo)*pow(PtGenValues[iGenPt],(double) (icalo/2.));
             }
         }
+        
+        if(CaloParGenPt[2] < 0) CaloParGenPt[2] = 0;
+        if(CaloParGenPt[5] < 0) CaloParGenPt[5] = 0;    
+        float Sqrt2Pi = 2.506628275;
+
         for(int iBin = 0; iBin <= 200; iBin++)
-            DblGausPlot->SetBinContent(iBin,CaloParGenPt[2]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[0]),2)/(2*pow(CaloParGenPt[1],2))))+CaloParGenPt[5]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[3]),2)/(2*pow(CaloParGenPt[4],2)))));
+            DblGausPlot->SetBinContent(iBin,(1/Sqrt2Pi)*(1/(CaloParGenPt[1]*CaloParGenPt[2] + CaloParGenPt[4]*CaloParGenPt[5]))*CaloParGenPt[2]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[0]),2)/(2*pow(CaloParGenPt[1],2))))+CaloParGenPt[5]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[3]),2)/(2*pow(CaloParGenPt[4],2)))));
         DblGausPlot->Write();
 
         if(iGenPt > 3 && iGenPt < 10){
@@ -584,10 +590,12 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
             TH1F* GausWide = new TH1F("GausWide","Gaussian distribution of the second fit",200,(fitHisto->GetYaxis()->GetXmin())*2,(fitHisto->GetYaxis()->GetXmax())*2);
             GausWide->SetTitle( (string(GausWide->GetTitle())+" (Pt of parton = "+tostr(PtGenValues[iGenPt])+")").c_str());
             GausWide->SetName( (string(GausWide->GetName())+"_WideGausPlot_GenPt"+tostr(PtGenValues[iGenPt])).c_str());
+            TH1F* GausSum = new TH1F("GausSum","Gaussian distribution of the sum",200,(fitHisto->GetYaxis()->GetXmin())*2,(fitHisto->GetYaxis()->GetXmax())*2);
  
             for(int iBin = 0; iBin <= 200; iBin++){
-                GausNarrow->SetBinContent(iBin,CaloParGenPt[NarrowGaus[2]]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[NarrowGaus[0]]),2)/(2*pow(CaloParGenPt[NarrowGaus[1]],2)))));
-                GausWide->SetBinContent(iBin,CaloParGenPt[WideGaus[2]]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[WideGaus[0]]),2)/(2*pow(CaloParGenPt[WideGaus[1]],2)))));                
+                GausNarrow->SetBinContent(iBin,(1/Sqrt2Pi)*(1/(CaloParGenPt[1]*CaloParGenPt[2] + CaloParGenPt[4]*CaloParGenPt[5]))*CaloParGenPt[NarrowGaus[2]]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[NarrowGaus[0]]),2)/(2*pow(CaloParGenPt[NarrowGaus[1]],2)))));
+                GausWide->SetBinContent(iBin,(1/Sqrt2Pi)*(1/(CaloParGenPt[1]*CaloParGenPt[2] + CaloParGenPt[4]*CaloParGenPt[5]))*CaloParGenPt[WideGaus[2]]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[WideGaus[0]]),2)/(2*pow(CaloParGenPt[WideGaus[1]],2)))));
+                GausSum->SetBinContent(iBin,(1/Sqrt2Pi)*(1/(CaloParGenPt[1]*CaloParGenPt[2] + CaloParGenPt[4]*CaloParGenPt[5]))*(CaloParGenPt[2]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[0]),2)/(2*pow(CaloParGenPt[1],2))))+CaloParGenPt[5]*(exp(-pow((DblGausPlot->GetXaxis()->GetBinCenter(iBin)-CaloParGenPt[3]),2)/(2*pow(CaloParGenPt[4],2))))));
             }
             double GausMax = GausNarrow->GetMaximum();
             if(GausWide->GetMaximum() > GausNarrow->GetMaximum()){ GausMax = GausWide->GetMaximum(); std::cout << "Wrong maximum for histogram " << fitHisto->GetName() << " ! " << std::endl;}
@@ -595,15 +603,18 @@ void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
             gStyle->SetOptStat(0);
             canvasSame->cd(ptCounter);
             GausNarrow->SetLineColor(kRed);
-            GausNarrow->SetMaximum(GausMax);
+            GausNarrow->SetMaximum(GausSum->GetMaximum());
             GausNarrow->Draw();
             GausWide->SetLineColor(kGreen);
             GausWide->Draw("same");
+            GausSum->SetLineColor(kOrange);
+            GausSum->Draw("same");
 
             sameLegend->Clear();
             sameLegend->SetHeader(fitHisto->GetName());
             sameLegend->AddEntry(GausNarrow, ("Narrow gaussian (mean a_{"+tostr(NarrowGaus[0])+"}, sigma a_{"+tostr(NarrowGaus[1])+"} and amplitude a_{"+tostr(NarrowGaus[2])+"})").c_str(), "l");
             sameLegend->AddEntry(GausWide,   ("Wide gaussian   (mean a_{"+tostr(WideGaus[0])+"}, sigma a_{"+tostr(WideGaus[1])+"} and amplitude a_{"+tostr(WideGaus[2])+"})").c_str(), "l");
+            sameLegend->AddEntry(GausSum, "Sum of both gaussians ","l");
             sameLegend->Draw();
 
             if(iGenPt == 9) canvasSame->Write();            
