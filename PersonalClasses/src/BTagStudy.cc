@@ -3,8 +3,8 @@
 BTagStudy::BTagStudy(int outputVerbose){
     BTagStudy::InitializeBegin();
     verbose = outputVerbose;
-    evtSelOutput[0].open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables4JetCase.tex");
-    evtSelOutput[1].open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/eventSelectionChoiceTables5JetCase.tex");
+    evtSelOutput[0].open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/eventSelectionChoiceTables4JetCase.tex");
+    evtSelOutput[1].open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/eventSelectionChoiceTables5JetCase.tex");
 }
 
 BTagStudy::~BTagStudy(){
@@ -33,17 +33,30 @@ void BTagStudy::InitializeBegin(){
   float bjetWP[6]      = {   0.244,                      0.679,                      0.679,                       0.898,                      0.898,                       0.898                    };
   float lightjetWP[6]  = {   0.244,                      0.679,                                  0.244,           0.898,                                  0.679,                       0.244        };
   string optionName[6] = {"  2 L b-tags             ","  2 M b-tags             ","  2 M b-tags, light L-veto","  2 T b-tags             ","  2 T b-tags, light M-veto","  2 T b-tags, light L-veto"};
+  string bName[6] = {"(2 L b-tags)","(2 M b-tags)","(2 M b-tags, light L-veto)","(2 T b-tags)","(2 T b-tags, light M-veto)","(2 T b-tags, light L-veto)"};
+  string bTitle[6] = {"LooseTags","MediumTags","MediumTagsLVeto","TightTags","TightTagsMVeto","TightTagsLVeto"};
   for(int ii = 0; ii < 6; ii++){
     BJetWP[ii] = bjetWP[ii];
     LightJetWP[ii] = lightjetWP[ii];
     OptionName[ii] = optionName[ii];
+    BName[ii] = bName[ii];
+    BTitle[ii] = bTitle[ii];
   }
 
-  //ChiSq Mlb and Mqqb information!
+  //---  ChiSq Mlb and Mqqb information ---//
   Mlb = 103.286;
   SigmaMlb = 26.7764;
   Mqqb = 178.722;
   SigmaMqqb = 18.1385;
+
+  //---  Create the histograms  ---//
+  for(int itBTag = 0; itBTag < 6; itBTag++){
+    histo1D["Mlb_ChiSqDistribution_"+BTitle[itBTag]] = new TH1F(("Mlb_ChiSqDistribution_"+BTitle[itBTag]).c_str(),("#chi^{2}_{mlb} distribution for b-jet choice "+BName[itBTag]).c_str(),        150,0,10);
+    histo1D["Mlb_CorrectCombiChiSq_"+BTitle[itBTag]] = new TH1F(("Mlb_CorrectCombiChiSq_"+BTitle[itBTag]).c_str(),("#chi^{2}_{mlb} distribution for correct b-jet choice "+BName[itBTag]).c_str(),150,0,10);
+    histo1D["Mlb_WrongCombiChiSq_"+BTitle[itBTag]]   = new TH1F(("Mlb_WrongCombiChiSq_"+BTitle[itBTag]).c_str(),  ("#chi^{2}_{mlb} distribution for wrong b-jet choice "+BName[itBTag]).c_str(),  150,0,10);
+
+    histo1D["Mlb_MassDistribution_"+BTitle[itBTag]] = new TH1F(("Mlb_MassDistribution_"+BTitle[itBTag]).c_str(), ("Mass distribution of lepton and leptonic b-jet "+BName[itBTag]).c_str(), 150, 50, 180);
+  }
 }
 
 void BTagStudy::ResetEventArrays(){
@@ -93,7 +106,7 @@ void BTagStudy::CalculateJets(vector<TRootJet*> Jets, vector<int> jetCombi, TLor
     if(bTaggedJetNr[bTagOption].size() >= 2 && LightJetNr[bTagOption].size() >=2 ){
 
       //--- Use Mlb chi-sq to select the b-jets ---//
-      CalculateMlbChiSq(bTagOption, lepton, Jets);
+      CalculateMlbChiSq(bTagOption, lepton, Jets, jetCombi);
 
       //--- For 4-jet case jet combi numbers can be calculated directly ---//
       light1Index4Jets[bTagOption] = (LightJetNr[bTagOption])[0];
@@ -128,7 +141,7 @@ void BTagStudy::CalculateJets(vector<TRootJet*> Jets, vector<int> jetCombi, TLor
   }//Loop over all btag options!
 }
 
-void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector* lepton, vector<TRootJet*> Jets){
+void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector* lepton, vector<TRootJet*> Jets, vector<int> correctJetCombi){
 
   //---  This will distinguish the leptonic and hadronic b-jets  ---//
   //---     ==> Identical for 4- and 5-jet case                  ---//
@@ -144,6 +157,15 @@ void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector* lepton, vector<TRo
     }
   }
   bLeptIndex[bTagNr] = (bTaggedJetNr[bTagNr])[LowestChiSqMlb[bTagNr]];
+  histo1D["Mlb_MassDistribution_"+BTitle[bTagNr]]->Fill( (*lepton+*Jets[bLeptIndex[bTagNr]]).M() );
+
+  //--- Save information in histograms ---//
+  //jet combi order is : 0 = BLeptonic & 1 = BHadronic
+  if(correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999){
+    histo1D["Mlb_ChiSqDistribution_"+BTitle[bTagNr]]->Fill( (ChiSquaredMlb[bTagNr])[LowestChiSqMlb[bTagNr]] );
+    if(bLeptIndex[bTagNr] == correctJetCombi[0] && bHadrIndex[bTagNr] == correctJetCombi[1]) histo1D["Mlb_CorrectCombiChiSq_"+BTitle[bTagNr]]->Fill( (ChiSquaredMlb[bTagNr])[LowestChiSqMlb[bTagNr]]);
+    if(bLeptIndex[bTagNr] != correctJetCombi[0] || bHadrIndex[bTagNr] != correctJetCombi[1]) histo1D["Mlb_WrongCombiChiSq_"+BTitle[bTagNr]]->Fill( (ChiSquaredMlb[bTagNr])[LowestChiSqMlb[bTagNr]]);
+  }
 }
 
 vector<int> BTagStudy::CalculateMqqbChiSq(int bTagNr, vector<TRootJet*> Jets){
@@ -172,9 +194,29 @@ vector<int> BTagStudy::CalculateMqqbChiSq(int bTagNr, vector<TRootJet*> Jets){
   return lightIndices;
 }
 
-void BTagStudy::CreateChiSqHistograms(){
+void BTagStudy::CreateHistograms(TFile* outfile){
   //--- Use this function to create ChiSq histograms ---//
-  //---    --> Maybe split up Mlb and Mqqb ?         ---//
+  outfile->cd();
+  std::cout << " Inside CreateHistograms function of BTagStudy class ! " << std::endl;
+  std::cout << " Histograms will be filled in file : " << outfile->GetName() << " ************************************" << std::endl;
+
+  TDirectory* th1dir = outfile->mkdir("1D_histograms_BTagStudy");
+  th1dir->cd();
+  for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
+    TH1F *temp = it->second;
+    int N = temp->GetNbinsX();
+    temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+    temp->SetBinContent(N+1,0);
+    temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+    temp->Write();
+  }
+  TDirectory* th2dir = outfile->mkdir("2D_histograms_BTagStudy");
+  th2dir->cd();
+  for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){    
+    TH2F *temp = it->second;
+    temp->Write();
+  }
+  outfile->cd(); 
 }
 
 void BTagStudy::CompareJetCombi(vector<int> jetCombi, int OptionNr, int NrJets, int lightOne, int lightTwo){
