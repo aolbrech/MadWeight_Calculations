@@ -41,7 +41,7 @@ using namespace TopTree;
 
 int main (int argc, char *argv[]){
 
-  string rootFileName = "AnomCouplings.root";
+  string rootFileName = "PlotsMacro/AnomCouplings.root";
   clock_t start = clock();
   
   cout << "*************************************************************" << endl;
@@ -465,7 +465,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
     if (verbose > 1) cout << "	Loop over events " << endl;
 
     for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 50000; ievt++){
+    //for (unsigned int ievt = 0; ievt < 250000; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -1127,6 +1127,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
 
     //--- Get output from bTagStudy class ---//
     bTagStudy.ReturnBTagTable();
+    bTagStudy.CreateHistograms(fout);
         
     //---  Mlb combination output  ---//
     //mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, ChosenBTag, ChiSqCutValueStr );  //All 4 jets correctly matched
@@ -1192,7 +1193,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name, 0, false, false, false, 1);     //string label, unsigned int RatioType, bool addRatioErrorBand, bool addErrorBand, bool ErrorBandAroundTotalInput, int scaleNPSSignal 
-    temp->Write(fout, name, true, "PlotsMacro/MSPlots/", "png");
+    temp->Write(fout, name, true, "PlotsMacro/MSPlots/", "pdf");
   }
 
   TDirectory* th1dir = fout->mkdir("1D_histograms");
@@ -1214,10 +1215,10 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
 
   //Selection tables
   selecTableSemiMu.TableCalculator(false,true,true,true,true);
-  string selectiontableMu = "SelectionTable_BTAG_SEMIMU.tex";
+  string selectiontableMu = "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/SelectionTable_BTAG_SEMIMU.tex";
   selecTableSemiMu.Write(selectiontableMu.c_str());
   selecTableSemiEl.TableCalculator(false, true, true, true, true);
-  string selectiontableEl = "SelectionTable_BTAG_SEMIEL.tex";
+  string selectiontableEl = "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/SelectionTable_BTAG_SEMIEL.tex";
   selecTableSemiEl.Write(selectiontableEl.c_str());
   
   // Do some special things with certain plots (normalize, BayesDivide, ... )
