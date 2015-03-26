@@ -465,7 +465,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
     if (verbose > 1) cout << "	Loop over events " << endl;
 
     for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 250000; ievt++){
+    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -475,6 +475,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
       vector < TRootJet* > init_jets;
       vector < TRootMET* > mets;
       vector < TRootGenJet* > genjets;
+      vector<int> jetCombi(4,9999);;   //Define this here and just initialize to 9999 such that it also can be used for other datasets!
       
       nEvents[d]++;
       
@@ -841,7 +842,6 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
       //   Use genEvent information to get the correct event topology   //
       ////////////////////////////////////////////////////////////////////    
       if(dataSetName.find("TTbarJets") == 0){
-        vector<int> jetCombi;
         vector<TRootMCParticle> mcParticlesMatching;      	
         vector< pair<unsigned int, unsigned int> > JetPartonPair, ISRJetPartonPair; // First one is jet number, second one is mcParticle number
 	
@@ -914,10 +914,10 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
 	}
 	
         //--- Initialize jetCombi vector which has the jet number information ---//
-	jetCombi.push_back(leptonicBJet_.first);
-	jetCombi.push_back(hadronicBJet_.first);
-	jetCombi.push_back(hadronicWJet1_.first);
-	jetCombi.push_back(hadronicWJet2_.first);
+	jetCombi[0] = leptonicBJet_.first;
+	jetCombi[1] = hadronicBJet_.first;
+	jetCombi[2] = hadronicWJet1_.first;
+	jetCombi[3] = hadronicWJet2_.first;
 	if(verbose > 3) cout<<" Index of BHadronic: "<<jetCombi[1]<<" , Index of BLeptonic: "<<jetCombi[0]<<" , Index of quark1: "<<jetCombi[2]<<" & Index of quark2: "<<jetCombi[3]<<endl;
 	
         //--- Make CSV discriminant and jet number plots ---//	
@@ -1091,9 +1091,13 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
       
       //****************************//   
       //  Produce Reco LHCO Output  //
+      //  --> Last integer = mode   //
+      //       * 0 ~ all events     //
+      //       * 1 ~ good combi's   //
+      //       * 2 ~ bad combi's    //
       //****************************//
       if( RecoLHCOOutput == true)
-        lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, LeptonRecoCharge);
+        lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, LeptonRecoCharge, jetCombi);
 
     } //loop on events
 

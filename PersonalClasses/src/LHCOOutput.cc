@@ -8,8 +8,10 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     
   //Constructor: Define variables which have to be initialized in the beginning!
   NumberNegativeElectrons = 0; NumberNegativeMuons = 0; NumberPositiveElectrons = 0; NumberPositiveMuons = 0;
+  WrongEvtCounter = 0;
   CorrectGenEvtContent = false;
   NumberNegRecoEl = 0;         NumberNegRecoMu = 0;     NumberPosRecoEl = 0;         NumberPosRecoMu = 0; 
+  NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; 
   genOutput_ = GenOutput; recoOutput_ = RecoOutput;
   verbose_ = verbosity;
 
@@ -18,6 +20,7 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     GenOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeMuon.lhco");
     GenOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveElectron.lhco");
     GenOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeElectron.lhco");
+    WrongGenFile.open("MadWeightInput/AnalyzerOutput/WrongGeneratorEvents.lhco");
   }
 
   if(recoOutput_){
@@ -25,6 +28,8 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     RecoOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeMuon.lhco");
     RecoOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElec.lhco");
     RecoOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeElec.lhco");
+    WrongRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/WrongRecoEvents_PositiveMuon.lhco");
+    CorrectRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/CorrectRecoEvents_PositiveMuon.lhco");
   }
 }
 
@@ -35,6 +40,8 @@ LHCOOutput::~LHCOOutput(){
     if(genOutput_) GenOutFile[ii].close();
     if(recoOutput_) RecoOutFile[ii].close();
   }
+  if(genOutput_) WrongGenFile.close();
+  if(recoOutput_){ WrongRecoMuPosFile.close(); CorrectRecoMuPosFile.close();}
 
 }
 
@@ -186,6 +193,7 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
   }//Correct event content found
   else{
     CorrectGenEvtContent = false;
+    WrongEvtCounter++;
 
     //Output in case wrong event content needs to be double-checked
     if(verbose_>4){
@@ -195,10 +203,27 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
       cout << " Number of W-bosons        : " << EventContent[3] << endl;
       cout << " Number of lepton/neutrino : " << EventContent[4] << endl;
     }
+
+    //---  Also create a .lhco file for wrong Gen events! ---//
+    vector<TLorentzVector*> LHCOVectorWrongGen(6);
+    vector<int> MadGraphIdWrongGen(6,4);
+    vector<float> MGBtagWrongGen(6,0.0);
+    MadGraphIdWrongGen[1] = 2; MadGraphIdWrongGen[2] = 6;    //Consider the event as a semi-mu (+) event
+    MGBtagWrongGen[0] = 2.0; MGBtagWrongGen[3] = 2.0;     
+
+    LHCOVectorWrongGen[0] = (TLorentzVector*) mcParticles[0];
+    LHCOVectorWrongGen[1] = (TLorentzVector*) mcParticles[1];
+    LHCOVectorWrongGen[2] = (TLorentzVector*) mcParticles[2];
+    LHCOVectorWrongGen[3] = (TLorentzVector*) mcParticles[3];
+    LHCOVectorWrongGen[4] = (TLorentzVector*) mcParticles[4];
+    LHCOVectorWrongGen[5] = (TLorentzVector*) mcParticles[5];
+
+    if(WrongEvtCounter <= 10000)
+      LHCOEventOutput(2, WrongGenFile, WrongEvtCounter, LHCOVectorWrongGen, MadGraphIdWrongGen, MGBtagWrongGen);
   }			    
 }//End of class StoreGenInfo
 
-void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptonCharge){
+void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptonCharge, vector<int> jetCombi){
 
   //--- Reconstruct neutrino partially ---//
   //---   (Neutrino Pt and M needed)   ---//
@@ -215,7 +240,19 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
   vector<int> MadGraphRecoId(6,4);
   vector<float> MGRecoBtagId(6,0.0);
   if(Jets[bLeptIndex]->btag_combinedSecondaryVertexBJetTags() > 0 && Jets[bHadrIndex]->btag_combinedSecondaryVertexBJetTags() > 0)
-    MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;     
+    MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;
+
+  //--- Check whether the event is correctly reconstructed  ---// 
+  //---  (jetCombi is initialized to 9999 for all dataSets) ---//
+  bool jetCombiFound = false;
+  bool EventCorrectlyMatched = false;
+  if(jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999){
+    jetCombiFound = true;
+    if( bLeptIndex == jetCombi[0] && bHadrIndex == jetCombi[1]    &&
+       (light1Index == jetCombi[2] || light1Index == jetCombi[3]) &&
+       (light2Index == jetCombi[3] || light2Index == jetCombi[3]) )
+      EventCorrectlyMatched = true;
+  }
 	
   //---  Filling of LHCO files for reco events  ---//
   if(leptonCharge < 0.0 ){ //Negative lepton events
@@ -256,6 +293,8 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
       MadGraphRecoId[1] = 2;
       NumberPosRecoMu++;
       LHCOEventOutput(0, RecoOutFile[0], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+      if(EventCorrectlyMatched == true && jetCombiFound == true){       NrPosRecoMuCorrect++; LHCOEventOutput(3, CorrectRecoMuPosFile, NrPosRecoMuCorrect, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);}
+      else if(EventCorrectlyMatched == false && jetCombiFound == true){ NrPosRecoMuWrong++;   LHCOEventOutput(3, WrongRecoMuPosFile, NrPosRecoMuWrong, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);}
     }
   }//End of positive lepton
 
