@@ -7,6 +7,9 @@
 #include "TopTreeProducer/interface/TRootMCParticle.h"
 #include "TopTreeProducer/interface/TRootJet.h"
 #include "TLorentzVector.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TFile.h"
 
 using namespace std;
 using namespace TopTree;
@@ -19,6 +22,7 @@ public:
 
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
   void StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge, vector<int> jetCombi); 
+  void WriteLHCOPlots(TFile*);
 
   bool GenEventContentCorrect()    {return CorrectGenEvtContent;};
   int getLeptonType()              {return leptonType;};
@@ -44,6 +48,9 @@ private:
 
   enum LeptonType_t {muPlus, muMinus, elPlus, elMinus};
   LeptonType_t leptonType;
+
+  map<string,TH1F*> histo1D;
+  map<string,TH2F*> histo2D;
 };
 
 #endif

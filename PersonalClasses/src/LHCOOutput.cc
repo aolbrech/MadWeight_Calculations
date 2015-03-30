@@ -31,6 +31,13 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     WrongRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/WrongRecoEvents_PositiveMuon.lhco");
     CorrectRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/CorrectRecoEvents_PositiveMuon.lhco");
   }
+
+  histo1D["WrongGen_TopMassLept"] = new TH1F("WrongGen_TopMassLept","Leptonic top-mass distribution for wrong generator events",250,0,500);
+  histo1D["WrongGen_TopMassHadr"] = new TH1F("WrongGen_TopMassHadr","Hadronic top-mass distribution for wrong generator events",250,0,500);
+  histo1D["WrongReco_TopMassLept"] = new TH1F("WrongReco_TopMassLept","Leptonic top-mass distribution for wrong reco events",250,0,500);
+  histo1D["WrongReco_TopMassHadr"] = new TH1F("WrongReco_TopMassHadr","Hadronic top-mass distribution for wrong reco events",250,0,500);
+  histo1D["CorrectReco_TopMassLept"] = new TH1F("CorrectReco_TopMassLept","Leptonic top-mass distribution for correct reco events",250,0,500);
+  histo1D["CorrectReco_TopMassHadr"] = new TH1F("CorrectReco_TopMassHadr","Hadronic top-mass distribution for correct reco events",250,0,500);
 }
 
 LHCOOutput::~LHCOOutput(){
@@ -218,8 +225,11 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
     LHCOVectorWrongGen[4] = (TLorentzVector*) mcParticles[4];
     LHCOVectorWrongGen[5] = (TLorentzVector*) mcParticles[5];
 
-    if(WrongEvtCounter <= 10000)
+    if(WrongEvtCounter <= 10000){
       LHCOEventOutput(2, WrongGenFile, WrongEvtCounter, LHCOVectorWrongGen, MadGraphIdWrongGen, MGBtagWrongGen);
+      histo1D["WrongGen_TopMassLept"]->Fill( (*mcParticles[0]+*mcParticles[1]+*mcParticles[2]).M());
+      histo1D["WrongGen_TopMassHadr"]->Fill( (*mcParticles[3]+*mcParticles[4]+*mcParticles[5]).M()); 	
+    }
   }			    
 }//End of class StoreGenInfo
 
@@ -293,8 +303,18 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
       MadGraphRecoId[1] = 2;
       NumberPosRecoMu++;
       LHCOEventOutput(0, RecoOutFile[0], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
-      if(EventCorrectlyMatched == true && jetCombiFound == true){       NrPosRecoMuCorrect++; LHCOEventOutput(3, CorrectRecoMuPosFile, NrPosRecoMuCorrect, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);}
-      else if(EventCorrectlyMatched == false && jetCombiFound == true){ NrPosRecoMuWrong++;   LHCOEventOutput(3, WrongRecoMuPosFile, NrPosRecoMuWrong, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);}
+      if(EventCorrectlyMatched == true && jetCombiFound == true){
+        NrPosRecoMuCorrect++; 
+        LHCOEventOutput(0, CorrectRecoMuPosFile, NrPosRecoMuCorrect, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+        histo1D["CorrectReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
+        histo1D["CorrectReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());
+      }
+      else if(EventCorrectlyMatched == false && jetCombiFound == true){ 
+        NrPosRecoMuWrong++;   
+        LHCOEventOutput(0, WrongRecoMuPosFile, NrPosRecoMuWrong, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+        histo1D["WrongReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
+        histo1D["WrongReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());
+      }
     }
   }//End of positive lepton
 
@@ -331,4 +351,30 @@ void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned in
     else                               outputFile << "    0.00";
     outputFile << " " << MGBtag[ii] << "     0.00  0.00  0.00" << endl;
   }
+}
+
+void LHCOOutput::WriteLHCOPlots(TFile* outfile){
+  //--- Use this function to create ChiSq histograms ---//
+  outfile->cd();
+  std::cout << " Inside WriteLHCOPlots function of LHCOOutput class ! " << std::endl;
+  std::cout << " Histograms will be filled in file : " << outfile->GetName() << " ************************************" << std::endl;
+
+  TDirectory* th1dir = outfile->mkdir("1D_histograms_LHCOOutput");
+  th1dir->cd();
+  for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
+    TH1F *temp = it->second;
+    int N = temp->GetNbinsX();
+    temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+    temp->SetBinContent(N+1,0);
+    temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+    temp->Write();
+  }
+  TDirectory* th2dir = outfile->mkdir("2D_histograms_LHCOOutput");
+  th2dir->cd();
+  for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){    
+    TH2F *temp = it->second;
+    temp->Write();
+  }
+  outfile->cd(); 
+
 }

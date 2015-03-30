@@ -1132,6 +1132,9 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
     //--- Get output from bTagStudy class ---//
     bTagStudy.ReturnBTagTable();
     bTagStudy.CreateHistograms(fout);
+
+    //--- Get output from LHCOOutput class ---//
+    lhcoOutput.WriteLHCOPlots(fout);	
         
     //---  Mlb combination output  ---//
     //mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, ChosenBTag, ChiSqCutValueStr );  //All 4 jets correctly matched
