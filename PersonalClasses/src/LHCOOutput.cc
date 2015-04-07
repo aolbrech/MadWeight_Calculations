@@ -38,6 +38,47 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
   histo1D["WrongReco_TopMassHadr"] = new TH1F("WrongReco_TopMassHadr","Hadronic top-mass distribution for wrong reco events",250,0,500);
   histo1D["CorrectReco_TopMassLept"] = new TH1F("CorrectReco_TopMassLept","Leptonic top-mass distribution for correct reco events",250,0,500);
   histo1D["CorrectReco_TopMassHadr"] = new TH1F("CorrectReco_TopMassHadr","Hadronic top-mass distribution for correct reco events",250,0,500);
+
+  histo1D["PtDistrGen_LightJets"] = new TH1F("PtDistrGen_LightJets","Pt-distribution for light jets",500,0,250);
+  histo1D["PtDistrGen_BJets"] = new TH1F("PtDistrGen_BJets","Pt-distribution for b-jets",500,0,250);
+  histo1D["PtDistrGen_Muon"] = new TH1F("PtDistrGen_Muon","Pt-distribution for muons",500,0,250);
+  histo1D["PtDistrGen_Electron"] = new TH1F("PtDistrGen_Electron","Pt-distribution for electrons",500,0,250);
+  histo1D["PtDistrGen_MET"] = new TH1F("PtDistrGen_MET","Pt-distribution for neutrinos",500,0,250);
+
+  histo1D["EtaDistrGen_LightJets"] = new TH1F("EtaDistrGen_LightJets","Eta-distribution for light jets",250,-5,5);
+  histo1D["EtaDistrGen_BJets"] = new TH1F("EtaDistrGen_BJets","Eta-distribution for b-jets",250,-5,5);
+  histo1D["EtaDistrGen_Muon"] = new TH1F("EtaDistrGen_Muon","Eta-distribution for muons",250,-5,5);
+  histo1D["EtaDistrGen_Electron"] = new TH1F("EtaDistrGen_Electron","Eta-distribution for electrons",250,-5,5);
+  histo1D["EtaDistrGen_MET"] = new TH1F("EtaDistrGen_MET","Eta-distribution for neutrinos",250,-5,5);
+
+  histo1D["deltaRDistrGen_LightJets"] = new TH1F("deltaRDistrGen_LightJets","deltaR distribution between both light jets",250,0,10);
+  histo1D["deltaRDistrGen_BJets"] = new TH1F("deltaRDistrGen_BJets","deltaR distribution between both b-jets",250,0,10);
+  histo1D["deltaRDistrGen_LightWithB"] = new TH1F("deltaRDistrGen_LightWithB","deltaR distribution between light and b-jet",250,0,10);
+  histo1D["deltaRDistrGen_MuonWithJet"] = new TH1F("deltaRDistrGen_MuonWithJet","deltaR distribution between muon and light jet",250,0,10);
+  histo1D["deltaRDistrGen_MuonWithB"] = new TH1F("deltaRDistrGen_MuonWithB","deltaR distribution between muon and b-jet",250,0,10);
+  histo1D["deltaRDistrGen_ElectronWithJet"] = new TH1F("deltaRDistrGen_ElectronWithJet","deltaR distribution between electron and jet",250,0,10);
+  histo1D["deltaRDistrGen_ElectronWithB"] = new TH1F("deltaRDistrGen_ElectronWithB","deltaR distribution between electron and b-jet",250,0,10);
+
+  histo1D["PtDistrReco_LightJets"] = new TH1F("PtDistrReco_LightJets","Pt-distribution for light jets",500,0,250);
+  histo1D["PtDistrReco_BJets"] = new TH1F("PtDistrReco_BJets","Pt-distribution for b-jets",500,0,250);
+  histo1D["PtDistrReco_Muon"] = new TH1F("PtDistrReco_Muon","Pt-distribution for muons",500,0,250);
+  histo1D["PtDistrReco_Electron"] = new TH1F("PtDistrReco_Electron","Pt-distribution for electrons",500,0,250);
+  histo1D["PtDistrReco_MET"] = new TH1F("PtDistrReco_MET","Pt-distribution for neutrinos",500,0,250);
+
+  histo1D["EtaDistrReco_LightJets"] = new TH1F("EtaDistrReco_LightJets","Eta-distribution for light jets",250,-5,5);
+  histo1D["EtaDistrReco_BJets"] = new TH1F("EtaDistrReco_BJets","Eta-distribution for b-jets",250,-5,5);
+  histo1D["EtaDistrReco_Muon"] = new TH1F("EtaDistrReco_Muon","Eta-distribution for muons",250,-5,5);
+  histo1D["EtaDistrReco_Electron"] = new TH1F("EtaDistrReco_Electron","Eta-distribution for electrons",250,-5,5);
+  histo1D["EtaDistrReco_MET"] = new TH1F("EtaDistrReco_MET","Eta-distribution for neutrinos",250,-5,5);
+
+  histo1D["deltaRDistrReco_LightJets"] = new TH1F("deltaRDistrReco_LightJets","deltaR distribution between both light jets",250,0,10);
+  histo1D["deltaRDistrReco_BJets"] = new TH1F("deltaRDistrReco_BJets","deltaR distribution between both b-jets",250,0,10);
+  histo1D["deltaRDistrReco_LightWithB"] = new TH1F("deltaRDistrReco_LightWithB","deltaR distribution between light and b-jet",250,0,10);
+  histo1D["deltaRDistrReco_MuonWithJet"] = new TH1F("deltaRDistrReco_MuonWithJet","deltaR distribution between muon and light jet",250,0,10);
+  histo1D["deltaRDistrReco_MuonWithB"] = new TH1F("deltaRDistrReco_MuonWithB","deltaR distribution between muon and b-jet",250,0,10);
+  histo1D["deltaRDistrReco_ElectronWithJet"] = new TH1F("deltaRDistrReco_ElectronWithJet","deltaR distribution between electron and jet",250,0,10);
+  histo1D["deltaRDistrReco_ElectronWithB"] = new TH1F("deltaRDistrReco_ElectronWithB","deltaR distribution between electron and b-jet",250,0,10);
+
 }
 
 LHCOOutput::~LHCOOutput(){
@@ -131,6 +172,33 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
     //Save the lepton and neutrino as TLorentzVectors
     GenLepton = (TLorentzVector*) Lepton;
     GenNeutrino = (TLorentzVector*) NeutrinoMC;
+
+    //--- Plot the generator-level distributions for Pt, eta and dR ---//
+    //---   --> Will be used for MG cuts comparison                 ---//
+    histo1D["PtDistrGen_LightJets"]->Fill(Light->Pt()); histo1D["PtDistrGen_LightJets"]->Fill(LightBar->Pt());
+    histo1D["PtDistrGen_BJets"]->Fill(Bottom->Pt());    histo1D["PtDistrGen_BJets"]->Fill(BottomBar->Pt()); 
+    if(fabs(Lepton->type()) == 13) histo1D["PtDistrGen_Muon"]->Fill(Lepton->Pt());
+    if(fabs(Lepton->type()) == 11) histo1D["PtDistrGen_Electron"]->Fill(Lepton->Pt());
+    histo1D["PtDistrGen_MET"]->Fill(NeutrinoMC->Pt());
+
+    histo1D["EtaDistrGen_LightJets"]->Fill(Light->Eta()); histo1D["EtaDistrGen_LightJets"]->Fill(LightBar->Eta());
+    histo1D["EtaDistrGen_BJets"]->Fill(Bottom->Eta());    histo1D["EtaDistrGen_BJets"]->Fill(BottomBar->Eta());
+    if(fabs(Lepton->type()) == 13) histo1D["EtaDistrGen_Muon"]->Fill(Lepton->Eta());
+    if(fabs(Lepton->type()) == 11) histo1D["EtaDistrGen_Electron"]->Fill(Lepton->Eta());
+    histo1D["EtaDistrGen_MET"]->Fill(NeutrinoMC->Eta());
+
+    histo1D["deltaRDistrGen_LightJets"]->Fill(Light->DeltaR(*LightBar));
+    histo1D["deltaRDistrGen_BJets"]->Fill(Bottom->DeltaR(*BottomBar));
+    histo1D["deltaRDistrGen_LightWithB"]->Fill(Light->DeltaR(*Bottom)); histo1D["deltaRDistrGen_LightWithB"]->Fill(Light->DeltaR(*BottomBar)); 
+    histo1D["deltaRDistrGen_LightWithB"]->Fill(LightBar->DeltaR(*Bottom)); histo1D["deltaRDistrGen_LightWithB"]->Fill(LightBar->DeltaR(*BottomBar));
+    if(fabs(Lepton->type()) == 13){
+      histo1D["deltaRDistrGen_MuonWithJet"]->Fill(Lepton->DeltaR(*Light)); histo1D["deltaRDistrGen_MuonWithJet"]->Fill(Lepton->DeltaR(*LightBar));
+      histo1D["deltaRDistrGen_MuonWithB"]->Fill(Lepton->DeltaR(*Bottom)); histo1D["deltaRDistrGen_MuonWithB"]->Fill(Lepton->DeltaR(*BottomBar));
+    }
+    if(fabs(Lepton->type()) == 11){
+      histo1D["deltaRDistrGen_ElectronWithJet"]->Fill(Lepton->DeltaR(*Light)); histo1D["deltaRDistrGen_ElectronWithJet"]->Fill(Lepton->DeltaR(*LightBar));
+      histo1D["deltaRDistrGen_ElectronWithB"]->Fill(Lepton->DeltaR(*Bottom)); histo1D["deltaRDistrGen_ElectronWithB"]->Fill(Lepton->DeltaR(*BottomBar));
+    }
 	
     //Create the lhco file for pp > t t~:
     if(Lepton->type() == 13 || Lepton->type() == 11){ //Negative lepton, hence t~ > b~ W-, W- > e/mu- ve/vm
@@ -262,6 +330,33 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
        (light1Index == jetCombi[2] || light1Index == jetCombi[3]) &&
        (light2Index == jetCombi[3] || light2Index == jetCombi[3]) )
       EventCorrectlyMatched = true;
+  }
+    
+  //--- Plot the generator-level distributions for Pt, eta and dR ---//
+  //---   --> Will be used for MG cuts comparison                 ---//
+  histo1D["PtDistrReco_LightJets"]->Fill(Jets[light1Index]->Pt()); histo1D["PtDistrReco_LightJets"]->Fill(Jets[light2Index]->Pt());
+  histo1D["PtDistrReco_BJets"]->Fill(Jets[bHadrIndex]->Pt());    histo1D["PtDistrReco_BJets"]->Fill(Jets[bLeptIndex]->Pt()); 
+  if(fabs(Lepton->type()) == 13) histo1D["PtDistrReco_Muon"]->Fill(lepton->Pt());
+  if(fabs(Lepton->type()) == 11) histo1D["PtDistrReco_Electron"]->Fill(lepton->Pt());
+  histo1D["PtDistrReco_MET"]->Fill(Neutrino.Pt());
+
+  histo1D["EtaDistrReco_LightJets"]->Fill(Jets[light1Index]->Eta()); histo1D["EtaDistrReco_LightJets"]->Fill(Jets[light2Index]->Eta());
+  histo1D["EtaDistrReco_BJets"]->Fill(Jets[bHadrIndex]->Eta());      histo1D["EtaDistrReco_BJets"]->Fill(Jets[bLeptIndex]->Eta());
+  if(fabs(Lepton->type()) == 13) histo1D["EtaDistrReco_Muon"]->Fill(lepton->Eta());
+  if(fabs(Lepton->type()) == 11) histo1D["EtaDistrReco_Electron"]->Fill(lepton->Eta());
+  histo1D["EtaDistrReco_MET"]->Fill(Neutrino.Eta());
+
+  histo1D["deltaRDistrReco_LightJets"]->Fill(Jets[light1Index]->DeltaR(*Jets[light2Index]));
+  histo1D["deltaRDistrReco_BJets"]->Fill(Jets[bHadrIndex]->DeltaR(*Jets[bLeptIndex]));
+  histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light1Index]->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light1Index]->DeltaR(*Jets[bLeptIndex])); 
+  histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light2Index]->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light2Index]->DeltaR(*Jets[bLeptIndex]));
+  if(fabs(Lepton->type()) == 13){
+    histo1D["deltaRDistrReco_MuonWithJet"]->Fill(lepton->DeltaR(*Jets[light1Index])); histo1D["deltaRDistrReco_MuonWithJet"]->Fill(lepton->DeltaR(*Jets[light2Index]));
+    histo1D["deltaRDistrReco_MuonWithB"]->Fill(lepton->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_MuonWithB"]->Fill(lepton->DeltaR(*Jets[bLeptIndex]));
+  }
+  if(fabs(Lepton->type()) == 11){
+    histo1D["deltaRDistrReco_ElectronWithJet"]->Fill(lepton->DeltaR(*Jets[light1Index])); histo1D["deltaRDistrReco_ElectronWithJet"]->Fill(lepton->DeltaR(*Jets[light2Index]));
+    histo1D["deltaRDistrReco_ElectronWithB"]->Fill(lepton->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_ElectronWithB"]->Fill(lepton->DeltaR(*Jets[bLeptIndex]));
   }
 	
   //---  Filling of LHCO files for reco events  ---//
