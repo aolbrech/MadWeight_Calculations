@@ -109,10 +109,6 @@ YRelMin    = TH1F('YRelMin',   'Relative deviation from parabolic fit for Re(VR)
 YRelMinXS  = TH1F('YRelMinXS', 'Relative deviation from parabolic fit for Re(VR) = -0.2 (XS normalisation)' ,150,-0.1,0.1)
 YRelMinAcc = TH1F('YRelMinAcc','Relative deviation from parabolic fit for Re(VR) = -0.2 (Acc normalisation)',150,-0.1,0.1)
 
-LnVariation    = TH1F('LnVariation',   'Variation of obtained likelihood values (no normalisation)' ,150,0,2)
-LnVariationXS  = TH1F('LnVariatonXS',  'Variation of obtained likelihood values (XS normalisation)' ,150,0,2)
-LnVariationAcc = TH1F('LnVariationAcc','Variation of obtained likelihood values (Acc normalisation)',150,0,2)
-
 FstDer    = TH1F('FirstDer',   'First derivative of -ln(likelihood) distribution', 4,0,4)
 FstDer.GetXaxis().SetBinLabel(1,"(y_{DATA}(x=-0.2) - y_{DATA}(x=-0.1))/0.1")
 FstDer.GetXaxis().SetBinLabel(1,"(y_{DATA}(x=-0.1) - y_{DATA}(x=0.0))/0.1")
@@ -168,39 +164,19 @@ for WeightLine in WeightsFile:
     for iEvt in range(nEvts):
       if str(WeightWord[0]) == str(iEvt+1):                                                               #Look at one single event!
         if str(WeightWord[1]) == "1":
-          #print "Looking at event : ",iEvt+1
-          LogMin = [-log(float(WeightWord[3])),-log(float(WeightWord[3]))+log(MGXS[int(WeightWord[1])-1]), -log(float(WeightWord[3]))+log(MGXS[int(WeightWord[1])-1])+log(Acceptance[int(WeightWord[1])-1])]
-          LogMax = [0,0,0]
+          #LogMin = [-log(float(WeightWord[3])),-log(float(WeightWord[3]))+log(MGXS[int(WeightWord[1])-1]), -log(float(WeightWord[3]))+log(MGXS[int(WeightWord[1])-1])+log(Acceptance[int(WeightWord[1])-1])]
           cHat, bHat01, bHat02, aHat01, aHat02 = [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]
           LnLogDistFit = TH1F("LnLogFit_Evt"+str(int(iEvt)+1),"LnLog distribution for fit (event "+str(int(iEvt)+1)+")",11,-0.55,0.55)
           LnLogDistFit.SetMarkerStyle(20), LnLogDistFit.SetLineColor(1), LnLogDistFit.SetMarkerColor(1), LnLogDistFit.SetMarkerSize(1.2)
-          LnLogDist.SetName("LnLog_Evt"+str(int(iEvt)+1))
-          LnLogDist.SetTitle("LnLog distribution for event "+str(int(iEvt)+1))
-          LnLogXSDist.SetName("LnLogXS_Evt"+str(int(iEvt)+1))
-          LnLogXSDist.SetTitle("LnLogXS distribution for event "+str(int(iEvt)+1))
-          LnLogAccDist.SetName("LnLogAcc_Evt"+str(int(iEvt)+1))
-          LnLogAccDist.SetTitle("LnLogAcc distribution for event "+str(int(iEvt)+1))
+          LnLogDist.SetName("LnLog_Evt"+str(int(iEvt)+1)),       LnLogDist.SetTitle("LnLog distribution for event "+str(int(iEvt)+1))
+          LnLogXSDist.SetName("LnLogXS_Evt"+str(int(iEvt)+1)),   LnLogXSDist.SetTitle("LnLogXS distribution for event "+str(int(iEvt)+1))
+          LnLogAccDist.SetName("LnLogAcc_Evt"+str(int(iEvt)+1)), LnLogAccDist.SetTitle("LnLogAcc distribution for event "+str(int(iEvt)+1))
         LnLog[int(WeightWord[1])-1] = -log(float(WeightWord[3]))
         LnLogXS[int(WeightWord[1])-1] = -log(float(WeightWord[3])) + log(MGXS[int(WeightWord[1])-1])
         LnLogAcc[int(WeightWord[1])-1] = -log(float(WeightWord[3])) + log(MGXS[int(WeightWord[1])-1]) + log(Acceptance[int(WeightWord[1])-1])
-        #Determine max and min for LnLog:
-        if LnLog[int(WeightWord[1])-1] >= LogMax[0]:
-          LogMax[0] = LnLog[int(WeightWord[1])-1]
-        if LnLog[int(WeightWord[1])-1] < LogMin[0]:
-          LogMin[0] = LnLog[int(WeightWord[1])-1]
-        #Determine max and min for LnLogXS:
-        if LnLogXS[int(WeightWord[1])-1] >= LogMax[1]:
-          LogMax[1] = LnLogXS[int(WeightWord[1])-1]
-        if LnLogXS[int(WeightWord[1])-1] < LogMin[1]:
-          LogMin[1] = LnLogXS[int(WeightWord[1])-1]
-        #Determine max and min for LnLogAcc:
-        if LnLogAcc[int(WeightWord[1])-1] >= LogMax[2]:
-          LogMax[2] = LnLogAcc[int(WeightWord[1])-1]
-        if LnLogAcc[int(WeightWord[1])-1] < LogMin[2]:
-          LogMin[2] = LnLogAcc[int(WeightWord[1])-1]
         #---  Fill the LnLog histograms for each event  ---#
         LnLogDistFit.SetBinContent(LnLogDistFit.FindBin(RVR[int(WeightWord[1])-1]), LnLog[int(WeightWord[1])-1])
-        if str(WeightWord[1]) != "1" or str(WeightWord[1]) != "9":
+        if str(WeightWord[1]) != "1" or str(WeightWord[1]) != "9":                                             #Don't fill the bins coresponding to -0.5 & 0.5 (= too wide range)
           LnLogDist.SetBinContent(LnLogDist.FindBin(RVR[int(WeightWord[1])-1]), LnLog[int(WeightWord[1])-1])
           LnLogXSDist.SetBinContent(LnLogXSDist.FindBin(RVR[int(WeightWord[1])-1]), LnLogXS[int(WeightWord[1])-1])
           LnLogAccDist.SetBinContent(LnLogAccDist.FindBin(RVR[int(WeightWord[1])-1]), LnLogAcc[int(WeightWord[1])-1])
@@ -262,7 +238,6 @@ for WeightLine in WeightsFile:
           YMin.Fill(yMin[0]),                               YMinXS.Fill(yMin[1]),                                     YMinAcc.Fill(yMin[2])
           YMinMin.Fill(yMinMin[0]),                         YMinMinXS.Fill(yMinMin[1]),                               YMinMinAcc.Fill(yMinMin[2])
           #YRelMin.Fill(yMin[0]/LnLog[2]),                   YRelMinXS.Fill(yMin[1]/LnLogXS[2]),                       YRelMinAcc.Fill(yMin[2]/LnLogAcc[2])
-          #LnVariation.Fill(LogMax[0] - LogMin[0]),          LnVariationXS.Fill(LogMax[1] - LogMin[1]),                LnVariationAcc.Fill(LogMax[2] - LogMin[2])
           ScdDer01.Fill(10*(LnLog[3]-2*LnLog[4]+LnLog[5])), ScdDerXS01.Fill(10*(LnLogXS[3]-2*LnLogXS[4]+LnLogXS[5])), ScdDerAcc01.Fill(10*(LnLogAcc[3]-2*LnLogAcc[4]+LnLogAcc[5]))
           ScdDer02.Fill(5*(LnLog[2]-2*LnLog[4]+LnLog[6])),  ScdDerXS02.Fill(5*(LnLogXS[2]-2*LnLogXS[4]+LnLogXS[6])),  ScdDerAcc02.Fill(5*(LnLogAcc[2]-2*LnLogAcc[4]+LnLogAcc[6]))
           ScdDerScatter.Fill(5*(LnLog[2]-2*LnLog[4]+LnLog[6]) , 10*(LnLog[3]-2*LnLog[4]+LnLog[5]) )
@@ -333,7 +308,6 @@ YRelPlus.Write(),      YRelPlusXS.Write(),      YRelPlusAcc.Write()
 YMin.Write(),          YMinXS.Write(),          YMinAcc.Write()
 YMinMin.Write(),       YMinMinXS.Write(),       YMinMinAcc.Write()
 YRelMin.Write(),       YRelMinXS.Write(),       YRelMinAcc.Write()
-LnVariation.Write(),   LnVariationXS.Write(),   LnVariationAcc.Write()
 ScdDer01.Write(),      ScdDerXS01.Write(),      ScdDerAcc01.Write()
 ScdDer02.Write(),      ScdDerXS02.Write(),      ScdDerAcc02.Write()
 ScdDerScatter.Write(), ScdDerXSScatter.Write(), ScdDerAccScatter.Write()
