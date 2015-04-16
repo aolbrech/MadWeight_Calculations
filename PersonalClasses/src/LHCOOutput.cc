@@ -11,7 +11,7 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
   WrongEvtCounter = 0;
   CorrectGenEvtContent = false;
   NumberNegRecoEl = 0;         NumberNegRecoMu = 0;     NumberPosRecoEl = 0;         NumberPosRecoMu = 0; 
-  NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; 
+  NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; NrPosRecoMuUnmatched; 
   genOutput_ = GenOutput; recoOutput_ = RecoOutput;
   verbose_ = verbosity;
 
@@ -29,6 +29,7 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     RecoOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElec.lhco");
     RecoOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeElec.lhco");
     WrongRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/WrongRecoEvents_PositiveMuon.lhco");
+    UnmatchedRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/UnmatchedRecoEvents_PositiveMuon.lhco");
     CorrectRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/CorrectRecoEvents_PositiveMuon.lhco");
   }
 
@@ -38,6 +39,8 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
   histo1D["WrongReco_TopMassHadr"] = new TH1F("WrongReco_TopMassHadr","Hadronic top-mass distribution for wrong reco events",250,0,500);
   histo1D["CorrectReco_TopMassLept"] = new TH1F("CorrectReco_TopMassLept","Leptonic top-mass distribution for correct reco events",250,0,500);
   histo1D["CorrectReco_TopMassHadr"] = new TH1F("CorrectReco_TopMassHadr","Hadronic top-mass distribution for correct reco events",250,0,500);
+  histo1D["UnmatchedReco_TopMassLept"] = new TH1F("UnmatchedReco_TopMassLept","Leptonic top-mass distribution for unmatched reco events",250,0,500);
+  histo1D["UnmatchedReco_TopMassHadr"] = new TH1F("UnmatchedReco_TopMassHadr","Hadronic top-mass distribution for unmatched reco events",250,0,500);
 
   histo1D["PtDistrGen_LightJets"] = new TH1F("PtDistrGen_LightJets","Pt-distribution for light jets",500,0,250);
   histo1D["PtDistrGen_BJets"] = new TH1F("PtDistrGen_BJets","Pt-distribution for b-jets",500,0,250);
@@ -89,7 +92,7 @@ LHCOOutput::~LHCOOutput(){
     if(recoOutput_) RecoOutFile[ii].close();
   }
   if(genOutput_) WrongGenFile.close();
-  if(recoOutput_){ WrongRecoMuPosFile.close(); CorrectRecoMuPosFile.close();}
+  if(recoOutput_){ WrongRecoMuPosFile.close(); CorrectRecoMuPosFile.close();UnmatchedRecoMuPosFile.close();}
 
 }
 
@@ -409,6 +412,12 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
         LHCOEventOutput(0, WrongRecoMuPosFile, NrPosRecoMuWrong, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
         histo1D["WrongReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
         histo1D["WrongReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());
+      }
+      else if(jetCombiFound == false){
+        NrPosRecoMuUnmatched++;
+        LHCOEventOutput(0, UnmatchedRecoMuPosFile, NrPosRecoMuUnmatched, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+        histo1D["UnmatchedReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
+        histo1D["UnmatchedReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());       
       }
     }
   }//End of positive lepton

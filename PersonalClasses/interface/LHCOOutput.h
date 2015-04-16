@@ -40,9 +40,9 @@ private:
   TLorentzVector *GenLeptonicTop, *GenLeptonicW, *GenLepton, *GenNeutrino;
   //TLorentzVector *GenHadronicTop, *GenHadronicW;
   unsigned int NumberNegativeElectrons, NumberNegativeMuons, NumberPositiveElectrons, NumberPositiveMuons, WrongEvtCounter;
-  unsigned int NumberNegRecoEl, NumberNegRecoMu, NumberPosRecoEl, NumberPosRecoMu, NrPosRecoMuCorrect, NrPosRecoMuWrong;
+  unsigned int NumberNegRecoEl, NumberNegRecoMu, NumberPosRecoEl, NumberPosRecoMu, NrPosRecoMuCorrect, NrPosRecoMuWrong, NrPosRecoMuUnmatched;
   bool CorrectGenEvtContent;
-  ofstream GenOutFile[4], RecoOutFile[4], WrongGenFile, CorrectRecoMuPosFile, WrongRecoMuPosFile;
+  ofstream GenOutFile[4], RecoOutFile[4], WrongGenFile, CorrectRecoMuPosFile, WrongRecoMuPosFile, UnmatchedRecoMuPosFile;
   int verbose_, LeptonCharge;
   bool genOutput_, recoOutput_;
 
