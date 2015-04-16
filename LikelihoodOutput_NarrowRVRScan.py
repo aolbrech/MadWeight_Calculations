@@ -17,6 +17,8 @@ RVRValues = ["Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R})
 RVR =       [-0.3,              -0.2,              -0.1,              -0.05,              0.0,              0.05,              0.1,              0.2,              0.3              ]
 MGXS =      [13.3944,           12.06555,          11.25909,          11.02784,           10.90059,         10.88228,          10.97767,         11.49883,         12.49056         ]
 MGXSe =     [0.00995808028337,  0.0093464076837,   0.00836607833038,  0.0,                0.00822214433527, 0.0                0.00847293509122, 0.00901976602967, 0.00874682264197 ]
+#-- Remark --#
+# No real need to add acceptance information here since for reco-level events always a couple of events fail the MadWeight computation! -#
 
 NrEvents = 10000 
 
