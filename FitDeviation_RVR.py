@@ -51,19 +51,19 @@ print "Will be using file : ",WeightsFile
 #ROOT file where all the information will be stored:
 Tfile = TFile(os.path.join(whichDir+"FitDeviation.root"),'recreate')
 gStyle.SetOptStat(0)
-YPlusGausTest    = TH1F('YPlusGausTest',   'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (no normalisation)', 250,-0.5,0.5)
-YPlusGausTestXS  = TH1F('YPlusGausTestXS', 'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (XS normalisation)', 250,-0.5,0.5)
-YPlusGausTestAcc = TH1F('YPlusGausTestAcc','Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (Acc normalisation)',250,-0.5,0.5)
-YPlusGausTestPosScdDer    = TH1F('YPlusGausTestPosScdDer',   'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (no normalisation -- second der > 0)', 250,-0.2,0.2)
-YPlusGausTestXSPosScdDer  = TH1F('YPlusGausTestXSPosScdDer', 'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (XS normalisation -- second der > 0)', 250,-0.2,0.2)
-YPlusGausTestAccPosScdDer = TH1F('YPlusGausTestAccPosScdDer','Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (Acc normalisation -- second der > 0)',250,-0.2,0.2)
-YPlusGausTestNegScdDer    = TH1F('YPlusGausTestNegScdDer',   'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (no normalisation -- second der < 0)', 250,-0.2,0.2)
-YPlusGausTestXSNegScdDer  = TH1F('YPlusGausTestXSNegScdDer', 'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (XS normalisation -- second der < 0)', 250,-0.2,0.2)
-YPlusGausTestAccNegScdDer = TH1F('YPlusGausTestAccNegScdDer','Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (Acc normalisation -- second der < 0)',250,-0.2,0.2)
+YPlusGausTest    = TH1F('YPlusGausTest',   'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (no normalisation)', 250,-0.15,0.15)
+YPlusGausTestXS  = TH1F('YPlusGausTestXS', 'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (XS normalisation)', 250,-0.15,0.15)
+YPlusGausTestAcc = TH1F('YPlusGausTestAcc','Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (Acc normalisation)',250,-0.15,0.15)
+YPlusGausTestPosScdDer    = TH1F('YPlusGausTestPosScdDer',   'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (no normalisation -- second der > 0)', 250,-0.1,0.1)
+YPlusGausTestXSPosScdDer  = TH1F('YPlusGausTestXSPosScdDer', 'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (XS normalisation -- second der > 0)', 250,-0.1,0.1)
+YPlusGausTestAccPosScdDer = TH1F('YPlusGausTestAccPosScdDer','Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (Acc normalisation -- second der > 0)',250,-0.1,0.1)
+YPlusGausTestNegScdDer    = TH1F('YPlusGausTestNegScdDer',   'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (no normalisation -- second der < 0)', 250,-0.1,0.1)
+YPlusGausTestXSNegScdDer  = TH1F('YPlusGausTestXSNegScdDer', 'Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (XS normalisation -- second der < 0)', 250,-0.1,0.1)
+YPlusGausTestAccNegScdDer = TH1F('YPlusGausTestAccNegScdDer','Comparison of fit deviation in Re(VR) = 0.2 and Re(VR) = 0.1 (Acc normalisation -- second der < 0)',250,-0.1,0.1)
 
-YPlus    = TH1F('YPlus',   'Deviation from parabolic fit for Re(VR) = 0.1 (no normalisation)' ,150,-0.5,0.5)
-YPlusXS  = TH1F('YPlusXS', 'Deviation from parabolic fit for Re(VR) = 0.1 (XS normalisation)' ,150,-0.5,0.5)
-YPlusAcc = TH1F('YPlusAcc','Deviation from parabolic fit for Re(VR) = 0.1 (Acc normalisation)',150,-0.5,0.5)
+YPlus    = TH1F('YPlus',   'Deviation from parabolic fit for Re(VR) = 0.1 (no normalisation)' ,150,-0.25,0.25)
+YPlusXS  = TH1F('YPlusXS', 'Deviation from parabolic fit for Re(VR) = 0.1 (XS normalisation)' ,150,-0.25,0.25)
+YPlusAcc = TH1F('YPlusAcc','Deviation from parabolic fit for Re(VR) = 0.1 (Acc normalisation)',150,-0.25,0.25)
 YPlusPosScdDer    = TH1F('YPlusPosScdDer',   'Deviation from parabolic fit for Re(VR) = 0.1 (no normalisation -- second der > 0)' ,150,-0.2,0.2)
 YPlusXSPosScdDer  = TH1F('YPlusXSPosScdDer', 'Deviation from parabolic fit for Re(VR) = 0.1 (XS normalisation -- second der > 0)' ,150,-0.2,0.2)
 YPlusAccPosScdDer = TH1F('YPlusAccPosScdDer','Deviation from parabolic fit for Re(VR) = 0.1 (Acc normalisation -- second der > 0)',150,-0.2,0.2)
@@ -77,16 +77,16 @@ YPlusAccPosScdDerPosYPlusPlus = TH1F('YPlusAccPosScdDerPosYPlusPlus','Deviation 
 YPlusPlus    = TH1F('YPlusPlus',   'Deviation from parabolic fit for Re(VR) = 0.2 (no normalisation)' ,150,-0.5,0.5)
 YPlusPlusXS  = TH1F('YPlusPlusXS', 'Deviation from parabolic fit for Re(VR) = 0.2 (XS normalisation)' ,150,-0.5,0.5)
 YPlusPlusAcc = TH1F('YPlusPlusAcc','Deviation from parabolic fit for Re(VR) = 0.2 (Acc normalisation)',150,-0.5,0.5)
-YPlusPlusPosScdDer    = TH1F('YPlusPlusPosScdDer',   'Deviation from parabolic fit for Re(VR) = 0.2 (no normalisation -- second der > 0)' ,150,-0.2,0.2)
-YPlusPlusXSPosScdDer  = TH1F('YPlusPlusXSPosScdDer', 'Deviation from parabolic fit for Re(VR) = 0.2 (XS normalisation -- second der > 0)' ,150,-0.2,0.2)
-YPlusPlusAccPosScdDer = TH1F('YPlusPlusAccPosScdDer','Deviation from parabolic fit for Re(VR) = 0.2 (Acc normalisation -- second der > 0)',150,-0.2,0.2)
-YPlusPlusNegScdDer    = TH1F('YPlusPlusNegScdDer',   'Deviation from parabolic fit for Re(VR) = 0.2 (no normalisation -- second der < 0)' ,150,-0.2,0.2)
-YPlusPlusXSNegScdDer  = TH1F('YPlusPlusXSNegScdDer', 'Deviation from parabolic fit for Re(VR) = 0.2 (XS normalisation -- second der < 0)' ,150,-0.2,0.2)
-YPlusPlusAccNegScdDer = TH1F('YPlusPlusAccNegScdDer','Deviation from parabolic fit for Re(VR) = 0.2 (Acc normalisation -- second der < 0)',150,-0.2,0.2)
+YPlusPlusPosScdDer    = TH1F('YPlusPlusPosScdDer',   'Deviation from parabolic fit for Re(VR) = 0.2 (no normalisation -- second der > 0)' ,150,-0.3,0.3)
+YPlusPlusXSPosScdDer  = TH1F('YPlusPlusXSPosScdDer', 'Deviation from parabolic fit for Re(VR) = 0.2 (XS normalisation -- second der > 0)' ,150,-0.3,0.3)
+YPlusPlusAccPosScdDer = TH1F('YPlusPlusAccPosScdDer','Deviation from parabolic fit for Re(VR) = 0.2 (Acc normalisation -- second der > 0)',150,-0.3,0.3)
+YPlusPlusNegScdDer    = TH1F('YPlusPlusNegScdDer',   'Deviation from parabolic fit for Re(VR) = 0.2 (no normalisation -- second der < 0)' ,150,-0.3,0.3)
+YPlusPlusXSNegScdDer  = TH1F('YPlusPlusXSNegScdDer', 'Deviation from parabolic fit for Re(VR) = 0.2 (XS normalisation -- second der < 0)' ,150,-0.3,0.3)
+YPlusPlusAccNegScdDer = TH1F('YPlusPlusAccNegScdDer','Deviation from parabolic fit for Re(VR) = 0.2 (Acc normalisation -- second der < 0)',150,-0.3,0.3)
 
-YMin    = TH1F('YMin',   'Deviation from parabolic fit for Re(VR) = -0.1 (no normalisation)' ,150,-0.5,0.5)
-YMinXS  = TH1F('YMinXS', 'Deviation from parabolic fit for Re(VR) = -0.1 (XS normalisation)' ,150,-0.5,0.5)
-YMinAcc = TH1F('YMinAcc','Deviation from parabolic fit for Re(VR) = -0.1 (Acc normalisation)',150,-0.5,0.5)
+YMin    = TH1F('YMin',   'Deviation from parabolic fit for Re(VR) = -0.1 (no normalisation)' ,150,-0.25,0.25)
+YMinXS  = TH1F('YMinXS', 'Deviation from parabolic fit for Re(VR) = -0.1 (XS normalisation)' ,150,-0.25,0.25)
+YMinAcc = TH1F('YMinAcc','Deviation from parabolic fit for Re(VR) = -0.1 (Acc normalisation)',150,-0.25,0.25)
 YMinPosScdDer    = TH1F('YMinPosScdDer',   'Deviation from parabolic fit for Re(VR) = -0.1 (no normalisation -- second der > 0)' ,150,-0.2,0.2)
 YMinXSPosScdDer  = TH1F('YMinXSPosScdDer', 'Deviation from parabolic fit for Re(VR) = -0.1 (XS normalisation -- second der > 0)' ,150,-0.2,0.2)
 YMinAccPosScdDer = TH1F('YMinAccPosScdDer','Deviation from parabolic fit for Re(VR) = -0.1 (Acc normalisation -- second der > 0)',150,-0.2,0.2)
@@ -97,12 +97,12 @@ YMinAccNegScdDer = TH1F('YMinAccNegScdDer','Deviation from parabolic fit for Re(
 YMinMin    = TH1F('YMinMin',   'Deviation from parabolic fit for Re(VR) = -0.2 (no normalisation)' ,150,-0.5,0.5)
 YMinMinXS  = TH1F('YMinMinXS', 'Deviation from parabolic fit for Re(VR) = -0.2 (XS normalisation)' ,150,-0.5,0.5)
 YMinMinAcc = TH1F('YMinMinAcc','Deviation from parabolic fit for Re(VR) = -0.2 (Acc normalisation)',150,-0.5,0.5)
-YMinMinPosScdDer    = TH1F('YMinMinPosScdDer',   'Deviation from parabolic fit for Re(VR) = -0.2 (no normalisation -- second der > 0)' ,150,-0.2,0.2)
-YMinMinXSPosScdDer  = TH1F('YMinMinXSPosScdDer', 'Deviation from parabolic fit for Re(VR) = -0.2 (XS normalisation -- second der > 0)' ,150,-0.2,0.2)
-YMinMinAccPosScdDer = TH1F('YMinMinAccPosScdDer','Deviation from parabolic fit for Re(VR) = -0.2 (Acc normalisation -- second der > 0)',150,-0.2,0.2)
-YMinMinNegScdDer    = TH1F('YMinMinNegScdDer',   'Deviation from parabolic fit for Re(VR) = -0.2 (no normalisation -- second der < 0)' ,150,-0.2,0.2)
-YMinMinXSNegScdDer  = TH1F('YMinMinXSNegScdDer', 'Deviation from parabolic fit for Re(VR) = -0.2 (XS normalisation -- second der < 0)' ,150,-0.2,0.2)
-YMinMinAccNegScdDer = TH1F('YMinMinAccNegScdDer','Deviation from parabolic fit for Re(VR) = -0.2 (Acc normalisation -- second der < 0)',150,-0.2,0.2)
+YMinMinPosScdDer    = TH1F('YMinMinPosScdDer',   'Deviation from parabolic fit for Re(VR) = -0.2 (no normalisation -- second der > 0)' ,150,-0.3,0.3)
+YMinMinXSPosScdDer  = TH1F('YMinMinXSPosScdDer', 'Deviation from parabolic fit for Re(VR) = -0.2 (XS normalisation -- second der > 0)' ,150,-0.3,0.3)
+YMinMinAccPosScdDer = TH1F('YMinMinAccPosScdDer','Deviation from parabolic fit for Re(VR) = -0.2 (Acc normalisation -- second der > 0)',150,-0.3,0.3)
+YMinMinNegScdDer    = TH1F('YMinMinNegScdDer',   'Deviation from parabolic fit for Re(VR) = -0.2 (no normalisation -- second der < 0)' ,150,-0.3,0.3)
+YMinMinXSNegScdDer  = TH1F('YMinMinXSNegScdDer', 'Deviation from parabolic fit for Re(VR) = -0.2 (XS normalisation -- second der < 0)' ,150,-0.3,0.3)
+YMinMinAccNegScdDer = TH1F('YMinMinAccNegScdDer','Deviation from parabolic fit for Re(VR) = -0.2 (Acc normalisation -- second der < 0)',150,-0.3,0.3)
 
 YRelPlus    = TH1F('YRelPlus',   'Relative deviation from parabolic fit for Re(VR) = 0.2 (no normalisation)' ,250,-0.1,0.1)
 YRelPlusXS  = TH1F('YRelPlusXS', 'Relative deviation from parabolic fit for Re(VR) = 0.2 (XS normalisation)' ,250,-0.1,0.1)
@@ -119,15 +119,15 @@ FstDer.GetXaxis().SetBinLabel(1,"(y_{DATA}(x=0.0) - y_{DATA}(x=0.1))/0.1")
 FstDer.GetXaxis().SetBinLabel(1,"(y_{DATA}(x=0.1) - y_{DATA}(x=0.2))/0.1")
 FstDerXS  = TH1F('FirstDerivativeXS', 'First derivative of -ln(likelihood) distribution (XS normalisation)', 5,-0.25,0.25)
 FstDerAcc = TH1F('FirstDerivativeAcc','First derivative of -ln(likelihood) distribution (Acc normalisation)',5,-0.25,0.25)
-ScdDerNarrow    = TH1F('SecondDerivativeNarrow',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = -0.1/0.0/0.1)', 250,-20,20)
-ScdDerXSNarrow  = TH1F('SecondDerivativeXSNarrow', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = -0.1/0.0/0.1)', 250,-20,20)
-ScdDerAccNarrow = TH1F('SecondDerivativeAccNarrow','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = -0.1/0.0/0.1)',250,-20,20)
-ScdDerWide    = TH1F('SecondDerivativeWide',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = -0.2/0.0/0.2)', 250,-20,20)
-ScdDerXSWide  = TH1F('SecondDerivativeXSWide', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = -0.2/0.0/0.2)', 250,-20,20)
-ScdDerAccWide = TH1F('SecondDerivativeAccWide','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = -0.2/0.0/0.2)',250,-20,20)
-ScdDerScatter    = TH2F('ScdDerScatterPlot',   'Second derivative of -ln(L) using Re(VR) = -0.1/0.0/0.1 versus using Re(VR) = -0.2/0.0/0.2 (no normalisation)', 250,-15,15,250,-15,15)
-ScdDerXSScatter  = TH2F('ScdDerXSScatterPlot', 'Second derivative of -ln(L) using Re(VR) = -0.1/0.0/0.1 versus using Re(VR) = -0.2/0.0/0.2 (XS normalisation)', 250,-15,15,250,-15,15)
-ScdDerAccScatter = TH2F('ScdDerAccScatterPlot','Second derivative of -ln(L) using Re(VR) = -0.1/0.0/0.1 versus using Re(VR) = -0.2/0.0/0.2 (Acc normalisation)',250,-15,15,250,-15,15)
+ScdDerNarrow    = TH1F('SecondDerivativeNarrow',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = -0.1/0.0/0.1)', 250,-5,5)
+ScdDerXSNarrow  = TH1F('SecondDerivativeXSNarrow', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = -0.1/0.0/0.1)', 250,-5,5)
+ScdDerAccNarrow = TH1F('SecondDerivativeAccNarrow','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = -0.1/0.0/0.1)',250,-5,5)
+ScdDerWide    = TH1F('SecondDerivativeWide',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = -0.2/0.0/0.2)', 250,-5,5)
+ScdDerXSWide  = TH1F('SecondDerivativeXSWide', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = -0.2/0.0/0.2)', 250,-5,5)
+ScdDerAccWide = TH1F('SecondDerivativeAccWide','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = -0.2/0.0/0.2)',250,-5,5)
+ScdDerScatter    = TH2F('ScdDerScatterPlot',   'Second derivative of -ln(L) using Re(VR) = -0.1/0.0/0.1 versus using Re(VR) = -0.2/0.0/0.2 (no normalisation)', 250,-5,5,250,-5,5)
+ScdDerXSScatter  = TH2F('ScdDerXSScatterPlot', 'Second derivative of -ln(L) using Re(VR) = -0.1/0.0/0.1 versus using Re(VR) = -0.2/0.0/0.2 (XS normalisation)', 250,-5,5,250,-5,5)
+ScdDerAccScatter = TH2F('ScdDerAccScatterPlot','Second derivative of -ln(L) using Re(VR) = -0.1/0.0/0.1 versus using Re(VR) = -0.2/0.0/0.2 (Acc normalisation)',250,-5,5,250,-5,5)
 
 LnLogDist = TH1F("LnLog","title",7,-0.35,0.35)
 LnLogDist.SetMarkerStyle(20), LnLogDist.SetLineColor(1), LnLogDist.SetMarkerColor(1), LnLogDist.SetMarkerSize(1.2)
@@ -155,10 +155,9 @@ for ii in range(NrConfigs):
 EvtsWithPosScdDerNarrow, EvtsWithPosScdDerXSNarrow, EvtsWithPosScdDerAccNarrow = [], [], []
 EvtsWithPosScdDerWide, EvtsWithPosScdDerXSWide, EvtsWithPosScdDerAccWide = [], [], []
 EvtsWithYPlusGausSmall, EvtsWithYPlusGausSmallXS, EvtsWithYPlusGausSmallAcc = [], [], []
-EvtsWithBothYPos, EvtsWithBothYPosXS, EvtsWithBothYPosAcc = [],[],[]
 
 
-nEvts = 1000
+nEvts = 10000
 print " **** Will be using ",nEvts," events!!"
 #Loop over all lines in weights file:
 for WeightLine in WeightsFile:
@@ -211,8 +210,8 @@ for WeightLine in WeightsFile:
               LnLogAccFunction[ii].append( aHatAcc[ii]*RVR[rvr]*RVR[rvr]+bHatAcc[ii]*RVR[rvr]+cHatAcc[ii])
           LnLogGraphNarrow = TGraph(9, RVR, LnLogFunction[0])
           LnLogGraphNarrow.SetTitle('Comparison between ROOT fit and algebraic method')
-          LnLogGraphNarrow.GetXaxis().SetTitle('#Delta ln(Likelihood)')
-          LnLogGraphNarrow.GetYaxis().SetTitle('Number of events')
+          LnLogGraphNarrow.GetYaxis().SetTitle('#Delta ln(Likelihood)')
+          LnLogGraphNarrow.GetXaxis().SetTitle('Re(VR) value')
           LnLogGraphNarrow.SetMarkerColor(6), LnLogGraphNarrow.SetLineColor(6), LnLogGraphNarrow.SetMarkerSize(1.2)
           LnLogGraphWide = TGraph(9,RVR, LnLogFunction[1])
           LnLogGraphWide.SetMarkerColor(7), LnLogGraphWide.SetLineColor(7), LnLogGraphWide.SetMarkerSize(1.2)	
@@ -295,9 +294,6 @@ for WeightLine in WeightsFile:
 #--- Save all the histograms containing information about all the events! ---#
 Tfile.cd()
 YPlusPosScdDerPosYPlusPlus.Write(), YPlusXSPosScdDerPosYPlusPlus.Write(), YPlusAccPosScdDerPosYPlusPlus.Write()  #How can they be both positive ... (y+ & y++)
-print "List of events with both y+ and y++ positive (no norm) = ",EvtsWithBothYPos
-print "\n List of events with both y+ and y++ positive (XS norm) = ",EvtsWithBothYPosXS
-print "\n List of events with both y+ and y++ positive (Acc norm) = ",EvtsWithBothYPosAcc
 
 YPlusGausTest.Write(), YPlusGausTestXS.Write(), YPlusGausTestAcc.Write()
 YPlus.Write(),         YPlusXS.Write(),         YPlusAcc.Write()
@@ -313,7 +309,7 @@ ScdDerScatter.Write(), ScdDerXSScatter.Write(), ScdDerAccScatter.Write()
 #---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---#
 print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = -0.1/0.0/0.1) ",len(EvtsWithPosScdDerNarrow),", ",len(EvtsWithPosScdDerXSNarrow)," & ",len(EvtsWithPosScdDerAccNarrow)
 print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = -0.2/0.0/0.2) ",len(EvtsWithPosScdDerWide),", ",len(EvtsWithPosScdDerXSWide)," & ",len(EvtsWithPosScdDerAccWide)
-print "Nr of events with Gaussianse vergelijking voor + (LnLog, LnLogXS & LnLogAcc) ", len(EvtsWithYPlusGausSmall),", ",len(EvtsWithYPlusGausSmallXS)," & ",len(EvtsWithYPlusGausSmallAcc)
+print "Nr of events with Gaussiaanse vergelijking voor + (LnLog, LnLogXS & LnLogAcc) ", len(EvtsWithYPlusGausSmall),", ",len(EvtsWithYPlusGausSmallXS)," & ",len(EvtsWithYPlusGausSmallAcc)
 LLPosScdDerNarrow,   LLNegScdDerNarrow,   LLXSPosScdDerNarrow,   LLXSNegScdDerNarrow,   LLAccPosScdDerNarrow,   LLAccNegScdDerNarrow = [],[],[],[],[],[]
 LLPosScdDerWide,   LLNegScdDerWide,   LLXSPosScdDerWide,   LLXSNegScdDerWide,   LLAccPosScdDerWide,   LLAccNegScdDerWide = [],[],[],[],[],[]
 LLPosScdDerBoth, LLNegScdDerBoth, LLXSPosScdDerBoth, LLXSNegScdDerBoth, LLAccPosScdDerBoth, LLAccNegScdDerBoth = [],[],[],[],[],[]
