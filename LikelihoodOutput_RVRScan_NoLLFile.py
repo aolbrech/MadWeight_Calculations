@@ -39,14 +39,22 @@ elif int(weightsFileCounter) > 1:
     print " ",ii," ) ",WeightsFileArray[ii]
   fileNr = raw_input('Choose the number of the file of interest! : ')
   WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
-
 print "Will be using file : ",WeightsFile
 
+#Set title of root file!
+title = ""
+if whichDir.find("Correct") <= len(whichDir)     and whichDir.find("Correct") > 0:   title = "Correct"
+elif whichDir.find("Wrong") <= len(whichDir)     and whichDir.find("Wrong") > 0:     title = "Wrong"
+elif whichDir.find("Unmatched") <= len(whichDir) and whichDir.find("Unmatched") > 0: title = "Unmatched"
+
+if whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0: title += "Reco"
+elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:  title += "Gen"
+
 #ROOT file where all the information will be stored:
-Tfile = TFile(os.path.join(whichDir+"Likelihood_RVRScan_UsingWeights.root"),'recreate')
-LLDist = TH1F('LL_RVR','Non-normalized -ln(likelihood) for Single Gaus TF',11,-0.55,0.55)
-LLNormDist = TH1F('NormLL_RVR','Normalized -ln(likelihood) for Single Gaus TF',11,-0.55,0.55)
-LLNormAccDist = TH1F('NormLL_Acceptance_RVR','Normalized -ln(likelihood) for Single Gaus TF (acceptance taken into account)',11,-0.55,0.55)
+Tfile = TFile(os.path.join(whichDir+"Likelihood_RVRScan_"+title+"_UsingWeights.root"),'recreate')
+LLDist        = TH1F('LLRVR',    '-ln(L) for Single Gaus TF (no normalisation -- '+title+' evts)',131,-0.325,0.325)
+LLNormDist    = TH1F('LLRVR_XS', '-ln(L) for Single Gaus TF (XS normalisation -- '+title+' evts)',131,-0.325,0.325)
+LLNormAccDist = TH1F('LLRVR_Acc','-ln(L) for Single Gaus TF (Acc normalisation -- '+title+' evts)',131,-0.325,0.325)
 gStyle.SetOptStat(0)
 
 #Set the bin content originally very low such that these points don't show up in the histograms
@@ -129,7 +137,7 @@ for ii in range(len(RVR)):
 LLDist.GetYaxis().SetTitle("#Delta #chi^{2} = -2ln(L/L_{max})")
 LLDist.GetYaxis().SetTitleOffset(1.3)
 
-LLCanvas = TCanvas('LLDistributions','Comparing influence of XS and acceptance normalisation on -ln(likelihood)')
+LLCanvas = TCanvas('LLDistributions','Comparing influence of XS and acceptance normalisation on -ln(L) -- '+title+' evts')
 legend = TLegend(0.75,0.7,0.95,0.95)
 LLCanvas.cd()
 legend.AddEntry(LLDist,'Non-normalized -ln(likelihood)',"p")
