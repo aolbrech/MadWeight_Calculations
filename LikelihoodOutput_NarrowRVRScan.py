@@ -26,7 +26,7 @@ NrEvents = 10000
 LLFile = open(os.path.join(whichDir+'un-normalized_likelihood.out'),'r') 
 
 #ROOT file where all the information will be stored:
-Tfile = TFile(os.path.join(whichDir+"Likelihood_RVRScan.root"),'recreate')
+Tfile = TFile(os.path.join(whichDir+"Likelihood_RVRNarrowScan.root"),'recreate')
 LLDist = TH1F('LL_RVR','Non-normalized -ln(likelihood) for Single Gaus TF',11,-0.55,0.55)
 LLNormDist = TH1F('NormLL_RVR','Normalized -ln(likelihood) for Single Gaus TF',11,-0.55,0.55)
 gStyle.SetOptStat(0)
