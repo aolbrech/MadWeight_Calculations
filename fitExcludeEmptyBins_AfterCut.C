@@ -16,16 +16,17 @@ Double_t Minimum(TH1F* histo)
 
 void fitExcludeEmptyBins_AfterCut() {
   //Get the histogram from the ROOT file   --> Name gets changed by pythonScript!!
-  TFile* InputFile = new TFile(" Events_ContainingMTopScansForRecLevelEvts/TopMass_Gen_ManyEvts/FitDeviation_Gen_MTop.root ","r");
-  TFile* OutputFile = new TFile(" Events_ContainingMTopScansForRecLevelEvts/TopMass_Gen_ManyEvts/LimitedFitResult_AfterCut_Gen_MTop.root ","RECREATE");
+  TFile* InputFile = new TFile(" Events/TopMass_RecoUnmatched_SingleGausTF_10000Evts/FitDeviation_UnmatchedReco_MTop.root ","r");
+  TFile* OutputFile = new TFile(" Events/TopMass_RecoUnmatched_SingleGausTF_10000Evts/LimitedFitResult_UnmatchedReco_MTop_ScdDerBothCutApplied.root ","RECREATE");
 
-  bool GenLevel = true; 
+  bool GenLevel = false; 
 
-  TH1F* LL    = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPosScdDerInner");
-  TH1F* LLXS  = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLXSPosScdDerInner");
-  TH1F* LLAcc = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPosScdDerInner");
+  TH1F* LL    = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPosScdDerBoth"); 
+  TH1F* LLXS  = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLXSPosScdDerBoth"); 
+  TH1F* LLAcc = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLAccPosScdDerBoth"); 
 
-  TF1 *func = new TF1("func","pol2",171,175);
+  TF1 *func = new TF1("func","pol2",171,175); 
+  func->SetName("fit_LL");
   LL->Fit(func);
   TCanvas* LLCanvas = new TCanvas("LLCanvas","Distribution of -ln(likelihood) (no normalisation)");
   LLCanvas->cd();
@@ -53,7 +54,7 @@ void fitExcludeEmptyBins_AfterCut() {
   funcXS->Write();
 
   if(GenLevel == false){
-    TF1 *funcAcc = new TF1("funcAcc","pol2",171,175); 
+  TF1 *funcAcc = new TF1("funcAcc","pol2",171,175); 
     funcAcc->SetName("fit_LLAcc");
     LLAcc->Fit(funcAcc);
     TCanvas* LLAccCanvas = new TCanvas("LLAccCanvas","Distribution of -ln(likelihood) (Acc normalisation)");
