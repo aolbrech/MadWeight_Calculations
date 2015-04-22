@@ -4,7 +4,7 @@ import sys
 from math import log
 #import ROOT
 from array import array
-from ROOT import TH1F,TH2F,TFile,TCanvas,TLegend,gStyle,TDirectory,gROOT,TGraph
+from ROOT import TH1F,TH2F,TFile,TCanvas,TLegend,gStyle,gROOT,TGraph
 gROOT.SetBatch(True)                       #Don't print the histograms (necessary for fit)
 
 #Directory of interest:
@@ -15,14 +15,39 @@ whichDir = sys.argv[1]
 print " Interested in directory : ",whichDir
 
 #Information about the scanned MTop values and the corresponding cross-section
-MTopValues = ["m_{top} = 171",  "m_{top} = 172",  "m_{top} = 173",  "m_{top} = 174",  "m_{top} = 175"]
-MTop =       array('d',[171,              172,              173,              174,              175            ])
-MGXS =       array('d',[10.70485,         10.8257,          10.96469,         11.08428,         11.22448       ])
-MGXSe =      array('d',[0.00814303595657, 0.00878899028501, 0.00816801717126, 0.00904797742371, 0.008653800078 ])
-Acceptance = array('d',[0.21460,          0.21735,          0.21290,          0.21752,          0.22185        ])
-xPos = [3,4]   #Want minimum around mtop = 173, which corresponds to position 2!
-xNeg = [1,0]
-xMin = 2
+MTopValues = ["m_{top} = 153",  "m_{top} = 163",  "m_{top} = 170",  "m_{top} = 171",  "m_{top} = 172",  "m_{top} = 173",  "m_{top} = 174",  "m_{top} = 175","m_{top} = 183",  "m_{top} = 193"]
+MTop =       array('d',[153,              163,              170,              171,              172,              173,              174,              175,            183,              193            ])
+MGXS =       array('d',[8.20916,          9.6299,           10.57123,         10.70485,         10.8257,          10.96469,         11.08428,         11.22448,       12.18068,         13.3046        ])
+MGXSe =      array('d',[0.00641266950107, 0.00775899974932, 0.00857143063963, 0.00814303595657, 0.00878899028501, 0.00816801717126, 0.00904797742371, 0.008653800078, 0.00931290317946, 0.0103310001752])
+Acceptance = array('d',[0.16203,          0.19152,          0.21008,          0.21460,          0.21735,          0.21290,          0.21752,          0.22185,        0.23941,          0.26413        ])
+
+#Select which window of masses was considered!
+MTopWindow = raw_input('** Choose the correct mass-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [153, 163, 170, 171, 172, 173, 174, 175, 183, 193] \n  2) Normal : [153, 163, 171, 172, 173, 174, 175, 183, 193] \n  3) Narrow : [171, 172, 173, 174, 175] \n --> Choose the correct number : ')
+
+xMinValue = [5, 4, 2]
+xPos = [xMinValue[int(MTopWindow)-1]+1,xMinValue[int(MTopWindow)-1]+2]   #Want minimum around mtop = 173, which corresponds to position 2!
+xNeg = [xMinValue[int(MTopWindow)-1]-1,xMinValue[int(MTopWindow)-1]-2]
+xMin = xMinValue[int(MTopWindow)-1]
+
+if MTopWindow == "2":
+  MTopValues.pop(0), MTop.pop(0), MGXS.pop(0), MGXSe.pop(0), Acceptance.pop(0)
+elif MTopWindow == "3":
+  MTopValues.pop(9), MTop.pop(9), MGXS.pop(9), MGXSe.pop(9), Acceptance.pop(9)
+  MTopValues.pop(8), MTop.pop(8), MGXS.pop(8), MGXSe.pop(8), Acceptance.pop(8)
+  MTopValues.pop(2), MTop.pop(2), MGXS.pop(2), MGXSe.pop(2), Acceptance.pop(2)
+  MTopValues.pop(1), MTop.pop(1), MGXS.pop(1), MGXSe.pop(1), Acceptance.pop(1)
+  MTopValues.pop(0), MTop.pop(0), MGXS.pop(0), MGXSe.pop(0), Acceptance.pop(0)
+NrConfigs = len(MTop)
+print "List of studied top-mass values : ",MTopValues
+
+#Set title of root file!
+title = ""
+if whichDir.find("Correct") <= len(whichDir)     and whichDir.find("Correct") > 0:   title = "Correct"
+elif whichDir.find("Wrong") <= len(whichDir)     and whichDir.find("Wrong") > 0:     title = "Wrong"
+elif whichDir.find("Unmatched") <= len(whichDir) and whichDir.find("Unmatched") > 0: title = "Unmatched"
+
+if whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0: title += "Reco"
+elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:  title += "Gen" 
 
 #File of interest:
 list_dir = []
@@ -49,17 +74,17 @@ elif int(weightsFileCounter) > 1:
 print "Will be using file : ",WeightsFile
 
 #ROOT file where all the information will be stored:
-Tfile = TFile(os.path.join(whichDir+"FitDeviation.root"),'recreate')
+Tfile = TFile(os.path.join(whichDir+'FitDeviation_MTop_'+title+'.root'),'recreate')
 gStyle.SetOptStat(0)
-YPlusGausTest    = TH1F('YPlusGausTest',   'Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (no normalisation)', 250,-0.5,0.5)
-YPlusGausTestXS  = TH1F('YPlusGausTestXS', 'Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (XS normalisation)', 250,-0.5,0.5)
-YPlusGausTestAcc = TH1F('YPlusGausTestAcc','Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (Acc normalisation)',250,-0.5,0.5)
-YPlusGausTestPosScdDer    = TH1F('YPlusGausTestPosScdDer',   'Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (no normalisation -- second der > 0)', 250,-0.2,0.2)
-YPlusGausTestXSPosScdDer  = TH1F('YPlusGausTestXSPosScdDer', 'Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (XS normalisation -- second der > 0)', 250,-0.2,0.2)
-YPlusGausTestAccPosScdDer = TH1F('YPlusGausTestAccPosScdDer','Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (Acc normalisation -- second der > 0)',250,-0.2,0.2)
-YPlusGausTestNegScdDer    = TH1F('YPlusGausTestNegScdDer',   'Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (no normalisation -- second der < 0)', 250,-0.2,0.2)
-YPlusGausTestXSNegScdDer  = TH1F('YPlusGausTestXSNegScdDer', 'Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (XS normalisation -- second der < 0)', 250,-0.2,0.2)
-YPlusGausTestAccNegScdDer = TH1F('YPlusGausTestAccNegScdDer','Comparison of fit deviation in m_{top} = 175 and m_{top} = 174 (Acc normalisation -- second der < 0)',250,-0.2,0.2)
+YPlusGausTest    = TH1F('YPlusGausTest',   'Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (no normalisation)', 250,-0.5,0.5)
+YPlusGausTestXS  = TH1F('YPlusGausTestXS', 'Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (XS normalisation)', 250,-0.5,0.5)
+YPlusGausTestAcc = TH1F('YPlusGausTestAcc','Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (Acc normalisation)',250,-0.5,0.5)
+YPlusGausTestPosScdDer    = TH1F('YPlusGausTestPosScdDer',   'Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (no normalisation -- second der > 0)', 250,-0.2,0.2)
+YPlusGausTestXSPosScdDer  = TH1F('YPlusGausTestXSPosScdDer', 'Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (XS normalisation -- second der > 0)', 250,-0.2,0.2)
+YPlusGausTestAccPosScdDer = TH1F('YPlusGausTestAccPosScdDer','Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (Acc normalisation -- second der > 0)',250,-0.2,0.2)
+YPlusGausTestNegScdDer    = TH1F('YPlusGausTestNegScdDer',   'Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (no normalisation -- second der < 0)', 250,-0.2,0.2)
+YPlusGausTestXSNegScdDer  = TH1F('YPlusGausTestXSNegScdDer', 'Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (XS normalisation -- second der < 0)', 250,-0.2,0.2)
+YPlusGausTestAccNegScdDer = TH1F('YPlusGausTestAccNegScdDer','Comparison of fit deviation in m_{top} = '+str(MTop[xPos[2]])+' and m_{top} = 174 (Acc normalisation -- second der < 0)',250,-0.2,0.2)
 
 YPlus    = TH1F('YPlus',   'Deviation from parabolic fit for m_{top} = 174 (no normalisation)' ,150,-0.5,0.5)
 YPlusXS  = TH1F('YPlusXS', 'Deviation from parabolic fit for m_{top} = 174 (XS normalisation)' ,150,-0.5,0.5)
@@ -71,15 +96,15 @@ YPlusNegScdDer    = TH1F('YPlusNegScdDer',   'Deviation from parabolic fit for m
 YPlusXSNegScdDer  = TH1F('YPlusXSNegScdDer', 'Deviation from parabolic fit for m_{top} = 174 (XS normalisation -- second der < 0)' ,150,-0.2,0.2)
 YPlusAccNegScdDer = TH1F('YPlusAccNegScdDer','Deviation from parabolic fit for m_{top} = 174 (Acc normalisation -- second der < 0)',150,-0.2,0.2)
 
-YPlusPlus    = TH1F('YPlusPlus',   'Deviation from parabolic fit for m_{top} = 175 (no normalisation)' ,150,-0.5,0.5)
-YPlusPlusXS  = TH1F('YPlusPlusXS', 'Deviation from parabolic fit for m_{top} = 175 (XS normalisation)' ,150,-0.5,0.5)
-YPlusPlusAcc = TH1F('YPlusPlusAcc','Deviation from parabolic fit for m_{top} = 175 (Acc normalisation)',150,-0.5,0.5)
-YPlusPlusPosScdDer    = TH1F('YPlusPlusPosScdDer',   'Deviation from parabolic fit for m_{top} = 175 (no normalisation -- second der > 0)' ,150,-0.2,0.2)
-YPlusPlusXSPosScdDer  = TH1F('YPlusPlusXSPosScdDer', 'Deviation from parabolic fit for m_{top} = 175 (XS normalisation -- second der > 0)' ,150,-0.2,0.2)
-YPlusPlusAccPosScdDer = TH1F('YPlusPlusAccPosScdDer','Deviation from parabolic fit for m_{top} = 175 (Acc normalisation -- second der > 0)',150,-0.2,0.2)
-YPlusPlusNegScdDer    = TH1F('YPlusPlusNegScdDer',   'Deviation from parabolic fit for m_{top} = 175 (no normalisation -- second der < 0)' ,150,-0.2,0.2)
-YPlusPlusXSNegScdDer  = TH1F('YPlusPlusXSNegScdDer', 'Deviation from parabolic fit for m_{top} = 175 (XS normalisation -- second der < 0)' ,150,-0.2,0.2)
-YPlusPlusAccNegScdDer = TH1F('YPlusPlusAccNegScdDer','Deviation from parabolic fit for m_{top} = 175 (Acc normalisation -- second der < 0)',150,-0.2,0.2)
+YPlusPlus    = TH1F('YPlusPlus',   'Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (no normalisation)' ,150,-0.5,0.5)
+YPlusPlusXS  = TH1F('YPlusPlusXS', 'Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (XS normalisation)' ,150,-0.5,0.5)
+YPlusPlusAcc = TH1F('YPlusPlusAcc','Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (Acc normalisation)',150,-0.5,0.5)
+YPlusPlusPosScdDer    = TH1F('YPlusPlusPosScdDer',   'Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (no normalisation -- second der > 0)' ,150,-0.2,0.2)
+YPlusPlusXSPosScdDer  = TH1F('YPlusPlusXSPosScdDer', 'Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (XS normalisation -- second der > 0)' ,150,-0.2,0.2)
+YPlusPlusAccPosScdDer = TH1F('YPlusPlusAccPosScdDer','Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (Acc normalisation -- second der > 0)',150,-0.2,0.2)
+YPlusPlusNegScdDer    = TH1F('YPlusPlusNegScdDer',   'Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (no normalisation -- second der < 0)' ,150,-0.2,0.2)
+YPlusPlusXSNegScdDer  = TH1F('YPlusPlusXSNegScdDer', 'Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (XS normalisation -- second der < 0)' ,150,-0.2,0.2)
+YPlusPlusAccNegScdDer = TH1F('YPlusPlusAccNegScdDer','Deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (Acc normalisation -- second der < 0)',150,-0.2,0.2)
 
 YMin    = TH1F('YMin',   'Deviation from parabolic fit for m_{top} = 172 (no normalisation)' ,150,-0.5,0.5)
 YMinXS  = TH1F('YMinXS', 'Deviation from parabolic fit for m_{top} = 172 (XS normalisation)' ,150,-0.5,0.5)
@@ -101,9 +126,9 @@ YMinMinNegScdDer    = TH1F('YMinMinNegScdDer',   'Deviation from parabolic fit f
 YMinMinXSNegScdDer  = TH1F('YMinMinXSNegScdDer', 'Deviation from parabolic fit for m_{top} = 171 (XS normalisation -- second der < 0)' ,150,-0.2,0.2)
 YMinMinAccNegScdDer = TH1F('YMinMinAccNegScdDer','Deviation from parabolic fit for m_{top} = 171 (Acc normalisation -- second der < 0)',150,-0.2,0.2)
 
-YRelPlus    = TH1F('YRelPlus',   'Relative deviation from parabolic fit for m_{top} = 175 (no normalisation)' ,250,-0.1,0.1)
-YRelPlusXS  = TH1F('YRelPlusXS', 'Relative deviation from parabolic fit for m_{top} = 175 (XS normalisation)' ,250,-0.1,0.1)
-YRelPlusAcc = TH1F('YRelPlusAcc','Relative deviation from parabolic fit for m_{top} = 175 (Acc normalisation)',250,-0.1,0.1)
+YRelPlus    = TH1F('YRelPlus',   'Relative deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (no normalisation)' ,250,-0.1,0.1)
+YRelPlusXS  = TH1F('YRelPlusXS', 'Relative deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (XS normalisation)' ,250,-0.1,0.1)
+YRelPlusAcc = TH1F('YRelPlusAcc','Relative deviation from parabolic fit for m_{top} = '+str(MTop[xPos[2]])+' (Acc normalisation)',250,-0.1,0.1)
 
 YRelMin    = TH1F('YRelMin',   'Relative deviation from parabolic fit for m_{top} = 171 (no normalisation)' ,150,-0.1,0.1)
 YRelMinXS  = TH1F('YRelMinXS', 'Relative deviation from parabolic fit for m_{top} = 171 (XS normalisation)' ,150,-0.1,0.1)
@@ -113,18 +138,18 @@ FstDer    = TH1F('FirstDer',   'First derivative of -ln(likelihood) distribution
 FstDer.GetXaxis().SetBinLabel(1,"y_{DATA}(x=171) - y_{DATA}(x=172)")
 FstDer.GetXaxis().SetBinLabel(1,"y_{DATA}(x=172) - y_{DATA}(x=173)")
 FstDer.GetXaxis().SetBinLabel(1,"y_{DATA}(x=173) - y_{DATA}(x=174)")
-FstDer.GetXaxis().SetBinLabel(1,"y_{DATA}(x=174) - y_{DATA}(x=175)")
+FstDer.GetXaxis().SetBinLabel(1,"y_{DATA}(x=174) - y_{DATA}(x='+str(MTop[xPos[2]])+')")
 FstDerXS  = TH1F('FirstDerivativeXS', 'First derivative of -ln(likelihood) distribution (XS normalisation)', 5,-0.25,0.25)
 FstDerAcc = TH1F('FirstDerivativeAcc','First derivative of -ln(likelihood) distribution (Acc normalisation)',5,-0.25,0.25)
 ScdDerNarrow    = TH1F('SecondDerivativeNarrow',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = 172/173/174)', 250,-20,20)
 ScdDerXSNarrow  = TH1F('SecondDerivativeXSNarrow', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = 172/173/174)', 250,-20,20)
 ScdDerAccNarrow = TH1F('SecondDerivativeAccNarrow','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = 172/173/174)',250,-20,20)
-ScdDerWide    = TH1F('SecondDerivativeWide',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = 171/173/175)', 250,-20,20)
-ScdDerXSWide  = TH1F('SecondDerivativeXSWide', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = 171/173/175)', 250,-20,20)
-ScdDerAccWide = TH1F('SecondDerivativeAccWide','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = 171/173/175)',250,-20,20)
-ScdDerScatter    = TH2F('ScdDerScatterPlot',   'Second derivative of -ln(L) using Re(VR) = 172/173/174 versus using Re(VR) = 171/173/175 (no normalisation)', 250,-15,15,250,-15,15)
-ScdDerXSScatter  = TH2F('ScdDerXSScatterPlot', 'Second derivative of -ln(L) using Re(VR) = 172/173/174 versus using Re(VR) = 171/173/175 (XS normalisation)', 250,-15,15,250,-15,15)
-ScdDerAccScatter = TH2F('ScdDerAccScatterPlot','Second derivative of -ln(L) using Re(VR) = 172/173/174 versus using Re(VR) = 171/173/175 (Acc normalisation)',250,-15,15,250,-15,15)
+ScdDerWide    = TH1F('SecondDerivativeWide',   'Second derivative of -ln(likelihood) distribution (no normalisation -- using x = 171/173/'+str(MTop[xPos[2]])+')', 250,-20,20)
+ScdDerXSWide  = TH1F('SecondDerivativeXSWide', 'Second derivative of -ln(likelihood) distribution (XS normalisation -- using x = 171/173/'+str(MTop[xPos[2]])+')', 250,-20,20)
+ScdDerAccWide = TH1F('SecondDerivativeAccWide','Second derivative of -ln(likelihood) distribution (Acc normalisation -- using x = 171/173/'+str(MTop[xPos[2]])+')',250,-20,20)
+ScdDerScatter    = TH2F('ScdDerScatterPlot',   'Second derivative of -ln(L) using Re(VR) = 172/173/174 versus using Re(VR) = 171/173/'+str(MTop[xPos[2]])+' (no normalisation)', 250,-15,15,250,-15,15)
+ScdDerXSScatter  = TH2F('ScdDerXSScatterPlot', 'Second derivative of -ln(L) using Re(VR) = 172/173/174 versus using Re(VR) = 171/173/'+str(MTop[xPos[2]])+' (XS normalisation)', 250,-15,15,250,-15,15)
+ScdDerAccScatter = TH2F('ScdDerAccScatterPlot','Second derivative of -ln(L) using Re(VR) = 172/173/174 versus using Re(VR) = 171/173/'+str(MTop[xPos[2]])+' (Acc normalisation)',250,-15,15,250,-15,15)
 
 LnLogDist = TH1F("LnLog","title",5,170.5,175.5)
 LnLogDist.SetMarkerStyle(20), LnLogDist.SetLineColor(1), LnLogDist.SetMarkerColor(1), LnLogDist.SetMarkerSize(1.2)
@@ -143,7 +168,6 @@ LnLogFitCanvasName = "LnLogFitCanvas_Evt"
 LnLogFitCanvasTitle = "Comparing fit function from ROOT fit and algebraic function for event "
 
 #Create the arrays where the likelihood values will be stored
-NrConfigs = 5
 LnLog, LnLogXS, LnLogAcc = [], [], []
 for ii in range(NrConfigs):
   LnLog.append(0), LnLogXS.append(0), LnLogAcc.append(0)
@@ -171,6 +195,7 @@ for WeightLine in WeightsFile:
           LnLogDist.SetName("LnLog_Evt"+str(int(iEvt)+1)),       LnLogDist.SetTitle("LnLog distribution for event "+str(int(iEvt)+1))
           LnLogXSDist.SetName("LnLogXS_Evt"+str(int(iEvt)+1)),   LnLogXSDist.SetTitle("LnLogXS distribution for event "+str(int(iEvt)+1))
           LnLogAccDist.SetName("LnLogAcc_Evt"+str(int(iEvt)+1)), LnLogAccDist.SetTitle("LnLogAcc distribution for event "+str(int(iEvt)+1))
+	#print "weightword[1] = ",WeightWord[1]," & weightWord[3] = ",WeightWord[3]
         LnLog[int(WeightWord[1])-1] = -log(float(WeightWord[3]))
         LnLogXS[int(WeightWord[1])-1] = -log(float(WeightWord[3])) + log(MGXS[int(WeightWord[1])-1])
         LnLogAcc[int(WeightWord[1])-1] = -log(float(WeightWord[3])) + log(MGXS[int(WeightWord[1])-1]) + log(Acceptance[int(WeightWord[1])-1])
@@ -182,9 +207,9 @@ for WeightLine in WeightsFile:
         #---  Only perform the fit after all configurations are considered!  ---#
         if str(WeightWord[1]) == str(NrConfigs):
           #---  Calculate the fit parameters (polynomial)  ---#
-          LnLogFunction = [array('d'),array('d'),array('d'),array('d'),array('d')]
-          LnLogXSFunction = [array('d'),array('d'),array('d'),array('d'),array('d')]
-          LnLogAccFunction = [array('d'),array('d'),array('d'),array('d'),array('d')]
+          LnLogFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
+          LnLogXSFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
+          LnLogAccFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
           for ii in range(2):
             cHat[ii] = LnLog[xNeg[ii]]*MTop[xPos[ii]]*MTop[xMin]/((MTop[xPos[ii]]-MTop[xNeg[ii]])*(MTop[xMin]-MTop[xNeg[ii]])) - LnLog[xMin]*MTop[xNeg[ii]]*MTop[xPos[ii]]/((MTop[xMin]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xMin])) + LnLog[xPos[ii]]*MTop[xNeg[ii]]*MTop[xMin]/((MTop[xPos[ii]]-MTop[xMin])*(MTop[xPos[ii]]-MTop[xNeg[ii]]))
             cHatXS[ii] = LnLogXS[xNeg[ii]]*MTop[xPos[ii]]*MTop[xMin]/((MTop[xPos[ii]]-MTop[xNeg[ii]])*(MTop[xMin]-MTop[xNeg[ii]])) - LnLogXS[xMin]*MTop[xNeg[ii]]*MTop[xPos[ii]]/((MTop[xMin]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xMin])) + LnLogXS[xPos[ii]]*MTop[xNeg[ii]]*MTop[xMin]/((MTop[xPos[ii]]-MTop[xMin])*(MTop[xPos[ii]]-MTop[xNeg[ii]]))
@@ -198,8 +223,8 @@ for WeightLine in WeightsFile:
             aHatXS[ii] = LnLogXS[xPos[ii]]/((MTop[xPos[ii]]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xMin])) - LnLogXS[xMin]/((MTop[xMin]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xMin])) + LnLogXS[xNeg[ii]]/((MTop[xMin]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xNeg[ii]]))
             aHatAcc[ii] = LnLogAcc[xPos[ii]]/((MTop[xPos[ii]]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xMin])) - LnLogAcc[xMin]/((MTop[xMin]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xMin])) + LnLogAcc[xNeg[ii]]/((MTop[xMin]-MTop[xNeg[ii]])*(MTop[xPos[ii]]-MTop[xNeg[ii]]))
 
-            #-- Now calculate each of the 9 MTop configurations using this parabola --#
-            for mtop in range(5):
+            #-- Now calculate each of the MTop configurations using this parabola --#
+            for mtop in range(NrConfigs):
               LnLogFunction[ii].append(aHat[ii]*MTop[mtop]*MTop[mtop]+bHat[ii]*MTop[mtop]+cHat[ii])
               LnLogXSFunction[ii].append( aHatXS[ii]*MTop[mtop]*MTop[mtop]+bHatXS[ii]*MTop[mtop]+cHatXS[ii])
               LnLogAccFunction[ii].append( aHatAcc[ii]*MTop[mtop]*MTop[mtop]+bHatAcc[ii]*MTop[mtop]+cHatAcc[ii])
@@ -216,7 +241,7 @@ for WeightLine in WeightsFile:
           legendLnLog = TLegend(0.75,0.7,0.95,0.95)
           LnLogFitCanvas.cd()
           legendLnLog.AddEntry(LnLogGraphNarrow,'Fit result using algebraic function (x = 172/173/174)',"p")
-          legendLnLog.AddEntry(LnLogGraphWide,'Fit result using algebraic function (x = 171/173/175)',"p")
+          legendLnLog.AddEntry(LnLogGraphWide,'Fit result using algebraic function (x = 171/173/'+str(MTop[xPos[2]])+')',"p")
           legendLnLog.AddEntry(LnLogDistFit,'Obtained LnLog values with ROOT fit',"p")
           LnLogGraphNarrow.Draw("AC*"), LnLogGraphWide.Draw("C*"), LnLogDistFit.Draw("samep"), legendLnLog.Draw()
           FitComp.cd(), LnLogFitCanvas.Write()
@@ -302,7 +327,7 @@ ScdDerScatter.Write(), ScdDerXSScatter.Write(), ScdDerAccScatter.Write()
 
 #---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---#
 print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = 172/173/174) ",len(EvtsWithPosScdDerNarrow),", ",len(EvtsWithPosScdDerXSNarrow)," & ",len(EvtsWithPosScdDerAccNarrow)
-print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = 171/173/175) ",len(EvtsWithPosScdDerWide),", ",len(EvtsWithPosScdDerXSWide)," & ",len(EvtsWithPosScdDerAccWide)
+print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = 171/173/'+str(MTop[xPos[2]])+') ",len(EvtsWithPosScdDerWide),", ",len(EvtsWithPosScdDerXSWide)," & ",len(EvtsWithPosScdDerAccWide)
 LLPosScdDerNarrow,   LLNegScdDerNarrow,   LLXSPosScdDerNarrow,   LLXSNegScdDerNarrow,   LLAccPosScdDerNarrow,   LLAccNegScdDerNarrow = [],[],[],[],[],[]
 LLPosScdDerWide,   LLNegScdDerWide,   LLXSPosScdDerWide,   LLXSNegScdDerWide,   LLAccPosScdDerWide,   LLAccNegScdDerWide = [],[],[],[],[],[]
 LLPosScdDerBoth, LLNegScdDerBoth, LLXSPosScdDerBoth, LLXSNegScdDerBoth, LLAccPosScdDerBoth, LLAccNegScdDerBoth = [],[],[],[],[],[]
@@ -345,15 +370,16 @@ for LikelihoodLine in LikelihoodFile:
     if int(LWord[0]) in EvtsWithPosScdDerAccWide: LLAccPosScdDerWide[int(LWord[1])-1] = LLAccPosScdDerWide[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
     else:                                       LLAccNegScdDerWide[int(LWord[1])-1] = LLAccNegScdDerWide[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
 
-LLPosScdDerDistBoth   =TH1F('LLPosScdDerBoth',   '-ln(L) for events with 2nd derivative > 0 (no norm -- using x = 174 & 175 -- '+str(EvtsWithPosScdDerBoth)+'/'+str(nEvts)+' evts)',    5,170.5,175.5)
-LLXSPosScdDerDistBoth =TH1F('LLXSPosScdDerBoth', '-ln(L) for events with 2nd derivative > 0 (XS norm -- using x = 174 & 175 -- '+str(EvtsWithPosScdDerXSBoth)+'/'+str(nEvts)+' evts)',  5,170.5,175.5)
-LLAccPosScdDerDistBoth=TH1F('LLAccPosScdDerBoth','-ln(L) for events with 2nd derivative > 0 (Acc norm -- using x = 174 & 175 -- '+str(EvtsWithPosScdDerAccBoth)+'/'+str(nEvts)+' evts)',5,170.5,175.5)
+LLPosScdDerDistBoth   =TH1F('LLPosScdDerBoth',   '-ln(L) when both 2nd derivatives > 0 (no norm -- '+str(EvtsPosScdDerBoth)+'/'+str(nEvts)+' evts -- '+title+')',    7,-0.35,0.35)
+LLPosScdDerDistBoth   =TH1F('LLPosScdDerBoth',   '-ln(L) when both 2nd derivatives > 0 (no norm -- '+str(EvtsWithPosScdDerBoth)+'/'+str(nEvts)+' evts -- '+title+')',    5,170.5,175.5)
+LLXSPosScdDerDistBoth =TH1F('LLXSPosScdDerBoth', '-ln(L) for events with 2nd derivative > 0 (XS norm -- using x = 174 & '+str(MTop[xPos[2]])+' -- '+str(EvtsWithPosScdDerXSBoth)+'/'+str(nEvts)+' evts)',  5,170.5,175.5)
+LLAccPosScdDerDistBoth=TH1F('LLAccPosScdDerBoth','-ln(L) for events with 2nd derivative > 0 (Acc norm -- using x = 174 & '+str(MTop[xPos[2]])+' -- '+str(EvtsWithPosScdDerAccBoth)+'/'+str(nEvts)+' evts)',5,170.5,175.5)
 LLPosScdDerDistNarrow   =TH1F('LLPosScdDerNarrow',   '-ln(L) for events with 2nd derivative > 0 (no norm -- x = 172/173/174 -- '+str(len(EvtsWithPosScdDerNarrow))+'/'+str(nEvts)+' evts)',    5,170.5,175.5)
 LLXSPosScdDerDistNarrow =TH1F('LLXSPosScdDerNarrow', '-ln(L) for events with 2nd derivative > 0 (XS norm -- x = 172/173/174 -- '+str(len(EvtsWithPosScdDerXSNarrow))+'/'+str(nEvts)+' evts)',  5,170.5,175.5)
 LLAccPosScdDerDistNarrow=TH1F('LLAccPosScdDerNarrow','-ln(L) for events with 2nd derivative > 0 (Acc norm -- x = 172/173/174 -- '+str(len(EvtsWithPosScdDerAccNarrow))+'/'+str(nEvts)+' evts)',5,170.5,175.5)
-LLPosScdDerDistWide   =TH1F('LLPosScdDerWide',   '-ln(L) for events with 2nd derivative > 0 (no norm -- x = 171/173/175 -- '+str(len(EvtsWithPosScdDerWide))+'/'+str(nEvts)+' evts)',    5,170.5,175.5)
-LLXSPosScdDerDistWide =TH1F('LLXSPosScdDerWide', '-ln(L) for events with 2nd derivative > 0 (XS norm -- x = 171/173/175 -- '+str(len(EvtsWithPosScdDerXSWide))+'/'+str(nEvts)+' evts)',  5,170.5,175.5)
-LLAccPosScdDerDistWide=TH1F('LLAccPosScdDerWide','-ln(L) for events with 2nd derivative > 0 (Acc norm -- x = 171/173/175 -- '+str(len(EvtsWithPosScdDerAccWide))+'/'+str(nEvts)+' evts)',5,170.5,175.5)
+LLPosScdDerDistWide   =TH1F('LLPosScdDerWide',   '-ln(L) for events with 2nd derivative > 0 (no norm -- x = 171/173/'+str(MTop[xPos[2]])+' -- '+str(len(EvtsWithPosScdDerWide))+'/'+str(nEvts)+' evts)',    5,170.5,175.5)
+LLXSPosScdDerDistWide =TH1F('LLXSPosScdDerWide', '-ln(L) for events with 2nd derivative > 0 (XS norm -- x = 171/173/'+str(MTop[xPos[2]])+' -- '+str(len(EvtsWithPosScdDerXSWide))+'/'+str(nEvts)+' evts)',  5,170.5,175.5)
+LLAccPosScdDerDistWide=TH1F('LLAccPosScdDerWide','-ln(L) for events with 2nd derivative > 0 (Acc norm -- x = 171/173/'+str(MTop[xPos[2]])+' -- '+str(len(EvtsWithPosScdDerAccWide))+'/'+str(nEvts)+' evts)',5,170.5,175.5)
 LLNegScdDerDistNarrow   =TH1F('LLNegScdDerNarrow',   '-ln(L) when 2nd derivative < 0 (no norm - narrow fit - '+str(int(nEvts)-len(EvtsWithPosScdDerNarrow))+'/'+str(nEvts)+' evts)',    5,170.5,175.5)
 LLXSNegScdDerDistNarrow =TH1F('LLXSNegScdDerNarrow', '-ln(L) when 2nd derivative < 0 (XS norm - narrow fit - '+str(int(nEvts)-len(EvtsWithPosScdDerXSNarrow))+'/'+str(nEvts)+' evts)',  5,170.5,175.5)
 LLAccNegScdDerDistNarrow=TH1F('LLAccNegScdDerNarrow','-ln(L) when 2nd derivative < 0 (Acc norm - narrow fit - '+str(int(nEvts)-len(EvtsWithPosScdDerAccNarrow))+'/'+str(nEvts)+' evts)',5,170.5,175.5)
