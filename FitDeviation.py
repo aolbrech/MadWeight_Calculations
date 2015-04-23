@@ -119,8 +119,11 @@ if whichDir.find("Correct") <= len(whichDir)     and whichDir.find("Correct") > 
 elif whichDir.find("Wrong") <= len(whichDir)     and whichDir.find("Wrong") > 0:     title = "Wrong"
 elif whichDir.find("Unmatched") <= len(whichDir) and whichDir.find("Unmatched") > 0: title = "Unmatched"
 
+GenLevel = False
 if whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0: title += "Reco"
-elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:  title += "Gen"
+elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
+  title += "Gen"
+  GenLevel = True
 title = title+"_"+KinVariable
 
 #ROOT file where all the information will be stored:
@@ -212,7 +215,7 @@ LnLogAccDist.SetMarkerStyle(22), LnLogAccDist.SetLineColor(4), LnLogAccDist.SetM
 FitComp = Tfile.mkdir("FitComparison")
 LnLogDir = Tfile.mkdir("LnLogDistr")
 LnLogXSDir = Tfile.mkdir("LnLogXSDistr")
-LnLogAccDir = Tfile.mkdir("LnLogAccDistr")
+if GenLevel == False: LnLogAccDir = Tfile.mkdir("LnLogAccDistr")
 FstDerDir = Tfile.mkdir("FirstDerivativeDistr")
 LnLogFitCanvas = TCanvas('name','title')
 LnLogFitCanvasName = 'LnLogFitCanvas_Evt'
@@ -321,7 +324,8 @@ for WeightLine in WeightsFile:
           #---  Save the LnLog distributions (event-per-event) and the Y-deviations in histograms  ---#
           LnLogDir.cd(),    LnLogDist.Write()
           LnLogXSDir.cd(),  LnLogXSDist.Write()
-          LnLogAccDir.cd(), LnLogAccDist.Write()
+          if GenLevel == False: 
+            LnLogAccDir.cd(), LnLogAccDist.Write()
           #-- Apply cut on YPlusGausTest --#
           if (yPlus[0] + yPlusPlus[0]/4) <= 0.025 and (yPlus[0] + yPlusPlus[0]/4) >= -0.025: EvtsWithYPlusGausSmall.append(iEvt+1)
           if (yPlus[1] + yPlusPlus[1]/4) <= 0.025 and (yPlus[1] + yPlusPlus[1]/4) >= -0.025: EvtsWithYPlusGausSmallXS.append(iEvt+1)
@@ -363,21 +367,30 @@ for WeightLine in WeightsFile:
 
 #--- Save all the histograms containing information about all the events! ---#
 Tfile.cd()
-YPlusGausTest.Write(), YPlusGausTestXS.Write(), YPlusGausTestAcc.Write()
-YPlus.Write(),         YPlusXS.Write(),         YPlusAcc.Write()
-YPlusPlus.Write(),     YPlusPlusXS.Write(),     YPlusPlusAcc.Write()
-YRelPlus.Write(),      YRelPlusXS.Write(),      YRelPlusAcc.Write()
-YMin.Write(),          YMinXS.Write(),          YMinAcc.Write()
-YMinMin.Write(),       YMinMinXS.Write(),       YMinMinAcc.Write()
-YRelMin.Write(),       YRelMinXS.Write(),       YRelMinAcc.Write()
-ScdDerInner.Write(),   ScdDerXSInner.Write(),   ScdDerAccInner.Write()
-ScdDerOuter.Write(),   ScdDerXSOuter.Write(),   ScdDerAccOuter.Write()
-ScdDerScatter.Write(), ScdDerXSScatter.Write(), ScdDerAccScatter.Write()
+YPlusGausTest.Write(), YPlusGausTestXS.Write() 
+YPlus.Write(),         YPlusXS.Write()
+YPlusPlus.Write(),     YPlusPlusXS.Write()
+YRelPlus.Write(),      YRelPlusXS.Write()
+YMin.Write(),          YMinXS.Write()
+YMinMin.Write(),       YMinMinXS.Write()
+YRelMin.Write(),       YRelMinXS.Write()
+ScdDerInner.Write(),   ScdDerXSInner.Write()
+ScdDerOuter.Write(),   ScdDerXSOuter.Write()
+ScdDerScatter.Write(), ScdDerXSScatter.Write() 
+if GenLevel == False: 
+  YPlusGausTestAcc.Write(),YPlusAcc.Write(),YPlusPlusAcc.Write(),YRelPlusAcc.Write()
+  YMinAcc.Write(),YMinMinAcc.Write(),YRelMinAcc.Write()
+  ScdDerAccInner.Write(),ScdDerAccOuter.Write(),ScdDerAccScatter.Write()
 
 #---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---#
-print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = ",str(Var[xNeg[0]]),"/",str(Var[xMin]),"/",str(Var[xPos[0]]),") :",len(EvtsPosScdDerInner),", ",len(EvtsPosScdDerXSInner)," & ",len(EvtsPosScdDerAccInner)
-print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = ",str(Var[xNeg[1]]),"/",str(Var[xMin]),"/",str(Var[xPos[1]]),") :",len(EvtsPosScdDerOuter),", ",len(EvtsPosScdDerXSOuter)," & ",len(EvtsPosScdDerAccOuter)
-print "Nr of events with Gaussiaanse vergelijking voor + (LnLog, LnLogXS & LnLogAcc) ", len(EvtsWithYPlusGausSmall),", ",len(EvtsWithYPlusGausSmallXS)," & ",len(EvtsWithYPlusGausSmallAcc)
+if GenLevel == False:
+  print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = ",str(Var[xNeg[0]]),"/",str(Var[xMin]),"/",str(Var[xPos[0]]),") :",len(EvtsPosScdDerInner),", ",len(EvtsPosScdDerXSInner)," & ",len(EvtsPosScdDerAccInner)
+  print "Nr of events with 2nd derivative > 0 (LnLog, LnLogXS & LnLogAcc -- using x = ",str(Var[xNeg[1]]),"/",str(Var[xMin]),"/",str(Var[xPos[1]]),") :",len(EvtsPosScdDerOuter),", ",len(EvtsPosScdDerXSOuter)," & ",len(EvtsPosScdDerAccOuter)
+  print "Nr of events with Gaussiaanse vergelijking voor + (LnLog, LnLogXS & LnLogAcc) ", len(EvtsWithYPlusGausSmall),", ",len(EvtsWithYPlusGausSmallXS)," & ",len(EvtsWithYPlusGausSmallAcc)
+else:
+  print "Nr of events with 2nd derivative > 0 (LnLog & LnLogXS -- using x = ",str(Var[xNeg[0]]),"/",str(Var[xMin]),"/",str(Var[xPos[0]]),") :",len(EvtsPosScdDerInner)," & ",len(EvtsPosScdDerXSInner)
+  print "Nr of events with 2nd derivative > 0 (LnLog & LnLogXS -- using x = ",str(Var[xNeg[1]]),"/",str(Var[xMin]),"/",str(Var[xPos[1]]),") :",len(EvtsPosScdDerOuter)," & ",len(EvtsPosScdDerXSOuter)
+  print "Nr of events with Gaussiaanse vergelijking voor + (LnLog & LnLogXS) ", len(EvtsWithYPlusGausSmall)," & ",len(EvtsWithYPlusGausSmallXS)
 
 LLPosScdDerInner, LLNegScdDerInner, LLXSPosScdDerInner, LLXSNegScdDerInner, LLAccPosScdDerInner, LLAccNegScdDerInner = [],[],[],[],[],[]
 LLPosScdDerOuter, LLNegScdDerOuter, LLXSPosScdDerOuter, LLXSNegScdDerOuter, LLAccPosScdDerOuter, LLAccNegScdDerOuter = [],[],[],[],[],[]
@@ -437,7 +450,7 @@ LLXSNegScdDerDistOuter  = TH1F('LLXSNegScdDerOuter', '-ln(L) when outer 2nd deri
 LLAccNegScdDerDistOuter = TH1F('LLAccNegScdDerOuter','-ln(L) when outer 2nd derivative < 0 (Acc norm -- '+str(NrEvtsNegScdDerAccOuter)+'/'+nEvts+' evts -- '+title+')',xBinZoom,xLowZoom,xHighZoom)
 
 for ii in range(NrConfigs):
-  LLPosScdDerDistInner.SetBinContent(LLPosScdDerDistInner.FindBin(Var[ii]), float(LLPosScdDerInner[ii]))
+  LLPosScdDerDistInner.SetBinContent(LLPosScdDerDistInner.FindBin(Var[ii]), float(LLPosScdDerInner[ii])), 
   LLXSPosScdDerDistInner.SetBinContent(LLXSPosScdDerDistInner.FindBin(Var[ii]),float(LLXSPosScdDerInner[ii]))
   LLAccPosScdDerDistInner.SetBinContent(LLAccPosScdDerDistInner.FindBin(Var[ii]),float(LLAccPosScdDerInner[ii]))
   LLNegScdDerDistInner.SetBinContent(LLNegScdDerDistInner.FindBin(Var[ii]), float(LLNegScdDerInner[ii]))
@@ -458,11 +471,14 @@ for ii in range(NrConfigs):
 AppliedCutsDir = Tfile.mkdir("LikelihoodAfterCuts")
 SignScdDerDir = AppliedCutsDir.mkdir("SignSecondDerivative")
 SignScdDerDir.cd()
-LLPosScdDerDistInner.Write(),   LLXSPosScdDerDistInner.Write(),   LLAccPosScdDerDistInner.Write()
-LLNegScdDerDistInner.Write(),   LLXSNegScdDerDistInner.Write(),   LLAccNegScdDerDistInner.Write()
-LLPosScdDerDistOuter.Write(),   LLXSPosScdDerDistOuter.Write(),   LLAccPosScdDerDistOuter.Write()
-LLNegScdDerDistOuter.Write(),   LLXSNegScdDerDistOuter.Write(),   LLAccNegScdDerDistOuter.Write()
-LLPosScdDerDistBoth.Write(), LLXSPosScdDerDistBoth.Write(), LLAccPosScdDerDistBoth.Write()
+LLPosScdDerDistInner.Write(), LLXSPosScdDerDistInner.Write() 
+LLNegScdDerDistInner.Write(), LLXSNegScdDerDistInner.Write() 
+LLPosScdDerDistOuter.Write(), LLXSPosScdDerDistOuter.Write() 
+LLNegScdDerDistOuter.Write(), LLXSNegScdDerDistOuter.Write() 
+LLPosScdDerDistBoth.Write(),  LLXSPosScdDerDistBoth.Write()  
+if GenLevel == False:
+ LLAccPosScdDerDistInner.Write(),LLAccPosScdDerDistBoth.Write(),LLAccNegScdDerDistOuter.Write(),LLAccPosScdDerDistOuter.Write(),LLAccNegScdDerDistInner.Write()
+
 #-- Save the variables separate of scd Der sign  --#
 #--   --> Can give hint for good cut!            --#
 #- Save the YPlusGausTest variables -#
@@ -472,8 +488,9 @@ YPlusGausTestCanvas = TCanvas('YPlusGausTestCanvas','Combined distribution of YP
 YPlusGausTestCanvas.cd(), YPlusGausTestPosScdDer.Draw(), YPlusGausTestNegScdDer.Draw("same"), YPlusGausTestCanvas.Write()
 YPlusGausTestXSCanvas = TCanvas('YPlusGausTestXSCanvas','Combined distribution of YPlusGausTest variable for events with positive and negative scd derivative (XS normalisation -- '+title+')')
 YPlusGausTestXSCanvas.cd(), YPlusGausTestXSNegScdDer.Draw(), YPlusGausTestXSPosScdDer.Draw("same"), YPlusGausTestXSCanvas.Write()
-YPlusGausTestAccCanvas = TCanvas('YPlusGausTestAccCanvas','Combined distribution of YPlusGausTest variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
-YPlusGausTestAccCanvas.cd(), YPlusGausTestAccNegScdDer.Draw(), YPlusGausTestAccPosScdDer.Draw("same"), YPlusGausTestAccCanvas.Write()
+if GenLevel == False:
+  YPlusGausTestAccCanvas = TCanvas('YPlusGausTestAccCanvas','Combined distribution of YPlusGausTest variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
+  YPlusGausTestAccCanvas.cd(), YPlusGausTestAccNegScdDer.Draw(), YPlusGausTestAccPosScdDer.Draw("same"), YPlusGausTestAccCanvas.Write()
 #- Save the YPlus variables -#
 YPlusPosScdDer.SetLineColor(3), YPlusXSPosScdDer.SetLineColor(3), YPlusAccPosScdDer.SetLineColor(3)
 YPlusNegScdDer.SetLineColor(2), YPlusXSNegScdDer.SetLineColor(2), YPlusAccNegScdDer.SetLineColor(2)
@@ -481,8 +498,9 @@ YPlusCanvas = TCanvas('YPlusCanvas','Combined distribution of YPlus variable for
 YPlusCanvas.cd(), YPlusPosScdDer.Draw(), YPlusNegScdDer.Draw("same"), YPlusCanvas.Write()
 YPlusXSCanvas = TCanvas('YPlusXSCanvas','Combined distribution of YPlus variable for events with positive and negative scd derivative (XS normalisation -- '+title+')')
 YPlusXSCanvas.cd(), YPlusXSNegScdDer.Draw(), YPlusXSPosScdDer.Draw("same"), YPlusXSCanvas.Write()
-YPlusAccCanvas = TCanvas('YPlusAccCanvas','Combined distribution of YPlus variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
-YPlusAccCanvas.cd(), YPlusAccNegScdDer.Draw(), YPlusAccPosScdDer.Draw("same"), YPlusAccCanvas.Write()
+if GenLevel == False:
+  YPlusAccCanvas = TCanvas('YPlusAccCanvas','Combined distribution of YPlus variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
+  YPlusAccCanvas.cd(), YPlusAccNegScdDer.Draw(), YPlusAccPosScdDer.Draw("same"), YPlusAccCanvas.Write()
 #- Save the YPlusPlus variables -#
 YPlusPlusPosScdDer.SetLineColor(3), YPlusPlusXSPosScdDer.SetLineColor(3), YPlusPlusAccPosScdDer.SetLineColor(3)
 YPlusPlusNegScdDer.SetLineColor(2), YPlusPlusXSNegScdDer.SetLineColor(2), YPlusPlusAccNegScdDer.SetLineColor(2)
@@ -490,8 +508,9 @@ YPlusPlusCanvas = TCanvas('YPlusPlusCanvas','Combined distribution of YPlusPlus 
 YPlusPlusCanvas.cd(), YPlusPlusPosScdDer.Draw(), YPlusPlusNegScdDer.Draw("same"), YPlusPlusCanvas.Write()
 YPlusPlusXSCanvas = TCanvas('YPlusPlusXSCanvas','Combined distribution of YPlusPlus variable for events with positive and negative scd derivative (XS normalisation -- '+title+')')
 YPlusPlusXSCanvas.cd(), YPlusPlusXSNegScdDer.Draw(), YPlusPlusXSPosScdDer.Draw("same"), YPlusPlusXSCanvas.Write()
-YPlusPlusAccCanvas = TCanvas('YPlusPlusAccCanvas','Combined distribution of YPlusPlus variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
-YPlusPlusAccCanvas.cd(), YPlusPlusAccNegScdDer.Draw(), YPlusPlusAccPosScdDer.Draw("same"), YPlusPlusAccCanvas.Write()
+if GenLevel == False:
+  YPlusPlusAccCanvas = TCanvas('YPlusPlusAccCanvas','Combined distribution of YPlusPlus variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
+  YPlusPlusAccCanvas.cd(), YPlusPlusAccNegScdDer.Draw(), YPlusPlusAccPosScdDer.Draw("same"), YPlusPlusAccCanvas.Write()
 #- Save the YMin variables -#
 YMinPosScdDer.SetLineColor(3), YMinXSPosScdDer.SetLineColor(3), YMinAccPosScdDer.SetLineColor(3)
 YMinNegScdDer.SetLineColor(2), YMinXSNegScdDer.SetLineColor(2), YMinAccNegScdDer.SetLineColor(2)
@@ -499,8 +518,9 @@ YMinCanvas = TCanvas('YMinCanvas','Combined distribution of YMin variable for ev
 YMinCanvas.cd(), YMinPosScdDer.Draw(), YMinNegScdDer.Draw("same"), YMinCanvas.Write()
 YMinXSCanvas = TCanvas('YMinXSCanvas','Combined distribution of YMin variable for events with positive and negative scd derivative (XS normalisation -- '+title+')')
 YMinXSCanvas.cd(), YMinXSNegScdDer.Draw(), YMinXSPosScdDer.Draw("same"), YMinXSCanvas.Write()
-YMinAccCanvas = TCanvas('YMinAccCanvas','Combined distribution of YMin variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
-YMinAccCanvas.cd(), YMinAccNegScdDer.Draw(), YMinAccPosScdDer.Draw("same"), YMinAccCanvas.Write()
+if GenLevel == False:
+  YMinAccCanvas = TCanvas('YMinAccCanvas','Combined distribution of YMin variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
+  YMinAccCanvas.cd(), YMinAccNegScdDer.Draw(), YMinAccPosScdDer.Draw("same"), YMinAccCanvas.Write()
 #- Save the YMinMin variables -#
 YMinMinPosScdDer.SetLineColor(3), YMinMinXSPosScdDer.SetLineColor(3), YMinMinAccPosScdDer.SetLineColor(3)
 YMinMinNegScdDer.SetLineColor(2), YMinMinXSNegScdDer.SetLineColor(2), YMinMinAccNegScdDer.SetLineColor(2)
@@ -508,6 +528,7 @@ YMinMinCanvas = TCanvas('YMinMinCanvas','Combined distribution of YMinMin variab
 YMinMinCanvas.cd(), YMinMinPosScdDer.Draw(), YMinMinNegScdDer.Draw("same"), YMinMinCanvas.Write()
 YMinMinXSCanvas = TCanvas('YMinMinXSCanvas','Combined distribution of YMinMin variable for events with positive and negative scd derivative (XS normalisation -- '+title+')')
 YMinMinXSCanvas.cd(), YMinMinXSNegScdDer.Draw(), YMinMinXSPosScdDer.Draw("same"), YMinMinXSCanvas.Write()
-YMinMinAccCanvas = TCanvas('YMinMinAccCanvas','Combined distribution of YMinMin variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
-YMinMinAccCanvas.cd(), YMinMinAccNegScdDer.Draw(), YMinMinAccPosScdDer.Draw("same"), YMinMinAccCanvas.Write()
+if GenLevel == False:
+  YMinMinAccCanvas = TCanvas('YMinMinAccCanvas','Combined distribution of YMinMin variable for events with positive and negative scd derivative (Acc normalisation -- '+title+')')
+  YMinMinAccCanvas.cd(), YMinMinAccNegScdDer.Draw(), YMinMinAccPosScdDer.Draw("same"), YMinMinAccCanvas.Write()
 
