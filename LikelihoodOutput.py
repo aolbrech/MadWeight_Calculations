@@ -177,14 +177,14 @@ for ii in range(len(Var)):
     LLMin = float(LL[ii])
   if float(LLXS[ii]) < LLXSMin:
     LLXSMin = float(LLXS[ii])  
-  if float(LLAcc[ii]) < LLAccMin and GenLevel == False:
+  if GenLevel == False and float(LLAcc[ii]) < LLAccMin:
     LLAccMin = float(LLAcc[ii])  
 
 LLDist.SetMinimum(0),   LLDist.SetMarkerStyle(20),   LLDist.SetLineColor(1),   LLDist.SetMarkerColor(1),   LLDist.Write()
 LLXSDist.SetMinimum(0), LLXSDist.SetMarkerStyle(21), LLXSDist.SetLineColor(2), LLXSDist.SetMarkerColor(2), LLXSDist.Write()
 if GenLevel == False: LLAccDist.SetMinimum(0), LLAccDist.SetMarkerStyle(22), LLAccDist.SetLineColor(3), LLAccDist.SetMarkerColor(3), LLAccDist.Write()
-print " Found minimums (LL, LLXS & LLAcc): ",LLMin,", ",LLXSMin," and ",LLAccMin
-if GenLevel == False: print " Found minimums (LL & LLXS): ",LLMin," & ",LLXSMin
+if GenLevel == False: print " Found minimums (LL, LLXS & LLAcc): ",LLMin,", ",LLXSMin," and ",LLAccMin
+else:                 print " Found minimums (LL & LLXS): ",LLMin," & ",LLXSMin
 
 #Change bin content for combined canvas!
 for ii in range(len(Var)):
