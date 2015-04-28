@@ -9,11 +9,11 @@ from ROOT import TH1F,TFile,TCanvas,TLegend,gStyle
 #Get all the input from the command line:
 if len(sys.argv) <= 1:
   print "Need to give the directory of interest, the considered kinematic variable and whether scdDer cuts should be applied in the command line !"
-  print " Correct syntax is : python FitLikelihood.py Events/blabla/ MTop (WithCut)"
+  print " Correct syntax is : python FitLikelihood.py Events/blabla/ MTop"
   sys.exit()
 elif len(sys.argv) == 2:
   print "Need to specify the considered kinematic variable (MTop or RVR)"
-  print " Correct syntax is : python FitLikelihood.py Events/blabla/ MTop (WithCut)"
+  print " Correct syntax is : python FitLikelihood.py Events/blabla/ MTop"
   sys.exit()
 whichDir = sys.argv[1]
 KinVariable = sys.argv[2]
