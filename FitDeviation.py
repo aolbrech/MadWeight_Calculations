@@ -34,6 +34,7 @@ if KinVariable == "RVR":
   VarValues =  ["Re(V_{R}) = -0.5","Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3", "Re(V_{R}) = 0.5"]
   Var =        array('d',[-0.5,            -0.3,             -0.2,            -0.1,             -0.05,    0.0,              0.05,     0.1,              0.2,              0.3,              0.5            ])
   MGXS =       array('d',[17.9275,         13.3944,          12.06555,        11.25909,         11.02784, 10.90059,         10.88228, 10.97767,         11.49883,         12.49056,         16.1508        ])
+  MGXSCut =    array('d',[17.9275,         13.3944,          12.06555,        11.25909,         11.02784, 10.90059,         10.88228, 10.97767,         11.49883,         12.49056,         16.1508        ])
   MGXSe =      array('d',[0.0123100357311, 0.00995808028337, 0.0093464076837, 0.00836607833038, 0.0,      0.00822214433527, 0.0,      0.00847293509122, 0.00901976602967, 0.00874682264197, 0.0113081652137])
   Acceptance = array('d',[0.22164,         0.21742,          0.21672,         0.21737,          0.21614,  0.21670,          0.21531,  0.21677,          0.21437,          0.21793,          0.22205        ])
 
@@ -44,21 +45,20 @@ if KinVariable == "RVR":
   KinVar = "Re(V_{R})"
 
   if VarWindow == "1":
-    VarValues.pop(6), Var.pop(6), MGXS.pop(6), MGXSe.pop(6), Acceptance.pop(6)
-    VarValues.pop(4), Var.pop(4), MGXS.pop(4), MGXSe.pop(4), Acceptance.pop(4)
+    VarValues.pop(6), Var.pop(6), MGXS.pop(6), MGXSe.pop(6), MGXSCut.pop(6), Acceptance.pop(6)
+    VarValues.pop(4), Var.pop(4), MGXS.pop(4), MGXSe.pop(4), MGXSCut.pop(4)Acceptance.pop(4)
     xBin, xLow, xHigh = 11, -0.55, 0.55
-    xBinZoom, xLowZoom, xHighZoom = 7, -0.35, 0.35 
   elif VarWindow == "2":
-    VarValues.pop(10), Var.pop(10), MGXS.pop(10), MGXSe.pop(10), Acceptance.pop(10)
-    VarValues.pop(0), Var.pop(0), MGXS.pop(0), MGXSe.pop(0), Acceptance.pop(0)
+    VarValues.pop(10), Var.pop(10), MGXS.pop(10), MGXSe.pop(10), MGXSCut.pop(10), Acceptance.pop(10)
+    VarValues.pop(0), Var.pop(0), MGXS.pop(0), MGXSe.pop(0), MGXSCut.pop(0), Acceptance.pop(0)
     xBin, xLow, xHigh = 13, -0.325, 0.325
-    xBinZoom, xLowZoom, xHighZoom = xBin, xLow, xHigh
 
 elif KinVariable == "MTop":
   #Information about the scanned MTop values and the corresponding cross-section
   VarValues = ["m_{top} = 153",  "m_{top} = 163",  "m_{top} = 170",  "m_{top} = 171",  "m_{top} = 172",  "m_{top} = 173",  "m_{top} = 174",  "m_{top} = 175","m_{top} = 183",  "m_{top} = 193"]
   Var =        array('d',[153,              163,              170,              171,              172,              173,              174,              175,            183,              193            ])
   MGXS =       array('d',[8.20916,          9.6299,           10.57123,         10.70485,         10.8257,          10.96469,         11.08428,         11.22448,       12.18068,         13.3046        ])
+  MGXSCut =    array('d',[8.20916,          9.6299,           10.57123,         10.70485,         10.8257,          10.96469,         11.08428,         11.22448,       12.18068,         13.3046        ])
   MGXSe =      array('d',[0.00641266950107, 0.00775899974932, 0.00857143063963, 0.00814303595657, 0.00878899028501, 0.00816801717126, 0.00904797742371, 0.008653800078, 0.00931290317946, 0.0103310001752])
   Acceptance = array('d',[0.16203,          0.19152,          0.21008,          0.21460,          0.21735,          0.21290,          0.21752,          0.22185,        0.23941,          0.26413        ])
 
@@ -71,16 +71,15 @@ elif KinVariable == "MTop":
   if VarWindow == "1":
     xBin, xLow, xHigh = 41, 152.5, 193.5
   elif VarWindow == "2":
-    VarValues.pop(2), Var.pop(2), MGXS.pop(2), MGXSe.pop(2), Acceptance.pop(2)
+    VarValues.pop(2), Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2), Acceptance.pop(2)
     xBin, xLow, xHigh = 41, 152.5, 193.5
   elif VarWindow == "3":
-    VarValues.pop(9), Var.pop(9), MGXS.pop(9), MGXSe.pop(9), Acceptance.pop(9)
-    VarValues.pop(8), Var.pop(8), MGXS.pop(8), MGXSe.pop(8), Acceptance.pop(8)
-    VarValues.pop(2), Var.pop(2), MGXS.pop(2), MGXSe.pop(2), Acceptance.pop(2)
-    VarValues.pop(1), Var.pop(1), MGXS.pop(1), MGXSe.pop(1), Acceptance.pop(1)
-    VarValues.pop(0), Var.pop(0), MGXS.pop(0), MGXSe.pop(0), Acceptance.pop(0)
+    VarValues.pop(9), Var.pop(9), MGXS.pop(9), MGXSe.pop(9), MGXSCut.pop(9), Acceptance.pop(9)
+    VarValues.pop(8), Var.pop(8), MGXS.pop(8), MGXSe.pop(8), MGXSCut.pop(8), Acceptance.pop(8)
+    VarValues.pop(2), Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2), Acceptance.pop(2)
+    VarValues.pop(1), Var.pop(1), MGXS.pop(1), MGXSe.pop(1), MGXSCut.pop(1), Acceptance.pop(1)
+    VarValues.pop(0), Var.pop(0), MGXS.pop(0), MGXSe.pop(0), MGXSCut.pop(0), Acceptance.pop(0)
     xBin, xLow, xHigh = 5, 170.5, 175.5
-  xBinZoom, xLowZoom, xHighZoom = 5, 170.5, 175.5
 
 print " List of considered Var values is : ",Var    
 NrConfigs = len(Var)
@@ -127,7 +126,7 @@ elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
 title = title+"_"+KinVariable
 
 #ROOT file where all the information will be stored:
-Tfile = TFile(os.path.join(whichDir+"FitDeviation_"+title+".root"),'recreate')
+Tfile = TFile(os.path.join(whichDir+"FitDeviation_"+title+"_"+nEvts+"Evts.root"),'recreate')
 gStyle.SetOptStat(0)
 
 YPlusGausTest    = TH1F('YPlusGausTest',   'Comparison of fit deviation in '+KinVar+' = '+str(Var[xPos[1]])+' and '+KinVar+' = '+str(Var[xPos[0]])+' (no normalisation -- '+title+' evts)', 250,-0.15,0.15)
@@ -205,6 +204,19 @@ ScdDerScatter    = TH2F('ScdDerScatterPlot',   'Second derivative of -ln(L) usin
 ScdDerXSScatter  = TH2F('ScdDerXSScatterPlot', 'Second derivative of -ln(L) using inner points versus using outer points (XS normalisation -- '+title+' evts)', 250,-5,5,250,-5,5)
 ScdDerAccScatter = TH2F('ScdDerAccScatterPlot','Second derivative of -ln(L) using inner points versus using outer points (Acc normalisation -- '+title+' evts)',250,-5,5,250,-5,5)
 
+FstDerInnerPlusRelToUnc = TH1F('FirstDerInner_Plus_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (no norm -- pos inner point)',250,-0.1,0.1)
+FstDerXSInnerPlusRelToUnc = TH1F('FirstDerXSInner_Plus_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (XS norm -- pos inner point)',250,-0.1,0.1)
+FstDerAccInnerPlusRelToUnc = TH1F('FirstDerAccInner_Plus_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (Acc norm -- pos inner point)',250,-0.1,0.1)
+FstDerInnerMinRelToUnc = TH1F('FirstDerInner_Min_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (no norm -- neg inner point)',250,-0.1,0.1)
+FstDerXSInnerMinRelToUnc = TH1F('FirstDerXSInner_Min_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (XS norm -- neg inner point)',250,-0.1,0.1)
+FstDerAccInnerMinRelToUnc = TH1F('FirstDerAccInner_Min_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (Acc norm -- neg inner point)',250,-0.1,0.1)
+FstDerOuterPlusRelToUnc = TH1F('FirstDerOuter_Plus_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (no norm -- pos outer point)',250,-0.1,0.1)
+FstDerXSOuterPlusRelToUnc = TH1F('FirstDerXSOuter_Plus_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (XS norm -- pos outer point)',250,-0.1,0.1)
+FstDerAccOuterPlusRelToUnc = TH1F('FirstDerAccOuter_Plus_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (Acc norm -- pos outer point)',250,-0.1,0.1)
+FstDerOuterMinRelToUnc = TH1F('FirstDerOuter_Min_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (no norm -- neg outer point)',250,-0.1,0.1)
+FstDerXSOuterMinRelToUnc = TH1F('FirstDerXSOuter_Min_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (XS norm -- neg outer point)',250,-0.1,0.1)
+FstDerAccOuterMinRelToUnc = TH1F('FirstDerAccouter_Min_RelativeToUnc','First derivative of -ln(L) distribution wrt unc of '+KinVar+' = '+str(Var[xMin])+' (Acc norm -- neg outer point)',250,-0.1,0.1)
+
 LnLogDist = TH1F("LnLog","title",xBin,xLow,xHigh)
 LnLogDist.SetMarkerStyle(20), LnLogDist.SetLineColor(1), LnLogDist.SetMarkerColor(1), LnLogDist.SetMarkerSize(1.2)
 LnLogXSDist = TH1F("LnLogXS","title",xBin,xLow,xHigh)
@@ -222,9 +234,9 @@ LnLogFitCanvasName = 'LnLogFitCanvas_Evt'
 LnLogFitCanvasTitle = 'Comparing fit function from ROOT fit and algebraic function for event -- '+title+' evts '
 
 #Create the arrays where the likelihood values will be stored
-LnLog, LnLogXS, LnLogAcc = [], [], []
+LnLog, LnLogXS, LnLogAcc, Log, LogXS, LogAcc, LogError, LogXSError, LogAccError = [], [], [], [], [], [], [], [], []
 for ii in range(NrConfigs):
-  LnLog.append(0), LnLogXS.append(0), LnLogAcc.append(0)
+  LnLog.append(0), LnLogXS.append(0), LnLogAcc.append(0), Log.append(0), LogError.append(0)
 
 #---  Create arrays where the events passing specific cuts will be stored  ---#
 EvtsWithPosScdDerInner, EvtsWithPosScdDerXSInner, EvtsWithPosScdDerAccInner = [], [], []
@@ -235,27 +247,29 @@ EvtsWithYPlusGausSmall, EvtsWithYPlusGausSmallXS, EvtsWithYPlusGausSmallAcc = []
 
 #Loop over all lines in weights file:
 for WeightLine in WeightsFile:
-  WeightWord = WeightLine.split()
+  WWord = WeightLine.split()
   #Only interested in files starting with a number
-  if str(WeightWord[0]) != "#" and str(WeightWord[3]) != "0.0" :
+  if str(WWord[0]) != "#" and str(WWord[3]) != "0.0" :
     for iEvt in range(int(nEvts)):
-      if str(WeightWord[0]) == str(iEvt+1):                                                               #Look at one single event!
-        if str(WeightWord[1]) == "1":
+      if str(WWord[0]) == str(iEvt+1):                                                               #Look at one single event!
+        if str(WWord[1]) == "1":
           cHat, cHatXS, cHatAcc = [0,0],[0,0],[0,0]
           bHat, bHatXS, bHatAcc = [0,0],[0,0],[0,0]
           aHat, aHatXS, aHatAcc = [0,0],[0,0],[0,0]
           LnLogDist.SetName("LnLog_Evt"+str(int(iEvt)+1)),       LnLogDist.SetTitle('LnLog distribution for event '+str(int(iEvt)+1)+' -- '+title+' evts')
           LnLogXSDist.SetName("LnLogXS_Evt"+str(int(iEvt)+1)),   LnLogXSDist.SetTitle('LnLogXS distribution for event '+str(int(iEvt)+1)+' -- '+title+' evts')
           LnLogAccDist.SetName("LnLogAcc_Evt"+str(int(iEvt)+1)), LnLogAccDist.SetTitle('LnLogAcc distribution for event '+str(int(iEvt)+1)+' -- '+title+' evts')
-        LnLog[int(WeightWord[1])-1] = -log(float(WeightWord[3]))
-        LnLogXS[int(WeightWord[1])-1] = -log(float(WeightWord[3])) + log(MGXS[int(WeightWord[1])-1])
-        LnLogAcc[int(WeightWord[1])-1] = -log(float(WeightWord[3])) + log(MGXS[int(WeightWord[1])-1]) + log(Acceptance[int(WeightWord[1])-1])
+        LnLogError[int(WWord[1])-1] = -log(float(WWord[4]))
+	Log[int(WWord[1])-1], LnLog[int(WWord[1])-1] = float(WWord[3]), -log(float(WWord[3]))
+        LogXS[int(WWord[1])-1], LnLogXS[int(WWord[1])-1] = float(WWord[3])/MGXS[int(WWord[1])-1], -log(float(WWord[3])) + log(MGXS[int(WWord[1])-1])
+        LogAcc[int(WWord[1])-1], LnLogAcc[int(WWord[1])-1] = float(WWord[3])/MGXSCut[int(WWord[1])-1], -log(float(WWord[3])) + log(MGXSCut[int(WWord[1])-1])
+	LogError, LogXSError, LogAccError = float(WWord[4]), float(WWord[4])/MGXS[int(WWord[1])-1], float(WWord[4])/MGXSCut[int(WWord[1])-1]
         #---  Fill the LnLog histograms for each event  ---#
-        LnLogDist.SetBinContent(LnLogDist.FindBin(Var[int(WeightWord[1])-1]), LnLog[int(WeightWord[1])-1])
-        LnLogXSDist.SetBinContent(LnLogXSDist.FindBin(Var[int(WeightWord[1])-1]), LnLogXS[int(WeightWord[1])-1])
-        LnLogAccDist.SetBinContent(LnLogAccDist.FindBin(Var[int(WeightWord[1])-1]), LnLogAcc[int(WeightWord[1])-1])
+        LnLogDist.SetBinContent(LnLogDist.FindBin(Var[int(WWord[1])-1]), LnLog[int(WWord[1])-1])
+        LnLogXSDist.SetBinContent(LnLogXSDist.FindBin(Var[int(WWord[1])-1]), LnLogXS[int(WWord[1])-1])
+        LnLogAccDist.SetBinContent(LnLogAccDist.FindBin(Var[int(WWord[1])-1]), LnLogAcc[int(WWord[1])-1])
         #---  Only perform the fit after all configurations are considered!  ---#
-        if str(WeightWord[1]) == str(NrConfigs):
+        if str(WWord[1]) == str(NrConfigs):
           #---  Calculate the fit parameters (polynomial)  ---#
           LnLogFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
           LnLogXSFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
@@ -286,15 +300,15 @@ for WeightLine in WeightsFile:
           LnLogGraphOuter = TGraph(9,Var, LnLogFunction[1])
           LnLogGraphOuter.SetMarkerColor(7), LnLogGraphOuter.SetLineColor(7), LnLogGraphOuter.SetMarkerSize(1.2)	
           #---  Compare with TF1 fit from ROOT  ---#
-          LnLogDist.Fit("pol2","Q")
-          LnLogFitCanvas.SetName(LnLogFitCanvasName+str(int(iEvt)+1)), LnLogFitCanvas.SetTitle(LnLogFitCanvasTitle+str(int(iEvt)+1))
-          legendLnLog = TLegend(0.75,0.7,0.95,0.95)
-          LnLogFitCanvas.cd()
-          legendLnLog.AddEntry(LnLogGraphInner,'Fit result using algebraic function (x = '+str(Var[xNeg[0]])+'/'+str(Var[xMin])+'/'+str(Var[xPos[0]])+')',"p")
-          legendLnLog.AddEntry(LnLogGraphOuter,'Fit result using algebraic function (x = '+str(Var[xNeg[1]])+'/'+str(Var[xMin])+'/'+str(Var[xPos[1]])+')',"p")
-          legendLnLog.AddEntry(LnLogDist,'Obtained LnLog values with ROOT fit',"p")
-          LnLogGraphInner.Draw("AC*"), LnLogGraphOuter.Draw("C*"), LnLogDist.Draw("samep"), legendLnLog.Draw()
-          FitComp.cd(), LnLogFitCanvas.Write()
+          #LnLogDist.Fit("pol2","Q")
+          #LnLogFitCanvas.SetName(LnLogFitCanvasName+str(int(iEvt)+1)), LnLogFitCanvas.SetTitle(LnLogFitCanvasTitle+str(int(iEvt)+1))
+          #legendLnLog = TLegend(0.75,0.7,0.95,0.95)
+          #LnLogFitCanvas.cd()
+          #legendLnLog.AddEntry(LnLogGraphInner,'Fit result using algebraic function (x = '+str(Var[xNeg[0]])+'/'+str(Var[xMin])+'/'+str(Var[xPos[0]])+')',"p")
+          #legendLnLog.AddEntry(LnLogGraphOuter,'Fit result using algebraic function (x = '+str(Var[xNeg[1]])+'/'+str(Var[xMin])+'/'+str(Var[xPos[1]])+')',"p")
+          #legendLnLog.AddEntry(LnLogDist,'Obtained LnLog values with ROOT fit',"p")
+          #LnLogGraphInner.Draw("AC*"), LnLogGraphOuter.Draw("C*"), LnLogDist.Draw("samep"), legendLnLog.Draw()
+          #FitComp.cd(), LnLogFitCanvas.Write()
 
           #---  Calculate the first derivative distribution and save them in event-by-event plot  ---#
           FstDer.SetName('FirstDerivative_Evt'+str(int(iEvt)+1))
@@ -308,8 +322,11 @@ for WeightLine in WeightsFile:
           yPlus = [LnLog[xPos[0]] - LnLogFunction[1][xPos[0]], LnLogXS[xPos[0]] - LnLogXSFunction[1][xPos[0]], LnLogAcc[xPos[0]] - LnLogAccFunction[1][xPos[0]]]
           yMin  = [LnLog[xNeg[0]] - LnLogFunction[1][xNeg[0]], LnLogXS[xNeg[0]] - LnLogXSFunction[1][xNeg[0]], LnLogAcc[xNeg[0]] - LnLogAccFunction[1][xNeg[0]]]
           scdDerInner = [LnLog[xNeg[0]]-2*LnLog[xMin]+LnLog[xPos[0]], LnLogXS[xNeg[0]]-2*LnLogXS[xMin]+LnLogXS[xPos[0]], LnLogAcc[xNeg[0]]-2*LnLogAcc[xMin]+LnLogAcc[xPos[0]]]	
-          scdDerOuter   = [LnLog[xNeg[1]]-2*LnLog[xMin]+LnLog[xPos[1]], LnLogXS[xNeg[1]]-2*LnLogXS[xMin]+LnLogXS[xPos[1]], LnLogAcc[xNeg[1]]-2*LnLogAcc[xMin]+LnLogAcc[xPos[1]]]	
-
+          scdDerOuter   = [LnLog[xNeg[1]]-2*LnLog[xMin]+LnLog[xPos[1]], LnLogXS[xNeg[1]]-2*LnLogXS[xMin]+LnLogXS[xPos[1]], LnLogAcc[xNeg[1]]-2*LnLogAcc[xMin]+LnLogAcc[xPos[1]]]
+          fstDerInnerPlusRelToUnc = [(LnLog[xMin]-LnLog[xPos[0]])/LnLogError[xMin], (LnLogXS[xMin]-LnLogXS[xPos[0]])/LnLogError[xMin], (LnLogAcc[xMin]-LnLogAcc[xPos[0]])/LnLogError[xMin]]
+          fstDerInnerMinRelToUnc = [(LnLog[xNeg[0]]-LnLog[xMin])/LnLogError[xMin], (LnLogXS[xNeg[0]]-LnLogXS[xMin])/LnLogError[xMin], (LnLogAcc[xNeg[0]]-LnLogAcc[xMin])/LnLogError[xMin]]
+          fstDerOuterPlusRelToUnc = [(LnLog[xMin]-LnLog[xPos[1]])/LnLogError[xMin], (LnLogXS[xMin]-LnLogXS[xPos[1]])/LnLogError[xMin], (LnLogAcc[xMin]-LnLogAcc[xPos[1]])/LnLogError[xMin]]
+          fstDerOuterMinRelToUnc = [(LnLog[xNeg[1]]-LnLog[xMin])/LnLogError[xMin], (LnLogXS[xNeg[1]]-LnLogXS[xMin])/LnLogError[xMin], (LnLogAcc[xNeg[1]]-LnLogAcc[xMin])/LnLogError[xMin]]
           #--- Fill the histograms  ---#
           YPlus.Fill(yPlus[0]),                               YPlusXS.Fill(yPlus[1]),                               YPlusAcc.Fill(yPlus[2])
           YPlusPlus.Fill(yPlusPlus[0]),                       YPlusPlusXS.Fill(yPlusPlus[1]),                       YPlusPlusAcc.Fill(yPlusPlus[2])
@@ -321,6 +338,10 @@ for WeightLine in WeightsFile:
           ScdDerInner.Fill(scdDerInner[0]),                   ScdDerXSInner.Fill(scdDerInner[1]),                   ScdDerAccInner.Fill(scdDerInner[2])
           ScdDerOuter.Fill(scdDerOuter[0]),                   ScdDerXSOuter.Fill(scdDerOuter[1]),                   ScdDerAccOuter.Fill(scdDerOuter[2])
           ScdDerScatter.Fill(scdDerOuter[0], scdDerInner[0]), ScdDerXSScatter.Fill(scdDerOuter[1], scdDerInner[1]), ScdDerAccScatter.Fill(scdDerOuter[2], scdDerInner[2])
+          FstDerInnerPlusRelToUnc.Fill(fstDerInnerPlusRelToUnc[0]), FstDerXSInnerPlusRelToUnc.Fill(fstDerInnerPlusRelToUnc[1]), FstDerAccInnerPlusRelToUnc.Fill(fstDerInnerPlusRelToUnc[2])
+          FstDerInnerMinRelToUnc.Fill(fstDerInnerMinRelToUnc[0]), FstDerXSInnerMinRelToUnc.Fill(fstDerInnerMinRelToUnc[1]), FstDerAccInnerMinRelToUnc.Fill(fstDerInnerMinRelToUnc[2])
+          FstDerOuterPlusRelToUnc.Fill(fstDerOuterPlusRelToUnc[0]), FstDerXSOuterPlusRelToUnc.Fill(fstDerOuterPlusRelToUnc[1]), FstDerAccOuterPlusRelToUnc.Fill(fstDerOuterPlusRelToUnc[2])
+          FstDerOuterMinRelToUnc.Fill(fstDerOuterMinRelToUnc[0]), FstDerXSOuterMinRelToUnc.Fill(fstDerOuterMinRelToUnc[1]), FstDerAccOuterMinRelToUnc.Fill(fstDerOuterMinRelToUnc[2])
           #---  Save the LnLog distributions (event-per-event) and the Y-deviations in histograms  ---#
           LnLogDir.cd(),    LnLogDist.Write()
           LnLogXSDir.cd(),  LnLogXSDist.Write()
@@ -374,13 +395,18 @@ YRelPlus.Write(),      YRelPlusXS.Write()
 YMin.Write(),          YMinXS.Write()
 YMinMin.Write(),       YMinMinXS.Write()
 YRelMin.Write(),       YRelMinXS.Write()
-ScdDerInner.Write(),   ScdDerXSInner.Write()
-ScdDerOuter.Write(),   ScdDerXSOuter.Write()
-ScdDerScatter.Write(), ScdDerXSScatter.Write() 
+ScdDerInner.Write(),             ScdDerXSInner.Write()
+ScdDerOuter.Write(),             ScdDerXSOuter.Write()
+ScdDerScatter.Write(),           ScdDerXSScatter.Write() 
+FstDerInnerPlusRelToUnc.Write(), FstDerXSInnerPlusRelToUnc.Write()
+FstDerInnerMinRelToUnc.Write(), FstDerXSInnerMinRelToUnc.Write()
+FstDerOuterPlusRelToUnc.Write(), FstDerXSOuterPlusRelToUnc.Write()
+FstDerOuterMinRelToUnc.Write(), FstDerXSOuterMinRelToUnc.Write()
 if GenLevel == False: 
   YPlusGausTestAcc.Write(),YPlusAcc.Write(),YPlusPlusAcc.Write(),YRelPlusAcc.Write()
   YMinAcc.Write(),YMinMinAcc.Write(),YRelMinAcc.Write()
   ScdDerAccInner.Write(),ScdDerAccOuter.Write(),ScdDerAccScatter.Write()
+  FstDerAccInnerPlusRelToUnc.Write(), FstDerAccInnerMinRelToUnc.Write(), FstDerAccOuterPlusRelToUnc.Write(), FstDerAccOuterMinRelToUnc.Write()
 
 #---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---#
 if GenLevel == False:
@@ -414,40 +440,40 @@ for LikelihoodLine in LikelihoodFile:
       LLXSPosScdDerBoth[int(LWord[1])-1] = LLXSPosScdDerBoth[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])
       if LWord[1] == "1": EvtsPosScdDerXSBoth += 1
     if int(LWord[0]) in EvtsPosScdDerAccInner and int(LWord[0]) in EvtsPosScdDerAccOuter:
-      LLAccPosScdDerBoth[int(LWord[1])-1] = LLAccPosScdDerBoth[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
+      LLAccPosScdDerBoth[int(LWord[1])-1] = LLAccPosScdDerBoth[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXSCut[int(LWord[1])-1])
       if LWord[1] == "1": EvtsPosScdDerAccBoth += 1
     #---  Separate the events with positive and negative second derivative (using inner Var points) ---#
     if int(LWord[0]) in EvtsPosScdDerInner:    LLPosScdDerInner[int(LWord[1])-1] = LLPosScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))
     else:                                      LLNegScdDerInner[int(LWord[1])-1] = LLNegScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))
     if int(LWord[0]) in EvtsPosScdDerXSInner:  LLXSPosScdDerInner[int(LWord[1])-1] = LLXSPosScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])
     else:                                      LLXSNegScdDerInner[int(LWord[1])-1] = LLXSNegScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])
-    if int(LWord[0]) in EvtsPosScdDerAccInner: LLAccPosScdDerInner[int(LWord[1])-1] = LLAccPosScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
-    else:                                      LLAccNegScdDerInner[int(LWord[1])-1] = LLAccNegScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
+    if int(LWord[0]) in EvtsPosScdDerAccInner: LLAccPosScdDerInner[int(LWord[1])-1] = LLAccPosScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXSCut[int(LWord[1])-1])
+    else:                                      LLAccNegScdDerInner[int(LWord[1])-1] = LLAccNegScdDerInner[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXSCut[int(LWord[1])-1])
     #---  Separate the events with positive and negative second derivative (using outer Var points) ---#
     if int(LWord[0]) in EvtsPosScdDerOuter:    LLPosScdDerOuter[int(LWord[1])-1] = LLPosScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))
     else:                                      LLNegScdDerOuter[int(LWord[1])-1] = LLNegScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))
     if int(LWord[0]) in EvtsPosScdDerXSOuter:  LLXSPosScdDerOuter[int(LWord[1])-1] = LLXSPosScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])
     else:                                      LLXSNegScdDerOuter[int(LWord[1])-1] = LLXSNegScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])
-    if int(LWord[0]) in EvtsPosScdDerAccOuter: LLAccPosScdDerOuter[int(LWord[1])-1] = LLAccPosScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
-    else:                                      LLAccNegScdDerOuter[int(LWord[1])-1] = LLAccNegScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXS[int(LWord[1])-1])+log(Acceptance[int(LWord[1])-1])
+    if int(LWord[0]) in EvtsPosScdDerAccOuter: LLAccPosScdDerOuter[int(LWord[1])-1] = LLAccPosScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXSCut[int(LWord[1])-1])
+    else:                                      LLAccNegScdDerOuter[int(LWord[1])-1] = LLAccNegScdDerOuter[int(LWord[1])-1]-log(float(LWord[3]))+log(MGXSCut[int(LWord[1])-1])
 
 NrEvtsNegScdDerInner, NrEvtsNegScdDerXSInner, NrEvtsNegScdDerAccInner = int(nEvts)-len(EvtsPosScdDerInner), int(nEvts) - len(EvtsPosScdDerXSInner), int(nEvts) - len(EvtsPosScdDerAccInner)
 NrEvtsNegScdDerOuter, NrEvtsNegScdDerXSOuter, NrEvtsNegScdDerAccOuter = int(nEvts)-len(EvtsPosScdDerOuter), int(nEvts) - len(EvtsPosScdDerXSOuter), int(nEvts) - len(EvtsPosScdDerAccOuter)
-LLPosScdDerDistBoth     = TH1F('LLPosScdDerBoth',    '-ln(L) when both 2nd derivatives > 0 (no norm -- '+str(EvtsPosScdDerBoth)+'/'+nEvts+' evts -- '+title+')',    xBinZoom,xLowZoom,xHighZoom)
-LLXSPosScdDerDistBoth   = TH1F('LLXSPosScdDerBoth',  '-ln(L) when both 2nd derivatives > 0 (XS norm -- '+str(EvtsPosScdDerXSBoth)+'/'+nEvts+' evts -- '+title+')',  xBinZoom,xLowZoom,xHighZoom)
-LLAccPosScdDerDistBoth  = TH1F('LLAccPosScdDerBoth', '-ln(L) when both 2nd derivatives > 0 (Acc norm -- '+str(EvtsPosScdDerAccBoth)+'/'+nEvts+' evts -- '+title+')',xBinZoom,xLowZoom,xHighZoom)
-LLPosScdDerDistInner    = TH1F('LLPosScdDerInner',   '-ln(L) when inner 2nd derivative > 0 (no norm -- '+str(len(EvtsPosScdDerInner))+'/'+nEvts+' evts -- '+title+')',    xBinZoom,xLowZoom,xHighZoom)
-LLXSPosScdDerDistInner  = TH1F('LLXSPosScdDerInner', '-ln(L) when inner 2nd derivative > 0 (XS norm -- '+str(len(EvtsPosScdDerXSInner))+'/'+nEvts+' evts -- '+title+')',  xBinZoom,xLowZoom,xHighZoom)
-LLAccPosScdDerDistInner = TH1F('LLAccPosScdDerInner','-ln(L) when inner 2nd derivative > 0 (Acc norm -- '+str(len(EvtsPosScdDerAccInner))+'/'+nEvts+' evts -- '+title+')',xBinZoom,xLowZoom,xHighZoom)
-LLPosScdDerDistOuter    = TH1F('LLPosScdDerOuter',   '-ln(L) when outer 2nd derivative > 0 (no norm -- '+str(len(EvtsPosScdDerOuter))+'/'+nEvts+' evts -- '+title+')',    xBinZoom,xLowZoom,xHighZoom)
-LLXSPosScdDerDistOuter  = TH1F('LLXSPosScdDerOuter', '-ln(L) when outer 2nd derivative > 0 (XS norm -- '+str(len(EvtsPosScdDerXSOuter))+'/'+nEvts+' evts -- '+title+')',  xBinZoom,xLowZoom,xHighZoom)
-LLAccPosScdDerDistOuter = TH1F('LLAccPosScdDerOuter','-ln(L) when outer 2nd derivative > 0 (Acc norm -- '+str(len(EvtsPosScdDerAccOuter))+'/'+nEvts+' evts -- '+title+')',xBinZoom,xLowZoom,xHighZoom)
-LLNegScdDerDistInner    = TH1F('LLNegScdDerInner',   '-ln(L) when inner 2nd derivative < 0 (no norm -- '+str(NrEvtsNegScdDerInner)+'/'+nEvts+' evts -- '+title+')',    xBinZoom,xLowZoom,xHighZoom)
-LLXSNegScdDerDistInner  = TH1F('LLXSNegScdDerInner', '-ln(L) when inner 2nd derivative < 0 (XS norm -- '+str(NrEvtsNegScdDerXSInner)+'/'+nEvts+' evts -- '+title+')',  xBinZoom,xLowZoom,xHighZoom)
-LLAccNegScdDerDistInner = TH1F('LLAccNegScdDerInner','-ln(L) when inner 2nd derivative < 0 (Acc norm -- '+str(NrEvtsNegScdDerAccInner)+'/'+nEvts+' evts -- '+title+')',xBinZoom,xLowZoom,xHighZoom)
-LLNegScdDerDistOuter    = TH1F('LLNegScdDerOuter',   '-ln(L) when outer 2nd derivative < 0 (no norm -- '+str(NrEvtsNegScdDerOuter)+'/'+nEvts+' evts -- '+title+')',    xBinZoom,xLowZoom,xHighZoom)
-LLXSNegScdDerDistOuter  = TH1F('LLXSNegScdDerOuter', '-ln(L) when outer 2nd derivative < 0 (XS norm -- '+str(NrEvtsNegScdDerXSOuter)+'/'+nEvts+' evts -- '+title+')',  xBinZoom,xLowZoom,xHighZoom)
-LLAccNegScdDerDistOuter = TH1F('LLAccNegScdDerOuter','-ln(L) when outer 2nd derivative < 0 (Acc norm -- '+str(NrEvtsNegScdDerAccOuter)+'/'+nEvts+' evts -- '+title+')',xBinZoom,xLowZoom,xHighZoom)
+LLPosScdDerDistBoth     = TH1F('LLPosScdDerBoth',    '-ln(L) when both 2nd derivatives > 0 (no norm -- '+str(EvtsPosScdDerBoth)+'/'+nEvts+' evts -- '+title+')',    xBin,xLow,xHigh)
+LLXSPosScdDerDistBoth   = TH1F('LLXSPosScdDerBoth',  '-ln(L) when both 2nd derivatives > 0 (XS norm -- '+str(EvtsPosScdDerXSBoth)+'/'+nEvts+' evts -- '+title+')',  xBin,xLow,xHigh)
+LLAccPosScdDerDistBoth  = TH1F('LLAccPosScdDerBoth', '-ln(L) when both 2nd derivatives > 0 (Acc norm -- '+str(EvtsPosScdDerAccBoth)+'/'+nEvts+' evts -- '+title+')',xBin,xLow,xHigh)
+LLPosScdDerDistInner    = TH1F('LLPosScdDerInner',   '-ln(L) when inner 2nd derivative > 0 (no norm -- '+str(len(EvtsPosScdDerInner))+'/'+nEvts+' evts -- '+title+')',    xBin,xLow,xHigh)
+LLXSPosScdDerDistInner  = TH1F('LLXSPosScdDerInner', '-ln(L) when inner 2nd derivative > 0 (XS norm -- '+str(len(EvtsPosScdDerXSInner))+'/'+nEvts+' evts -- '+title+')',  xBin,xLow,xHigh)
+LLAccPosScdDerDistInner = TH1F('LLAccPosScdDerInner','-ln(L) when inner 2nd derivative > 0 (Acc norm -- '+str(len(EvtsPosScdDerAccInner))+'/'+nEvts+' evts -- '+title+')',xBin,xLow,xHigh)
+LLPosScdDerDistOuter    = TH1F('LLPosScdDerOuter',   '-ln(L) when outer 2nd derivative > 0 (no norm -- '+str(len(EvtsPosScdDerOuter))+'/'+nEvts+' evts -- '+title+')',    xBin,xLow,xHigh)
+LLXSPosScdDerDistOuter  = TH1F('LLXSPosScdDerOuter', '-ln(L) when outer 2nd derivative > 0 (XS norm -- '+str(len(EvtsPosScdDerXSOuter))+'/'+nEvts+' evts -- '+title+')',  xBin,xLow,xHigh)
+LLAccPosScdDerDistOuter = TH1F('LLAccPosScdDerOuter','-ln(L) when outer 2nd derivative > 0 (Acc norm -- '+str(len(EvtsPosScdDerAccOuter))+'/'+nEvts+' evts -- '+title+')',xBin,xLow,xHigh)
+LLNegScdDerDistInner    = TH1F('LLNegScdDerInner',   '-ln(L) when inner 2nd derivative < 0 (no norm -- '+str(NrEvtsNegScdDerInner)+'/'+nEvts+' evts -- '+title+')',    xBin,xLow,xHigh)
+LLXSNegScdDerDistInner  = TH1F('LLXSNegScdDerInner', '-ln(L) when inner 2nd derivative < 0 (XS norm -- '+str(NrEvtsNegScdDerXSInner)+'/'+nEvts+' evts -- '+title+')',  xBin,xLow,xHigh)
+LLAccNegScdDerDistInner = TH1F('LLAccNegScdDerInner','-ln(L) when inner 2nd derivative < 0 (Acc norm -- '+str(NrEvtsNegScdDerAccInner)+'/'+nEvts+' evts -- '+title+')',xBin,xLow,xHigh)
+LLNegScdDerDistOuter    = TH1F('LLNegScdDerOuter',   '-ln(L) when outer 2nd derivative < 0 (no norm -- '+str(NrEvtsNegScdDerOuter)+'/'+nEvts+' evts -- '+title+')',    xBin,xLow,xHigh)
+LLXSNegScdDerDistOuter  = TH1F('LLXSNegScdDerOuter', '-ln(L) when outer 2nd derivative < 0 (XS norm -- '+str(NrEvtsNegScdDerXSOuter)+'/'+nEvts+' evts -- '+title+')',  xBin,xLow,xHigh)
+LLAccNegScdDerDistOuter = TH1F('LLAccNegScdDerOuter','-ln(L) when outer 2nd derivative < 0 (Acc norm -- '+str(NrEvtsNegScdDerAccOuter)+'/'+nEvts+' evts -- '+title+')',xBin,xLow,xHigh)
 
 for ii in range(NrConfigs):
   LLPosScdDerDistInner.SetBinContent(LLPosScdDerDistInner.FindBin(Var[ii]), float(LLPosScdDerInner[ii])), 
@@ -477,7 +503,7 @@ LLPosScdDerDistOuter.Write(), LLXSPosScdDerDistOuter.Write()
 LLNegScdDerDistOuter.Write(), LLXSNegScdDerDistOuter.Write() 
 LLPosScdDerDistBoth.Write(),  LLXSPosScdDerDistBoth.Write()  
 if GenLevel == False:
- LLAccPosScdDerDistInner.Write(),LLAccPosScdDerDistBoth.Write(),LLAccNegScdDerDistOuter.Write(),LLAccPosScdDerDistOuter.Write(),LLAccNegScdDerDistInner.Write()
+ LLAccPosScdDerDistInner.Write(),LLAccPosScdDerDistOuter.Write(),LLAccPosScdDerDistBoth.Write(),LLAccNegScdDerDistOuter.Write(),LLAccNegScdDerDistInner.Write()
 
 #-- Save the variables separate of scd Der sign  --#
 #--   --> Can give hint for good cut!            --#
