@@ -24,7 +24,6 @@ else:
   elif whichScdDer == "1": AppliedCut = "ScdDerInner"
   elif whichScdDer == "2": AppliedCut = "ScdDerOuter"
   elif whichScdDer == "3": AppliedCut = "ScdDerBoth"
-
 whichDir = sys.argv[1]
 KinVariable = sys.argv[2]
 
@@ -69,84 +68,61 @@ elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
   GenLevel = "true"
 title = title+"_"+KinVariable
 if CutApplied == True: title = title+"_"+AppliedCut+"CutApplied"
+print "GenLevel = ",GenLevel
 
 #-Identify kinematic variable considered (mtop or RVR)
 if KinVariable == "RVR":
   KinVar = "$Re(V_R)$"
-  ValuesToKeep = [-0.5, -0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3, 0.5]
+  FitValues = [-0.5, -0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3, 0.5]
 
   #Select which window of RVR values was considered!
   VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n --> Choose the correct number : ')
   
-  if CutApplied == False:
-    if VarWindow == "1":   ValuesToKeep.pop(6), ValuesToKeep.pop(4)
-    elif VarWindow == "2": ValuesToKeep.pop(10), ValuesToKeep.pop(0)
-  elif CutApplied == True:
-    if VarWindow == "1":   ValuesToKeep.pop(10), ValuesToKeep.pop(9), ValuesToKeep.pop(6), ValuesToKeep.pop(4), ValuesToKeep.pop(1), ValuesToKeep.pop(0)
-    elif VarWindow == "2": ValuesToKeep.pop(10), ValuesToKeep.pop(9), ValuesToKeep.pop(8), ValuesToKeep.pop(2), ValuesToKeep.pop(1), ValuesToKeep.pop(0)
+  if VarWindow == "1":   FitValues.pop(6), FitValues.pop(4)
+  elif VarWindow == "2": FitValues.pop(10), FitValues.pop(0)
+  FitValues.pop(8), FitValues.pop(7), FitValues.pop(1), FitValues.pop(0)     #Fit will only be applied on the inner points!
 
 elif KinVariable == "MTop":
   KinVar = "$m_{top}$"
-  ValuesToKeep = [153, 163, 171, 172, 173, 174, 175, 183, 193]
-  
-  if CutApplied == True: ValuesToKeep.pop(8), ValuesToKeep.pop(7), ValuesToKeep.pop(1), ValuesToKeep.pop(0)
+  FitValues = [171,172,173,174,175]
 
-print "Values to keep array = ",ValuesToKeep," which has length = ",len(ValuesToKeep)
-fitRange = [ValuesToKeep[0], ValuesToKeep[len(ValuesToKeep)-1]]
+print "FitValues = ",FitValues, "which has length = ",len(FitValues)
+fitStep = (float(FitValues[len(FitValues)-1]-FitValues[0]+abs(FitValues[0]-FitValues[1])))/float(len(FitValues))
+fitRange = [FitValues[0]-fitStep/2.0,FitValues[len(FitValues)-1]+fitStep/2.0] 
 print " Considered fit range is : ", fitRange 
 
-if CutApplied == False:
-  RejectLine = '  if (reject && ('
-  for ii in range(len(ValuesToKeep)):
-    if ii == 0:                     RejectLine += ' x[0] != '+str(ValuesToKeep[ii])
-    elif ii == len(ValuesToKeep)-1: RejectLine += ' && x[0] != '+str(ValuesToKeep[ii])+') ){ \n'
-    else:                           RejectLine += ' && x[0] != '+str(ValuesToKeep[ii])
-  print "Correct Reject line = ",RejectLine
-
 #--Replace ROOT file information in analyzer
-if CutApplied == False: RootAnalyzer = open('fitExcludeEmptyBins.C','r')
-else:                   RootAnalyzer = open('fitExcludeEmptyBins_AfterCut.C','r')
-
-#  TH1F* LL    = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPosScdDerInner");
-#  TH1F* LLXS  = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLXSPosScdDerInner");
-#  TH1F* LLAcc = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPosScdDerInner");
+RootAnalyzer = open('fitExcludeEmptyBins.C','r')
 
 NewRootAnalyzer = open('output','w')
 for RootLine in RootAnalyzer:
   RootWord = RootLine.split()
   if re.search( r".root", RootLine):
-    if RootWord[1] == "InputFile":
-      NewRootAnalyzer.write(RootLine.replace(RootWord[5],RootFile))
-    if RootWord[1] == "OutputFile":
-      NewRootAnalyzer.write(RootLine.replace(RootWord[5],whichDir+'LimitedFitResult_'+title+'.root'))
-  elif re.search( r"reject &&",RootLine):
-    NewRootAnalyzer.write(RejectLine)
-  elif re.search( r"TF1 ",RootLine):
+    if RootWord[1] == "InputFile":  NewRootAnalyzer.write(RootLine.replace(RootWord[5],RootFile))
+    if RootWord[1] == "OutputFile": NewRootAnalyzer.write(RootLine.replace(RootWord[5],whichDir+'LimitedFitResult_'+title+'.root'))
+  #Set the correct start and end values for the fit-histogram!
+  elif re.search( r"Initialize",RootLine):
+    if re.search( r"nrBins", RootLine):     NewRootAnalyzer.write('  int nBins = '+str(len(FitValues))+';         //Initialize nrBins \n')
+    elif re.search( r"fitStart", RootLine): NewRootAnalyzer.write('  float fitStart = '+str(fitRange[0])+';  //Initialize fitStart \n')
+    elif re.search( r"fitEnd", RootLine):   NewRootAnalyzer.write('  float fitEnd = '+str(fitRange[1])+';    //Initialize fitEnd \n')
+  #Get the correct histogram from the InputFile!
+  elif re.search( r"TH1F", RootLine) and re.search( r"InputFile",RootLine):
     if CutApplied == False:
-      if re.search(   r"XS",RootLine):  NewRootAnalyzer.write('  TF1 *funcXS = new TF1("funcXS",fpol,'+str(fitRange[0])+','+str(fitRange[1])+',3); \n')
-      elif re.search( r"Acc",RootLine): NewRootAnalyzer.write('  TF1 *funcAcc = new TF1("funcAcc",fpol,'+str(fitRange[0])+','+str(fitRange[1])+',3); \n')
-      else:                             NewRootAnalyzer.write('  TF1 *func = new TF1("func",fpol,'+str(fitRange[0])+','+str(fitRange[1])+',3); \n')
+      if re.search( r"XS",RootLine):    NewRootAnalyzer.write('  TH1F* LLXS  = (TH1F*) InputFile->Get("LL_XS"); \n')
+      elif re.search( r"Acc",RootLine): NewRootAnalyzer.write('  TH1F* LLAcc = (TH1F*) InputFile->Get("LL_Acc"); \n')
+      else:                             NewRootAnalyzer.write('  TH1F* LL    = (TH1F*) InputFile->Get("LL"); \n')
     elif CutApplied == True:
-      if re.search(   r"XS",RootLine):  NewRootAnalyzer.write('  TF1 *funcXS = new TF1("funcXS","pol2",'+str(fitRange[0])+','+str(fitRange[1])+'); \n')
-      elif re.search( r"Acc",RootLine): NewRootAnalyzer.write('  TF1 *funcAcc = new TF1("funcAcc","pol2",'+str(fitRange[0])+','+str(fitRange[1])+'); \n')
-      else:                             NewRootAnalyzer.write('  TF1 *func = new TF1("func","pol2",'+str(fitRange[0])+','+str(fitRange[1])+'); \n')
+      if re.search( r"XS",RootLine):    NewRootAnalyzer.write('  TH1F* LLXS  = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLXSPos'+AppliedCut+'"); \n') 
+      elif re.search( r"Acc",RootLine): NewRootAnalyzer.write('  TH1F* LLAcc = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLAccPos'+AppliedCut+'"); \n')
+      else:                             NewRootAnalyzer.write('  TH1F* LL    = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPos'+AppliedCut+'"); \n')
   elif re.search( r" bool GenLevel",RootLine):
     NewRootAnalyzer.write('  bool GenLevel = '+GenLevel+'; \n')
-  elif re.search( r"LikelihoodAfterCuts",RootLine) and CutApplied == True:
-      if re.search(   r"XS",RootLine):  NewRootAnalyzer.write('  TH1F* LLXS  = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLXSPos'+AppliedCut+'"); \n')
-      elif re.search( r"Acc",RootLine): 
-        if GenLevel == "false":  NewRootAnalyzer.write('  TH1F* LLAcc = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLAccPos'+AppliedCut+'"); \n')
-        elif GenLevel == "true": NewRootAnalyzer.write('  TH1F* LLAcc = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPos'+AppliedCut+'"); \n')         #Acc doesn't exist for Gen!
-      else:                             NewRootAnalyzer.write('  TH1F* LL    = (TH1F*) InputFile->Get("LikelihoodAfterCuts/SignSecondDerivative/LLPos'+AppliedCut+'"); \n')
   else:
     NewRootAnalyzer.write(RootLine)
 RootAnalyzer.close()
 NewRootAnalyzer.close()
 
-if CutApplied == False:
-  os.rename('output','fitExcludeEmptyBins.C'), os.system("root -l -b fitExcludeEmptyBins.C")
-elif CutApplied == True:
-  os.rename('output','fitExcludeEmptyBins_AfterCut.C'), os.system("root -l -b fitExcludeEmptyBins_AfterCut.C")
+os.rename('output','fitExcludeEmptyBins.C'), os.system("root -l -b -q fitExcludeEmptyBins.C")
 
 #-- Now open the created ROOT file and place the minimum (with uncertainty) in a table! --#
 FitFile = TFile(os.path.join(whichDir+"LimitedFitResult_"+title+".root"),'r')
@@ -156,15 +132,48 @@ TableOutput.write('\\begin{table}[h!t] \n \\centering \n \\caption{Fit parameter
 TableOutput.write('  & $a_{0}$ & $a_{1}$ & $a_{2}$ & '+KinVar+' \\\\ \n  \hline \n')
 
 fit = FitFile.Get("fit_LL")
-TableOutput.write('  no normalisation & '+str(fit.GetParameter(0))+' & '+str(fit.GetParameter(1))+' & '+str(fit.GetParameter(2))+' & '+str(fit.GetMinimumX(fitRange[0],fitRange[1]))+' \\\\ \n')
+VarPlus1Sig = (fit.GetX(fit.GetMinimum()+0.5, fit.GetMinimumX(), fitRange[1]) - fit.GetMinimumX())
+VarMin1Sig =  (fit.GetMinimumX() - fit.GetX(fit.GetMinimum()+0.5, fitRange[0], fit.GetMinimumX()))
+if abs(abs(VarPlus1Sig) - abs(VarMin1Sig)) > 0.00001:
+  if KinVariable == "RVR": 
+    TableOutput.write('  no normalisation & %.3f & %.3f & %.3f & $%.5f^{+%.6f}_{-%.6f}$  \\\\ \n' %( fit.GetParameter(0), fit.GetParameter(1), fit.GetParameter(2), fit.GetMinimumX(fitRange[0],fitRange[1]), VarPlus1Sig, VarMin1Sig ))
+  elif KinVariable == "MTop": 
+    TableOutput.write('  no normalisation & %.3f & %.3f & %.3f & $%.3f^{+%.4f}_{-%.4f}$  \\\\ \n' %( fit.GetParameter(0), fit.GetParameter(1), fit.GetParameter(2), fit.GetMinimumX(fitRange[0],fitRange[1]), VarPlus1Sig, VarMin1Sig ))
+else:
+  if KinVariable == "RVR": 
+    TableOutput.write('  no normalisation & %.3f & %.3f & %.3f & %.5f $\\pm$ %.6f  \\\\ \n' %( fit.GetParameter(0), fit.GetParameter(1), fit.GetParameter(2), fit.GetMinimumX(fitRange[0],fitRange[1]), abs(VarPlus1Sig) ))
+  elif KinVariable == "MTop": 
+    TableOutput.write('  no normalisation & %.3f & %.3f & %.3f & %.3f $\\pm$ %.4f  \\\\ \n' %( fit.GetParameter(0), fit.GetParameter(1), fit.GetParameter(2), fit.GetMinimumX(fitRange[0],fitRange[1]), abs(VarPlus1Sig) ))
 
 fitXS = FitFile.Get("fit_LLXS")
-TableOutput.write('  XS normalisation & '+str(fitXS.GetParameter(0))+' & '+str(fitXS.GetParameter(1))+' & '+str(fitXS.GetParameter(2))+' & '+str(fitXS.GetMinimumX(fitRange[0],fitRange[1])))
+VarXSPlus1Sig = (fitXS.GetX(fitXS.GetMinimum()+0.5, fitXS.GetMinimumX(), fitRange[1]) - fitXS.GetMinimumX())
+VarXSMin1Sig =  (fitXS.GetMinimumX() - fitXS.GetX(fitXS.GetMinimum()+0.5, fitRange[0], fitXS.GetMinimumX()))
+if abs(abs(VarXSPlus1Sig) - abs(VarXSMin1Sig)) > 0.00001:
+  if KinVariable == "RVR": 
+    TableOutput.write('  XS normalisation & %.3f & %.3f & %.3f & $%.5f^{+%.6f}_{-%.6f}$ ' %( fitXS.GetParameter(0), fitXS.GetParameter(1), fitXS.GetParameter(2), fitXS.GetMinimumX(fitRange[0],fitRange[1]), VarXSPlus1Sig, VarXSMin1Sig) )
+  elif KinVariable == "MTop": 
+    TableOutput.write('  XS normalisation & %.3f & %.3f & %.3f & $%.3f^{+%.4f}_{-%.4f}$ ' %( fitXS.GetParameter(0), fitXS.GetParameter(1), fitXS.GetParameter(2), fitXS.GetMinimumX(fitRange[0],fitRange[1]), VarXSPlus1Sig, VarXSMin1Sig) )
+else:
+  if KinVariable == "RVR": 
+    TableOutput.write('  XS normalisation & %.3f & %.3f & %.3f & %.5f $\\pm$ %.6f ' %( fitXS.GetParameter(0), fitXS.GetParameter(1), fitXS.GetParameter(2), fitXS.GetMinimumX(fitRange[0],fitRange[1]), abs(VarXSPlus1Sig) ))
+  elif KinVariable == "MTop": 
+    TableOutput.write('  XS normalisation & %.3f & %.3f & %.3f & %.3f $\\pm$ %.4f ' %( fitXS.GetParameter(0), fitXS.GetParameter(1), fitXS.GetParameter(2), fitXS.GetMinimumX(fitRange[0],fitRange[1]), abs(VarXSPlus1Sig) ))
 
 if GenLevel == "false":
   fitAcc = FitFile.Get("fit_LLAcc")
-  TableOutput.write(' \\\\ \n  Acc normalisation & '+str(fitAcc.GetParameter(0))+' & '+str(fitAcc.GetParameter(1))+' & '+str(fitAcc.GetParameter(2))+' & '+str(fitAcc.GetMinimumX(fitRange[0],fitRange[1]))+' ')
-
+  VarAccPlus1Sig = (fitAcc.GetX(fitAcc.GetMinimum()+0.5, fitAcc.GetMinimumX(), fitRange[1]) - fitAcc.GetMinimumX())
+  VarAccMin1Sig =  (fitAcc.GetMinimumX() - fitAcc.GetX(fitAcc.GetMinimum()+0.5, fitRange[0], fitAcc.GetMinimumX()))
+  if abs(abs(VarAccPlus1Sig) - abs(VarAccMin1Sig)) > 0.00001:
+    print "1Sigma interval not similar ! : ", abs(abs(VarAccPlus1Sig) - abs(VarAccMin1Sig))
+    if KinVariable == "RVR": 
+      TableOutput.write(' \\\\ \n  Acc normalisation & %.3f & %.3f & %.3f & $%.5f^{+%.6f}_{-%.6f}$' %( fitAcc.GetParameter(0), fitAcc.GetParameter(1), fitAcc.GetParameter(2), fitAcc.GetMinimumX(fitRange[0],fitRange[1]), VarAccPlus1Sig, VarAccMin1Sig))
+    elif KinVariable == "MTop": 
+      TableOutput.write(' \\\\ \n  Acc normalisation & %.3f & %.3f & %.3f & $%.3f^{+%.4f}_{-%.4f}$' %( fitAcc.GetParameter(0), fitAcc.GetParameter(1), fitAcc.GetParameter(2), fitAcc.GetMinimumX(fitRange[0],fitRange[1]), VarAccPlus1Sig, VarAccMin1Sig))
+  else:
+    if KinVariable == "RVR": 
+      TableOutput.write(' \\\\ \n  Acc normalisation & %.3f & %.3f & %.3f & %.5f $\\pm$ %.6f' %( fitAcc.GetParameter(0), fitAcc.GetParameter(1), fitAcc.GetParameter(2), fitAcc.GetMinimumX(fitRange[0],fitRange[1]), abs(VarAccPlus1Sig) ))
+    elif KinVariable == "MTop": 
+      TableOutput.write(' \\\\ \n  Acc normalisation & %.3f & %.3f & %.3f & %.3f $\\pm$ %.4f' %( fitAcc.GetParameter(0), fitAcc.GetParameter(1), fitAcc.GetParameter(2), fitAcc.GetMinimumX(fitRange[0],fitRange[1]), abs(VarAccPlus1Sig) ))
+    
 TableOutput.write('\n \\end{tabular} \n\\end{table} \n')
-
 print "Output can be found in the following directory : ",whichDir
