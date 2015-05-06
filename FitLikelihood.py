@@ -76,11 +76,12 @@ if KinVariable == "RVR":
   FitValues = [-0.5, -0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3, 0.5]
 
   #Select which window of RVR values was considered!
-  VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n --> Choose the correct number : ')
+  VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  3) Many   : [-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1] \n --> Choose the correct number : ')
   
   if VarWindow == "1":   FitValues.pop(6), FitValues.pop(4)
   elif VarWindow == "2": FitValues.pop(10), FitValues.pop(0)
   FitValues.pop(8), FitValues.pop(7), FitValues.pop(1), FitValues.pop(0)     #Fit will only be applied on the inner points!
+  if VarWindow == "3": FitValues = [-0.1, -0.07, -0.05, -0.02, 0.0, 0.02, 0.05, 0.07, 0.1]
 
 elif KinVariable == "MTop":
   KinVar = "$m_{top}$"
