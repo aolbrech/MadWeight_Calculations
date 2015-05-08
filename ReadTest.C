@@ -29,6 +29,7 @@ TFile* Tfile = new TFile("Test.root","RECREATE");
 
 const int NrConfigs = 9;
 const int nEvts = 10; 
+const int TotalNrEvts = 10000;
 
 void ReadTest(){
   
@@ -100,12 +101,13 @@ void ReadTest(){
   TH1F* YRelMinAcc = new TH1F("YRelMinAcc",("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.1,0.1);
   
   TH1F* FstDer    = new TH1F("FirstDer",   ("First derivative of -ln(likelihood) distribution -- "+title+" evts").c_str(), 4,0,4);
-  (FstDer->GetXaxis())->SetBinLabel(1,"test"); //("(y_{DATA}(x="+Var[xNeg[1]]+") - y_{DATA}(x="+Var[xNeg[0]]+"))/"+xStep[0]).c_str());
-  FstDer->GetXaxis()->SetBinLabel(2,"bin2 test"); //("(y_{DATA}(x="+Var[xNeg[0]]+") - y_{DATA}(x="+Var[xMin]+"))/"+xStep[1]).c_str());
-  FstDer->GetXaxis()->SetBinLabel(3,"bin3 test"); //("(y_{DATA}(x="+Var[xMin]+") - y_{DATA}(x="+Var[xPos[0]]+"))/"+xStep[2]).c_str());
-  FstDer->GetXaxis()->SetBinLabel(4,"bin4 test"); //("(y_{DATA}(x="+Var[xPos[0]]+") - y_{DATA}(x="+Var[xPos[1]]+"))/"+xStep[3]).c_str());
-  TH1F* FstDerXS  = new TH1F("FirstDerivativeXS", ("First derivative of -ln(likelihood) distribution (XS norm -- "+title+" evts)").c_str(), 5,-0.25,0.25);
-  TH1F* FstDerAcc = new TH1F("FirstDerivativeAcc",("First derivative of -ln(likelihood) distribution (Acc norm -- "+title+" evts)").c_str(),5,-0.25,0.25);
+  //std::string LabelOne = ("(yDATA(x="+Var[xNeg[1]]+") - yDATA(x="+Var[xNeg[0]]+"))/"+xStep[0]).c_str();
+  //(FstDer->GetXaxis())->SetBinLabel(1,("(yDATA(x="+Var[xNeg[1]]+") - yDATA(x="+Var[xNeg[0]]+"))/"+xStep[0]));
+  //FstDer->GetXaxis()->SetBinLabel(2,"bin2 test"); //("(y_{DATA}(x="+Var[xNeg[0]]+") - y_{DATA}(x="+Var[xMin]+"))/"+xStep[1]).c_str());
+  //FstDer->GetXaxis()->SetBinLabel(3,"bin3 test"); //("(y_{DATA}(x="+Var[xMin]+") - y_{DATA}(x="+Var[xPos[0]]+"))/"+xStep[2]).c_str());
+  //FstDer->GetXaxis()->SetBinLabel(4,"bin4 test"); //("(y_{DATA}(x="+Var[xPos[0]]+") - y_{DATA}(x="+Var[xPos[1]]+"))/"+xStep[3]).c_str());
+  //TH1F* FstDerXS  = new TH1F("FirstDerivativeXS", ("First derivative of -ln(likelihood) distribution (XS norm -- "+title+" evts)").c_str(), 5,-0.25,0.25);
+  //TH1F* FstDerAcc = new TH1F("FirstDerivativeAcc",("First derivative of -ln(likelihood) distribution (Acc norm -- "+title+" evts)").c_str(),5,-0.25,0.25);
   TH1F* ScdDerInner    = new TH1F("SecondDerivativeInner",   ("Second derivative of -ln(likelihood) distribution (no norm -- using inner points -- "+title+" evts)").c_str(), 250,-5,5);
   TH1F* ScdDerXSInner  = new TH1F("SecondDerivativeXSInner", ("Second derivative of -ln(likelihood) distribution (XS norm -- using inner points -- "+title+" evts)").c_str(), 250,-5,5);
   TH1F* ScdDerAccInner = new TH1F("SecondDerivativeAccInner",("Second derivative of -ln(likelihood) distribution (Acc norm -- using inner points -- "+title+" evts)").c_str(),250,-5,5);
@@ -134,13 +136,12 @@ void ReadTest(){
   
   TDirectory* FitComp = Tfile->mkdir("FitComparison");
   TDirectory* LnLikDir = Tfile->mkdir("LnLikDist");
+  TDirectory* LnLikStackDir = LnLikDir->mkdir("LnLikStackDist");
   TDirectory* LnLikXSDir = Tfile->mkdir("LnLikXSDist");
   TDirectory* LnLikAccDir = Tfile->mkdir("LnLikAccDist");
   TDirectory* LnLikAccDirVarVsUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanAvgUnc");
   TDirectory* LnLikAccDirVarVsDUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanTwiceAvgUnc");
   TDirectory* FstDerDir = Tfile->mkdir("FirstDerivativeDist");
-  TCanvas* LnLikFitCanvas = new TCanvas("name","title");
-  std::string LnLikFitCanvasName = "LnLikFitCanvas_Evt", LnLikFitCanvasTitle = "Comparing fit function from ROOT fit and algebraic function for event -- '+title+' evts ";
 
   //-----------------------------------//
   //----  Specific cut histograms  ----//
@@ -166,32 +167,38 @@ void ReadTest(){
   //vector<int> EvtsPosScdDerOuter, EvtsPosScdDerXSOuter, EvtsPosScdDerAccOuter;
   vector<int> EvtsWithSmallFctDev;
   //double weightsValue[nEvts][NrConfigs];
+  int consEvts = 0;
+  int NrCanvas = 0, xDivide = 3, yDivide = 3;
+  TCanvas* StackCanvas = new TCanvas("StackCanvas_Nr0","StackedCanvas");
+  StackCanvas->Divide(xDivide,yDivide);
+  TGraph* LnLikFctOuter[TotalNrEvts];
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("weights.txt", std::ifstream::in);
+  std::ifstream ifs ("Events/RVR_Gen_SingleGausTFHalfWidth_10000Evts/weights.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
   double weight, weightUnc;
-  bool weightFound = 0;
-  while( std::getline(ifs,line) ){
+  while( std::getline(ifs,line) && consEvts < nEvts){
     std::istringstream iss(line);
     if( iss >> evt >> config >> tf >> weight >> weightUnc){
-      std::cout << " Looking at event : " << evt << std::endl;
+    
+      if(config == 1){ std::cout << " Looking at event : " << evt << std::endl; consEvts++;}
+
       stringstream ssEvt; ssEvt << evt; string sEvt = ssEvt.str();
       //--- Initialize the event-per-event variables! ---//
       if( config == 1){
-        vector<double> aHat(2,0.0), aHatXS(2,0.0), aHatAcc(2,0.0);
-        vector<double> bHat(2,0.0), bHatXS(2,0.0), bHatAcc(2,0.0);
-        vector<double> cHat(2,0.0), cHatXS(2,0.0), cHatAcc(2,0.0);
-        vector<double> LnLik(NrConfigs,0.0), LnLikXS(NrConfigs,0.0), LnLikAcc(NrConfigs,0.0);
-        vector<double> Lik(NrConfigs,0.0),   LikXS(NrConfigs,0.0),   LikAcc(NrConfigs,0.0);
+        double aHat[2] = {0.0, 0.0}, aHatXS[2] = {0.0, 0.0}, aHatAcc[2] = {0.0, 0.0};
+        double bHat[2] = {0.0, 0.0}, bHatXS[2] = {0.0, 0.0}, bHatAcc[2] = {0.0, 0.0};
+        double cHat[2] = {0.0, 0.0}, cHatXS[2] = {0.0, 0.0}, cHatAcc[2] = {0.0, 0.0};
+        double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};
+        //double Lik[NrConfigs] = {0.0},   LikXS[NrConfigs] = {0.0},   LikAcc[NrConfigs] = {0.0};
 
         LnLikDist->SetName(("LnLik_Evt"+sEvt).c_str());       LnLikDist->SetTitle(("LnLik distribution for event "+sEvt+" -- "+title+" evts").c_str());
         LnLikXSDist->SetName(("LnLikXS_Evt"+sEvt).c_str());   LnLikXSDist->SetTitle(("LnLikXS distribution for event "+sEvt+" -- "+title+" evts").c_str());
         LnLikAccDist->SetName(("LnLikAcc_Evt"+sEvt).c_str()); LnLikAccDist->SetTitle(("LnLikAcc distribution for event "+sEvt+" -- "+title+" evts").c_str());
       }
-      Lik[config-1] = weight;         LikXS[config-1] = weight/MGXS[config-1];              LikAcc[config-1] = weight/MGXSCut[config-1];
+      //Lik[config-1] = weight;         LikXS[config-1] = weight/MGXS[config-1];              LikAcc[config-1] = weight/MGXSCut[config-1];
       LnLik[config-1] = -log(weight); LnLikXS[config-1] = -log(weight)+log(MGXS[config-1]); LnLikAcc[config-1] = -log(weight)+log(MGXSCut[config-1]);
       //weightsValue[evt-1][config-1] = weight;
 
@@ -243,7 +250,7 @@ void ReadTest(){
         double xVar[NrConfigs], yLnLik[NrConfigs], yLnLikXS[NrConfigs], yLnLikAcc[NrConfigs];
         for( int i = 0; i < NrConfigs; i++){ xVar[i] = Var[i]; yLnLik[i] = LnLikFunction[1][i]; yLnLikXS[i] = LnLikXSFunction[1][i]; yLnLikAcc[i] = LnLikAccFunction[1][i]; }
 
-        std::cout << " TotalFctDevOuter value is : " << TotalFctDevOuter << std::endl;
+        //std::cout << " TotalFctDevOuter value is : " << TotalFctDevOuter << std::endl;
         stringstream ssTotalFctDevOuter;       ssTotalFctDevOuter << TotalFctDevOuter;             string sTotalFctDevOuter       = ssTotalFctDevOuter.str();
         stringstream ssTotalRelFctDevOuter;    ssTotalRelFctDevOuter << TotalRelFctDevOuter;       string sTotalRelFctDevOuter    = ssTotalRelFctDevOuter.str();
         stringstream ssTotalFctDevXSOuter;     ssTotalFctDevXSOuter << TotalFctDevXSOuter;         string sTotalFctDevXSOuter     = ssTotalFctDevXSOuter.str();
@@ -251,15 +258,33 @@ void ReadTest(){
         stringstream ssTotalFctDevAccOuter;    ssTotalFctDevAccOuter << TotalFctDevAccOuter;       string sTotalFctDevAccOuter    = ssTotalFctDevAccOuter.str();
         stringstream ssTotalRelFctDevAccOuter; ssTotalRelFctDevAccOuter << TotalRelFctDevAccOuter; string sTotalRelFctDevAccOuter = ssTotalRelFctDevAccOuter.str();
 
-        TGraph* LnLikFctOuter    = new TGraph(NrConfigs,xVar,yLnLik);    LnLikFctOuter->SetMarkerColor(2);    LnLikFctOuter->SetLineColor(2);
+        //TGraph* LnLikFctOuter[nEvts];
+        LnLikFctOuter[evt]    = new TGraph(NrConfigs,xVar,yLnLik);    LnLikFctOuter[evt]->SetMarkerColor(2);    LnLikFctOuter[evt]->SetLineColor(2);
         TGraph* LnLikXSFctOuter  = new TGraph(NrConfigs,xVar,yLnLikXS);  LnLikXSFctOuter->SetMarkerColor(2);  LnLikXSFctOuter->SetLineColor(2);
         TGraph* LnLikAccFctOuter = new TGraph(NrConfigs,xVar,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
-        LnLikFctOuter->SetTitle(("LnLik for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevOuter+" -- "+sTotalRelFctDevOuter+")").c_str());
+        LnLikFctOuter[evt]->SetName(("LnLikFctOuter_Evt"+sEvt).c_str());
+
+        LnLikFctOuter[evt]->SetTitle(("LnLik for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevOuter+" -- "+sTotalRelFctDevOuter+")").c_str());
         LnLikXSFctOuter->SetTitle(("LnLikXS for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevXSOuter+" -- "+sTotalRelFctDevXSOuter+")").c_str());
         LnLikAccFctOuter->SetTitle(("LnLikAcc for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevAccOuter+" -- "+sTotalRelFctDevAccOuter+")").c_str());
-        TCanvas* LnLikCanv =    new TCanvas(("LnLikCanv_"+sEvt).c_str(),"LnLik");      LnLikCanv->cd();   LnLikFctOuter->Draw("AC*");   LnLikDist->Draw("samep");   LnLikDir->cd();   LnLikCanv->Write();
+        TCanvas* LnLikCanv =    new TCanvas(("LnLikCanv_"+sEvt).c_str(),"LnLik");      LnLikCanv->cd();   LnLikFctOuter[evt]->Draw("AC*");   LnLikDist->Draw("samep");   LnLikDir->cd();   LnLikCanv->Write();
         TCanvas* LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
         TCanvas* LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
+
+        //Save 20 of these histograms in one TCanvas!
+        stringstream ssNrCanvas; ssNrCanvas << NrCanvas; string sNrCanvas = ssNrCanvas.str();
+        std::cout << " Comparing " << consEvts << " with " << xDivide*yDivide*(NrCanvas+1) << std::endl;
+        if( consEvts == (xDivide*yDivide*(NrCanvas+1))){
+          std::cout << " ------------------ NrCanvas value = " << NrCanvas << std::endl;
+          LnLikStackDir->cd(); 
+          StackCanvas->Write(); 
+          StackCanvas->SetName( ("StackCanvas_Nr"+sNrCanvas).c_str() );
+          StackCanvas->Divide(xDivide,yDivide);
+          NrCanvas++;
+        }
+        StackCanvas->cd(consEvts - (xDivide*yDivide*NrCanvas) );
+        std::cout << " -- Storing on canvas nr : " << consEvts - (xDivide*yDivide*(NrCanvas)) << std::endl;
+        LnLikFctOuter[evt]->Draw("AC*");   LnLikDist->Draw("samep");
 
         //---  Calculate the first derivative distribution and save them in event-by-event plot  ---//
         FstDer->SetName(("FirstDerivative_Evt"+sEvt).c_str());
