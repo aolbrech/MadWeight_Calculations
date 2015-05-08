@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include <cmath>
+#include <algorithm>
 
 std::string VarValues[] = {"Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3"}; 
 float Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
@@ -182,10 +183,23 @@ void ReadTest(){
   //-----------------------------------//
   TH1F* LLSmallFctDevDist = new TH1F("LLSmallFctDeviation","-ln(L) when sum of deviations between -ln(L)- and function-value < 0.5 (acc norm -- outer points used)",xBin,xLow,xHigh);
 
+  TH1F* LLPosScdDerDistBoth     = new TH1F("LLPosScdDerBoth",    "-ln(L) when both 2nd derivatives > 0 (no norm -- ", xBin,xLow,xHigh);
+  TH1F* LLXSPosScdDerDistBoth   = new TH1F("LLXSPosScdDerBoth",  "-ln(L) when both 2nd derivatives > 0 (XS norm -- ", xBin,xLow,xHigh);
+  TH1F* LLAccPosScdDerDistBoth  = new TH1F("LLAccPosScdDerBoth", "-ln(L) when both 2nd derivatives > 0 (Acc norm -- ",xBin,xLow,xHigh);
+  TH1F* LLPosScdDerDistInner    = new TH1F("LLPosScdDerInner",   "-ln(L) when inner 2nd derivative > 0 (no norm -- ", xBin,xLow,xHigh);
+  TH1F* LLXSPosScdDerDistInner  = new TH1F("LLXSPosScdDerInner", "-ln(L) when inner 2nd derivative > 0 (XS norm -- ", xBin,xLow,xHigh);
+  TH1F* LLAccPosScdDerDistInner = new TH1F("LLAccPosScdDerInner","-ln(L) when inner 2nd derivative > 0 (Acc norm -- ",xBin,xLow,xHigh);
+  TH1F* LLPosScdDerDistOuter    = new TH1F("LLPosScdDerOuter",   "-ln(L) when outer 2nd derivative > 0 (no norm -- ", xBin,xLow,xHigh);
+  TH1F* LLXSPosScdDerDistOuter  = new TH1F("LLXSPosScdDerOuter", "-ln(L) when outer 2nd derivative > 0 (XS norm -- ", xBin,xLow,xHigh);
+  TH1F* LLAccPosScdDerDistOuter = new TH1F("LLAccPosScdDerOuter","-ln(L) when outer 2nd derivative > 0 (Acc norm -- ",xBin,xLow,xHigh);
+
   //Initialize the event counters:
   vector<int> EvtsWithYPlusGausSmall, EvtsWithYPlusGausSmallXS, EvtsWithYPlusGausSmallAcc;
-  vector<int> EvtsPosScdDerInner, EvtsPosScdDerXSInner, EvtsPosScdDerAccInner;
-  vector<int> EvtsPosScdDerOuter, EvtsPosScdDerXSOuter, EvtsPosScdDerAccOuter;
+  int EvtsWithPosScdDerInner = 0, EvtsWithPosScdDerXSInner = 0, EvtsWithPosScdDerAccInner = 0;
+  int EvtsWithPosScdDerOuter = 0, EvtsWithPosScdDerXSOuter = 0, EvtsWithPosScdDerAccOuter = 0;
+  int EvtsWithPosScdDerBoth  = 0, EvtsWithPosScdDerXSBoth  = 0, EvtsWithPosScdDerAccBoth  = 0;
+  //vector<int> EvtsPosScdDerInner, EvtsPosScdDerXSInner, EvtsPosScdDerAccInner;
+  //vector<int> EvtsPosScdDerOuter, EvtsPosScdDerXSOuter, EvtsPosScdDerAccOuter;
   vector<int> EvtsWithSmallFctDev;
   double weightsValue[nEvts][NrConfigs];
 
@@ -364,54 +378,89 @@ void ReadTest(){
         if( (yPlus[1] + yPlusPlus[1]/4) <= 0.025 && (yPlus[1] + yPlusPlus[1]/4) >= -0.025) EvtsWithYPlusGausSmallXS.push_back(evt);
         if( (yPlus[2] + yPlusPlus[2]/4) <= 0.025 && (yPlus[2] + yPlusPlus[2]/4) >= -0.025) EvtsWithYPlusGausSmallAcc.push_back(evt);
 
-        //-- Apply cut on TotalFctDeviation --//
-        if( TotalFctDevAccOuter <= 0.5){
-          EvtsWithSmallFctDev.push_back(evt);
-          for(int iConf = 0; iConf < NrConfigs; iConf++)
+        //------------------------------------------------------------//
+        //---  Now apply cuts and save the interesting histograms  ---//
+        //------------------------------------------------------------//
+        for(int iConf = 0; iConf < NrConfigs; iConf++){
+
+          //-- Apply cut on TotalFctDeviation --//
+          if( TotalFctDevAccOuter <= 0.1){
+            if(iConf == 0) EvtsWithSmallFctDev.push_back(evt);  //Still an interesting variable??
             LLSmallFctDevDist->SetBinContent(LLSmallFctDevDist->FindBin(Var[iConf]), LLSmallFctDevDist->GetBinContent(LLSmallFctDevDist->FindBin(Var[iConf])) + LnLikAcc[iConf]);
-        }
-        //-- Apply cut on ScdDer (using inner Var points) --//
-        if( scdDerInner[0] > 0.0){
-          EvtsPosScdDerInner.push_back(evt); //LLPosScdDerDistInner.SetBinContent(
-        }
-        if( scdDerInner[1] > 0.0) EvtsPosScdDerXSInner.push_back(evt);
-        if( scdDerInner[2] > 0.0) EvtsPosScdDerAccInner.push_back(evt);
+          }
+          //-- Apply cut on ScdDer (using inner Var points) --//
+          if( scdDerInner[0] > 0.0){
+            if(iConf == 0) EvtsWithPosScdDerInner++; 
+            LLPosScdDerDistInner->SetBinContent(LLPosScdDerDistInner->FindBin(Var[iConf]), LLPosScdDerDistInner->GetBinContent(LLPosScdDerDistInner->FindBin(Var[iConf]) + LnLik[iConf]) );          
+          }
+          if( scdDerInner[1] > 0.0){
+            if(iConf == 0) EvtsWithPosScdDerXSInner++;
+            LLXSPosScdDerDistInner->SetBinContent(LLXSPosScdDerDistInner->FindBin(Var[iConf]), LLXSPosScdDerDistInner->GetBinContent(LLXSPosScdDerDistInner->FindBin(Var[iConf]) + LnLikXS[iConf]) );
+          }
+          if( scdDerInner[2] > 0.0){
+            if(iConf == 0) EvtsWithPosScdDerAccInner++;
+            LLAccPosScdDerDistInner->SetBinContent(LLAccPosScdDerDistInner->FindBin(Var[iConf]), LLAccPosScdDerDistInner->GetBinContent(LLAccPosScdDerDistInner->FindBin(Var[iConf]) + LnLikAcc[iConf]) );
+          }
 
-        //-- Apply cut on ScdDer (using outer Var points) --//
-        if( scdDerOuter[0] > 0.0){
-          EvtsPosScdDerOuter.push_back(evt);
-          YPlusGausTestPosScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
-          YPlusPosScdDer->Fill(yPlus[0]); YPlusPlusPosScdDer->Fill(yPlusPlus[0]);
-          YMinPosScdDer->Fill(yMin[0]);   YMinMinPosScdDer->Fill(yMinMin[0]);
-        }
-        else{
-          YPlusGausTestNegScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
-          YPlusNegScdDer->Fill(yPlus[0]); YPlusPlusNegScdDer->Fill(yPlusPlus[0]);
-          YMinNegScdDer->Fill(yMin[0]);   YMinMinNegScdDer->Fill(yMinMin[0]);
-        }
+          //-- Apply cut on both ScdDer --//        
+          if( scdDerInner[0] > 0.0 && scdDerOuter[0] > 0.0){
+            if(iConf == 0) EvtsWithPosScdDerBoth++;
+            LLPosScdDerDistBoth->SetBinContent(LLPosScdDerDistBoth->FindBin(Var[iConf]), LLPosScdDerDistBoth->GetBinContent(LLPosScdDerDistBoth->FindBin(Var[iConf]) + LnLik[iConf]) );
+          }
+          if( scdDerInner[1] > 0.0 && scdDerOuter[1] > 0.0){
+            if(iConf == 0) EvtsWithPosScdDerXSBoth++;
+            LLXSPosScdDerDistBoth->SetBinContent(LLXSPosScdDerDistBoth->FindBin(Var[iConf]), LLXSPosScdDerDistBoth->GetBinContent(LLXSPosScdDerDistBoth->FindBin(Var[iConf]) + LnLikXS[iConf]) );
+          }
+          if( scdDerInner[2] > 0.0 && scdDerOuter[2] > 0.0){
+            if(iConf == 0) EvtsWithPosScdDerAccBoth++;
+            LLAccPosScdDerDistBoth->SetBinContent(LLAccPosScdDerDistBoth->FindBin(Var[iConf]), LLAccPosScdDerDistBoth->GetBinContent(LLAccPosScdDerDistBoth->FindBin(Var[iConf]) + LnLikAcc[iConf]) );
+          }
 
-        if( scdDerOuter[1] > 0.0){
-          EvtsPosScdDerXSOuter.push_back(evt);
-          YPlusGausTestXSPosScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
-          YPlusXSPosScdDer->Fill(yPlus[1]); YPlusPlusXSPosScdDer->Fill(yPlusPlus[1]);
-          YMinXSPosScdDer->Fill(yMin[1]);   YMinMinXSPosScdDer->Fill(yMinMin[1]);
-        }
-        else{
-          YPlusGausTestXSNegScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
-          YPlusXSNegScdDer->Fill(yPlus[1]); YPlusPlusXSNegScdDer->Fill(yPlusPlus[1]);
-          YMinXSNegScdDer->Fill(yMin[1]);   YMinMinXSNegScdDer->Fill(yMinMin[1]);
-        }
+          //-- Apply cut on ScdDer (using outer Var points) --//
+          if( scdDerOuter[0] > 0.0){
+            if(iConf == 0){
+              EvtsWithPosScdDerOuter++;
+              YPlusGausTestPosScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
+              YPlusPosScdDer->Fill(yPlus[0]); YPlusPlusPosScdDer->Fill(yPlusPlus[0]); YMinPosScdDer->Fill(yMin[0]); YMinMinPosScdDer->Fill(yMinMin[0]);
+            }
+            LLPosScdDerDistOuter->SetBinContent(LLPosScdDerDistOuter->FindBin(Var[iConf]), LLPosScdDerDistOuter->GetBinContent(LLPosScdDerDistOuter->FindBin(Var[iConf]) + LnLik[iConf]) );
+          }
+          else{  //Are these distributions for negative scdDer still interesting?
+            if(iConf == 0){
+              YPlusGausTestNegScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
+              YPlusNegScdDer->Fill(yPlus[0]); YPlusPlusNegScdDer->Fill(yPlusPlus[0]); YMinNegScdDer->Fill(yMin[0]); YMinMinNegScdDer->Fill(yMinMin[0]);
+            }
+          }
 
-        if( scdDerOuter[2] > 0.0){
-          EvtsPosScdDerAccOuter.push_back(evt);
-          YPlusGausTestAccPosScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
-          YPlusAccPosScdDer->Fill(yPlus[2]); YPlusPlusAccPosScdDer->Fill(yPlusPlus[2]);
-          YMinAccPosScdDer->Fill(yMin[2]);   YMinMinAccPosScdDer->Fill(yMinMin[2]);
-        }
-        else{
-          YPlusGausTestAccNegScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
-          YPlusAccNegScdDer->Fill(yPlus[2]); YPlusPlusAccNegScdDer->Fill(yPlusPlus[2]);
-          YMinAccNegScdDer->Fill(yMin[2]);   YMinMinAccNegScdDer->Fill(yMinMin[2]);
+          if( scdDerOuter[1] > 0.0){
+            if(iConf == 0){
+              EvtsWithPosScdDerXSOuter++;
+              YPlusGausTestXSPosScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
+              YPlusXSPosScdDer->Fill(yPlus[1]); YPlusPlusXSPosScdDer->Fill(yPlusPlus[1]); YMinXSPosScdDer->Fill(yMin[1]); YMinMinXSPosScdDer->Fill(yMinMin[1]);
+            }
+            LLXSPosScdDerDistOuter->SetBinContent(LLXSPosScdDerDistOuter->FindBin(Var[iConf]), LLXSPosScdDerDistOuter->GetBinContent(LLXSPosScdDerDistOuter->FindBin(Var[iConf]) + LnLikXS[iConf]) );
+          }
+          else{
+            if(iConf == 0){
+              YPlusGausTestXSNegScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
+              YPlusXSNegScdDer->Fill(yPlus[1]); YPlusPlusXSNegScdDer->Fill(yPlusPlus[1]); YMinXSNegScdDer->Fill(yMin[1]); YMinMinXSNegScdDer->Fill(yMinMin[1]);
+            }
+          }
+
+          if( scdDerOuter[2] > 0.0){
+            if(iConf == 0){
+              EvtsWithPosScdDerAccOuter++;
+              YPlusGausTestAccPosScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
+              YPlusAccPosScdDer->Fill(yPlus[2]); YPlusPlusAccPosScdDer->Fill(yPlusPlus[2]); YMinAccPosScdDer->Fill(yMin[2]); YMinMinAccPosScdDer->Fill(yMinMin[2]);
+            }
+            LLAccPosScdDerDistOuter->SetBinContent(LLAccPosScdDerDistOuter->FindBin(Var[iConf]), LLAccPosScdDerDistOuter->GetBinContent(LLAccPosScdDerDistOuter->FindBin(Var[iConf]) + LnLikAcc[iConf]) );
+          }
+          else{
+            if(iConf == 0){  
+              YPlusGausTestAccNegScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
+              YPlusAccNegScdDer->Fill(yPlus[2]); YPlusPlusAccNegScdDer->Fill(yPlusPlus[2]); YMinAccNegScdDer->Fill(yMin[2]); YMinMinAccNegScdDer->Fill(yMinMin[2]);
+            }
+          }
         }
 
       }
@@ -449,8 +498,9 @@ void ReadTest(){
   LnLikVariationDist->Write();*/
 
   //---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---//
-  std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[0]] << "/" << Var[xMin] << "/" << Var[xPos[0]] << ") : " << EvtsPosScdDerInner.size() << ", " << EvtsPosScdDerXSInner.size() << " & " << EvtsPosScdDerAccInner.size() << std::endl;
-  std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[1]] << "/" << Var[xMin] << "/" << Var[xPos[1]] << ") : " << EvtsPosScdDerOuter.size() << ", " << EvtsPosScdDerXSOuter.size() << " & " << EvtsPosScdDerAccOuter.size() << std::endl;
+  std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[0]] << "/" << Var[xMin] << "/" << Var[xPos[0]] << ") : " << EvtsWithPosScdDerInner << ", " << EvtsWithPosScdDerXSInner << " & " << EvtsWithPosScdDerAccInner << std::endl;
+  std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[1]] << "/" << Var[xMin] << "/" << Var[xPos[1]] << ") : " << EvtsWithPosScdDerOuter << ", " << EvtsWithPosScdDerXSOuter << " & " << EvtsWithPosScdDerAccOuter << std::endl;
+  std::cout << "Nr of events with both 2nd derivatives > 0 (LnLik, LnLikXS & LnLikAcc) : " << EvtsWithPosScdDerOuter << ", " << EvtsWithPosScdDerXSOuter << " & " << EvtsWithPosScdDerAccOuter << std::endl;
   std::cout << "Nr of events with small Gaussian-test deviation for plus-case (LnLik, LnLikXS & LnLikAcc) " << EvtsWithYPlusGausSmall.size() << ", " << EvtsWithYPlusGausSmallXS.size() << " & " << EvtsWithYPlusGausSmallAcc.size() << std::endl;
   std::cout << "Nr of events with total function deviation < 0.5 : " << EvtsWithSmallFctDev.size() << std::endl;
 
@@ -458,6 +508,31 @@ void ReadTest(){
   TDirectory* SmallFctDevDir = AppliedCutsDir->mkdir("SmallFunctionDeviation");
   SmallFctDevDir->cd(); LLSmallFctDevDist->Write();
 
+  stringstream ssEvtsWithPosScdDerOuter;    ssEvtsWithPosScdDerOuter << EvtsWithPosScdDerOuter;    string sEvtsWithPosScdDerOuter    = ssEvtsWithPosScdDerOuter.str();
+  stringstream ssEvtsWithPosScdDerXSOuter;  ssEvtsWithPosScdDerXSOuter << EvtsWithPosScdDerOuter;  string sEvtsWithPosScdDerXSOuter  = ssEvtsWithPosScdDerXSOuter.str();
+  stringstream ssEvtsWithPosScdDerAccOuter; ssEvtsWithPosScdDerAccOuter << EvtsWithPosScdDerOuter; string sEvtsWithPosScdDerAccOuter = ssEvtsWithPosScdDerAccOuter.str();
+  stringstream ssEvtsWithPosScdDerInner;    ssEvtsWithPosScdDerInner << EvtsWithPosScdDerInner;    string sEvtsWithPosScdDerInner    = ssEvtsWithPosScdDerInner.str();
+  stringstream ssEvtsWithPosScdDerXSInner;  ssEvtsWithPosScdDerXSInner << EvtsWithPosScdDerInner;  string sEvtsWithPosScdDerXSInner  = ssEvtsWithPosScdDerXSInner.str();
+  stringstream ssEvtsWithPosScdDerAccInner; ssEvtsWithPosScdDerAccInner << EvtsWithPosScdDerInner; string sEvtsWithPosScdDerAccInner = ssEvtsWithPosScdDerAccInner.str();
+  stringstream ssEvtsWithPosScdDerBoth;     ssEvtsWithPosScdDerBoth << EvtsWithPosScdDerBoth;      string sEvtsWithPosScdDerBoth     = ssEvtsWithPosScdDerBoth.str();
+  stringstream ssEvtsWithPosScdDerXSBoth;   ssEvtsWithPosScdDerXSBoth << EvtsWithPosScdDerBoth;    string sEvtsWithPosScdDerXSBoth   = ssEvtsWithPosScdDerXSBoth.str();
+  stringstream ssEvtsWithPosScdDerAccBoth;  ssEvtsWithPosScdDerAccBoth << EvtsWithPosScdDerBoth;   string sEvtsWithPosScdDerAccBoth  = ssEvtsWithPosScdDerAccBoth.str();
+
+  LLPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (no norm -- "+sEvtsWithPosScdDerBoth+"/"+nEvts+" evts -- "+title+")").c_str());
+  LLXSPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (XS norm -- "+sEvtsWithPosScdDerXSBoth+"/"+nEvts+" evts -- "+title+")").c_str());
+  LLAccPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (Acc norm -- "+sEvtsWithPosScdDerAccBoth+"/"+nEvts+" evts -- "+title+")").c_str());
+  LLPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (no norm -- "+sEvtsWithPosScdDerInner+"/"+nEvts+" evts -- "+title+")").c_str()    );
+  LLXSPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (XS norm -- "+sEvtsWithPosScdDerXSInner+"/"+nEvts+" evts -- "+title+")").c_str() );
+  LLAccPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (Acc norm -- "+sEvtsWithPosScdDerAccInner+"/"+nEvts+" evts -- "+title+")").c_str() );
+  LLPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (no norm -- "+sEvtsWithPosScdDerOuter+"/"+nEvts+" evts -- "+title+")").c_str() );
+  LLXSPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (XS norm -- "+sEvtsWithPosScdDerXSOuter+"/"+nEvts+" evts -- "+title+")").c_str() );
+  LLAccPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (Acc norm -- "+sEvtsWithPosScdDerAccOuter+"/"+nEvts+" evts -- "+title+")").c_str() );
+
+  /*for(int iEvt = 0; iEvt < nEvts; iEvt++){
+    if(std::find(EvtsWithSmallFctDev.begin(), EvtsWithSmallFctDev.end(), iEvt) != EvtsWithSmallFctDev.end() ){
+      std::cout << iEvt << ") Event number is found : " << EvtsWithSmallFctDev[iEvt]  << std::endl;
+    }
+  }*/
 
 
 }
