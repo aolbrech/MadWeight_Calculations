@@ -177,6 +177,11 @@ void ReadTest(){
   TCanvas* LnLikFitCanvas = new TCanvas("name","title");
   std::string LnLikFitCanvasName = "LnLikFitCanvas_Evt", LnLikFitCanvasTitle = "Comparing fit function from ROOT fit and algebraic function for event -- '+title+' evts ";
 
+  //-----------------------------------//
+  //----  Specific cut histograms  ----//
+  //-----------------------------------//
+  TH1F* LLSmallFctDevDist = new TH1F("LLSmallFctDeviation","-ln(L) when sum of deviations between -ln(L)- and function-value < 0.5 (acc norm -- outer points used)",xBin,xLow,xHigh);
+
   //Initialize the event counters:
   vector<int> EvtsWithYPlusGausSmall, EvtsWithYPlusGausSmallXS, EvtsWithYPlusGausSmallAcc;
   vector<int> EvtsPosScdDerInner, EvtsPosScdDerXSInner, EvtsPosScdDerAccInner;
@@ -358,12 +363,20 @@ void ReadTest(){
         if( (yPlus[0] + yPlusPlus[0]/4) <= 0.025 && (yPlus[0] + yPlusPlus[0]/4) >= -0.025) EvtsWithYPlusGausSmall.push_back(evt);
         if( (yPlus[1] + yPlusPlus[1]/4) <= 0.025 && (yPlus[1] + yPlusPlus[1]/4) >= -0.025) EvtsWithYPlusGausSmallXS.push_back(evt);
         if( (yPlus[2] + yPlusPlus[2]/4) <= 0.025 && (yPlus[2] + yPlusPlus[2]/4) >= -0.025) EvtsWithYPlusGausSmallAcc.push_back(evt);
+
         //-- Apply cut on TotalFctDeviation --//
-        if( TotalFctDevAccOuter <= 0.5) EvtsWithSmallFctDev.push_back(evt);
+        if( TotalFctDevAccOuter <= 0.5){
+          EvtsWithSmallFctDev.push_back(evt);
+          for(int iConf = 0; iConf < NrConfigs; iConf++)
+            LLSmallFctDevDist->SetBinContent(LLSmallFctDevDist->FindBin(Var[iConf]), LLSmallFctDevDist->GetBinContent(LLSmallFctDevDist->FindBin(Var[iConf])) + LnLikAcc[iConf]);
+        }
         //-- Apply cut on ScdDer (using inner Var points) --//
-        if( scdDerInner[0] > 0.0) EvtsPosScdDerInner.push_back(evt);
+        if( scdDerInner[0] > 0.0){
+          EvtsPosScdDerInner.push_back(evt); //LLPosScdDerDistInner.SetBinContent(
+        }
         if( scdDerInner[1] > 0.0) EvtsPosScdDerXSInner.push_back(evt);
         if( scdDerInner[2] > 0.0) EvtsPosScdDerAccInner.push_back(evt);
+
         //-- Apply cut on ScdDer (using outer Var points) --//
         if( scdDerOuter[0] > 0.0){
           EvtsPosScdDerOuter.push_back(evt);
@@ -419,7 +432,7 @@ void ReadTest(){
   ScdDerInner->Write();             ScdDerXSInner->Write();             ScdDerAccInner->Write();
   ScdDerOuter->Write();             ScdDerXSOuter->Write();             ScdDerAccOuter->Write();
   ScdDerScatter->Write();           ScdDerXSScatter->Write();           ScdDerAccScatter->Write();
-  FstDerInnerPlusRelToUnc->Write(); FstDerXSInnerPlusRelToUnc->Write(); FstDerAccInnerPlusRelToUnc->Write();
+  /*FstDerInnerPlusRelToUnc->Write(); FstDerXSInnerPlusRelToUnc->Write(); FstDerAccInnerPlusRelToUnc->Write();
   FstDerInnerMinRelToUnc->Write();  FstDerXSInnerMinRelToUnc->Write();  FstDerAccInnerMinRelToUnc->Write();
   FstDerOuterPlusRelToUnc->Write(); FstDerXSOuterPlusRelToUnc->Write(); FstDerAccOuterPlusRelToUnc->Write();
   FstDerOuterMinRelToUnc->Write();  FstDerXSOuterMinRelToUnc->Write();  FstDerAccOuterMinRelToUnc->Write();
@@ -433,7 +446,18 @@ void ReadTest(){
   WeightVsUncMin->Write();
   SigmaVarianceDist->Write();
   AverageSigmaDist->Write();
-  LnLikVariationDist->Write();
+  LnLikVariationDist->Write();*/
+
+  //---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---//
+  std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[0]] << "/" << Var[xMin] << "/" << Var[xPos[0]] << ") : " << EvtsPosScdDerInner.size() << ", " << EvtsPosScdDerXSInner.size() << " & " << EvtsPosScdDerAccInner.size() << std::endl;
+  std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[1]] << "/" << Var[xMin] << "/" << Var[xPos[1]] << ") : " << EvtsPosScdDerOuter.size() << ", " << EvtsPosScdDerXSOuter.size() << " & " << EvtsPosScdDerAccOuter.size() << std::endl;
+  std::cout << "Nr of events with small Gaussian-test deviation for plus-case (LnLik, LnLikXS & LnLikAcc) " << EvtsWithYPlusGausSmall.size() << ", " << EvtsWithYPlusGausSmallXS.size() << " & " << EvtsWithYPlusGausSmallAcc.size() << std::endl;
+  std::cout << "Nr of events with total function deviation < 0.5 : " << EvtsWithSmallFctDev.size() << std::endl;
+
+  TDirectory* AppliedCutsDir = Tfile->mkdir("LikelihoodAfterCuts");
+  TDirectory* SmallFctDevDir = AppliedCutsDir->mkdir("SmallFunctionDeviation");
+  SmallFctDevDir->cd(); LLSmallFctDevDist->Write();
+
 
 
 }
