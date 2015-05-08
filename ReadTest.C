@@ -27,7 +27,7 @@ std::string title = "Gen_RVR";
 TFile* Tfile = new TFile("Test.root","RECREATE");
 
 const int NrConfigs = 9;
-int nEvts = 10; 
+const int nEvts = 10; 
 
 void ReadTest(){
   
@@ -177,6 +177,13 @@ void ReadTest(){
   TCanvas* LnLikFitCanvas = new TCanvas("name","title");
   std::string LnLikFitCanvasName = "LnLikFitCanvas_Evt", LnLikFitCanvasTitle = "Comparing fit function from ROOT fit and algebraic function for event -- '+title+' evts ";
 
+  //Initialize the event counters:
+  vector<int> EvtsWithYPlusGausSmall, EvtsWithYPlusGausSmallXS, EvtsWithYPlusGausSmallAcc;
+  vector<int> EvtsPosScdDerInner, EvtsPosScdDerXSInner, EvtsPosScdDerAccInner;
+  vector<int> EvtsPosScdDerOuter, EvtsPosScdDerXSOuter, EvtsPosScdDerAccOuter;
+  vector<int> EvtsWithSmallFctDev;
+  double weightsValue[nEvts][NrConfigs];
+
   //--- Read all likelihood values ! ---//
   std::ifstream ifs ("weights.txt", std::ifstream::in);
   //ifs.open("weights.txt");
@@ -205,6 +212,7 @@ void ReadTest(){
       }
       Lik[config-1] = weight;         LikXS[config-1] = weight/MGXS[config-1];              LikAcc[config-1] = weight/MGXSCut[config-1];
       LnLik[config-1] = -log(weight); LnLikXS[config-1] = -log(weight)+log(MGXS[config-1]); LnLikAcc[config-1] = -log(weight)+log(MGXSCut[config-1]);
+      weightsValue[evt-1][config-1] = weight;
 
       //---  Fill the LnLik histograms for each event and for all events together  ---//
       LnLikDist->SetBinContent(   LnLikDist->FindBin(Var[config-1]),    LnLik[config-1]);
@@ -340,6 +348,58 @@ void ReadTest(){
         //TotalFctDevDist->Fill(TotalFctDevAccOuter);
         if( TotalFctDevAccOuter > 5) std::cout << "Overflow found for TotalFctDevDist : " << TotalFctDevAccOuter << std::endl;
 
+        /*//-- Check for presence of high overflow! --//
+        if LikErr[xMin] > 0.00000000000000000002: print "Overflow found for LikUncDist : ",LikErr[xMin]
+        if LnLikErr[xMin]/LnLik[xMin] > 0.002: print "Overflow found for RelLnLikUncDist :", LnLikErr[xMin]/LnLik[xMin]
+        if LnLikErr[xMin] > 0.2: print " Overflow found for LnLikUncDist : ",LnLikErr[xMin]
+        if LikErr[xMin]/Lik[xMin] > 0.2: print "Overflow found for RelLikUncDist : ",LikErr[xMin]/Lik[xMin]*/
+
+        //-- Apply cut on YPlusGausTest --//
+        if( (yPlus[0] + yPlusPlus[0]/4) <= 0.025 && (yPlus[0] + yPlusPlus[0]/4) >= -0.025) EvtsWithYPlusGausSmall.push_back(evt);
+        if( (yPlus[1] + yPlusPlus[1]/4) <= 0.025 && (yPlus[1] + yPlusPlus[1]/4) >= -0.025) EvtsWithYPlusGausSmallXS.push_back(evt);
+        if( (yPlus[2] + yPlusPlus[2]/4) <= 0.025 && (yPlus[2] + yPlusPlus[2]/4) >= -0.025) EvtsWithYPlusGausSmallAcc.push_back(evt);
+        //-- Apply cut on TotalFctDeviation --//
+        if( TotalFctDevAccOuter <= 0.5) EvtsWithSmallFctDev.push_back(evt);
+        //-- Apply cut on ScdDer (using inner Var points) --//
+        if( scdDerInner[0] > 0.0) EvtsPosScdDerInner.push_back(evt);
+        if( scdDerInner[1] > 0.0) EvtsPosScdDerXSInner.push_back(evt);
+        if( scdDerInner[2] > 0.0) EvtsPosScdDerAccInner.push_back(evt);
+        //-- Apply cut on ScdDer (using outer Var points) --//
+        if( scdDerOuter[0] > 0.0){
+          EvtsPosScdDerOuter.push_back(evt);
+          YPlusGausTestPosScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
+          YPlusPosScdDer->Fill(yPlus[0]); YPlusPlusPosScdDer->Fill(yPlusPlus[0]);
+          YMinPosScdDer->Fill(yMin[0]);   YMinMinPosScdDer->Fill(yMinMin[0]);
+        }
+        else{
+          YPlusGausTestNegScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
+          YPlusNegScdDer->Fill(yPlus[0]); YPlusPlusNegScdDer->Fill(yPlusPlus[0]);
+          YMinNegScdDer->Fill(yMin[0]);   YMinMinNegScdDer->Fill(yMinMin[0]);
+        }
+
+        if( scdDerOuter[1] > 0.0){
+          EvtsPosScdDerXSOuter.push_back(evt);
+          YPlusGausTestXSPosScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
+          YPlusXSPosScdDer->Fill(yPlus[1]); YPlusPlusXSPosScdDer->Fill(yPlusPlus[1]);
+          YMinXSPosScdDer->Fill(yMin[1]);   YMinMinXSPosScdDer->Fill(yMinMin[1]);
+        }
+        else{
+          YPlusGausTestXSNegScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
+          YPlusXSNegScdDer->Fill(yPlus[1]); YPlusPlusXSNegScdDer->Fill(yPlusPlus[1]);
+          YMinXSNegScdDer->Fill(yMin[1]);   YMinMinXSNegScdDer->Fill(yMinMin[1]);
+        }
+
+        if( scdDerOuter[2] > 0.0){
+          EvtsPosScdDerAccOuter.push_back(evt);
+          YPlusGausTestAccPosScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
+          YPlusAccPosScdDer->Fill(yPlus[2]); YPlusPlusAccPosScdDer->Fill(yPlusPlus[2]);
+          YMinAccPosScdDer->Fill(yMin[2]);   YMinMinAccPosScdDer->Fill(yMinMin[2]);
+        }
+        else{
+          YPlusGausTestAccNegScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
+          YPlusAccNegScdDer->Fill(yPlus[2]); YPlusPlusAccNegScdDer->Fill(yPlusPlus[2]);
+          YMinAccNegScdDer->Fill(yMin[2]);   YMinMinAccNegScdDer->Fill(yMinMin[2]);
+        }
 
       }
     }
@@ -375,19 +435,6 @@ void ReadTest(){
   AverageSigmaDist->Write();
   LnLikVariationDist->Write();
 
-
-
-  /*for(int iEvt = 0; iEvt < nEvts; iEvt++){
-    vector<float> aHat = {0,0}, aHatXS = {0,0}, aHatAcc = {0,0};
-    float bHat[2] = {0,0}, bHatXS[2] = {0,0}, bHatAcc[2]={0,0};
-    float cHat[2], cHatXS[2], cHatAcc[2];
-    vector<double> LnLik(NrConfigs,0.0), LnLikXS(NrConfigs,0.0), LnLikAcc(NrConfigs,0.0);
-    vector<double> Lik(NrConfigs,0.0),   LikXS(NrConfigs,0.0),   LikAcc(NrConfigs,0.0);
-    for(int iConfig = 0; iConfig < NrConfigs; iConfig++){
-      //LnLik[iConfig] = readFromFile(iEvt+1, iConfig+1);
-    }
-    std::cout << iEvt+1 << ") Stored LnLik values are : " << LnLik[0] << ", " << LnLik[1] << " , " << LnLik[2] << " , " << LnLik[3] << " & " << LnLik[4] << std::endl;
-  }*/
 
 }
 
