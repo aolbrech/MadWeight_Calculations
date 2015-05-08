@@ -10,27 +10,27 @@
 #include <map>
 #include <stdlib.h>
 
-std::string VarValues[] = {"Re(V_{R}) = -0.1","Re(V_{R}) = -0.09","Re(VR) = -0.08","Re(V_{R}) = -0.07","Re(VR) = -0.06","Re(V_{R}) = -0.05","Re(V_{R}) = -0.04","Re(V_{R}) = -0.03","Re(V_{R}) = -0.02","Re(V_{R}) = -0.01","Re(VR) = 0.0","Re(V_{R}) = 0.01","Re(VR) = 0.02","Re(V_{R}) = 0.03","Re(V_{R}) = 0.04","Re(V_{R}) = 0.05","Re(V_{R}) = 0.06","Re(V_{R}) = 0.07","Re(V_{R}) = 0.08","Re(V_{R}) = 0.09","Re(V_{R}) = 0.1"};
-double Var[] = {-0.1,     -0.09,    -0.08,    -0.07,    -0.06,    -0.05,    -0.04,    -0.03,   -0.02,    -0.01,    0.0,      0.01,     0.02,     0.03,     0.04,     0.05,     0.06,     0.07,     0.08,     0.09,    0.1};
-double MGXS[] = {11.25909, 11.19599, 11.14075, 11.10667, 11.06145, 11.02784, 10.99474, 10.9534, 10.93846, 10.91787, 10.90059, 10.89643, 10.86829, 10.87792, 10.87266, 10.88228, 10.87684, 10.89534, 10.91641, 10.9317, 10.97767};
-double MGXSCut[] = {2.43546,  2.42182,  2.41059,  2.40057,  2.38839,  2.38187,  2.36976,  2.36513, 2.35512,  2.35666,  2.35415,  2.35694,  2.35174,  2.34909,  2.34392,  2.35108,  2.34767,  2.35477,  2.36148,  2.3643,  2.37424};
-int xBin = 21;
-float xLow = -0.105;
-float xHigh = 0.105;
-int xMinValue[] = {4, 4, 10};
-std::string KinVar = "Re(V_{R})";
-int VarWindow = 3;
-float xPos[] = {xMinValue[VarWindow-1]+1,xMinValue[VarWindow-1]+2};
-float xNeg[] = {xMinValue[VarWindow-1]-1,xMinValue[VarWindow-1]-2};
-std::string title = "title";
+std::string VarValues[] = {"Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3"}; 
+float Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
+float MGXS[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
+float MGXSCut[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
+int xBin = 13; 
+float xLow = -0.325; 
+float xHigh = 0.325; 
+int xMinValue[] = {4,4,10}; 
+std::string KinVar = "Re(V_{R})"; 
+int VarWindow = 2; 
+int xPos[] = {5,6}; 
+int xNeg[] = {3,2}; 
+std::string title = "Gen_RVR"; 
 TFile* Tfile = new TFile("Test.root","RECREATE");
 
-int NrConfigs = 21;
+int NrConfigs = 9;
 int nEvts = 10; 
 
 void ReadTest(){
   
-  float xMin = xMinValue[VarWindow-1];
+  int xMin = xMinValue[VarWindow-1];
   float xStep[] = {Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] };
   std::cout << " Value of xStep is : " << xStep[0] << std::endl;
 
@@ -221,8 +221,6 @@ void ReadTest(){
           //LnLikAccFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
 
         for(int ii=0; ii < 2; ii++){
-          std::cout << " Looking at xPos and xNeg values of : " << xPos[ii] << " & " << xNeg[ii] << std::endl;
-          std::cout << " LnLik values used : " << LnLik[xNeg[ii]] << " , " << LnLik[xMin] << " & " << LnLik[xPos[ii]] << std::endl;
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
           cHatXS[ii] = LnLikXS[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLikXS[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLikXS[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
           cHatAcc[ii] = LnLikAcc[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLikAcc[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLikAcc[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
