@@ -391,29 +391,29 @@ void ReadTest(){
           //-- Apply cut on ScdDer (using inner Var points) --//
           if( scdDerInner[0] > 0.0){
             if(iConf == 0) EvtsWithPosScdDerInner++; 
-            LLPosScdDerDistInner->SetBinContent(LLPosScdDerDistInner->FindBin(Var[iConf]), LLPosScdDerDistInner->GetBinContent(LLPosScdDerDistInner->FindBin(Var[iConf]) + LnLik[iConf]) );          
+            LLPosScdDerDistInner->SetBinContent(LLPosScdDerDistInner->FindBin(Var[iConf]), LLPosScdDerDistInner->GetBinContent(LLPosScdDerDistInner->FindBin(Var[iConf])) + LnLik[iConf] );          
           }
           if( scdDerInner[1] > 0.0){
             if(iConf == 0) EvtsWithPosScdDerXSInner++;
-            LLXSPosScdDerDistInner->SetBinContent(LLXSPosScdDerDistInner->FindBin(Var[iConf]), LLXSPosScdDerDistInner->GetBinContent(LLXSPosScdDerDistInner->FindBin(Var[iConf]) + LnLikXS[iConf]) );
+            LLXSPosScdDerDistInner->SetBinContent(LLXSPosScdDerDistInner->FindBin(Var[iConf]), LLXSPosScdDerDistInner->GetBinContent(LLXSPosScdDerDistInner->FindBin(Var[iConf])) + LnLikXS[iConf] );
           }
           if( scdDerInner[2] > 0.0){
             if(iConf == 0) EvtsWithPosScdDerAccInner++;
-            LLAccPosScdDerDistInner->SetBinContent(LLAccPosScdDerDistInner->FindBin(Var[iConf]), LLAccPosScdDerDistInner->GetBinContent(LLAccPosScdDerDistInner->FindBin(Var[iConf]) + LnLikAcc[iConf]) );
+            LLAccPosScdDerDistInner->SetBinContent(LLAccPosScdDerDistInner->FindBin(Var[iConf]), LLAccPosScdDerDistInner->GetBinContent(LLAccPosScdDerDistInner->FindBin(Var[iConf])) + LnLikAcc[iConf] );
           }
 
           //-- Apply cut on both ScdDer --//        
           if( scdDerInner[0] > 0.0 && scdDerOuter[0] > 0.0){
             if(iConf == 0) EvtsWithPosScdDerBoth++;
-            LLPosScdDerDistBoth->SetBinContent(LLPosScdDerDistBoth->FindBin(Var[iConf]), LLPosScdDerDistBoth->GetBinContent(LLPosScdDerDistBoth->FindBin(Var[iConf]) + LnLik[iConf]) );
+            LLPosScdDerDistBoth->SetBinContent(LLPosScdDerDistBoth->FindBin(Var[iConf]), LLPosScdDerDistBoth->GetBinContent(LLPosScdDerDistBoth->FindBin(Var[iConf])) + LnLik[iConf] );
           }
           if( scdDerInner[1] > 0.0 && scdDerOuter[1] > 0.0){
             if(iConf == 0) EvtsWithPosScdDerXSBoth++;
-            LLXSPosScdDerDistBoth->SetBinContent(LLXSPosScdDerDistBoth->FindBin(Var[iConf]), LLXSPosScdDerDistBoth->GetBinContent(LLXSPosScdDerDistBoth->FindBin(Var[iConf]) + LnLikXS[iConf]) );
+            LLXSPosScdDerDistBoth->SetBinContent(LLXSPosScdDerDistBoth->FindBin(Var[iConf]), LLXSPosScdDerDistBoth->GetBinContent(LLXSPosScdDerDistBoth->FindBin(Var[iConf])) + LnLikXS[iConf] );
           }
           if( scdDerInner[2] > 0.0 && scdDerOuter[2] > 0.0){
             if(iConf == 0) EvtsWithPosScdDerAccBoth++;
-            LLAccPosScdDerDistBoth->SetBinContent(LLAccPosScdDerDistBoth->FindBin(Var[iConf]), LLAccPosScdDerDistBoth->GetBinContent(LLAccPosScdDerDistBoth->FindBin(Var[iConf]) + LnLikAcc[iConf]) );
+            LLAccPosScdDerDistBoth->SetBinContent(LLAccPosScdDerDistBoth->FindBin(Var[iConf]), LLAccPosScdDerDistBoth->GetBinContent(LLAccPosScdDerDistBoth->FindBin(Var[iConf])) + LnLikAcc[iConf] );
           }
 
           //-- Apply cut on ScdDer (using outer Var points) --//
@@ -423,7 +423,7 @@ void ReadTest(){
               YPlusGausTestPosScdDer->Fill(yPlus[0] + yPlusPlus[0]/4);
               YPlusPosScdDer->Fill(yPlus[0]); YPlusPlusPosScdDer->Fill(yPlusPlus[0]); YMinPosScdDer->Fill(yMin[0]); YMinMinPosScdDer->Fill(yMinMin[0]);
             }
-            LLPosScdDerDistOuter->SetBinContent(LLPosScdDerDistOuter->FindBin(Var[iConf]), LLPosScdDerDistOuter->GetBinContent(LLPosScdDerDistOuter->FindBin(Var[iConf]) + LnLik[iConf]) );
+            LLPosScdDerDistOuter->SetBinContent(LLPosScdDerDistOuter->FindBin(Var[iConf]), LLPosScdDerDistOuter->GetBinContent(LLPosScdDerDistOuter->FindBin(Var[iConf])) + LnLik[iConf] );
           }
           else{  //Are these distributions for negative scdDer still interesting?
             if(iConf == 0){
@@ -438,7 +438,7 @@ void ReadTest(){
               YPlusGausTestXSPosScdDer->Fill(yPlus[1] + yPlusPlus[1]/4);
               YPlusXSPosScdDer->Fill(yPlus[1]); YPlusPlusXSPosScdDer->Fill(yPlusPlus[1]); YMinXSPosScdDer->Fill(yMin[1]); YMinMinXSPosScdDer->Fill(yMinMin[1]);
             }
-            LLXSPosScdDerDistOuter->SetBinContent(LLXSPosScdDerDistOuter->FindBin(Var[iConf]), LLXSPosScdDerDistOuter->GetBinContent(LLXSPosScdDerDistOuter->FindBin(Var[iConf]) + LnLikXS[iConf]) );
+            LLXSPosScdDerDistOuter->SetBinContent(LLXSPosScdDerDistOuter->FindBin(Var[iConf]), LLXSPosScdDerDistOuter->GetBinContent(LLXSPosScdDerDistOuter->FindBin(Var[iConf])) + LnLikXS[iConf] );
           }
           else{
             if(iConf == 0){
@@ -453,7 +453,7 @@ void ReadTest(){
               YPlusGausTestAccPosScdDer->Fill(yPlus[2] + yPlusPlus[2]/4);
               YPlusAccPosScdDer->Fill(yPlus[2]); YPlusPlusAccPosScdDer->Fill(yPlusPlus[2]); YMinAccPosScdDer->Fill(yMin[2]); YMinMinAccPosScdDer->Fill(yMinMin[2]);
             }
-            LLAccPosScdDerDistOuter->SetBinContent(LLAccPosScdDerDistOuter->FindBin(Var[iConf]), LLAccPosScdDerDistOuter->GetBinContent(LLAccPosScdDerDistOuter->FindBin(Var[iConf]) + LnLikAcc[iConf]) );
+            LLAccPosScdDerDistOuter->SetBinContent(LLAccPosScdDerDistOuter->FindBin(Var[iConf]), LLAccPosScdDerDistOuter->GetBinContent(LLAccPosScdDerDistOuter->FindBin(Var[iConf])) + LnLikAcc[iConf] );
           }
           else{
             if(iConf == 0){  
@@ -517,16 +517,22 @@ void ReadTest(){
   stringstream ssEvtsWithPosScdDerBoth;     ssEvtsWithPosScdDerBoth << EvtsWithPosScdDerBoth;      string sEvtsWithPosScdDerBoth     = ssEvtsWithPosScdDerBoth.str();
   stringstream ssEvtsWithPosScdDerXSBoth;   ssEvtsWithPosScdDerXSBoth << EvtsWithPosScdDerBoth;    string sEvtsWithPosScdDerXSBoth   = ssEvtsWithPosScdDerXSBoth.str();
   stringstream ssEvtsWithPosScdDerAccBoth;  ssEvtsWithPosScdDerAccBoth << EvtsWithPosScdDerBoth;   string sEvtsWithPosScdDerAccBoth  = ssEvtsWithPosScdDerAccBoth.str();
+  stringstream ssNEvts; ssNEvts << nEvts; string sNEvts = ssNEvts.str();
 
-  LLPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (no norm -- "+sEvtsWithPosScdDerBoth+"/"+nEvts+" evts -- "+title+")").c_str());
-  LLXSPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (XS norm -- "+sEvtsWithPosScdDerXSBoth+"/"+nEvts+" evts -- "+title+")").c_str());
-  LLAccPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (Acc norm -- "+sEvtsWithPosScdDerAccBoth+"/"+nEvts+" evts -- "+title+")").c_str());
-  LLPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (no norm -- "+sEvtsWithPosScdDerInner+"/"+nEvts+" evts -- "+title+")").c_str()    );
-  LLXSPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (XS norm -- "+sEvtsWithPosScdDerXSInner+"/"+nEvts+" evts -- "+title+")").c_str() );
-  LLAccPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (Acc norm -- "+sEvtsWithPosScdDerAccInner+"/"+nEvts+" evts -- "+title+")").c_str() );
-  LLPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (no norm -- "+sEvtsWithPosScdDerOuter+"/"+nEvts+" evts -- "+title+")").c_str() );
-  LLXSPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (XS norm -- "+sEvtsWithPosScdDerXSOuter+"/"+nEvts+" evts -- "+title+")").c_str() );
-  LLAccPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (Acc norm -- "+sEvtsWithPosScdDerAccOuter+"/"+nEvts+" evts -- "+title+")").c_str() );
+  LLPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (no norm -- "+sEvtsWithPosScdDerBoth+"/"+sNEvts+" evts -- "+title+")").c_str());
+  LLXSPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (XS norm -- "+sEvtsWithPosScdDerXSBoth+"/"+sNEvts+" evts -- "+title+")").c_str());
+  LLAccPosScdDerDistBoth->SetTitle( ("-ln(L) when both 2nd derivatives > 0 (Acc norm -- "+sEvtsWithPosScdDerAccBoth+"/"+sNEvts+" evts -- "+title+")").c_str());
+  LLPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (no norm -- "+sEvtsWithPosScdDerInner+"/"+sNEvts+" evts -- "+title+")").c_str()    );
+  LLXSPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (XS norm -- "+sEvtsWithPosScdDerXSInner+"/"+sNEvts+" evts -- "+title+")").c_str() );
+  LLAccPosScdDerDistInner->SetTitle( ("-ln(L) when inner 2nd derivative > 0 (Acc norm -- "+sEvtsWithPosScdDerAccInner+"/"+sNEvts+" evts -- "+title+")").c_str() );
+  LLPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (no norm -- "+sEvtsWithPosScdDerOuter+"/"+sNEvts+" evts -- "+title+")").c_str() );
+  LLXSPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (XS norm -- "+sEvtsWithPosScdDerXSOuter+"/"+sNEvts+" evts -- "+title+")").c_str() );
+  LLAccPosScdDerDistOuter->SetTitle( ("-ln(L) when outer 2nd derivative > 0 (Acc norm -- "+sEvtsWithPosScdDerAccOuter+"/"+sNEvts+" evts -- "+title+")").c_str() );
+
+  TDirectory* SignScdDerDir = AppliedCutsDir->mkdir("SignSecondDerivative"); SignScdDerDir->cd();
+  LLPosScdDerDistInner->Write(); LLXSPosScdDerDistInner->Write(); LLAccPosScdDerDistInner->Write();
+  LLPosScdDerDistOuter->Write(); LLXSPosScdDerDistOuter->Write(); LLAccPosScdDerDistOuter->Write();
+  LLPosScdDerDistBoth->Write();  LLXSPosScdDerDistBoth->Write();  LLAccPosScdDerDistBoth->Write();
 
   /*for(int iEvt = 0; iEvt < nEvts; iEvt++){
     if(std::find(EvtsWithSmallFctDev.begin(), EvtsWithSmallFctDev.end(), iEvt) != EvtsWithSmallFctDev.end() ){
