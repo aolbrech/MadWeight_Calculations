@@ -272,10 +272,109 @@ void ReadTest(){
         TCanvas* LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
         TCanvas* LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
 
+        //---  Calculate the first derivative distribution and save them in event-by-event plot  ---//
+        FstDer->SetName(("FirstDerivative_Evt"+sEvt).c_str());
+        FstDer->SetTitle(("First derivative of -ln(likelihood) distribution for event"+sEvt+" (no normalisation) -- "+title+" evts").c_str());
+        for(int ii = 0; ii < FstDer->GetNbinsX(); ii++)
+          FstDer->SetBinContent(ii+1, (LnLik[ii+2] - LnLik[ii+3])/xStep[ii]);
+        FstDerDir->cd(); FstDer->Write();
+
+        //---  Calculate the positive and negative deviation  ---//
+        double yPlusPlus[3] = {LnLik[xPos[1]] - LnLikFunction[0][xPos[1]], LnLikXS[xPos[1]] - LnLikXSFunction[0][xPos[1]], LnLikAcc[xPos[1]] - LnLikAccFunction[0][xPos[1]]};
+        double yMinMin[3]   = {LnLik[xNeg[1]] - LnLikFunction[0][xNeg[1]], LnLikXS[xNeg[1]] - LnLikXSFunction[0][xNeg[1]], LnLikAcc[xNeg[1]] - LnLikAccFunction[0][xNeg[1]]};
+        double yPlus[3] = {LnLik[xPos[0]] - LnLikFunction[1][xPos[0]], LnLikXS[xPos[0]] - LnLikXSFunction[1][xPos[0]], LnLikAcc[xPos[0]] - LnLikAccFunction[1][xPos[0]]};
+        double yMin[3]  = {LnLik[xNeg[0]] - LnLikFunction[1][xNeg[0]], LnLikXS[xNeg[0]] - LnLikXSFunction[1][xNeg[0]], LnLikAcc[xNeg[0]] - LnLikAccFunction[1][xNeg[0]]};
+        double scdDerInner[3] = {LnLik[xNeg[0]]-2*LnLik[xMin]+LnLik[xPos[0]], LnLikXS[xNeg[0]]-2*LnLikXS[xMin]+LnLikXS[xPos[0]], LnLikAcc[xNeg[0]]-2*LnLikAcc[xMin]+LnLikAcc[xPos[0]]};
+        double scdDerOuter[3]   = {LnLik[xNeg[1]]-2*LnLik[xMin]+LnLik[xPos[1]], LnLikXS[xNeg[1]]-2*LnLikXS[xMin]+LnLikXS[xPos[1]], LnLikAcc[xNeg[1]]-2*LnLikAcc[xMin]+LnLikAcc[xPos[1]]};
+        //-- Commented because uncertainty is not reliable !!! --//
+        /*double fstDerInnerPlusRelToUnc[3] = {abs(Lik[xMin]-Lik[xPos[0]])/sqrt(pow(LikErr[xMin],2)+pow(LikErr[xPos[0]],2)),abs(LikXS[xMin]-LikXS[xPos[0]])/sqrt(pow(LikXSErr[xMin],2)+pow(LikXSErr[xPos[0]],2)), abs(LikAcc[xMin]-LikAcc[xPos[0]])/sqrt(pow(LikAccErr[xMin],2)+pow(LikAccErr[xPos[0]],2))};
+        double fstDerInnerMinRelToUnc[3] =  {abs(Lik[xNeg[0]]-Lik[xMin])/sqrt(pow(LikErr[xMin],2)+pow(LikErr[xNeg[0]],2)), abs(LikXS[xNeg[0]]-LikXS[xMin])/sqrt(pow(LikXSErr[xMin],2)+pow(LikXSErr[xNeg[0]],2)), abs(LikAcc[xNeg[0]]-LikAcc[xMin])/sqrt(pow(LikAccErr[xMin],2)+pow(LikAccErr[xNeg[0]],2))};
+        double fstDerOuterPlusRelToUnc[3] = {abs(Lik[xMin]-Lik[xPos[1]])/sqrt(pow(LikErr[xMin],2)+pow(LikErr[xPos[1]],2)), abs(LikXS[xMin]-LikXS[xPos[1]])/sqrt(pow(LikXSErr[xMin],2)+pow(LikXSErr[xPos[1]],2)), abs(LikAcc[xMin]-LikAcc[xPos[1]])/sqrt(pow(LikAccErr[xMin],2)+pow(LikAccErr[xPos[1]],2))};
+        double fstDerOuterMinRelToUnc[3] =  {abs(Lik[xNeg[1]]-Lik[xMin])/sqrt(pow(LikErr[xMin],2)+pow(LikErr[xNeg[1]],2)), abs(LikXS[xNeg[1]]-LikXS[xMin])/sqrt(pow(LikXSErr[xMin],2)+pow(LikXSErr[xNeg[1]],2)), abs(LikAcc[xNeg[1]]-LikAcc[xMin])/sqrt(pow(LikAccErr[xMin],2)+pow(LikAccErr[xNeg[1]],2))};
+
+        //-- Check the spread of the uncertainties for each event ! --//
+        double AverageSigma = 0, SigmaVariance = 0;
+        for(int ii=0; ii < NrConfigs; ii++){
+          AverageSigma += LnLikErr[ii];
+          SigmaVariance += pow((LnLikErr[jj]-AverageSigma),2);
+        }
+        AverageSigma = AverageSigma/NrConfigs; SigmaVariance = SigmaVariance/(NrConfigs-1);
+
+        //-- Calculate the difference between the minimum and maximum of the -ln(L) --//
+        double maxLnLik = 0, minLnLik = LnLikAcc[0];
+        for(int ii = 0; ii <NrConfigs; ii++){
+          if( LnLikAcc[ii] > maxLnLik) maxLnLik = LnLikAcc[ii];
+          if( LnLikAcc[ii] < minLnLik) minLnLik = LnLikAcc[ii];
+        }
+        LnLikVariation = maxLnLik - minLnLik;
+        if( LnLikVariation < 3*AverageSigma){
+          LnLikAccDirVarVsUnc->cd(); LnLikAccDist->Write();
+          nrEvtsWithVarLargerThanAverageUnc += 1;
+        }
+        if( LnLikVariation > 3*AverageSigma && LnLikVariation < 10*AverageSigma && scdDerOuter[2] > 0.0){
+          LnLikAccDirVarVsDUnc->cd(); LnLikAccDist->Write();
+          nrEvtsWithVarLargerThanTwiceAverageUnc += 1;
+        }*/
+
+        //--- Fill the histograms  ---//
+        YPlus->Fill(yPlus[0]);                                     YPlusXS->Fill(yPlus[1]);                                     YPlusAcc->Fill(yPlus[2]);
+        YPlusPlus->Fill(yPlusPlus[0]);                             YPlusPlusXS->Fill(yPlusPlus[1]);                             YPlusPlusAcc->Fill(yPlusPlus[2]);
+        YPlusGausTest->Fill(yPlus[0] + yPlusPlus[0]/4);            YPlusGausTestXS->Fill(yPlus[1] + yPlusPlus[1]/4);            YPlusGausTestAcc->Fill(yPlus[2] + yPlusPlus[2]/4);
+        //YRelPlus->Fill(yPlus[0]/LnLik[6]);                         YRelPlusXS->Fill(yPlus[1]/LnLikXS[6]);                       YRelPlusAcc->Fill(yPlus[2]/LnLikAcc[6]);
+        YMin->Fill(yMin[0]);                                       YMinXS->Fill(yMin[1]);                                       YMinAcc->Fill(yMin[2]);
+        YMinMin->Fill(yMinMin[0]);                                 YMinMinXS->Fill(yMinMin[1]);                                 YMinMinAcc->Fill(yMinMin[2]);
+        //YRelMin->Fill(yMin[0]/LnLik[2]);                           YRelMinXS->Fill(yMin[1]/LnLikXS[2]);                         YRelMinAcc->Fill(yMin[2]/LnLikAcc[2]);
+        ScdDerInner->Fill(scdDerInner[0]);                         ScdDerXSInner->Fill(scdDerInner[1]);                         ScdDerAccInner->Fill(scdDerInner[2]);
+        ScdDerOuter->Fill(scdDerOuter[0]);                         ScdDerXSOuter->Fill(scdDerOuter[1]);                         ScdDerAccOuter->Fill(scdDerOuter[2]);
+        ScdDerScatter->Fill(scdDerOuter[0], scdDerInner[0]);       ScdDerXSScatter->Fill(scdDerOuter[1], scdDerInner[1]);       ScdDerAccScatter->Fill(scdDerOuter[2], scdDerInner[2]);
+        //FstDerInnerPlusRelToUnc->Fill(fstDerInnerPlusRelToUnc[0]); FstDerXSInnerPlusRelToUnc->Fill(fstDerInnerPlusRelToUnc[1]); FstDerAccInnerPlusRelToUnc->Fill(fstDerInnerPlusRelToUnc[2]);
+        //FstDerInnerMinRelToUnc->Fill(fstDerInnerMinRelToUnc[0]);   FstDerXSInnerMinRelToUnc->Fill(fstDerInnerMinRelToUnc[1]);   FstDerAccInnerMinRelToUnc->Fill(fstDerInnerMinRelToUnc[2]);
+        //FstDerOuterPlusRelToUnc->Fill(fstDerOuterPlusRelToUnc[0]); FstDerXSOuterPlusRelToUnc->Fill(fstDerOuterPlusRelToUnc[1]); FstDerAccOuterPlusRelToUnc->Fill(fstDerOuterPlusRelToUnc[2]);
+        //FstDerOuterMinRelToUnc->Fill(fstDerOuterMinRelToUnc[0]);   FstDerXSOuterMinRelToUnc->Fill(fstDerOuterMinRelToUnc[1]);   FstDerAccOuterMinRelToUnc->Fill(fstDerOuterMinRelToUnc[2]);
+        //LnLikUncDist->Fill(LnLikErr[xMin]);                       LnLikUncDistPlus->Fill(LnLikErr[xPos[0]]);                  LnLikUncDistMin->Fill(LnLikErr[xNeg[0]]);
+        //WeightVsUnc->Fill(LnLik[xMin],LnLikErr[xMin]);             WeightVsUncPlus->Fill(LnLik[xPos[0]],LnLikErr[xPos[0]]);     WeightVsUncMin->Fill(LnLik[xNeg[0]],LnLikErr[xNeg[0]]);
+        //LikUncDist->Fill(LikErr[xMin]);                           LikXSUncDist->Fill(LikXSErr[xMin]);                         LikAccUncDist->Fill(LikAccErr[xMin]);
+        //RelLnLikUncDist->Fill(LnLikErr[xMin]/LnLik[xMin]);        RelLnLikXSUncDist->Fill(LnLikErr[xMin]/LnLikXS[xMin]);      RelLnLikAccUncDist->Fill(LnLikErr[xMin]/LnLikAcc[xMin]);
+        //RelLikUncDist->Fill(LikErr[xMin]/Lik[xMin]);              RelLikXSUncDist->Fill(LikXSErr[xMin]/LikXS[xMin]);          RelLikAccUncDist->Fill(LikAccErr[xMin]/LikAcc[xMin]);
+        //SigmaVarianceDist->Fill(SigmaVariance);                   AverageSigmaDist->Fill(AverageSigma);                       LnLikVariationDist->Fill(LnLikVariation);
+        //TotalFctDevDist->Fill(TotalFctDevAccOuter);
+        if( TotalFctDevAccOuter > 5) std::cout << "Overflow found for TotalFctDevDist : " << TotalFctDevAccOuter << std::endl;
+
+
       }
     }
   }
   ifs.close();
+
+  //--- Save all the histograms containing information about all the events! ---//
+  Tfile->cd();
+  LnLikAll->Write();                LnLikXSAll->Write();                LnLikAccAll->Write();
+  YPlusGausTest->Write();           YPlusGausTestXS->Write();           YPlusGausTestAcc->Write();
+  YPlus->Write();                   YPlusXS->Write();                   YPlusAcc->Write();
+  YPlusPlus->Write();               YPlusPlusXS->Write();               YPlusPlusAcc->Write();
+  YRelPlus->Write();                YRelPlusXS->Write();                YRelPlusAcc->Write();
+  YMin->Write();                    YMinXS->Write();                    YMinAcc->Write();
+  YMinMin->Write();                 YMinMinXS->Write();                 YMinMinAcc->Write();
+  YRelMin->Write();                 YRelMinXS->Write();                 YRelMinAcc->Write();
+  ScdDerInner->Write();             ScdDerXSInner->Write();             ScdDerAccInner->Write();
+  ScdDerOuter->Write();             ScdDerXSOuter->Write();             ScdDerAccOuter->Write();
+  ScdDerScatter->Write();           ScdDerXSScatter->Write();           ScdDerAccScatter->Write();
+  FstDerInnerPlusRelToUnc->Write(); FstDerXSInnerPlusRelToUnc->Write(); FstDerAccInnerPlusRelToUnc->Write();
+  FstDerInnerMinRelToUnc->Write();  FstDerXSInnerMinRelToUnc->Write();  FstDerAccInnerMinRelToUnc->Write();
+  FstDerOuterPlusRelToUnc->Write(); FstDerXSOuterPlusRelToUnc->Write(); FstDerAccOuterPlusRelToUnc->Write();
+  FstDerOuterMinRelToUnc->Write();  FstDerXSOuterMinRelToUnc->Write();  FstDerAccOuterMinRelToUnc->Write();
+  LnLikUncDist->Write();            LnLikUncDistPlus->Write();          LnLikUncDistMin->Write();
+  LikUncDist->Write();              LikXSUncDist->Write();              LikAccUncDist->Write();
+  RelLnLikUncDist->Write();         RelLnLikXSUncDist->Write();         RelLnLikAccUncDist->Write();
+  RelLikUncDist->Write();           RelLikXSUncDist->Write();           RelLikAccUncDist->Write();
+  TotalFctDevDist->Write();         TotalFctDevXSDist->Write();         TotalFctDevAccDist->Write();
+  WeightVsUnc->Write();
+  WeightVsUncPlus->Write();
+  WeightVsUncMin->Write();
+  SigmaVarianceDist->Write();
+  AverageSigmaDist->Write();
+  LnLikVariationDist->Write();
+
 
 
   /*for(int iEvt = 0; iEvt < nEvts; iEvt++){
