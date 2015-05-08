@@ -5,10 +5,11 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TCanvas.h"
+#include "TGraph.h"
 #include "TDirectory.h"
 #include <string>
 #include <map>
-#include <stdlib.h>
+#include <cmath>
 
 std::string VarValues[] = {"Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3"}; 
 float Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
@@ -25,7 +26,7 @@ int xNeg[] = {3,2};
 std::string title = "Gen_RVR"; 
 TFile* Tfile = new TFile("Test.root","RECREATE");
 
-int NrConfigs = 9;
+const int NrConfigs = 9;
 int nEvts = 10; 
 
 void ReadTest(){
@@ -215,10 +216,9 @@ void ReadTest(){
 
       //---  Only perform the fit after all configurations are considered!  ---//
       if( config == NrConfigs){
-        //vector<double> LnLikFunction[NrConfigs]
-          //LnLikFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
-          //LnLikXSFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
-          //LnLikAccFunction = [array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d'),array('d')]
+        double LnLikFunction[2][NrConfigs], LnLikXSFunction[2][NrConfigs], LnLikAccFunction[2][NrConfigs];
+        vector<double> FctDevOuter, RelFctDevOuter,FctDevXSOuter, RelFctDevXSOuter , FctDevAccOuter, RelFctDevAccOuter;
+        double TotalFctDevOuter = 0, TotalRelFctDevOuter = 0, TotalFctDevXSOuter = 0, TotalRelFctDevXSOuter = 0, TotalFctDevAccOuter = 0, TotalRelFctDevAccOuter = 0;
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
@@ -233,11 +233,44 @@ void ReadTest(){
           aHatXS[ii] = LnLikXS[xPos[ii]]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) - LnLikXS[xMin]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLikXS[xNeg[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xNeg[ii]]));
           aHatAcc[ii] = LnLikAcc[xPos[ii]]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) - LnLikAcc[xMin]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLikAcc[xNeg[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xNeg[ii]]));
 
-          //for( int iConfig = 0; iConfig < NrConfigs; iConfig++){
-          //  LnLikFunction[ii].append( aHat[ii]*Var[var]*Var[var]+bHat[ii]*Var[var]+cHat[ii] );
-          //}
+          for( int iConfig = 0; iConfig < NrConfigs; iConfig++){
+            LnLikFunction[ii][iConfig] = aHat[ii]*Var[iConfig]*Var[iConfig]+bHat[ii]*Var[iConfig]+cHat[ii];
+            LnLikXSFunction[ii][iConfig] = aHatXS[ii]*Var[iConfig]*Var[iConfig]+bHatXS[ii]*Var[iConfig]+cHatXS[ii];
+            LnLikAccFunction[ii][iConfig] = aHatAcc[ii]*Var[iConfig]*Var[iConfig]+bHatAcc[ii]*Var[iConfig]+cHatAcc[ii];
 
-        }
+            if(ii == 1){
+              FctDevOuter.push_back(abs(LnLikFunction[1][iConfig]-LnLik[iConfig]));       RelFctDevOuter.push_back(FctDevOuter[iConfig]/LnLik[iConfig]);
+              FctDevXSOuter.push_back(abs(LnLikXSFunction[1][iConfig]-LnLikXS[iConfig]));    RelFctDevXSOuter.push_back(FctDevXSOuter[iConfig]/LnLikXS[iConfig]);
+              FctDevAccOuter.push_back(abs(LnLikAccFunction[1][iConfig]-LnLikAcc[iConfig])); RelFctDevAccOuter.push_back(FctDevAccOuter[iConfig]/LnLikAcc[iConfig]);
+              TotalFctDevOuter    = TotalFctDevOuter+FctDevOuter[iConfig];       TotalRelFctDevOuter    = TotalRelFctDevOuter+RelFctDevOuter[iConfig];
+              TotalFctDevXSOuter  = TotalFctDevXSOuter+FctDevXSOuter[iConfig];   TotalRelFctDevXSOuter  = TotalRelFctDevXSOuter+RelFctDevXSOuter[iConfig];
+              TotalFctDevAccOuter = TotalFctDevAccOuter+FctDevAccOuter[iConfig]; TotalRelFctDevAccOuter = TotalRelFctDevAccOuter+RelFctDevAccOuter[iConfig];
+            }
+          }
+        }//Looping over inner and outer parabolic function!
+
+        //---  Save the LnLik distributions (event-per-event) together with the function "fit" ---//
+        //-- Transformation needed in order to work with TGraphs --//
+        double xVar[NrConfigs], yLnLik[NrConfigs], yLnLikXS[NrConfigs], yLnLikAcc[NrConfigs];
+        for( int i = 0; i < NrConfigs; i++){ xVar[i] = Var[i]; yLnLik[i] = LnLikFunction[1][i]; yLnLikXS[i] = LnLikXSFunction[1][i]; yLnLikAcc[i] = LnLikAccFunction[1][i]; }
+
+        std::cout << " TotalFctDevOuter value is : " << TotalFctDevOuter << std::endl;
+        stringstream ssTotalFctDevOuter;       ssTotalFctDevOuter << TotalFctDevOuter;             string sTotalFctDevOuter       = ssTotalFctDevOuter.str();
+        stringstream ssTotalRelFctDevOuter;    ssTotalRelFctDevOuter << TotalRelFctDevOuter;       string sTotalRelFctDevOuter    = ssTotalRelFctDevOuter.str();
+        stringstream ssTotalFctDevXSOuter;     ssTotalFctDevXSOuter << TotalFctDevXSOuter;         string sTotalFctDevXSOuter     = ssTotalFctDevXSOuter.str();
+        stringstream ssTotalRelFctDevXSOuter;  ssTotalRelFctDevXSOuter << TotalRelFctDevXSOuter;   string sTotalRelFctDevXSOuter  = ssTotalRelFctDevXSOuter.str();
+        stringstream ssTotalFctDevAccOuter;    ssTotalFctDevAccOuter << TotalFctDevAccOuter;       string sTotalFctDevAccOuter    = ssTotalFctDevAccOuter.str();
+        stringstream ssTotalRelFctDevAccOuter; ssTotalRelFctDevAccOuter << TotalRelFctDevAccOuter; string sTotalRelFctDevAccOuter = ssTotalRelFctDevAccOuter.str();
+
+        TGraph* LnLikFctOuter    = new TGraph(NrConfigs,xVar,yLnLik);    LnLikFctOuter->SetMarkerColor(2);    LnLikFctOuter->SetLineColor(2);
+        TGraph* LnLikXSFctOuter  = new TGraph(NrConfigs,xVar,yLnLikXS);  LnLikXSFctOuter->SetMarkerColor(2);  LnLikXSFctOuter->SetLineColor(2);
+        TGraph* LnLikAccFctOuter = new TGraph(NrConfigs,xVar,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
+        LnLikFctOuter->SetTitle(("LnLik for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevOuter+" -- "+sTotalRelFctDevOuter+")").c_str());
+        LnLikXSFctOuter->SetTitle(("LnLikXS for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevXSOuter+" -- "+sTotalRelFctDevXSOuter+")").c_str());
+        LnLikAccFctOuter->SetTitle(("LnLikAcc for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevAccOuter+" -- "+sTotalRelFctDevAccOuter+")").c_str());
+        TCanvas* LnLikCanv =    new TCanvas(("LnLikCanv_"+sEvt).c_str(),"LnLik");      LnLikCanv->cd();   LnLikFctOuter->Draw("AC*");   LnLikDist->Draw("samep");   LnLikDir->cd();   LnLikCanv->Write();
+        TCanvas* LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
+        TCanvas* LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
 
       }
     }
