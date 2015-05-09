@@ -258,23 +258,23 @@ void ReadTest(){
         LnLikAccFctOuter = new TGraph(NrConfigs,xVar,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
 
         LnLikFctOuter->SetTitle(("Outer fct dev = "+sTotalFctDevOuter+" & "+sTotalRelFctDevOuter).c_str());
-        LnLikFctOuter->GetYaxis()->SetTitle(("-ln(L) value (no norm -- evt "+sEvt).c_str()); LnLikFctOuter->GetYaxis()->SetTitleOffset(1.2);
-        LnLikXSFctOuter->SetTitle(("LnLikXS for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevXSOuter+" -- "+sTotalRelFctDevXSOuter+")").c_str());
-        LnLikAccFctOuter->SetTitle(("LnLikAcc for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevAccOuter+" -- "+sTotalRelFctDevAccOuter+")").c_str());
+        LnLikFctOuter->GetYaxis()->SetTitle(("-ln(L) value (no norm -- evt "+sEvt+")").c_str()); LnLikFctOuter->GetYaxis()->SetTitleOffset(1.5);
+        LnLikXSFctOuter->SetTitle(("Outer fct dev = "+sTotalFctDevOuter+" & "+sTotalRelFctDevOuter).c_str());
+        LnLikXSFctOuter->GetYaxis()->SetTitle(("-ln(L) value (XS norm -- evt "+sEvt+")").c_str()); LnLikXSFctOuter->GetYaxis()->SetTitleOffset(1.5);
+        LnLikAccFctOuter->SetTitle(("Outer fct dev = "+sTotalFctDevOuter+" & "+sTotalRelFctDevOuter).c_str());
+        LnLikAccFctOuter->GetYaxis()->SetTitle(("-ln(L) value (Acc norm -- evt "+sEvt+")").c_str()); LnLikAccFctOuter->GetYaxis()->SetTitleOffset(1.5);
         LnLikCanv =    new TCanvas(("LnLikCanv_"+sEvt).c_str(),"LnLik");      LnLikCanv->cd();   LnLikFctOuter->Draw("AC*");   LnLikDist->Draw("samep");   LnLikDir->cd();   LnLikCanv->Write();
         LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
         LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
 
         //Save xDivide*yDivide of these histograms in one TCanvas!
         if( consEvts == 1){
-          StackCanvasLL    = new TCanvas("StackCanvasLL_Nr0",   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide, -1., -1.);
+          StackCanvasLL    = new TCanvas("StackCanvasLL_Nr0",   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide, 0.00000002, 0.000000002);
           StackCanvasLLXS  = new TCanvas("StackCanvasLLXS_Nr0", "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);
           StackCanvasLLAcc = new TCanvas("StackCanvasLLAcc_Nr0","StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
         }
 
         StackCanvasLL->cd(consEvts - (xDivide*yDivide*NrCanvas) );LnLikFctOuter->Draw("AC*");    LnLikDist->Draw("samep");    StackCanvasLL->Update();
-        //StackCanvasLL->SetTopMargin(0.);
-        //StackCanvasLL->SetBottomMargin(0.);
         StackCanvasLLXS->cd(consEvts - (xDivide*yDivide*NrCanvas) );  LnLikXSFctOuter->Draw("AC*");  LnLikXSDist->Draw("samep");  StackCanvasLLXS->Update();
         StackCanvasLLAcc->cd(consEvts - (xDivide*yDivide*NrCanvas) ); LnLikAccFctOuter->Draw("AC*"); LnLikAccDist->Draw("samep"); StackCanvasLLAcc->Update();
 
