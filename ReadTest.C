@@ -11,6 +11,7 @@
 #include <map>
 #include <cmath>
 #include <algorithm>
+#include <cstring>
 
 std::string VarValues[] = {"Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3"}; 
 float Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
@@ -28,8 +29,7 @@ std::string title = "Gen_RVR";
 TFile* Tfile = new TFile("Test.root","RECREATE");
 
 const int NrConfigs = 9;
-const int nEvts = 10; 
-const int TotalNrEvts = 10000;
+const int nEvts = 30; 
 
 void ReadTest(){
   
@@ -127,18 +127,14 @@ void ReadTest(){
   TH1F* TotalFctDevXSDist  = new TH1F("TotalFctXSDeviation", ("Sum of difference between likelihood and function value for each point in range (XS norm -- "+title+" events)").c_str(), 250,0,5);
   TH1F* TotalFctDevAccDist = new TH1F("TotalFctAccDeviation",("Sum of difference between likelihood and function value for each point in range (Acc norm -- "+title+" events)").c_str(),250,0,5);
 
-  TH1F* LnLikDist = new TH1F("LnLik","title",xBin,xLow,xHigh);
-  LnLikDist->SetMarkerStyle(20); LnLikDist->SetLineColor(1); LnLikDist->SetMarkerColor(1); LnLikDist->SetMarkerSize(1.2);
-  TH1F* LnLikXSDist = new TH1F("LnLikXS","title",xBin,xLow,xHigh);
-  LnLikXSDist->SetMarkerStyle(21); LnLikXSDist->SetLineColor(3); LnLikXSDist->SetMarkerColor(3); LnLikXSDist->SetMarkerSize(1.2);
-  TH1F* LnLikAccDist = new TH1F("LnLikAcc","title",xBin,xLow,xHigh);
-  LnLikAccDist->SetMarkerStyle(22); LnLikAccDist->SetLineColor(4); LnLikAccDist->SetMarkerColor(4); LnLikAccDist->SetMarkerSize(1.2);
+  TH1F *LnLikDist = 0, *LnLikXSDist = 0, *LnLikAccDist = 0; 
+  TCanvas *LnLikCanv = 0, *LnLikXSCanv = 0, *LnLikAccCanv = 0;
+  TGraph *LnLikFctOuter = 0, *LnLikXSFctOuter = 0, *LnLikAccFctOuter = 0;
   
   TDirectory* FitComp = Tfile->mkdir("FitComparison");
-  TDirectory* LnLikDir = Tfile->mkdir("LnLikDist");
-  TDirectory* LnLikStackDir = LnLikDir->mkdir("LnLikStackDist");
-  TDirectory* LnLikXSDir = Tfile->mkdir("LnLikXSDist");
-  TDirectory* LnLikAccDir = Tfile->mkdir("LnLikAccDist");
+  TDirectory* LnLikDir = Tfile->mkdir("LnLikDist");       TDirectory* LnLikStackDir = LnLikDir->mkdir("LnLikStackDist");
+  TDirectory* LnLikXSDir = Tfile->mkdir("LnLikXSDist");   TDirectory* LnLikXSStackDir = LnLikXSDir->mkdir("LnLikXSStackDist");
+  TDirectory* LnLikAccDir = Tfile->mkdir("LnLikAccDist"); TDirectory* LnLikAccStackDir = LnLikAccDir->mkdir("LnLikAccStackDist");
   TDirectory* LnLikAccDirVarVsUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanAvgUnc");
   TDirectory* LnLikAccDirVarVsDUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanTwiceAvgUnc");
   TDirectory* FstDerDir = Tfile->mkdir("FirstDerivativeDist");
@@ -168,10 +164,10 @@ void ReadTest(){
   vector<int> EvtsWithSmallFctDev;
   //double weightsValue[nEvts][NrConfigs];
   int consEvts = 0;
-  int NrCanvas = 0, xDivide = 3, yDivide = 3;
-  TCanvas* StackCanvas = new TCanvas("StackCanvas_Nr0","StackedCanvas");
-  StackCanvas->Divide(xDivide,yDivide);
-  TGraph* LnLikFctOuter[TotalNrEvts];
+  int NrCanvas = 0, xDivide = 5, yDivide = 4;
+  TCanvas *StackCanvasLL = 0, *StackCanvasLLXS = 0, *StackCanvasLLAcc = 0; 
+
+  double aHat[2] = {0.0}, aHatXS[2] = {0.0}, aHatAcc[2] = {0.0}, bHat[2] = {0.0}, bHatXS[2] = {0.0}, bHatAcc[2] = {0.0}, cHat[2] = {0.0}, cHatXS[2] = {0.0}, cHatAcc[2] = {0.0};
 
   //--- Read all likelihood values ! ---//
   std::ifstream ifs ("Events/RVR_Gen_SingleGausTFHalfWidth_10000Evts/weights.out", std::ifstream::in); 
@@ -182,21 +178,19 @@ void ReadTest(){
   while( std::getline(ifs,line) && consEvts < nEvts){
     std::istringstream iss(line);
     if( iss >> evt >> config >> tf >> weight >> weightUnc){
-    
-      if(config == 1){ std::cout << " Looking at event : " << evt << std::endl; consEvts++;}
-
+      if(config == 1 && ((consEvts+1) % 10 == 0) ) std::cout << " Looking at event : " << consEvts+1 << std::endl;
       stringstream ssEvt; ssEvt << evt; string sEvt = ssEvt.str();
+
       //--- Initialize the event-per-event variables! ---//
       if( config == 1){
-        double aHat[2] = {0.0, 0.0}, aHatXS[2] = {0.0, 0.0}, aHatAcc[2] = {0.0, 0.0};
-        double bHat[2] = {0.0, 0.0}, bHatXS[2] = {0.0, 0.0}, bHatAcc[2] = {0.0, 0.0};
-        double cHat[2] = {0.0, 0.0}, cHatXS[2] = {0.0, 0.0}, cHatAcc[2] = {0.0, 0.0};
-        double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};
-        //double Lik[NrConfigs] = {0.0},   LikXS[NrConfigs] = {0.0},   LikAcc[NrConfigs] = {0.0};
+        double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
-        LnLikDist->SetName(("LnLik_Evt"+sEvt).c_str());       LnLikDist->SetTitle(("LnLik distribution for event "+sEvt+" -- "+title+" evts").c_str());
-        LnLikXSDist->SetName(("LnLikXS_Evt"+sEvt).c_str());   LnLikXSDist->SetTitle(("LnLikXS distribution for event "+sEvt+" -- "+title+" evts").c_str());
-        LnLikAccDist->SetName(("LnLikAcc_Evt"+sEvt).c_str()); LnLikAccDist->SetTitle(("LnLikAcc distribution for event "+sEvt+" -- "+title+" evts").c_str());
+        LnLikDist = new TH1F(("LnLik_Evt"+sEvt).c_str(),("LnLik distribution for event "+sEvt+" -- "+title+" evts").c_str(),xBin,xLow,xHigh);
+        LnLikDist->SetMarkerStyle(20); LnLikDist->SetLineColor(1); LnLikDist->SetMarkerColor(1); LnLikDist->SetMarkerSize(1.2);
+        LnLikXSDist = new TH1F(("LnLikXS_Evt"+sEvt).c_str(),("LnLikXS distribution for event "+sEvt+" -- "+title+" evts").c_str(),xBin,xLow,xHigh);
+        LnLikXSDist->SetMarkerStyle(21); LnLikXSDist->SetLineColor(3); LnLikXSDist->SetMarkerColor(3); LnLikXSDist->SetMarkerSize(1.2);
+        LnLikAccDist = new TH1F(("LnLikAcc_Evt"+sEvt).c_str(),("LnLikAcc distribution for event "+sEvt+" -- "+title+" evts").c_str(),xBin,xLow,xHigh);
+        LnLikAccDist->SetMarkerStyle(22); LnLikAccDist->SetLineColor(4); LnLikAccDist->SetMarkerColor(4); LnLikAccDist->SetMarkerSize(1.2);
       }
       //Lik[config-1] = weight;         LikXS[config-1] = weight/MGXS[config-1];              LikAcc[config-1] = weight/MGXSCut[config-1];
       LnLik[config-1] = -log(weight); LnLikXS[config-1] = -log(weight)+log(MGXS[config-1]); LnLikAcc[config-1] = -log(weight)+log(MGXSCut[config-1]);
@@ -212,6 +206,7 @@ void ReadTest(){
 
       //---  Only perform the fit after all configurations are considered!  ---//
       if( config == NrConfigs){
+        consEvts++;   //Count the number of full events!
         double LnLikFunction[2][NrConfigs], LnLikXSFunction[2][NrConfigs], LnLikAccFunction[2][NrConfigs];
         vector<double> FctDevOuter, RelFctDevOuter,FctDevXSOuter, RelFctDevXSOuter , FctDevAccOuter, RelFctDevAccOuter;
         double TotalFctDevOuter = 0, TotalRelFctDevOuter = 0, TotalFctDevXSOuter = 0, TotalRelFctDevXSOuter = 0, TotalFctDevAccOuter = 0, TotalRelFctDevAccOuter = 0;
@@ -258,33 +253,42 @@ void ReadTest(){
         stringstream ssTotalFctDevAccOuter;    ssTotalFctDevAccOuter << TotalFctDevAccOuter;       string sTotalFctDevAccOuter    = ssTotalFctDevAccOuter.str();
         stringstream ssTotalRelFctDevAccOuter; ssTotalRelFctDevAccOuter << TotalRelFctDevAccOuter; string sTotalRelFctDevAccOuter = ssTotalRelFctDevAccOuter.str();
 
-        //TGraph* LnLikFctOuter[nEvts];
-        LnLikFctOuter[evt]    = new TGraph(NrConfigs,xVar,yLnLik);    LnLikFctOuter[evt]->SetMarkerColor(2);    LnLikFctOuter[evt]->SetLineColor(2);
-        TGraph* LnLikXSFctOuter  = new TGraph(NrConfigs,xVar,yLnLikXS);  LnLikXSFctOuter->SetMarkerColor(2);  LnLikXSFctOuter->SetLineColor(2);
-        TGraph* LnLikAccFctOuter = new TGraph(NrConfigs,xVar,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
-        LnLikFctOuter[evt]->SetName(("LnLikFctOuter_Evt"+sEvt).c_str());
+        LnLikFctOuter    = new TGraph(NrConfigs,xVar,yLnLik);    LnLikFctOuter->SetMarkerColor(2);    LnLikFctOuter->SetLineColor(2);
+        LnLikXSFctOuter  = new TGraph(NrConfigs,xVar,yLnLikXS);  LnLikXSFctOuter->SetMarkerColor(2);  LnLikXSFctOuter->SetLineColor(2);
+        LnLikAccFctOuter = new TGraph(NrConfigs,xVar,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
 
-        LnLikFctOuter[evt]->SetTitle(("LnLik for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevOuter+" -- "+sTotalRelFctDevOuter+")").c_str());
+        LnLikFctOuter->SetTitle(("Outer fct dev = "+sTotalFctDevOuter+" & "+sTotalRelFctDevOuter).c_str());
+        LnLikFctOuter->GetYaxis()->SetTitle(("-ln(L) value (no norm -- evt "+sEvt).c_str()); LnLikFctOuter->GetYaxis()->SetTitleOffset(1.2);
         LnLikXSFctOuter->SetTitle(("LnLikXS for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevXSOuter+" -- "+sTotalRelFctDevXSOuter+")").c_str());
         LnLikAccFctOuter->SetTitle(("LnLikAcc for event "+sEvt+" -- Outer points used (Fct deviation is "+sTotalFctDevAccOuter+" -- "+sTotalRelFctDevAccOuter+")").c_str());
-        TCanvas* LnLikCanv =    new TCanvas(("LnLikCanv_"+sEvt).c_str(),"LnLik");      LnLikCanv->cd();   LnLikFctOuter[evt]->Draw("AC*");   LnLikDist->Draw("samep");   LnLikDir->cd();   LnLikCanv->Write();
-        TCanvas* LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
-        TCanvas* LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
+        LnLikCanv =    new TCanvas(("LnLikCanv_"+sEvt).c_str(),"LnLik");      LnLikCanv->cd();   LnLikFctOuter->Draw("AC*");   LnLikDist->Draw("samep");   LnLikDir->cd();   LnLikCanv->Write();
+        LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
+        LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
 
-        //Save 20 of these histograms in one TCanvas!
-        stringstream ssNrCanvas; ssNrCanvas << NrCanvas; string sNrCanvas = ssNrCanvas.str();
-        std::cout << " Comparing " << consEvts << " with " << xDivide*yDivide*(NrCanvas+1) << std::endl;
-        if( consEvts == (xDivide*yDivide*(NrCanvas+1))){
-          std::cout << " ------------------ NrCanvas value = " << NrCanvas << std::endl;
-          LnLikStackDir->cd(); 
-          StackCanvas->Write(); 
-          StackCanvas->SetName( ("StackCanvas_Nr"+sNrCanvas).c_str() );
-          StackCanvas->Divide(xDivide,yDivide);
-          NrCanvas++;
+        //Save xDivide*yDivide of these histograms in one TCanvas!
+        if( consEvts == 1){
+          StackCanvasLL    = new TCanvas("StackCanvasLL_Nr0",   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide, -1., -1.);
+          StackCanvasLLXS  = new TCanvas("StackCanvasLLXS_Nr0", "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);
+          StackCanvasLLAcc = new TCanvas("StackCanvasLLAcc_Nr0","StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
         }
-        StackCanvas->cd(consEvts - (xDivide*yDivide*NrCanvas) );
-        std::cout << " -- Storing on canvas nr : " << consEvts - (xDivide*yDivide*(NrCanvas)) << std::endl;
-        LnLikFctOuter[evt]->Draw("AC*");   LnLikDist->Draw("samep");
+
+        StackCanvasLL->cd(consEvts - (xDivide*yDivide*NrCanvas) );LnLikFctOuter->Draw("AC*");    LnLikDist->Draw("samep");    StackCanvasLL->Update();
+        //StackCanvasLL->SetTopMargin(0.);
+        //StackCanvasLL->SetBottomMargin(0.);
+        StackCanvasLLXS->cd(consEvts - (xDivide*yDivide*NrCanvas) );  LnLikXSFctOuter->Draw("AC*");  LnLikXSDist->Draw("samep");  StackCanvasLLXS->Update();
+        StackCanvasLLAcc->cd(consEvts - (xDivide*yDivide*NrCanvas) ); LnLikAccFctOuter->Draw("AC*"); LnLikAccDist->Draw("samep"); StackCanvasLLAcc->Update();
+
+        if( consEvts == (xDivide*yDivide*(NrCanvas+1)) || consEvts == nEvts){
+          LnLikStackDir->cd();    StackCanvasLL->Write(); 
+          LnLikXSStackDir->cd();  StackCanvasLLXS->Write(); 
+          LnLikAccStackDir->cd(); StackCanvasLLAcc->Write(); 
+          NrCanvas++; stringstream ssNrCanvas; ssNrCanvas << NrCanvas; string sNrCanvas = ssNrCanvas.str();
+          if( consEvts != nEvts){
+            StackCanvasLL    = new TCanvas(("StackCanvasLL_Nr"+sNrCanvas).c_str(),   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide);
+            StackCanvasLLXS  = new TCanvas(("StackCanvasLLXS_Nr"+sNrCanvas).c_str(), "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);
+            StackCanvasLLAcc = new TCanvas(("StackCanvasLLAcc_Nr"+sNrCanvas).c_str(),"StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
+          }
+        }
 
         //---  Calculate the first derivative distribution and save them in event-by-event plot  ---//
         FstDer->SetName(("FirstDerivative_Evt"+sEvt).c_str());
@@ -465,7 +469,6 @@ void ReadTest(){
       std::cout << iEvt << ") Event number is found : " << EvtsWithSmallFctDev[iEvt]  << std::endl;
     }
   }*/
-
 
 }
 
