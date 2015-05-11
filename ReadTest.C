@@ -35,24 +35,33 @@ string sNrCanvas ="0";
 
 TF1 *polFunc = new TF1("polFunc","pol2",Var[0],Var[NrConfigs-1]);  
 
+//Method to sort a pair based on the second element!
+struct sort_pred {
+  bool operator()(const std::pair<int,int> &left, const std::pair<int,int> &right) 
+    return left.second < right.second;    
+};
+
 //TF1* calculateFit(double LogLikelihood[NrConfigs]){
 void calculateFit(double LogLikelihood[NrConfigs]){
   TGraph* LnLikGraph = new TGraph(NrConfigs,Var, LogLikelihood);
-  
+  double myTest[NrConfigs] = {6,2,-1,8,10,5,77,-18,0};
+  std::vector<std::pair<int, double> > FitDeviation, FitDeviationRel, Test;
+
   LnLikGraph->Fit(polFunc,"Q");
   std::cout << " First parameter : " << polFunc->GetParameter(0) << std::endl;
-  double LogLikFit[NrConfigs];
+  double LogLikFit[NrConfigs] = {-9999}; //, FitDeviation[NrConfigs] = {-9999}, FitDeviationRel[NrConfigs] = {-9999};
   for(int ii = 0; ii < NrConfigs; ii++){
     LogLikFit[ii] = polFunc->GetParameter(0)+polFunc->GetParameter(1)*Var[ii]+polFunc->GetParameter(2)*Var[ii]*Var[ii];
-    std::cout << " LogLik values to compare : " << LogLikelihood[ii] << " vs " << LogLikFit[ii] << std::endl;
+    //FitDeviation[ii] = abs(LogLikelihood[ii]-LogLikFit[ii]);
+    //FitDeviationRel[ii] = abs(LogLikelihood[ii]-LogLikFit[ii])/LogLikelihood[ii];
+    Test.push_back(std::make_pair(ii, myTest[ii]));
+    //std::cout << " Fit deviation values : " << FitDeviation[ii] << " & " << FitDeviationRel[ii] << std::endl;
   }
+  std::sort(Test.begin(), Test.end(), sort_pred());
+  
+  for(int jj = 0; jj < NrConfigs; jj++)
+    std::cout << jj << ") value is : " << Test[jj].second << " (corresponding to key " << Test[jj].first << ") " << std::endl;
 
-  //How to access the points of the fit?
-/*  std::cout << " Content of TGraph : " << std::endl;
-  for(int ii = 0; ii < NrConfigs; ii++)
-    std::cout << " ---- " << ii << " ) LogLikelihood : " << LogLikelihood[ii] << std::endl;
-  std::cout << " New TGraph created! " << std::endl;
-*/
   TCanvas* canvasGraph = new TCanvas("canvasGraph","canvasGraph");
   canvasGraph->cd();
   LnLikGraph->Draw("AC*");
