@@ -37,8 +37,9 @@ TF1 *polFunc = new TF1("polFunc","pol2",Var[0],Var[NrConfigs-1]);
 
 //Method to sort a pair based on the second element!
 struct sort_pred {
-  bool operator()(const std::pair<int,int> &left, const std::pair<int,int> &right) 
-    return left.second < right.second;    
+  bool operator()(const std::pair<int,double> &left, const std::pair<int,double> &right) {
+    return left.second < right.second;
+  }
 };
 
 //TF1* calculateFit(double LogLikelihood[NrConfigs]){
@@ -52,15 +53,17 @@ void calculateFit(double LogLikelihood[NrConfigs]){
   double LogLikFit[NrConfigs] = {-9999}; //, FitDeviation[NrConfigs] = {-9999}, FitDeviationRel[NrConfigs] = {-9999};
   for(int ii = 0; ii < NrConfigs; ii++){
     LogLikFit[ii] = polFunc->GetParameter(0)+polFunc->GetParameter(1)*Var[ii]+polFunc->GetParameter(2)*Var[ii]*Var[ii];
-    //FitDeviation[ii] = abs(LogLikelihood[ii]-LogLikFit[ii]);
-    //FitDeviationRel[ii] = abs(LogLikelihood[ii]-LogLikFit[ii])/LogLikelihood[ii];
+    FitDeviation.push_back( std::make_pair(ii, abs(LogLikelihood[ii]-LogLikFit[ii]) ) );
+    FitDeviationRel.push_back( std::make_pair(ii, abs(LogLikelihood[ii]-LogLikFit[ii])/LogLikelihood[ii] ) );
     Test.push_back(std::make_pair(ii, myTest[ii]));
     //std::cout << " Fit deviation values : " << FitDeviation[ii] << " & " << FitDeviationRel[ii] << std::endl;
   }
-  std::sort(Test.begin(), Test.end(), sort_pred());
+  //Sort the fitdeviation values depending on the second value!
+  std::sort(FitDeviation.begin(), FitDeviation.end(), sort_pred() );
+  std::sort(FitDeviationRel.begin(), FitDeviationRel.end(), sort_pred() );
   
   for(int jj = 0; jj < NrConfigs; jj++)
-    std::cout << jj << ") value is : " << Test[jj].second << " (corresponding to key " << Test[jj].first << ") " << std::endl;
+    std::cout << jj << ") FitDeviation value is : " << FitDeviation[jj].second << " (corresponding to key " << FitDeviation[jj].first << ") " << std::endl;
 
   TCanvas* canvasGraph = new TCanvas("canvasGraph","canvasGraph");
   canvasGraph->cd();
