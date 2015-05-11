@@ -4,6 +4,7 @@
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TF1.h"
 #include "TCanvas.h"
 #include "TGraph.h"
 #include "TDirectory.h"
@@ -14,9 +15,9 @@
 #include <cstring>
 
 std::string VarValues[] = {"Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3"}; 
-float Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
-float MGXS[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
-float MGXSCut[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
+double Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
+double MGXS[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
+double MGXSCut[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
 int xBin = 13; 
 float xLow = -0.325; 
 float xHigh = 0.325; 
@@ -29,12 +30,18 @@ std::string title = "Gen_RVR";
 TFile* Tfile = new TFile("Test.root","RECREATE");
 
 const int NrConfigs = 9;
-const int nEvts = 30; 
+const int nEvts = 100; 
+string sNrCanvas ="0";
+ 
+//TF1* calculateFit(double LogLikelihood[NrConfigs]){
+
+
+//}
 
 void ReadTest(){
   
   int xMin = xMinValue[VarWindow-1];
-  float xStep[] = {Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] };
+  float xStep[] = {Var[int(xNeg[0])]-Var[int(xNeg[1])], Var[int(xMin)]-Var[int(xNeg[0])], Var[int(xPos[0])]-Var[int(xMin)], Var[int(xPos[1])]-Var[int(xPos[0])] };
   std::cout << " Value of xStep is : " << xStep[0] << std::endl;
 
   //--- Initialize histograms ---//
@@ -42,70 +49,70 @@ void ReadTest(){
   TH1F* LnLikXSAll  = new TH1F("LnLikXSAll", ("Distribution of -ln(L) using all events (XS norm -- "+title+" evts)").c_str(), xBin,xLow,xHigh);
   TH1F* LnLikAccAll = new TH1F("LnLikAccAll",("Distribution of -ln(L) using all events (Acc norm -- "+title+" evts)").c_str(),xBin,xLow,xHigh);
 
-  TH1F* YPlusGausTest   =new TH1F("YPlusGausTest",   ("Comparison of fit deviation in "+KinVar+" = "+Var[xPos[1]]+" and "+KinVar+" = "+Var[xPos[0]]+" (no norm -- "+title+" evts)").c_str(), 250,-0.15,0.15);
-  TH1F* YPlusGausTestXS =new TH1F("YPlusGausTestXS", ("Comparison of fit deviation in "+KinVar+" = "+Var[xPos[1]]+" and "+KinVar+" = "+Var[xPos[0]]+" (XS norm -- "+title+" evts)").c_str(), 250,-0.15,0.15);
-  TH1F* YPlusGausTestAcc=new TH1F("YPlusGausTestAcc",("Comparison of fit deviation in "+KinVar+" = "+Var[xPos[1]]+" and "+KinVar+" = "+Var[xPos[0]]+" (Acc norm -- "+title+" evts)").c_str(),250,-0.15,0.15);
-  TH1F* YPlusGausTestPosScdDer    = new TH1F("YPlusGausTestPosScdDer",   ("Gaussian fit deviation using "+KinVar+" = "+Var[xPos[1]]+" & "+Var[xPos[0]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
-  TH1F* YPlusGausTestXSPosScdDer  = new TH1F("YPlusGausTestXSPosScdDer", ("Gaussian fit deviation using "+KinVar+" = "+Var[xPos[1]]+" & "+Var[xPos[0]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
-  TH1F* YPlusGausTestAccPosScdDer = new TH1F("YPlusGausTestAccPosScdDer",("Gaussian fit deviation using "+KinVar+" = "+Var[xPos[1]]+" & "+Var[xPos[0]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),250,-0.1,0.1);
-  TH1F* YPlusGausTestNegScdDer    = new TH1F("YPlusGausTestNegScdDer",   ("Gaussian fit deviation using "+KinVar+" = "+Var[xPos[1]]+" & "+Var[xPos[0]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
-  TH1F* YPlusGausTestXSNegScdDer  = new TH1F("YPlusGausTestXSNegScdDer", ("Gaussing fit deviation using "+KinVar+" = "+Var[xPos[1]]+" & "+Var[xPos[0]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
-  TH1F* YPlusGausTestAccNegScdDer = new TH1F("YPlusGausTestAccNegScdDer",("Gaussian fit deviation using "+KinVar+" = "+Var[xPos[1]]+" & "+Var[xPos[0]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),250,-0.1,0.1);
+  TH1F* YPlusGausTest   =new TH1F("YPlusGausTest",   ("Comparison of fit deviation in "+VarValues[xPos[1]]+" and "+VarValues[xPos[0]]+" (no norm -- "+title+" evts)").c_str(), 250,-0.15,0.15);
+  TH1F* YPlusGausTestXS =new TH1F("YPlusGausTestXS", ("Comparison of fit deviation in "+VarValues[xPos[1]]+" and "+VarValues[xPos[0]]+" (XS norm -- "+title+" evts)").c_str(), 250,-0.15,0.15);
+  TH1F* YPlusGausTestAcc=new TH1F("YPlusGausTestAcc",("Comparison of fit deviation in "+VarValues[xPos[1]]+" and "+VarValues[xPos[0]]+" (Acc norm -- "+title+" evts)").c_str(),250,-0.15,0.15);
+  TH1F* YPlusGausTestPosScdDer    = new TH1F("YPlusGausTestPosScdDer",   ("Gaussian fit deviation using "+VarValues[xPos[1]]+" & "+VarValues[xPos[0]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
+  TH1F* YPlusGausTestXSPosScdDer  = new TH1F("YPlusGausTestXSPosScdDer", ("Gaussian fit deviation using "+VarValues[xPos[1]]+" & "+VarValues[xPos[0]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
+  TH1F* YPlusGausTestAccPosScdDer = new TH1F("YPlusGausTestAccPosScdDer",("Gaussian fit deviation using "+VarValues[xPos[1]]+" & "+VarValues[xPos[0]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),250,-0.1,0.1);
+  TH1F* YPlusGausTestNegScdDer    = new TH1F("YPlusGausTestNegScdDer",   ("Gaussian fit deviation using "+VarValues[xPos[1]]+" & "+VarValues[xPos[0]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
+  TH1F* YPlusGausTestXSNegScdDer  = new TH1F("YPlusGausTestXSNegScdDer", ("Gaussing fit deviation using "+VarValues[xPos[1]]+" & "+VarValues[xPos[0]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(), 250,-0.1,0.1);
+  TH1F* YPlusGausTestAccNegScdDer = new TH1F("YPlusGausTestAccNegScdDer",("Gaussian fit deviation using "+VarValues[xPos[1]]+" & "+VarValues[xPos[0]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),250,-0.1,0.1);
 
-  TH1F* YPlus    = new TH1F("YPlus",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
-  TH1F* YPlusXS  = new TH1F("YPlusXS", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
-  TH1F* YPlusAcc = new TH1F("YPlusAcc",("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.25,0.25);
-  TH1F* YPlusPosScdDer    = new TH1F("YPlusPosScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YPlusXSPosScdDer  = new TH1F("YPlusXSPosScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YPlusAccPosScdDer = new TH1F("YPlusAccPosScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
-  TH1F* YPlusNegScdDer    = new TH1F("YPlusNegScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YPlusXSNegScdDer  = new TH1F("YPlusXSNegScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YPlusAccNegScdDer = new TH1F("YPlusAccNegScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[0]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
+  TH1F* YPlus    = new TH1F("YPlus",   ("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
+  TH1F* YPlusXS  = new TH1F("YPlusXS", ("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
+  TH1F* YPlusAcc = new TH1F("YPlusAcc",("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.25,0.25);
+  TH1F* YPlusPosScdDer    = new TH1F("YPlusPosScdDer",   ("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YPlusXSPosScdDer  = new TH1F("YPlusXSPosScdDer", ("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YPlusAccPosScdDer = new TH1F("YPlusAccPosScdDer",("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
+  TH1F* YPlusNegScdDer    = new TH1F("YPlusNegScdDer",   ("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YPlusXSNegScdDer  = new TH1F("YPlusXSNegScdDer", ("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YPlusAccNegScdDer = new TH1F("YPlusAccNegScdDer",("Deviation from parabolic fit for "+VarValues[xPos[0]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
 
-  TH1F* YPlusPlus    = new TH1F("YPlusPlus",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
-  TH1F*  YPlusPlusXS  = new TH1F("YPlusPlusXS", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
-  TH1F* YPlusPlusAcc = new TH1F("YPlusPlusAcc",("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.5,0.5);
-  TH1F*  YPlusPlusPosScdDer    = new TH1F("YPlusPlusPosScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F*  YPlusPlusXSPosScdDer  = new TH1F("YPlusPlusXSPosScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F*  YPlusPlusAccPosScdDer = new TH1F("YPlusPlusAccPosScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
-  TH1F*  YPlusPlusNegScdDer    = new TH1F("YPlusPlusNegScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F*  YPlusPlusXSNegScdDer  = new TH1F("YPlusPlusXSNegScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F*  YPlusPlusAccNegScdDer = new TH1F("YPlusPlusAccNegScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xPos[1]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
+  TH1F* YPlusPlus    = new TH1F("YPlusPlus",   ("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
+  TH1F* YPlusPlusXS  = new TH1F("YPlusPlusXS", ("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
+  TH1F* YPlusPlusAcc = new TH1F("YPlusPlusAcc",("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.5,0.5);
+  TH1F* YPlusPlusPosScdDer    = new TH1F("YPlusPlusPosScdDer",   ("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YPlusPlusXSPosScdDer  = new TH1F("YPlusPlusXSPosScdDer", ("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YPlusPlusAccPosScdDer = new TH1F("YPlusPlusAccPosScdDer",("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
+  TH1F* YPlusPlusNegScdDer    = new TH1F("YPlusPlusNegScdDer",   ("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YPlusPlusXSNegScdDer  = new TH1F("YPlusPlusXSNegScdDer", ("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YPlusPlusAccNegScdDer = new TH1F("YPlusPlusAccNegScdDer",("Deviation from parabolic fit for "+VarValues[xPos[1]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
 
-  TH1F* YMin    = new TH1F("YMin",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
-  TH1F* YMinXS  = new TH1F("YMinXS", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
-  TH1F* YMinAcc = new TH1F("YMinAcc",("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.25,0.25);
-  TH1F* YMinPosScdDer    = new TH1F("YMinPosScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YMinXSPosScdDer  = new TH1F("YMinXSPosScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YMinAccPosScdDer = new TH1F("YMinAccPosScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
-  TH1F* YMinNegScdDer    = new TH1F("YMinNegScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YMinXSNegScdDer  = new TH1F("YMinXSNegScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
-  TH1F* YMinAccNegScdDer = new TH1F("YMinAccNegScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
+  TH1F* YMin    = new TH1F("YMin",   ("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
+  TH1F* YMinXS  = new TH1F("YMinXS", ("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.25,0.25);
+  TH1F* YMinAcc = new TH1F("YMinAcc",("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.25,0.25);
+  TH1F* YMinPosScdDer    = new TH1F("YMinPosScdDer",   ("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YMinXSPosScdDer  = new TH1F("YMinXSPosScdDer", ("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YMinAccPosScdDer = new TH1F("YMinAccPosScdDer",("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
+  TH1F* YMinNegScdDer    = new TH1F("YMinNegScdDer",   ("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YMinXSNegScdDer  = new TH1F("YMinXSNegScdDer", ("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.2,0.2);
+  TH1F* YMinAccNegScdDer = new TH1F("YMinAccNegScdDer",("Deviation from parabolic fit for "+VarValues[xNeg[0]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.2,0.2);
   
-  TH1F* YMinMin    = new TH1F("YMinMin",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
-  TH1F* YMinMinXS  = new TH1F("YMinMinXS", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
-  TH1F* YMinMinAcc = new TH1F("YMinMinAcc",("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.5,0.5);
-  TH1F* YMinMinPosScdDer    = new TH1F("YMinMinPosScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F* YMinMinXSPosScdDer  = new TH1F("YMinMinXSPosScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F* YMinMinAccPosScdDer = new TH1F("YMinMinAccPosScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
-  TH1F* YMinMinNegScdDer    = new TH1F("YMinMinNegScdDer",   ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F* YMinMinXSNegScdDer  = new TH1F("YMinMinXSNegScdDer", ("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
-  TH1F* YMinMinAccNegScdDer = new TH1F("YMinMinAccNegScdDer",("Deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[1]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
+  TH1F* YMinMin    = new TH1F("YMinMin",   ("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
+  TH1F* YMinMinXS  = new TH1F("YMinMinXS", ("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.5,0.5);
+  TH1F* YMinMinAcc = new TH1F("YMinMinAcc",("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.5,0.5);
+  TH1F* YMinMinPosScdDer    = new TH1F("YMinMinPosScdDer",   ("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (no norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YMinMinXSPosScdDer  = new TH1F("YMinMinXSPosScdDer", ("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (XS norm -- outer 2nd der > 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YMinMinAccPosScdDer = new TH1F("YMinMinAccPosScdDer",("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (Acc norm -- outer 2nd der > 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
+  TH1F* YMinMinNegScdDer    = new TH1F("YMinMinNegScdDer",   ("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (no norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YMinMinXSNegScdDer  = new TH1F("YMinMinXSNegScdDer", ("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (XS norm -- outer 2nd der < 0 -- "+title+" evts)").c_str() ,150,-0.3,0.3);
+  TH1F* YMinMinAccNegScdDer = new TH1F("YMinMinAccNegScdDer",("Deviation from parabolic fit for "+VarValues[xNeg[1]]+" (Acc norm -- outer 2nd der < 0 -- "+title+" evts)").c_str(),150,-0.3,0.3);
   
-  TH1F* YRelPlus    = new TH1F("YRelPlus",   ("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (no norm -- "+title+" evts)").c_str() ,250,-0.1,0.1);
-  TH1F* YRelPlusXS  = new TH1F("YRelPlusXS", ("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (XS norm -- "+title+" evts)").c_str() ,250,-0.1,0.1);
-  TH1F* YRelPlusAcc = new TH1F("YRelPlusAcc",("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),250,-0.1,0.1);
+  TH1F* YRelPlus    = new TH1F("YRelPlus",   ("Relative deviation from parabolic fit for "+VarValues[xNeg[0]]+" (no norm -- "+title+" evts)").c_str() ,250,-0.1,0.1);
+  TH1F* YRelPlusXS  = new TH1F("YRelPlusXS", ("Relative deviation from parabolic fit for "+VarValues[xNeg[0]]+" (XS norm -- "+title+" evts)").c_str() ,250,-0.1,0.1);
+  TH1F* YRelPlusAcc = new TH1F("YRelPlusAcc",("Relative deviation from parabolic fit for "+VarValues[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),250,-0.1,0.1);
   
-  TH1F* YRelMin    = new TH1F("YRelMin",   ("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.1,0.1);
-  TH1F* YRelMinXS  = new TH1F("YRelMinXS", ("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.1,0.1);
-  TH1F* YRelMinAcc = new TH1F("YRelMinAcc",("Relative deviation from parabolic fit for "+KinVar+" = "+Var[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.1,0.1);
+  TH1F* YRelMin    = new TH1F("YRelMin",   ("Relative deviation from parabolic fit for "+VarValues[xNeg[0]]+" (no norm -- "+title+" evts)").c_str() ,150,-0.1,0.1);
+  TH1F* YRelMinXS  = new TH1F("YRelMinXS", ("Relative deviation from parabolic fit for "+VarValues[xNeg[0]]+" (XS norm -- "+title+" evts)").c_str() ,150,-0.1,0.1);
+  TH1F* YRelMinAcc = new TH1F("YRelMinAcc",("Relative deviation from parabolic fit for "+VarValues[xNeg[0]]+" (Acc norm -- "+title+" evts)").c_str(),150,-0.1,0.1);
   
   TH1F* FstDer    = new TH1F("FirstDer",   ("First derivative of -ln(likelihood) distribution -- "+title+" evts").c_str(), 4,0,4);
-  //std::string LabelOne = ("(yDATA(x="+Var[xNeg[1]]+") - yDATA(x="+Var[xNeg[0]]+"))/"+xStep[0]).c_str();
-  //(FstDer->GetXaxis())->SetBinLabel(1,("(yDATA(x="+Var[xNeg[1]]+") - yDATA(x="+Var[xNeg[0]]+"))/"+xStep[0]));
-  //FstDer->GetXaxis()->SetBinLabel(2,"bin2 test"); //("(y_{DATA}(x="+Var[xNeg[0]]+") - y_{DATA}(x="+Var[xMin]+"))/"+xStep[1]).c_str());
-  //FstDer->GetXaxis()->SetBinLabel(3,"bin3 test"); //("(y_{DATA}(x="+Var[xMin]+") - y_{DATA}(x="+Var[xPos[0]]+"))/"+xStep[2]).c_str());
-  //FstDer->GetXaxis()->SetBinLabel(4,"bin4 test"); //("(y_{DATA}(x="+Var[xPos[0]]+") - y_{DATA}(x="+Var[xPos[1]]+"))/"+xStep[3]).c_str());
+  std::ostringstream ssStepSize; ssStepSize << xStep[0]; std::string sStepSize(ssStepSize.str());
+  FstDer->GetXaxis()->SetBinLabel(1,("(LL("+VarValues[xNeg[1]]+")-LL("+VarValues[xNeg[0]]+"))/"+sStepSize).c_str());
+  FstDer->GetXaxis()->SetBinLabel(2,("(LL("+VarValues[xNeg[0]]+")-LL("+VarValues[xMin]+"))/"+sStepSize).c_str());
+  FstDer->GetXaxis()->SetBinLabel(3,("(LL("+VarValues[xMin]+")-LL("+VarValues[xPos[0]]+"))/"+sStepSize).c_str());
+  FstDer->GetXaxis()->SetBinLabel(4,("(LL("+VarValues[xPos[1]]+")-LL("+VarValues[xPos[1]]+"))/"+sStepSize).c_str());
   //TH1F* FstDerXS  = new TH1F("FirstDerivativeXS", ("First derivative of -ln(likelihood) distribution (XS norm -- "+title+" evts)").c_str(), 5,-0.25,0.25);
   //TH1F* FstDerAcc = new TH1F("FirstDerivativeAcc",("First derivative of -ln(likelihood) distribution (Acc norm -- "+title+" evts)").c_str(),5,-0.25,0.25);
   TH1F* ScdDerInner    = new TH1F("SecondDerivativeInner",   ("Second derivative of -ln(likelihood) distribution (no norm -- using inner points -- "+title+" evts)").c_str(), 250,-5,5);
@@ -118,25 +125,25 @@ void ReadTest(){
   TH2F* ScdDerXSScatter  = new TH2F("ScdDerXSScatterPlot", ("Second derivative of -ln(L) using inner points versus using outer points (XS norm -- "+title+" evts)").c_str(), 250,-5,5,250,-5,5);
   TH2F* ScdDerAccScatter = new TH2F("ScdDerAccScatterPlot",("Second derivative of -ln(L) using inner points versus using outer points (Acc norm -- "+title+" evts)").c_str(),250,-5,5,250,-5,5);
   
-  TH1F* ProcContrDist = new TH1F("ProcentualContribution","Procentual contribution of each of the events to the total likelihood",250,0,1);
+  //TH1F* ProcContrDist = new TH1F("ProcentualContribution","Procentual contribution of each of the events to the total likelihood",250,0,1);
   
-  TH1F* TotalFitDevDist    = new TH1F("TotalFitDeviation",   ("Sum of difference between likelihood and fit value for each point in range (no norm -- "+title+" events)").c_str(), 250,0,5);
-  TH1F* TotalFitDevXSDist  = new TH1F("TotalFitXSDeviation", ("Sum of difference between likelihood and fit value for each point in range (XS norm -- "+title+" events)").c_str(), 250,0,5);
-  TH1F* TotalFitDevAccDist = new TH1F("TotalFitAccDeviation",("Sum of difference between likelihood and fit value for each point in range (Acc norm -- "+title+" events)").c_str(),250,0,5);
-  TH1F* TotalFctDevDist    = new TH1F("TotalFctDeviation",   ("Sum of difference between likelihood and function value for each point in range (no norm -- "+title+" events)").c_str(), 250,0,5);
-  TH1F* TotalFctDevXSDist  = new TH1F("TotalFctXSDeviation", ("Sum of difference between likelihood and function value for each point in range (XS norm -- "+title+" events)").c_str(), 250,0,5);
-  TH1F* TotalFctDevAccDist = new TH1F("TotalFctAccDeviation",("Sum of difference between likelihood and function value for each point in range (Acc norm -- "+title+" events)").c_str(),250,0,5);
+  //TH1F* TotalFitDevDist    = new TH1F("TotalFitDeviation",   ("Sum of difference between likelihood and fit value for each point in range (no norm -- "+title+" events)").c_str(), 250,0,5);
+  //TH1F* TotalFitDevXSDist  = new TH1F("TotalFitXSDeviation", ("Sum of difference between likelihood and fit value for each point in range (XS norm -- "+title+" events)").c_str(), 250,0,5);
+  //TH1F* TotalFitDevAccDist = new TH1F("TotalFitAccDeviation",("Sum of difference between likelihood and fit value for each point in range (Acc norm -- "+title+" events)").c_str(),250,0,5);
+  //TH1F* TotalFctDevDist    = new TH1F("TotalFctDeviation",   ("Sum of difference between likelihood and function value for each point in range (no norm -- "+title+" events)").c_str(), 250,0,5);
+  //TH1F* TotalFctDevXSDist  = new TH1F("TotalFctXSDeviation", ("Sum of difference between likelihood and function value for each point in range (XS norm -- "+title+" events)").c_str(), 250,0,5);
+  //TH1F* TotalFctDevAccDist = new TH1F("TotalFctAccDeviation",("Sum of difference between likelihood and function value for each point in range (Acc norm -- "+title+" events)").c_str(),250,0,5);
 
   TH1F *LnLikDist = 0, *LnLikXSDist = 0, *LnLikAccDist = 0; 
   TCanvas *LnLikCanv = 0, *LnLikXSCanv = 0, *LnLikAccCanv = 0;
   TGraph *LnLikFctOuter = 0, *LnLikXSFctOuter = 0, *LnLikAccFctOuter = 0;
   
-  TDirectory* FitComp = Tfile->mkdir("FitComparison");
+  //TDirectory* FitComp = Tfile->mkdir("FitComparison");
   TDirectory* LnLikDir = Tfile->mkdir("LnLikDist");       TDirectory* LnLikStackDir = LnLikDir->mkdir("LnLikStackDist");
   TDirectory* LnLikXSDir = Tfile->mkdir("LnLikXSDist");   TDirectory* LnLikXSStackDir = LnLikXSDir->mkdir("LnLikXSStackDist");
   TDirectory* LnLikAccDir = Tfile->mkdir("LnLikAccDist"); TDirectory* LnLikAccStackDir = LnLikAccDir->mkdir("LnLikAccStackDist");
-  TDirectory* LnLikAccDirVarVsUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanAvgUnc");
-  TDirectory* LnLikAccDirVarVsDUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanTwiceAvgUnc");
+  //TDirectory* LnLikAccDirVarVsUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanAvgUnc");
+  //TDirectory* LnLikAccDirVarVsDUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanTwiceAvgUnc");
   TDirectory* FstDerDir = Tfile->mkdir("FirstDerivativeDist");
 
   //-----------------------------------//
@@ -168,6 +175,7 @@ void ReadTest(){
   TCanvas *StackCanvasLL = 0, *StackCanvasLLXS = 0, *StackCanvasLLAcc = 0; 
 
   double aHat[2] = {0.0}, aHatXS[2] = {0.0}, aHatAcc[2] = {0.0}, bHat[2] = {0.0}, bHatXS[2] = {0.0}, bHatAcc[2] = {0.0}, cHat[2] = {0.0}, cHatXS[2] = {0.0}, cHatAcc[2] = {0.0};
+  double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
   std::ifstream ifs ("Events/RVR_Gen_SingleGausTFHalfWidth_10000Evts/weights.out", std::ifstream::in); 
@@ -183,7 +191,6 @@ void ReadTest(){
 
       //--- Initialize the event-per-event variables! ---//
       if( config == 1){
-        double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
         LnLikDist = new TH1F(("LnLik_Evt"+sEvt).c_str(),("LnLik distribution for event "+sEvt+" -- "+title+" evts").c_str(),xBin,xLow,xHigh);
         LnLikDist->SetMarkerStyle(20); LnLikDist->SetLineColor(1); LnLikDist->SetMarkerColor(1); LnLikDist->SetMarkerSize(1.2);
@@ -210,6 +217,9 @@ void ReadTest(){
         double LnLikFunction[2][NrConfigs], LnLikXSFunction[2][NrConfigs], LnLikAccFunction[2][NrConfigs];
         vector<double> FctDevOuter, RelFctDevOuter,FctDevXSOuter, RelFctDevXSOuter , FctDevAccOuter, RelFctDevAccOuter;
         double TotalFctDevOuter = 0, TotalRelFctDevOuter = 0, TotalFctDevXSOuter = 0, TotalRelFctDevXSOuter = 0, TotalFctDevAccOuter = 0, TotalRelFctDevAccOuter = 0;
+
+        //-- Send the array containing the log(weights) to the predefined function to define the TGraph, fit this, detect the deviation points and fit again! --//
+        //TF1* fitGoodLL = calculateFit(LnLik);
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
@@ -242,8 +252,8 @@ void ReadTest(){
 
         //---  Save the LnLik distributions (event-per-event) together with the function "fit" ---//
         //-- Transformation needed in order to work with TGraphs --//
-        double xVar[NrConfigs], yLnLik[NrConfigs], yLnLikXS[NrConfigs], yLnLikAcc[NrConfigs];
-        for( int i = 0; i < NrConfigs; i++){ xVar[i] = Var[i]; yLnLik[i] = LnLikFunction[1][i]; yLnLikXS[i] = LnLikXSFunction[1][i]; yLnLikAcc[i] = LnLikAccFunction[1][i]; }
+        double yLnLik[NrConfigs], yLnLikXS[NrConfigs], yLnLikAcc[NrConfigs];
+        for( int i = 0; i < NrConfigs; i++){ yLnLik[i] = LnLikFunction[1][i]; yLnLikXS[i] = LnLikXSFunction[1][i]; yLnLikAcc[i] = LnLikAccFunction[1][i]; }
 
         //std::cout << " TotalFctDevOuter value is : " << TotalFctDevOuter << std::endl;
         stringstream ssTotalFctDevOuter;       ssTotalFctDevOuter << TotalFctDevOuter;             string sTotalFctDevOuter       = ssTotalFctDevOuter.str();
@@ -253,9 +263,9 @@ void ReadTest(){
         stringstream ssTotalFctDevAccOuter;    ssTotalFctDevAccOuter << TotalFctDevAccOuter;       string sTotalFctDevAccOuter    = ssTotalFctDevAccOuter.str();
         stringstream ssTotalRelFctDevAccOuter; ssTotalRelFctDevAccOuter << TotalRelFctDevAccOuter; string sTotalRelFctDevAccOuter = ssTotalRelFctDevAccOuter.str();
 
-        LnLikFctOuter    = new TGraph(NrConfigs,xVar,yLnLik);    LnLikFctOuter->SetMarkerColor(2);    LnLikFctOuter->SetLineColor(2);
-        LnLikXSFctOuter  = new TGraph(NrConfigs,xVar,yLnLikXS);  LnLikXSFctOuter->SetMarkerColor(2);  LnLikXSFctOuter->SetLineColor(2);
-        LnLikAccFctOuter = new TGraph(NrConfigs,xVar,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
+        LnLikFctOuter    = new TGraph(NrConfigs,Var,yLnLik);    LnLikFctOuter->SetMarkerColor(2);    LnLikFctOuter->SetLineColor(2);
+        LnLikXSFctOuter  = new TGraph(NrConfigs,Var,yLnLikXS);  LnLikXSFctOuter->SetMarkerColor(2);  LnLikXSFctOuter->SetLineColor(2);
+        LnLikAccFctOuter = new TGraph(NrConfigs,Var,yLnLikAcc); LnLikAccFctOuter->SetMarkerColor(2); LnLikAccFctOuter->SetLineColor(2);
 
         LnLikFctOuter->SetTitle(("Outer fct dev = "+sTotalFctDevOuter+" & "+sTotalRelFctDevOuter).c_str());
         LnLikFctOuter->GetYaxis()->SetTitle(("-ln(L) value (no norm -- evt "+sEvt+")").c_str()); LnLikFctOuter->GetYaxis()->SetTitleOffset(1.5);
@@ -279,16 +289,21 @@ void ReadTest(){
         StackCanvasLLAcc->cd(consEvts - (xDivide*yDivide*NrCanvas) ); LnLikAccFctOuter->Draw("AC*"); LnLikAccDist->Draw("samep"); StackCanvasLLAcc->Update();
 
         if( consEvts == (xDivide*yDivide*(NrCanvas+1)) || consEvts == nEvts){
-          LnLikStackDir->cd();    StackCanvasLL->Write(); 
-          LnLikXSStackDir->cd();  StackCanvasLLXS->Write(); 
-          LnLikAccStackDir->cd(); StackCanvasLLAcc->Write(); 
-          NrCanvas++; stringstream ssNrCanvas; ssNrCanvas << NrCanvas; string sNrCanvas = ssNrCanvas.str();
+          //std::string NameTest = (StackCanvasLLAcc->GetTitle()+"_Nr"+sNrCanvas).c_str();   //Why can't the Title or name be used ... ?
+          StackCanvasLL->Print(("StackedCanvasses/StackCanvasLL_Nr"+sNrCanvas+".pdf").c_str());
+          StackCanvasLLXS->Print(("StackedCanvasses/StackCanvasLLXS_Nr"+sNrCanvas+".pdf").c_str());
+          StackCanvasLLAcc->Print(("StackedCanvasses/StackCanvasLLAcc_Nr"+sNrCanvas+".pdf").c_str());
+          LnLikStackDir->cd();    StackCanvasLL->Write();
+          LnLikXSStackDir->cd();  StackCanvasLLXS->Write();
+          LnLikAccStackDir->cd(); StackCanvasLLAcc->Write();
           if( consEvts != nEvts){
+            NrCanvas++; stringstream ssNrCanvas; ssNrCanvas << NrCanvas; sNrCanvas = ssNrCanvas.str();
             StackCanvasLL    = new TCanvas(("StackCanvasLL_Nr"+sNrCanvas).c_str(),   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide);
             StackCanvasLLXS  = new TCanvas(("StackCanvasLLXS_Nr"+sNrCanvas).c_str(), "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);
             StackCanvasLLAcc = new TCanvas(("StackCanvasLLAcc_Nr"+sNrCanvas).c_str(),"StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
           }
         }
+          
 
         //---  Calculate the first derivative distribution and save them in event-by-event plot  ---//
         FstDer->SetName(("FirstDerivative_Evt"+sEvt).c_str());
@@ -464,6 +479,7 @@ void ReadTest(){
   LLPosScdDerDistOuter->Write(); LLXSPosScdDerDistOuter->Write(); LLAccPosScdDerDistOuter->Write();
   LLPosScdDerDistBoth->Write();  LLXSPosScdDerDistBoth->Write();  LLAccPosScdDerDistBoth->Write();
 
+  Tfile->Close();
   /*for(int iEvt = 0; iEvt < nEvts; iEvt++){
     if(std::find(EvtsWithSmallFctDev.begin(), EvtsWithSmallFctDev.end(), iEvt) != EvtsWithSmallFctDev.end() ){
       std::cout << iEvt << ") Event number is found : " << EvtsWithSmallFctDev[iEvt]  << std::endl;
