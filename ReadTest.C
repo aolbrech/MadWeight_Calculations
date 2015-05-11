@@ -30,13 +30,35 @@ std::string title = "Gen_RVR";
 TFile* Tfile = new TFile("Test.root","RECREATE");
 
 const int NrConfigs = 9;
-const int nEvts = 100; 
+const int nEvts = 10; 
 string sNrCanvas ="0";
- 
+
+TF1 *polFunc = new TF1("polFunc","pol2",Var[0],Var[NrConfigs-1]);  
+
 //TF1* calculateFit(double LogLikelihood[NrConfigs]){
+void calculateFit(double LogLikelihood[NrConfigs]){
+  TGraph* LnLikGraph = new TGraph(NrConfigs,Var, LogLikelihood);
+  
+  LnLikGraph->Fit(polFunc,"Q");
+  std::cout << " First parameter : " << polFunc->GetParameter(0) << std::endl;
+  double LogLikFit[NrConfigs];
+  for(int ii = 0; ii < NrConfigs; ii++){
+    LogLikFit[ii] = polFunc->GetParameter(0)+polFunc->GetParameter(1)*Var[ii]+polFunc->GetParameter(2)*Var[ii]*Var[ii];
+    std::cout << " LogLik values to compare : " << LogLikelihood[ii] << " vs " << LogLikFit[ii] << std::endl;
+  }
 
+  //How to access the points of the fit?
+/*  std::cout << " Content of TGraph : " << std::endl;
+  for(int ii = 0; ii < NrConfigs; ii++)
+    std::cout << " ---- " << ii << " ) LogLikelihood : " << LogLikelihood[ii] << std::endl;
+  std::cout << " New TGraph created! " << std::endl;
+*/
+  TCanvas* canvasGraph = new TCanvas("canvasGraph","canvasGraph");
+  canvasGraph->cd();
+  LnLikGraph->Draw("AC*");
+  canvasGraph->Write();
 
-//}
+}
 
 void ReadTest(){
   
@@ -220,6 +242,7 @@ void ReadTest(){
 
         //-- Send the array containing the log(weights) to the predefined function to define the TGraph, fit this, detect the deviation points and fit again! --//
         //TF1* fitGoodLL = calculateFit(LnLik);
+        calculateFit(LnLik);
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
@@ -255,7 +278,6 @@ void ReadTest(){
         double yLnLik[NrConfigs], yLnLikXS[NrConfigs], yLnLikAcc[NrConfigs];
         for( int i = 0; i < NrConfigs; i++){ yLnLik[i] = LnLikFunction[1][i]; yLnLikXS[i] = LnLikXSFunction[1][i]; yLnLikAcc[i] = LnLikAccFunction[1][i]; }
 
-        //std::cout << " TotalFctDevOuter value is : " << TotalFctDevOuter << std::endl;
         stringstream ssTotalFctDevOuter;       ssTotalFctDevOuter << TotalFctDevOuter;             string sTotalFctDevOuter       = ssTotalFctDevOuter.str();
         stringstream ssTotalRelFctDevOuter;    ssTotalRelFctDevOuter << TotalRelFctDevOuter;       string sTotalRelFctDevOuter    = ssTotalRelFctDevOuter.str();
         stringstream ssTotalFctDevXSOuter;     ssTotalFctDevXSOuter << TotalFctDevXSOuter;         string sTotalFctDevXSOuter     = ssTotalFctDevXSOuter.str();
