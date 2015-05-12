@@ -14,26 +14,39 @@
 #include <algorithm>
 #include <cstring>
 
-std::string VarValues[] = {"Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3"}; 
-double Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3}; 
-double MGXS[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
-double MGXSCut[] = {13.3944,12.06555,11.25909,11.02784,10.90059,10.88228,10.97767,11.49883,12.49056}; 
-int xBin = 13; 
-float xLow = -0.325; 
-float xHigh = 0.325; 
+std::string VarValues[] = {"Re(V_{R}) = -0.1","Re(V_{R}) = -0.09","Re(VR) = -0.08","Re(V_{R}) = -0.07","Re(VR) = -0.06","Re(V_{R}) = -0.05","Re(V_{R}) = -0.04","Re(V_{R}) = -0.03","Re(V_{R}) = -0.02","Re(V_{R}) = -0.01","Re(VR) = 0.0","Re(V_{R}) = 0.01","Re(VR) = 0.02","Re(V_{R}) = 0.03","Re(V_{R}) = 0.04","Re(V_{R}) = 0.05","Re(V_{R}) = 0.06","Re(V_{R}) = 0.07","Re(V_{R}) = 0.08","Re(V_{R}) = 0.09","Re(V_{R}) = 0.1"}; 
+double Var[] = {-0.1,-0.09,-0.08,-0.07,-0.06,-0.05,-0.04,-0.03,-0.02,-0.01,0.0,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1}; 
+double MGXS[] = {11.25909,11.19599,11.14075,11.10667,11.06145,11.02784,10.99474,10.9534,10.93846,10.91787,10.90059,10.89643,10.86829,10.87792,10.87266,10.88228,10.87684,10.89534,10.91641,10.9317,10.97767}; 
+double MGXSCut[] = {2.43546,2.42182,2.41059,2.40057,2.38839,2.38187,2.36976,2.36513,2.35512,2.35666,2.35415,2.35694,2.35174,2.34909,2.34392,2.35108,2.34767,2.35477,2.36148,2.3643,2.37424}; 
+int xBin = 21; 
+float xLow = -0.105; 
+float xHigh = 0.105; 
 int xMinValue[] = {4,4,10}; 
 std::string KinVar = "Re(V_{R})"; 
-int VarWindow = 2; 
-int xPos[] = {5,6}; 
-int xNeg[] = {3,2}; 
-std::string title = "Gen_RVR"; 
-TFile* Tfile = new TFile("Test.root","RECREATE");
+int VarWindow = 3; 
+int xPos[] = {15,20}; 
+int xNeg[] = {5,0}; 
+std::string title = "CorrectReco_RVR"; 
+TFile* Tfile = new TFile("Test.root","RECREATE"); 
 
-const int NrConfigs = 9;
+//ROOT file to store the Fit functions --> Will fasten the study of the cut-influences ...
+TFile* fitFile = new TFile("FitDistributions.root","RECREATE");
+TDirectory *FirstFitDir = fitFile->mkdir("FirstPolynomialFit"), *FirstFitDirXS = fitFile->mkdir("FirstPolynomialFit_XS"), *FirstFitDirAcc = fitFile->mkdir("FirstPolynomialFit_Acc");
+TDirectory *SecondFitDir = fitFile->mkdir("SecondPolynomialFit"), *SecondFitDirXS = fitFile->mkdir("SecondPolynomialFit_XS"), *SecondFitDirAcc = fitFile->mkdir("SecondPolynomialFit_Acc");
+
+const int NrConfigs = 21; 
 const int nEvts = 10; 
-string sNrCanvas ="0";
+const int NrToRemove = 7;
+int NrRemaining = NrConfigs-NrToRemove;
+std::string sNrCanvas ="0";
+std::string sNrRemaining; std::stringstream ssNrRemaining; 
 
-TF1 *polFunc = new TF1("polFunc","pol2",Var[0],Var[NrConfigs-1]);  
+TF1 *polFitAllPoints, *polFitReducedPoints;
+TH1F *h_FitDeviation[NrConfigs], *h_FitDeviationRel[NrConfigs];
+TH1F *h_PointsRemovedByFitDev = new TH1F("PointsRemovedByFitDev","Overview of which points are removed due to largest FitDeviation", xBin,xLow,xHigh);
+TH1F *h_PointsRemovedByFitDevRel = new TH1F("PointsRemovedByFitDevRel","Overview of which points are removed due to largest relative FitDeviation",xBin,xLow,xHigh);
+TH1F *h_ChiSquaredFirstFit = new TH1F("ChiSquaredFirstFit","Distribution of the chi-squared after the fit on all the points",200,0,0.01);
+TH1F *h_ChiSquaredSecondFit = new TH1F("ChiSquaredSecondFit","Distribution of the chi-squared after the fit on the reduced number of points",200,0,0.01);
 
 //Method to sort a pair based on the second element!
 struct sort_pred {
@@ -42,34 +55,86 @@ struct sort_pred {
   }
 };
 
-//TF1* calculateFit(double LogLikelihood[NrConfigs]){
-void calculateFit(double LogLikelihood[NrConfigs]){
-  TGraph* LnLikGraph = new TGraph(NrConfigs,Var, LogLikelihood);
-  double myTest[NrConfigs] = {6,2,-1,8,10,5,77,-18,0};
-  std::vector<std::pair<int, double> > FitDeviation, FitDeviationRel, Test;
+void PaintOverflow(TH1F *h, TFile *FileToWrite){     // This function draws the histogram h with an extra bin for overflows
+  Int_t nx    = h->GetNbinsX()+1;
+  Double_t x1 = h->GetBinLowEdge(1), bw = h->GetBinWidth(nx), x2 = h->GetBinLowEdge(nx)+bw;
 
-  LnLikGraph->Fit(polFunc,"Q");
-  std::cout << " First parameter : " << polFunc->GetParameter(0) << std::endl;
-  double LogLikFit[NrConfigs] = {-9999}; //, FitDeviation[NrConfigs] = {-9999}, FitDeviationRel[NrConfigs] = {-9999};
-  for(int ii = 0; ii < NrConfigs; ii++){
-    LogLikFit[ii] = polFunc->GetParameter(0)+polFunc->GetParameter(1)*Var[ii]+polFunc->GetParameter(2)*Var[ii]*Var[ii];
-    FitDeviation.push_back( std::make_pair(ii, abs(LogLikelihood[ii]-LogLikFit[ii]) ) );
-    FitDeviationRel.push_back( std::make_pair(ii, abs(LogLikelihood[ii]-LogLikFit[ii])/LogLikelihood[ii] ) );
-    Test.push_back(std::make_pair(ii, myTest[ii]));
-    //std::cout << " Fit deviation values : " << FitDeviation[ii] << " & " << FitDeviationRel[ii] << std::endl;
+  //Define a temporary histogram having an extra bin for overflows
+  char newTitle[100], newName[100];
+  strcpy(newTitle,h->GetTitle()); strcat(newTitle," (under- and overflow added)" );
+  strcpy(newName,h->GetName());  strcat(newName, "_Flow");
+  TH1F *htmp = new TH1F(newName, newTitle, nx, x1, x2);
+
+  // Fill the new histogram including the extra bin for overflows
+  for (Int_t i=1; i<=nx; i++)
+    htmp->Fill(htmp->GetBinCenter(i), h->GetBinContent(i));
+  // Fill the underflows
+  htmp->Fill(x1-1, h->GetBinContent(0));
+
+  // Restore the number of entries
+  htmp->SetEntries(h->GetEntries());
+
+  FileToWrite->cd();   //How to add the possibility to use a TDirectory here ..., but only use it when it has been specified otherwise use the general directory
+  htmp->Write();  
+}                  
+
+//TF1* calculateFit(double LogLikelihood[NrConfigs]){
+void calculateFit(double LogLikelihood[NrConfigs], string EvtNumber, std::string Type){
+  fitFile->cd();
+  if(EvtNumber == "1") ssNrRemaining << NrRemaining; sNrRemaining = ssNrRemaining.str();
+  
+  polFitAllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  TGraph* LnLikGraph = new TGraph(NrConfigs,Var, LogLikelihood);
+  LnLikGraph->Fit(polFitAllPoints,"Q");
+  h_ChiSquaredFirstFit->Fill(polFitAllPoints->GetChisquare());
+  if(Type == "") FirstFitDir->cd();
+  else if(Type == "XS") FirstFitDirXS->cd();
+  else if(Type == "Acc") FirstFitDirAcc->cd();
+  polFitAllPoints->Write();
+
+  std::vector<std::pair<int, double> > FitDeviation, FitDeviationRel;
+  double LogLikFit[NrConfigs] = {-9999}; 
+  for(int iConfig = 0; iConfig < NrConfigs; iConfig++){
+    LogLikFit[iConfig] = polFitAllPoints->GetParameter(0)+polFitAllPoints->GetParameter(1)*Var[iConfig]+polFitAllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig];
+    FitDeviation.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig]) ) );
+    FitDeviationRel.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig])/LogLikelihood[iConfig] ) );
   }
   //Sort the fitdeviation values depending on the second value!
   std::sort(FitDeviation.begin(), FitDeviation.end(), sort_pred() );
   std::sort(FitDeviationRel.begin(), FitDeviationRel.end(), sort_pred() );
   
-  for(int jj = 0; jj < NrConfigs; jj++)
-    std::cout << jj << ") FitDeviation value is : " << FitDeviation[jj].second << " (corresponding to key " << FitDeviation[jj].first << ") " << std::endl;
+  //Now loop again over all configurations, plot the FitDeviation in sorted order and save the configNr's which should be excluded 
+  std::vector<int> FitDevPointsToRemove, FitDevRelPointsToRemove;
+  for(int itSortedConfig = NrConfigs-1; itSortedConfig >= 0 ; itSortedConfig--){  //Looping from high to low values of the deviation!
+    h_FitDeviation[itSortedConfig]->Fill(FitDeviation[itSortedConfig].second);
+    h_FitDeviationRel[itSortedConfig]->Fill(FitDeviationRel[itSortedConfig].second);
+    
+    //Store the 'NrToRemove' points which need to be excluded from the TGraph!
+    if(FitDevPointsToRemove.size() < NrToRemove){ FitDevPointsToRemove.push_back(FitDeviation[itSortedConfig].first); h_PointsRemovedByFitDev->Fill(Var[FitDeviation[itSortedConfig].first]);}
+    if(FitDevRelPointsToRemove.size() < NrToRemove){FitDevRelPointsToRemove.push_back(FitDeviationRel[itSortedConfig].first);h_PointsRemovedByFitDevRel->Fill(Var[FitDeviationRel[itSortedConfig].first]);}
+  }
 
-  TCanvas* canvasGraph = new TCanvas("canvasGraph","canvasGraph");
-  canvasGraph->cd();
-  LnLikGraph->Draw("AC*");
-  canvasGraph->Write();
+  //Create new arrays with the reduced information!
+  double ReducedVar[NrConfigs-NrToRemove], ReducedLogLik[NrConfigs-NrToRemove];
+  int iCounter = 0;
+  for(int iConf = 0; iConf < NrConfigs; iConf++){
+    if(!(std::find(FitDevPointsToRemove.begin(), FitDevPointsToRemove.end(), iConf) != FitDevPointsToRemove.end()) ){
+      ReducedVar[iCounter] = Var[iConf];
+      ReducedLogLik[iCounter] = LogLikelihood[iConf];
+      iCounter++;
+    }
+  }
 
+  //Define new TGraph and fit again
+  TGraph* ReducedLnLikGraph = new TGraph(NrConfigs-NrToRemove, ReducedVar, ReducedLogLik);
+  polFitReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  ReducedLnLikGraph->Fit(polFitReducedPoints,"Q"); 
+  h_ChiSquaredSecondFit->Fill(polFitReducedPoints->GetChisquare());   //As expected NDF is always equal to NrConfigs-NrToRemove-3 (= nr params needed to define a parabola)
+  if(Type == "") SecondFitDir->cd();
+  else if(Type == "XS") SecondFitDirXS->cd();
+  else if(Type == "Acc") SecondFitDirAcc->cd();
+  polFitReducedPoints->Write();
+  Tfile->cd();
 }
 
 void ReadTest(){
@@ -212,7 +277,7 @@ void ReadTest(){
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events/RVR_Gen_SingleGausTFHalfWidth_10000Evts/weights.out", std::ifstream::in); 
+  std::ifstream ifs ("Events/RVR_RecoCorrect_SingleGausTF_10000Evts_ManySteps/weights_NoZero.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
@@ -220,8 +285,15 @@ void ReadTest(){
   while( std::getline(ifs,line) && consEvts < nEvts){
     std::istringstream iss(line);
     if( iss >> evt >> config >> tf >> weight >> weightUnc){
-      if(config == 1 && ((consEvts+1) % 10 == 0) ) std::cout << " Looking at event : " << consEvts+1 << std::endl;
+      if(config == 1 && ((consEvts+1) % 50 == 0) ) std::cout << " Looking at event : " << consEvts+1 << std::endl;
       stringstream ssEvt; ssEvt << evt; string sEvt = ssEvt.str();
+      stringstream ssConfig; ssConfig << config; string sConfig = ssConfig.str();
+
+      //Initialize the fitDeviation histograms (array of TH1F, one for each configuration ...)
+      if(consEvts == 0){
+        h_FitDeviation[config-1] = new TH1F(("FitDeviation_LowestConfig"+sConfig).c_str(),("FitDeviation histogram for "+sConfig+"st lowest value").c_str(), 200, 0, 0.1);
+        h_FitDeviationRel[config-1] = new TH1F(("FitDeviationRelative_LowestConfig"+sConfig).c_str(), ("FitDeviationRelative histogram for "+sConfig+"st lowest value").c_str(),200,0,0.005);
+      }
 
       //--- Initialize the event-per-event variables! ---//
       if( config == 1){
@@ -254,7 +326,7 @@ void ReadTest(){
 
         //-- Send the array containing the log(weights) to the predefined function to define the TGraph, fit this, detect the deviation points and fit again! --//
         //TF1* fitGoodLL = calculateFit(LnLik);
-        calculateFit(LnLik);
+        calculateFit(LnLikAcc,sEvt,"Acc");
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
@@ -365,7 +437,7 @@ void ReadTest(){
         ScdDerInner->Fill(scdDerInner[0]);                         ScdDerXSInner->Fill(scdDerInner[1]);                         ScdDerAccInner->Fill(scdDerInner[2]);
         ScdDerOuter->Fill(scdDerOuter[0]);                         ScdDerXSOuter->Fill(scdDerOuter[1]);                         ScdDerAccOuter->Fill(scdDerOuter[2]);
         ScdDerScatter->Fill(scdDerOuter[0], scdDerInner[0]);       ScdDerXSScatter->Fill(scdDerOuter[1], scdDerInner[1]);       ScdDerAccScatter->Fill(scdDerOuter[2], scdDerInner[2]);
-        if( TotalFctDevAccOuter > 5) std::cout << "Overflow found for TotalFctDevDist : " << TotalFctDevAccOuter << std::endl;
+        //if( TotalFctDevAccOuter > 5) std::cout << "Overflow found for TotalFctDevDist : " << TotalFctDevAccOuter << std::endl;
 
         //-- Apply cut on YPlusGausTest --//
         if( (yPlus[0] + yPlusPlus[0]/4) <= 0.025 && (yPlus[0] + yPlusPlus[0]/4) >= -0.025) EvtsWithYPlusGausSmall.push_back(evt);
@@ -475,6 +547,15 @@ void ReadTest(){
   ScdDerInner->Write();             ScdDerXSInner->Write();             ScdDerAccInner->Write();
   ScdDerOuter->Write();             ScdDerXSOuter->Write();             ScdDerAccOuter->Write();
   ScdDerScatter->Write();           ScdDerXSScatter->Write();           ScdDerAccScatter->Write();
+  h_PointsRemovedByFitDev->Write();
+  h_PointsRemovedByFitDevRel->Write();
+  //-- Save the histograms for which oveflow information is needed! --//
+  for(int iConf = 0; iConf < NrConfigs; iConf++){
+    PaintOverflow(h_FitDeviation[iConf], Tfile);
+    PaintOverflow(h_FitDeviationRel[iConf], Tfile);
+  }
+  PaintOverflow(h_ChiSquaredFirstFit, Tfile);
+  PaintOverflow(h_ChiSquaredSecondFit, Tfile);
 
   //---  Draw the likelihood distribution separately for events surviving and passing the cuts!  ---//
   std::cout << "Nr of events with 2nd derivative > 0 (LnLik, LnLikXS & LnLikAcc -- using x = " << Var[xNeg[0]] << "/" << Var[xMin] << "/" << Var[xPos[0]] << ") : " << EvtsWithPosScdDerInner << ", " << EvtsWithPosScdDerXSInner << " & " << EvtsWithPosScdDerAccInner << std::endl;
