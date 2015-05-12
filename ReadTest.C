@@ -30,9 +30,10 @@ std::string title = "CorrectReco_RVR";
 TFile* Tfile = new TFile("Test.root","RECREATE"); 
 
 //ROOT file to store the Fit functions --> Will fasten the study of the cut-influences ...
-TFile* fitFile = new TFile("FitDistributions.root","RECREATE");
-TDirectory *FirstFitDir = fitFile->mkdir("FirstPolynomialFit"), *FirstFitDirXS = fitFile->mkdir("FirstPolynomialFit_XS"), *FirstFitDirAcc = fitFile->mkdir("FirstPolynomialFit_Acc");
-TDirectory *SecondFitDir = fitFile->mkdir("SecondPolynomialFit"), *SecondFitDirXS = fitFile->mkdir("SecondPolynomialFit_XS"), *SecondFitDirAcc = fitFile->mkdir("SecondPolynomialFit_Acc");
+TFile* file_FitDist = new TFile("FitDistributions.root","RECREATE");
+TDirectory *dir_OriginalLL = file_FitDist->mkdir("OriginalLL"),        *dir_OriginalLLXS = file_FitDist->mkdir("OriginalLL_XS"),        *dir_OriginalLLAcc = file_FitDist->mkdir("OriginalLL_Acc");
+TDirectory *dir_FirstFit = file_FitDist->mkdir("FirstPolynomialFit"),  *dir_FirstFitXS = file_FitDist->mkdir("FirstPolynomialFit_XS"),  *dir_FirstFitAcc = file_FitDist->mkdir("FirstPolynomialFit_Acc");
+TDirectory *dir_SecondFit = file_FitDist->mkdir("SecondPolynomialFit"),*dir_SecondFitXS = file_FitDist->mkdir("SecondPolynomialFit_XS"),*dir_SecondFitAcc = file_FitDist->mkdir("SecondPolynomialFit_Acc");
 
 const int NrConfigs = 21; 
 const int nEvts = 10; 
@@ -41,7 +42,7 @@ int NrRemaining = NrConfigs-NrToRemove;
 std::string sNrCanvas ="0";
 std::string sNrRemaining; std::stringstream ssNrRemaining; 
 
-TF1 *polFitAllPoints, *polFitReducedPoints;
+TF1 *polFit_AllPoints, *polFit_ReducedPoints;
 TH1F *h_FitDeviation[NrConfigs], *h_FitDeviationRel[NrConfigs];
 TH1F *h_PointsRemovedByFitDev = new TH1F("PointsRemovedByFitDev","Overview of which points are removed due to largest FitDeviation", xBin,xLow,xHigh);
 TH1F *h_PointsRemovedByFitDevRel = new TH1F("PointsRemovedByFitDevRel","Overview of which points are removed due to largest relative FitDeviation",xBin,xLow,xHigh);
@@ -55,7 +56,7 @@ struct sort_pred {
   }
 };
 
-void PaintOverflow(TH1F *h, TFile *FileToWrite){     // This function draws the histogram h with an extra bin for overflows
+void PaintOverflow(TH1F *h, TFile *FileToWrite, const char* path = 0){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
   Double_t x1 = h->GetBinLowEdge(1), bw = h->GetBinWidth(nx), x2 = h->GetBinLowEdge(nx)+bw;
 
@@ -63,39 +64,47 @@ void PaintOverflow(TH1F *h, TFile *FileToWrite){     // This function draws the 
   char newTitle[100], newName[100];
   strcpy(newTitle,h->GetTitle()); strcat(newTitle," (under- and overflow added)" );
   strcpy(newName,h->GetName());  strcat(newName, "_Flow");
-  TH1F *htmp = new TH1F(newName, newTitle, nx, x1, x2);
+  TH1F *h_tmp = new TH1F(newName, newTitle, nx, x1, x2);
 
   // Fill the new histogram including the extra bin for overflows
   for (Int_t i=1; i<=nx; i++)
-    htmp->Fill(htmp->GetBinCenter(i), h->GetBinContent(i));
+    h_tmp->Fill(h_tmp->GetBinCenter(i), h->GetBinContent(i));
   // Fill the underflows
-  htmp->Fill(x1-1, h->GetBinContent(0));
+  h_tmp->Fill(x1-1, h->GetBinContent(0));
 
   // Restore the number of entries
-  htmp->SetEntries(h->GetEntries());
+  h_tmp->SetEntries(h->GetEntries());
 
-  FileToWrite->cd();   //How to add the possibility to use a TDirectory here ..., but only use it when it has been specified otherwise use the general directory
-  htmp->Write();  
+  FileToWrite->cd(path);
+  h_tmp->Write();  
 }                  
 
 //TF1* calculateFit(double LogLikelihood[NrConfigs]){
-void calculateFit(double LogLikelihood[NrConfigs], string EvtNumber, std::string Type){
-  fitFile->cd();
+void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type){
+  file_FitDist->cd();
   if(EvtNumber == "1") ssNrRemaining << NrRemaining; sNrRemaining = ssNrRemaining.str();
-  
-  polFitAllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
-  TGraph* LnLikGraph = new TGraph(NrConfigs,Var, LogLikelihood);
-  LnLikGraph->Fit(polFitAllPoints,"Q");
-  h_ChiSquaredFirstFit->Fill(polFitAllPoints->GetChisquare());
-  if(Type == "") FirstFitDir->cd();
-  else if(Type == "XS") FirstFitDirXS->cd();
-  else if(Type == "Acc") FirstFitDirAcc->cd();
-  polFitAllPoints->Write();
+
+  double LogLikelihood[NrConfigs];
+  for(int ii = 0; ii < NrConfigs; ii++)
+    LogLikelihood[ii] = h_LogLik->GetBinContent(h_LogLik->FindBin(Var[ii]));
+  if(Type == "")         dir_OriginalLL->cd();
+  else if(Type == "XS")  dir_OriginalLLXS->cd();
+  else if(Type == "Acc") dir_OriginalLLAcc->cd();
+  h_LogLik->Write();
+ 
+  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
+  gr_LnLik->Fit(polFit_AllPoints,"Q");
+  h_ChiSquaredFirstFit->Fill(polFit_AllPoints->GetChisquare());
+  if(Type == "")         dir_FirstFit->cd();
+  else if(Type == "XS")  dir_FirstFitXS->cd();
+  else if(Type == "Acc") dir_FirstFitAcc->cd();
+  polFit_AllPoints->Write();
 
   std::vector<std::pair<int, double> > FitDeviation, FitDeviationRel;
   double LogLikFit[NrConfigs] = {-9999}; 
   for(int iConfig = 0; iConfig < NrConfigs; iConfig++){
-    LogLikFit[iConfig] = polFitAllPoints->GetParameter(0)+polFitAllPoints->GetParameter(1)*Var[iConfig]+polFitAllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig];
+    LogLikFit[iConfig] = polFit_AllPoints->GetParameter(0)+polFit_AllPoints->GetParameter(1)*Var[iConfig]+polFit_AllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig];
     FitDeviation.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig]) ) );
     FitDeviationRel.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig])/LogLikelihood[iConfig] ) );
   }
@@ -126,14 +135,14 @@ void calculateFit(double LogLikelihood[NrConfigs], string EvtNumber, std::string
   }
 
   //Define new TGraph and fit again
-  TGraph* ReducedLnLikGraph = new TGraph(NrConfigs-NrToRemove, ReducedVar, ReducedLogLik);
-  polFitReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
-  ReducedLnLikGraph->Fit(polFitReducedPoints,"Q"); 
-  h_ChiSquaredSecondFit->Fill(polFitReducedPoints->GetChisquare());   //As expected NDF is always equal to NrConfigs-NrToRemove-3 (= nr params needed to define a parabola)
-  if(Type == "") SecondFitDir->cd();
-  else if(Type == "XS") SecondFitDirXS->cd();
-  else if(Type == "Acc") SecondFitDirAcc->cd();
-  polFitReducedPoints->Write();
+  TGraph* gr_ReducedLnLik = new TGraph(NrConfigs-NrToRemove, ReducedVar, ReducedLogLik);
+  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  gr_ReducedLnLik->Fit(polFit_ReducedPoints,"Q"); 
+  h_ChiSquaredSecondFit->Fill(polFit_ReducedPoints->GetChisquare());   //As expected NDF is always equal to NrConfigs-NrToRemove-3 (= nr params needed to define a parabola)
+  if(Type == "")         dir_SecondFit->cd();
+  else if(Type == "XS")  dir_SecondFitXS->cd();
+  else if(Type == "Acc") dir_SecondFitAcc->cd();
+  polFit_ReducedPoints->Write();
   Tfile->cd();
 }
 
@@ -326,7 +335,7 @@ void ReadTest(){
 
         //-- Send the array containing the log(weights) to the predefined function to define the TGraph, fit this, detect the deviation points and fit again! --//
         //TF1* fitGoodLL = calculateFit(LnLik);
-        calculateFit(LnLikAcc,sEvt,"Acc");
+        calculateFit(LnLikAccDist,sEvt,"Acc");
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
@@ -550,8 +559,9 @@ void ReadTest(){
   h_PointsRemovedByFitDev->Write();
   h_PointsRemovedByFitDevRel->Write();
   //-- Save the histograms for which oveflow information is needed! --//
+  TDirectory* TestDir = Tfile->mkdir("PathTest");
   for(int iConf = 0; iConf < NrConfigs; iConf++){
-    PaintOverflow(h_FitDeviation[iConf], Tfile);
+    PaintOverflow(h_FitDeviation[iConf], Tfile, TestDir->GetName());
     PaintOverflow(h_FitDeviationRel[iConf], Tfile);
   }
   PaintOverflow(h_ChiSquaredFirstFit, Tfile);
