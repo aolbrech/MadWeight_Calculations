@@ -42,7 +42,6 @@ void getIndividualDirObjects(TDirectory *dir){
     std::string dirName(dir->GetName(), 0, 100);
 
     TH1F *h_LLSum = 0, *h_FitSum = 0;
-    //TF1 *fitFunc[dir->GetNkeys()];// = {0};
     //Identify which directory is being studied --> Containing TF1 or TH1F & type of normalisation!
     std::string NormType = "", FitNr = "", NrUsedPoints = "";
     bool lookAtFits = false;
@@ -62,60 +61,21 @@ void getIndividualDirObjects(TDirectory *dir){
     
     std::string fitName = "";
     double fitXMin = 0, fitXMax = 0;
-    //int iCounter = 0;
-    //TF1 *fitSum = 0;
     while ((object_dir = next())) {         //Keep it general to TObject because both TF1 and TH1F are stored in this ROOT file!
       if(lookAtFits == false){  //Looking at TH1F objects!
         TH1F *h_iLL = (TH1F*) dir->Get(object_dir->GetName());
         h_LLSum->Add(h_iLL);
       }
       else if(lookAtFits == true){ //Looking at TF1 objects!
-        //std::stringstream ssCounter; ssCounter << iCounter; std::string sCounter = ssCounter.str();
-        //std::stringstream ssMinCounter; ssMinCounter << iCounter-1; std::string sMinCounter = ssMinCounter.str();
         TF1 *fitFunc = (TF1*) dir->Get(object_dir->GetName());
         h_FitSum->Add(fitFunc);
-        //fitFunc[0]->SetName("ff");
-        //fitFunc[1]->SetName("gg");
-        //fitFunc->SetName(("fitFunc_"+sCounter).c_str());
-        //fitXMin = fitFunc[iCounter]->GetXmin(); fitXMax = fitFunc[iCounter]->GetXmax();
-
-        /*if(iCounter != 0){
-          std::cout << " Trying to get name : " << ("fitSum_"+sMinCounter+"_"+NormType+"*fitFunc_"+sCounter).c_str() << std::endl;
-          //fitSum = new TF1(("fitSum_"+sCounter+"_"+NormType).c_str(),("fitSum_"+sMinCounter+"_"+NormType+"*fitFunc_"+sCounter).c_str(),fitXMin, fitXMax);
-          fitSum->Write();
-        }
-        else if(iCounter == 0){
-          fitSum = new TF1(("fitSum_"+sCounter+"_"+NormType).c_str(),("fitFunc_"+sCounter+"*1").c_str(),fitXMin, fitXMax);
-        }*/
-
-        //Simply add all the histograms!
-        //if(iCounter != 0) fitName = fitName+"+"+fitFunc[iCounter]->GetName();
-        //else              fitName = fitName+""+fitFunc[iCounter]->GetName();
-
-        //Require cut-value on the chi-squared of the fits!
       }
-      //iCounter++;
     }
 
-    //std::cout << " iCounter value : " << iCounter << std::endl;
-    //Write away the summed TF1's and TH1F's
-    if(lookAtFits == true){
+    if(lookAtFits == true)
       h_FitSum->Write();
-      /*std::cout << " Trying to write sum of TF1's ... " << std::endl;
-      //std::cout << " FitName is : \n " << fitName << std::endl;
-      if(NormType == "Acc"){
-        //TF1 *fitSum = new TF1("fitSum","polFitAcc_AllPoints_Evt1+polFitAcc_AllPoints_Evt2",fitXMin, fitXMax);
-        TF1 *fitSum = new TF1("fitSum","ff+gg",fitXMin, fitXMax);
-        fitSum->Write();
-        std::cout << " Done " << std::endl;
-      }
-      //for(int ii = 0; ii < iCounter; ii++)
-      //  fitFunc[ii]->Clear();
-      */
-    }
-    else{ 
+    else 
       h_LLSum->Write();
-    }
   }
   else{
     std::cout << "        ### Skipped the empty directory " << dir->GetName() << " ### " << std::endl;
