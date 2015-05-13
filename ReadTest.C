@@ -44,7 +44,7 @@ const int nEvts = 10;
 const int NrToRemove = 7;
 int NrRemaining = NrConfigs-NrToRemove;
 std::string sNrCanvas ="0";
-std::string sNrRemaining =""; std::stringstream ssNrRemaining; 
+std::string sNrRemaining = ""; std::stringstream ssNrRemaining; 
 
 TF1 *polFit_AllPoints, *polFit_ReducedPoints;
 TH1F *h_FitDeviation[NrConfigs], *h_FitDeviationRel[NrConfigs];
@@ -95,37 +95,8 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type){
   else if(Type == "Acc") dir_OriginalLLAcc->cd();
   h_LogLik->Write();
  
-  //polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
-  if(EvtNumber == "1" && Type == "Acc"){
-    TF1 *ff = new TF1("ffFit","pol2",Var[0],Var[NrConfigs-1]);
-    TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
-    gr_LnLik->Fit(ff,"Q");
-  }
-  if(EvtNumber == "100" && Type == "Acc"){
-    TF1 *gg = new TF1("ggFit","pol2",Var[0],Var[NrConfigs-1]);
-    TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);    
-    gr_LnLik->Fit(gg,"Q");
-  }
-
-  if(EvtNumber == "10" && Type == "Acc"){
-    TF1 *hh = new TF1("hhFit","pol2",Var[0],Var[NrConfigs-1]);
-    TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
-    gr_LnLik->Fit(hh,"Q");
-  }
-
-  if(EvtNumber == "100" && Type == "Acc"){
-    TF1 *sumFit = new TF1("sumTest","ffFit+ggFit+hhFit",Var[0],Var[NrConfigs-1]);
-    file_FitDist->cd();
-    sumFit->Write();
-    //TF1 *sumFit = new TF1("sumTest","polFitAcc_AllPoints_Evt1+polFitAcc_AllPoints_Evt100",Var[0],Var[NrConfigs-1]);
-    std::cout << " sumFit value (1+100) has -ln(L_Acc) = " << sumFit->GetParameter(0)+sumFit->GetParameter(1)*Var[0]+sumFit->GetParameter(2)*Var[0]*Var[0] << " (config : " << Var[0] << ")" << std::endl;
-    //TF1 *sumFitTwo = new TF1("sumTestTwo","polFitAcc_AllPoints_Evt1+polFitAcc_AllPoints_Evt10+polFitAcc_AllPoints_Evt100",Var[0],Var[NrConfigs-1]);
-    //file_FitDist->cd();
-    //sumFit->Write();
-    //sumFitTwo->Write();
-  }
-
-  /*TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
+  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
   gr_LnLik->Fit(polFit_AllPoints,"Q");
   h_ChiSquaredFirstFit->Fill(polFit_AllPoints->GetChisquare());
   if(Type == "")         dir_FirstFit->cd();
@@ -137,8 +108,6 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type){
   double LogLikFit[NrConfigs] = {-9999}; 
   for(int iConfig = 0; iConfig < NrConfigs; iConfig++){
     LogLikFit[iConfig] = polFit_AllPoints->GetParameter(0)+polFit_AllPoints->GetParameter(1)*Var[iConfig]+polFit_AllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig];
-    if(iConfig == 0 && Type == "Acc")
-      std::cout << " Conf " << Var[iConfig] << " ) has -ln(L_Acc) value of : " << LogLikFit[iConfig] << " ( Event number : " << EvtNumber << " ) " << std::endl;
     FitDeviation.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig]) ) );
     FitDeviationRel.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig])/LogLikelihood[iConfig] ) );
   }
@@ -178,7 +147,6 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type){
   else if(Type == "Acc") dir_SecondFitAcc->cd();
   polFit_ReducedPoints->Write();
   Tfile->cd();
-  */
 }
 
 void ReadTest(){
