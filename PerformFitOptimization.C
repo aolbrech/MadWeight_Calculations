@@ -15,12 +15,12 @@
 #include <cstring>
 #include <cstdlib>
 
-TFile *inFile = new TFile("FitDistributions.root","READ");
-TDirectory *dir_FstFit = inFile->GetDirectory("FirstPolynomialFit"), *dir_FstFitXS = inFile->GetDirectory("FirstPolynomialFit_XS"), *dir_FstFitAcc = inFile->GetDirectory("FirstPolynomialFit_Acc");
-TDirectory *dir_ScdFit = inFile->GetDirectory("SecondPolynomialFit"),*dir_ScdFitXS = inFile->GetDirectory("SecondPolynomialFit_XS"),*dir_ScdFitAcc = inFile->GetDirectory("SecondPolynomialFit_Acc");
-TDirectory *dir_OrigLL = inFile->GetDirectory("OriginalLL"),         *dir_OrigLLXS = inFile->GetDirectory("OriginalLL_XS"),         *dir_OrigLLAcc = inFile->GetDirectory("OriginalLL_Acc");
+TFile *inFile = new TFile("FitDistributions_10000RecoEvts_ManySteps.root","READ");       //Should be filled by the python script!
+//TDirectory *dir_FstFit = inFile->GetDirectory("FirstPolynomialFit"), *dir_FstFitXS = inFile->GetDirectory("FirstPolynomialFit_XS"), *dir_FstFitAcc = inFile->GetDirectory("FirstPolynomialFit_Acc");
+//TDirectory *dir_ScdFit = inFile->GetDirectory("SecondPolynomialFit"),*dir_ScdFitXS = inFile->GetDirectory("SecondPolynomialFit_XS"),*dir_ScdFitAcc = inFile->GetDirectory("SecondPolynomialFit_Acc");
+//TDirectory *dir_OrigLL = inFile->GetDirectory("OriginalLL"),         *dir_OrigLLXS = inFile->GetDirectory("OriginalLL_XS"),         *dir_OrigLLAcc = inFile->GetDirectory("OriginalLL_Acc");
 
-TFile *outputFile = new TFile("FitOptimizations.root","RECREATE");
+TFile *outputFile = new TFile("FitOptimizations.root","RECREATE"); //Should be filled by the python script!
 
 int NrEvts = 10; 
 int xBin = 21;        //Copy this from the python file!
@@ -30,7 +30,6 @@ float xHigh = 0.105;  //Copy this from the python file!
 void getIndividualDirObjects(TDirectory *dir){
   outputFile->cd();
 
-  std::cout << "    -- Looking at directory : " << dir->GetName() << " (with " << dir->GetNkeys() << " objects)" << std::endl;
   std::stringstream ssNkeys; ssNkeys << dir->GetNkeys(); std::string sNkeys = ssNkeys.str();
   //if(!(dir->GetNkeys() != NrEvts) ){
   if( dir->GetNkeys() > 0 ){
@@ -41,43 +40,81 @@ void getIndividualDirObjects(TDirectory *dir){
 
     //Convert name of directory (const char*) to a string:
     std::string dirName(dir->GetName(), 0, 100);
-    std::cout << dirName.size() << ":[" << dirName << "]" << std::endl;
 
-    TH1F *h_LLSum = 0;
+    TH1F *h_LLSum = 0, *h_FitSum = 0;
+    //TF1 *fitFunc[dir->GetNkeys()];// = {0};
     //Identify which directory is being studied --> Containing TF1 or TH1F & type of normalisation!
-    std::string NormType = "";
+    std::string NormType = "", FitNr = "", NrUsedPoints = "";
     bool lookAtFits = false;
     if(dirName.find("Acc") != std::string::npos)     NormType = "Acc";
     else if(dirName.find("XS") != std::string::npos) NormType = "XS";
     else                                             NormType = "";
 
-    if (dirName.find("LL") != std::string::npos)
-      h_LLSum = new TH1F(("LL"+NormType+"_Summed").c_str(), ("Distribution of "+dirName+"  after summing over all "+sNkeys.c_str()+" events").c_str(), xBin, xLow, xHigh);
-    else
-      lookAtFits = true;
+    if(dirName.find("FirstPolynomial") != std::string::npos){       FitNr = "FirstPol";  NrUsedPoints = "all";    }
+    else if(dirName.find("SecondPolynomial") != std::string::npos){ FitNr = "SecondPol"; NrUsedPoints = "reduced";}
 
-      
+    if (dirName.find("LL") != std::string::npos)
+      h_LLSum = new TH1F(("LL"+NormType+"_Summed").c_str(), ("Distribution of "+dirName+" after summing over all "+sNkeys.c_str()+" events").c_str(), xBin, xLow, xHigh);
+    else{
+      lookAtFits = true;
+      h_FitSum = new TH1F((FitNr+""+NormType+"_Summed").c_str(), ("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points").c_str(), xBin, xLow, xHigh);
+    }
+    
     std::string fitName = "";
+    double fitXMin = 0, fitXMax = 0;
+    //int iCounter = 0;
+    //TF1 *fitSum = 0;
     while ((object_dir = next())) {         //Keep it general to TObject because both TF1 and TH1F are stored in this ROOT file!
       if(lookAtFits == false){  //Looking at TH1F objects!
         TH1F *h_iLL = (TH1F*) dir->Get(object_dir->GetName());
         h_LLSum->Add(h_iLL);
       }
       else if(lookAtFits == true){ //Looking at TF1 objects!
-        //std::cout << " Updating fitName = " << fitName << " with " << object_dir->GetName() << std::endl;
-        fitName = fitName+object_dir->GetName();
+        //std::stringstream ssCounter; ssCounter << iCounter; std::string sCounter = ssCounter.str();
+        //std::stringstream ssMinCounter; ssMinCounter << iCounter-1; std::string sMinCounter = ssMinCounter.str();
+        TF1 *fitFunc = (TF1*) dir->Get(object_dir->GetName());
+        h_FitSum->Add(fitFunc);
+        //fitFunc[0]->SetName("ff");
+        //fitFunc[1]->SetName("gg");
+        //fitFunc->SetName(("fitFunc_"+sCounter).c_str());
+        //fitXMin = fitFunc[iCounter]->GetXmin(); fitXMax = fitFunc[iCounter]->GetXmax();
+
+        /*if(iCounter != 0){
+          std::cout << " Trying to get name : " << ("fitSum_"+sMinCounter+"_"+NormType+"*fitFunc_"+sCounter).c_str() << std::endl;
+          //fitSum = new TF1(("fitSum_"+sCounter+"_"+NormType).c_str(),("fitSum_"+sMinCounter+"_"+NormType+"*fitFunc_"+sCounter).c_str(),fitXMin, fitXMax);
+          fitSum->Write();
+        }
+        else if(iCounter == 0){
+          fitSum = new TF1(("fitSum_"+sCounter+"_"+NormType).c_str(),("fitFunc_"+sCounter+"*1").c_str(),fitXMin, fitXMax);
+        }*/
+
+        //Simply add all the histograms!
+        //if(iCounter != 0) fitName = fitName+"+"+fitFunc[iCounter]->GetName();
+        //else              fitName = fitName+""+fitFunc[iCounter]->GetName();
+
+        //Require cut-value on the chi-squared of the fits!
       }
+      //iCounter++;
     }
 
+    //std::cout << " iCounter value : " << iCounter << std::endl;
     //Write away the summed TF1's and TH1F's
-    std::cout << " Retrieved fitname is :" << fitName << std::endl;
     if(lookAtFits == true){
-      //TF1 *fitSum = new TF1(("fitSum_"+NormType).c_str(),fitName.c_str());
-      //fitSum->Write();
+      h_FitSum->Write();
+      /*std::cout << " Trying to write sum of TF1's ... " << std::endl;
+      //std::cout << " FitName is : \n " << fitName << std::endl;
+      if(NormType == "Acc"){
+        //TF1 *fitSum = new TF1("fitSum","polFitAcc_AllPoints_Evt1+polFitAcc_AllPoints_Evt2",fitXMin, fitXMax);
+        TF1 *fitSum = new TF1("fitSum","ff+gg",fitXMin, fitXMax);
+        fitSum->Write();
+        std::cout << " Done " << std::endl;
+      }
+      //for(int ii = 0; ii < iCounter; ii++)
+      //  fitFunc[ii]->Clear();
+      */
     }
     else{ 
       h_LLSum->Write();
-      std::cout << " Storing the TH1F !! " << std::endl;
     }
   }
   else{
@@ -88,7 +125,6 @@ void getIndividualDirObjects(TDirectory *dir){
 void PerformFitOptimization(){
 
   std::cout << " Looking at TFile " << inFile->GetName() << " (which has " << inFile->GetNkeys() << " directories) " << std::endl;
-  std::cout << " --> Looping over the different directories !! " << std::endl;
   TList *list_file = inFile->GetListOfKeys();
   TIter next(list_file);
   TObject* object_file = 0;
@@ -97,9 +133,9 @@ void PerformFitOptimization(){
   while( (object_file = next() ) ){
     std::cout << "  ** Name of directory : " << object_file->GetName() << std::endl;
     dir_file = inFile->GetDirectory(object_file->GetName());
-    std::cout << "   --> Nr of keys of this directory is : " << dir_file->GetNkeys() << std::endl;
     getIndividualDirObjects(dir_file);
   }
-  std::cout << " Number of keys of dir_ScdFitAcc directory : " << dir_ScdFitAcc->GetNkeys() << std::endl;
 
+  inFile->Close();
+  outputFile->Close();
 }
