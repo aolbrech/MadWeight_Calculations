@@ -40,7 +40,7 @@ TDirectory *dir_FirstFit = file_FitDist->mkdir("FirstPolynomialFit"),  *dir_Firs
 TDirectory *dir_SecondFit = file_FitDist->mkdir("SecondPolynomialFit"),*dir_SecondFitXS = file_FitDist->mkdir("SecondPolynomialFit_XS"),*dir_SecondFitAcc = file_FitDist->mkdir("SecondPolynomialFit_Acc");
 
 const int NrConfigs = 21; 
-const int nEvts = 10000; 
+const int nEvts = 100;
 const int NrToDel = 7;
 int NrRemaining = NrConfigs-NrToDel;
 std::string sNrCanvas ="0";
@@ -78,17 +78,23 @@ void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){ //TDirecto
   // Restore the number of entries
   h_tmp->SetEntries(h->GetEntries());
 
-  TDirectory *dir = FileToWrite->GetDirectory(dirName.c_str());
-  if (!dir)
-    dir = FileToWrite->mkdir(dirName.c_str());
+  //Set the correct path to save the file
+  const char* path = 0;
+  if(dirName != ""){
+    TDirectory *dir = FileToWrite->GetDirectory(dirName.c_str());
+    if (!dir)
+      dir = FileToWrite->mkdir(dirName.c_str());
+    path = dir->GetName();
+  }
 
-  FileToWrite->cd(dir->GetName());
+  FileToWrite->cd(path);
   h_tmp->Write();  
+  FileToWrite->cd();  //Reset to general directory! 
 }                  
 
-void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type){
+void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCounter){
   file_FitDist->cd();
-  if(EvtNumber == "1" && sNrRemaining == "") ssNrRemaining << NrRemaining; sNrRemaining = ssNrRemaining.str();
+  if(evtCounter == 1 && sNrRemaining == "") ssNrRemaining << NrRemaining; sNrRemaining = ssNrRemaining.str();
 
   double LogLikelihood[NrConfigs];
   int TypeNr;
@@ -100,7 +106,7 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type){
   h_LogLik->Write();
 
   //Set name of chisquared distributions!
-  if(EvtNumber == "1"){
+  if(evtCounter == 1){
     h_ChiSquaredFirstFit[TypeNr]  = new TH1F(("ChiSquared_"+Type+"FirstFit").c_str(), ("Distribution of the chi-squared after the fit on all the points (norm = "+Type+")").c_str(),200,0,0.005);
     h_ChiSquaredSecondFit[TypeNr] = new TH1F(("ChiSquared_"+Type+"SecondFit").c_str(),("Distribution of the chi-squared after the fit on the reduced points (norm = "+Type+")").c_str(),200,0,0.005);
     h_PointsDelByFitDev[TypeNr]    = new TH1F(("PointsDelBy"+Type+"FitDev").c_str(),   ("Overview of deleted points due to largest FitDeviation (norm = "+Type+")").c_str(),xBin,xLow,xHigh);
@@ -301,7 +307,7 @@ void ReadTest(){
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events/RVR_RecoCorrect_SingleGausTF_10000Evts_ManySteps/weights_NoZero.out", std::ifstream::in); 
+  std::ifstream ifs ("Events_AllRVRRecoTests_DifferentSteps/RVR_RecoCorrect_SingleGausTF_10000Evts_ManySteps/weights_NoZero.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
@@ -349,9 +355,9 @@ void ReadTest(){
         double TotalFctDevOuter = 0, TotalRelFctDevOuter = 0, TotalFctDevXSOuter = 0, TotalRelFctDevXSOuter = 0, TotalFctDevAccOuter = 0, TotalRelFctDevAccOuter = 0;
 
         //-- Send the array containing the log(weights) to the predefined function to define the TGraph, fit this, detect the deviation points and fit again! --//
-	calculateFit(LnLikDist,   sEvt,"");
-	calculateFit(LnLikXSDist, sEvt,"XS");
-        calculateFit(LnLikAccDist,sEvt,"Acc");
+	calculateFit(LnLikDist,   sEvt,"",    consEvts);
+	calculateFit(LnLikXSDist, sEvt,"XS",  consEvts);
+        calculateFit(LnLikAccDist,sEvt,"Acc", consEvts);
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
