@@ -15,14 +15,13 @@
 #include <cstring>
 #include <cstdlib>
 
-//TFile *inFile = new TFile("FitDistributions_10000RecoEvts_ManySteps.root","READ");       //Should be filled by the python script!
-TFile *inFile = new TFile("FitDistributions.root","READ");       //Should be filled by the python script!
-TFile *outputFile = new TFile("FitOptimizations.root","RECREATE"); //Should be filled by the python script!
+TFile *inFile = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/FitDistributions_MGSample_MTop_1000Evts.root","READ"); 
+TFile *outputFile = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/FitOptimizations_MGSample_MTop_1000Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
-int xBin = 21;        //Copy this from the python file!
-float xLow = -0.105;  //Copy this from the python file!
-float xHigh = 0.105;  //Copy this from the python file!
+int xBin = 5; 
+float xLow = 170.5; 
+float xHigh = 175.5; 
 
 void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
@@ -72,7 +71,7 @@ void getIndividualDirObjects(TDirectory *dir){
     std::string dirName(dir->GetName(), 0, 100);
 
     TH1F *h_LLSum = 0;
-    TH1F *h_FitSum = 0, *h_ChiSq = 0, *h_FitSumSmallChiSq = 0, *h_SlopeFit = 0, *h_FitSumSmallChiSqPosSlope;
+    TH1F *h_FitSum = 0, *h_ChiSq = 0, *h_FitSumSmallChiSq = 0, *h_SlopeFit = 0, *h_FitSumSmallChiSqPosSlope = 0;
     //Identify which directory is being studied --> Containing TF1 or TH1F & type of normalisation!
     std::string NormType = "", FitNr = "", NrUsedPoints = "";
     bool lookAtFits = false;
