@@ -15,8 +15,8 @@
 #include <cstring>
 #include <cstdlib>
 
-TFile *inFile = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/FitDistributions_MGSample_MTop_1000Evts.root","READ"); 
-TFile *outputFile = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/FitOptimizations_MGSample_MTop_1000Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events/MTop_MGSampleCreatedWith172_SingleGausTF_10000Evts_Narrow/FitDistributions_MGSample_MTop_10000Evts.root","READ"); 
+TFile *outputFile = new TFile("Events/MTop_MGSampleCreatedWith172_SingleGausTF_10000Evts_Narrow/FitOptimizations_MGSample_MTop_10000Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
 int xBin = 5; 
@@ -65,13 +65,22 @@ void getIndividualDirObjects(TDirectory *dir){
     
     TList *list_dir = dir->GetListOfKeys();
     TIter next(list_dir); 
-    TObject* object_dir = 0;  
+    TObject* object_dir = 0;
+    
+    //Store all the histograms prior to the application of cuts in the same histogram
+    TDirectory* OrigDir = outputFile->GetDirectory("OriginalDistributions");
+    if(!OrigDir)
+      OrigDir = outputFile->mkdir("OriginalDistributions");
 
     //Convert name of directory (const char*) to a string:
     std::string dirName(dir->GetName(), 0, 100);
 
+    //Specify which chi-sq cut values should be considered:
+    float ChiSqCuts[3] = {0.0002, 0.001, 0.0005};
+    const int NrChiSqCuts = sizeof(ChiSqCuts)/sizeof(float);
+
     TH1F *h_LLSum = 0;
-    TH1F *h_FitSum = 0, *h_ChiSq = 0, *h_FitSumSmallChiSq = 0, *h_SlopeFit = 0, *h_FitSumSmallChiSqPosSlope = 0;
+    TH1F *h_FitSum = 0, *h_ChiSq = 0, *h_FitSumSmallChiSq[NrChiSqCuts] = {0}, *h_SlopeFit = 0, *h_FitSumSmallChiSqPosSlope[NrChiSqCuts] = {0};
     //Identify which directory is being studied --> Containing TF1 or TH1F & type of normalisation!
     std::string NormType = "", FitNr = "", NrUsedPoints = "";
     bool lookAtFits = false;
@@ -86,15 +95,19 @@ void getIndividualDirObjects(TDirectory *dir){
       h_LLSum = new TH1F(("LL"+NormType+"_Summed").c_str(), ("Distribution of "+dirName+" after summing over all "+sNkeys.c_str()+" events").c_str(), xBin, xLow, xHigh);
     else{
       lookAtFits = true;
-      h_FitSum = new TH1F((FitNr+""+NormType+"_Summed").c_str(), ("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points").c_str(), xBin, xLow, xHigh);
-      h_SlopeFit = new TH1F((FitNr+""+NormType+"_SlopeVar").c_str(), ("Distribution of slope of "+FitNr).c_str(), 200, -5.0, 5.0);
-      h_ChiSq = new TH1F( ("ChiSq"+NormType+"_"+FitNr).c_str(), ("ChiSquared distribution of "+FitNr+" (norm = "+NormType+")").c_str(),200, 0, 0.005);
-      h_FitSumSmallChiSq = new TH1F((FitNr+""+NormType+"_SmallChiSq").c_str(), ("Distribution of "+FitNr+"after summing over "+NrUsedPoints+" points (ChiSq-cut applied)").c_str(),xBin,xLow,xHigh);
-      h_FitSumSmallChiSqPosSlope = new TH1F((FitNr+""+NormType+"_SmallChiSqPosSlope").c_str(), ("Distribution of "+FitNr+"after summing over "+NrUsedPoints+" points (ChiSq-cut applied, positive slope required)").c_str(),xBin,xLow,xHigh);
+      h_FitSum = new TH1F((FitNr+""+NormType+"_Summed").c_str(),                               "title",xBin,xLow,xHigh);
+      h_SlopeFit = new TH1F(("Slope_"+FitNr+""+NormType).c_str(),                           "title",200,-5.0, 5.0  );
+      h_ChiSq = new TH1F( ("ChiSq"+NormType+"_"+FitNr).c_str(),                                "title",200,0,    0.005);
     }
    
-    //Initialize counters:
-    int allEvts = 0, evtsSmallChiSq = 0, evtsSmallChiSqPosSlope = 0;
+    //Initialize counters and histograms:
+    int allEvts = 0;
+    int evtsSmallChiSq[NrChiSqCuts] = {0}, evtsSmallChiSqPosSlope[NrChiSqCuts] = {0};
+    for(int ii = 0; ii < NrChiSqCuts; ii++){
+      std::stringstream ssii; ssii << ii; std::string sii = ssii.str();
+      h_FitSumSmallChiSq[ii]         = new TH1F((FitNr+""+NormType+"_SmallChiSq"+sii).c_str(),        "title",xBin,xLow,xHigh);
+      h_FitSumSmallChiSqPosSlope[ii] = new TH1F((FitNr+""+NormType+"_SmallChiSqPosSlope"+sii).c_str(),"title",xBin,xLow,xHigh);
+    }
  
     std::string fitName = "";
     while ((object_dir = next())) {         //Keep it general to TObject because both TF1 and TH1F are stored in this ROOT file!
@@ -108,28 +121,55 @@ void getIndividualDirObjects(TDirectory *dir){
         h_SlopeFit->Fill(fitFunc->GetParameter(2));
         allEvts++;
         h_ChiSq->Fill(fitFunc->GetChisquare());
-        if(fitFunc->GetChisquare() < 0.0002){
-          h_FitSumSmallChiSq->Add(fitFunc);
-          evtsSmallChiSq++;
-          if(fitFunc->GetParameter(2) > 0){
-            h_FitSumSmallChiSqPosSlope->Add(fitFunc);
-            evtsSmallChiSqPosSlope++;
+
+        //Apply the chi-sq cuts for each of the values requested:
+        for(int iChiSq = 0; iChiSq < NrChiSqCuts; iChiSq++){
+          if(fitFunc->GetChisquare() < ChiSqCuts[iChiSq]){
+            h_FitSumSmallChiSq[iChiSq]->Add(fitFunc);
+            evtsSmallChiSq[iChiSq]++;
+            if(fitFunc->GetParameter(2) > 0){
+              h_FitSumSmallChiSqPosSlope[iChiSq]->Add(fitFunc);
+              evtsSmallChiSqPosSlope[iChiSq]++;
+            }
           }
         }
       }
     }
 
     if(lookAtFits == true){
-      h_FitSum->Write();
-      PaintOverflow(h_SlopeFit,outputFile,"");
-      PaintOverflow(h_ChiSq,outputFile,"ChiSq");
-      h_FitSumSmallChiSq->Write();
-      std::cout << " Histogram " << h_FitSumSmallChiSq->GetName() << " has " << evtsSmallChiSq << "/" << allEvts << " events selected !" << std::endl;
-      h_FitSumSmallChiSqPosSlope->Write();
-      std::cout << " Histogram " << h_FitSumSmallChiSqPosSlope->GetName() << " has " << evtsSmallChiSqPosSlope << "/" << allEvts << " events selected !" << std::endl;
+      //Convert the event counters into strings!
+      std::stringstream ssAllEvts; ssAllEvts << allEvts; std::string sAllEvts = ssAllEvts.str();
+
+      //Set the counter information in the titles:
+      h_FitSum->SetTitle(("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points ("+sAllEvts+" evts)").c_str());
+      h_SlopeFit->SetTitle(("Distribution of slope of "+FitNr+" ("+sAllEvts+" evts)").c_str());
+      h_ChiSq->SetTitle(("ChiSquared distribution of "+FitNr+" (norm = "+NormType+" -- "+sAllEvts+" evts)").c_str());
+
+      TDirectory *dir = outputFile->GetDirectory((FitNr+"FitDistributions").c_str());
+      if (!dir)
+        dir = outputFile->mkdir((FitNr+"FitDistributions").c_str());
+      dir->cd();
+
+      for(int ii = 0; ii < NrChiSqCuts; ii++){
+        std::stringstream ssChiSqCut;               ssChiSqCut << ChiSqCuts[ii];                            std::string sChiSqCut = ssChiSqCut.str();
+        std::stringstream ssEvtsSmallChiSq;         ssEvtsSmallChiSq << evtsSmallChiSq[ii];                 std::string sEvtsSmallChiSq = ssEvtsSmallChiSq.str();
+        std::stringstream ssEvtsSmallChiSqPosSlope; ssEvtsSmallChiSqPosSlope << evtsSmallChiSqPosSlope[ii]; std::string sEvtsSmallChiSqPosSlope = ssEvtsSmallChiSqPosSlope.str();
+
+        h_FitSumSmallChiSq[ii]->SetTitle(("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points (#chi^{2} <"+sChiSqCut+" -- "+sEvtsSmallChiSq+"/"+sAllEvts+" evts)").c_str());
+        h_FitSumSmallChiSqPosSlope[ii]->SetTitle(("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points (#chi^{2} < "+sChiSqCut+", slope > 0 -- "+sEvtsSmallChiSqPosSlope+"/"+sAllEvts+" evts)").c_str());
+        h_FitSumSmallChiSq[ii]->Write();
+        h_FitSumSmallChiSqPosSlope[ii]->Write();
+      }
+      outputFile->cd();
+
+      //Now write away the histograms
+      OrigDir->cd(); h_FitSum->Write(); outputFile->cd();
+      PaintOverflow(h_SlopeFit,outputFile,"SlopeDistributions");
+      PaintOverflow(h_ChiSq,outputFile,"ChiSqDistributions");
     }
-    else 
-      h_LLSum->Write();
+    else{ 
+      OrigDir->cd(); h_LLSum->Write(); outputFile->cd();
+    }
   }
   else{
     std::cout << "        ### Skipped the empty directory " << dir->GetName() << " ### " << std::endl;
