@@ -15,39 +15,43 @@
 
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
-bool storeStackedCanvas = false; 
-std::string StackedDir = "Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/StackedCanvasses"; 
+bool storeStackedCanvas = true; 
+std::string StackedDir = "Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/StackedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-std::string VarValues[] = {"m_{top} = 171","m_{top} = 172","m_{top} = 173","m_{top} = 174","m_{top} = 175"}; 
-double Var[] = {171.0,172.0,173.0,174.0,175.0}; 
-double MGXS[] = {10.70485,10.8257,10.96469,11.08428,11.22448}; 
-double MGXSCut[] = {2.27174,2.32261,2.38097,2.43678,2.49254}; 
-int xBin = 5; 
-float xLow = 170.5; 
-float xHigh = 175.5; 
-int xMinValue[] = {5,4,2}; 
-std::string KinVar = "m_{top}"; 
-int VarWindow = 3; 
-int xPos[] = {3,4}; 
-int xNeg[] = {1,0}; 
-std::string title = "MGSample_MTop"; 
-TFile* Tfile = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/FitDeviation_MGSample_MTop_1000Evts.root","RECREATE"); 
+std::string VarValues[] = {"Re(V_{R}) = -1.5","Re(V_{R}) = -1.0","Re(V_{R}) = -0.5","Re(V_{R}) = 0.0","Re(V_{R}) = 0.5","Re(V_{R}) = 1.0","Re(V_{R}) = 1.5"}; 
+double Var[] = {-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5}; 
+double MGXS[] = {122.082,46.4474,17.9275,10.90059,16.1508,40.8074,108.249}; 
+double MGXSCut[] = {122.082,46.4474,17.9275,10.90059,16.1508,40.8074,108.249}; 
+int xBin = 7; 
+float xLow = -1.75; 
+float xHigh = 1.75; 
+int xMinValue[] = {4,4,10,3,12}; 
+std::string KinVar = "Re(V_{R})"; 
+int VarWindow = 4; 
+int xPos[] = {4,5}; 
+int xNeg[] = {2,1}; 
+std::string title = "MGSample_RVR"; 
+TFile* Tfile = new TFile("Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/FitDeviation_MGSample_RVR_1000Evts.root","RECREATE"); 
 
 //ROOT file to store the Fit functions --> Will fasten the study of the cut-influences ...
-TFile* file_FitDist = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/FitDistributions_MGSample_MTop_1000Evts.root","RECREATE"); 
+TFile* file_FitDist = new TFile("Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/FitDistributions_MGSample_RVR_1000Evts.root","RECREATE"); 
 TDirectory *dir_OriginalLL = file_FitDist->mkdir("OriginalLL"),        *dir_OriginalLLXS = file_FitDist->mkdir("OriginalLL_XS"),        *dir_OriginalLLAcc = file_FitDist->mkdir("OriginalLL_Acc");
 TDirectory *dir_FirstFit = file_FitDist->mkdir("FirstPolynomialFit"),  *dir_FirstFitXS = file_FitDist->mkdir("FirstPolynomialFit_XS"),  *dir_FirstFitAcc = file_FitDist->mkdir("FirstPolynomialFit_Acc");
 TDirectory *dir_SecondFit = file_FitDist->mkdir("SecondPolynomialFit"),*dir_SecondFitXS = file_FitDist->mkdir("SecondPolynomialFit_XS"),*dir_SecondFitAcc = file_FitDist->mkdir("SecondPolynomialFit_Acc");
 
-const int NrConfigs = 5; 
+const int NrConfigs = 7; 
 const int nEvts = 1000; 
-const int NrToDel = 1; 
+const int NrToDel = 2; 
 int NrRemaining = NrConfigs-NrToDel;
 std::string sNrCanvas ="0";
 std::string sNrRemaining = ""; std::stringstream ssNrRemaining; 
 
+//Information for the stackedCanvas division!
+int NrCanvas = 0, xDivide = 5, yDivide = 4;
+
 TF1 *polFit_AllPoints, *polFit_ReducedPoints;
+TF1 *polFit_AllPointsPos, *polFit_AllPointsNeg;
 TH1F *h_FitDeviation[NrConfigs], *h_FitDeviationRel[NrConfigs];
 TH1F *h_PointsDelByFitDev[3], *h_PointsDelByFitDevRel[3];
 TDirectory *dir_FitDevDelete = Tfile->mkdir("PointsDeletedByFitDev"), *dir_RelFitDevDelete = Tfile->mkdir("PointsDeletedByRelFitDev");
@@ -93,18 +97,21 @@ void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){ //TDirecto
   FileToWrite->cd();  //Reset to general directory! 
 }                  
 
-void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCounter){
+void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCounter, TCanvas *canv_StackedLL){
   file_FitDist->cd();
   if(evtCounter == 1 && sNrRemaining == "") ssNrRemaining << NrRemaining; sNrRemaining = ssNrRemaining.str();
 
   double LogLikelihood[NrConfigs];
   int TypeNr;
+  std::string TypeName[3] = {"no norm","XS norm","Acc norm"};
   for(int ii = 0; ii < NrConfigs; ii++)
     LogLikelihood[ii] = h_LogLik->GetBinContent(h_LogLik->FindBin(Var[ii]));
+
   if(Type == ""){         dir_OriginalLL->cd();    TypeNr = 0;}
   else if(Type == "XS"){  dir_OriginalLLXS->cd();  TypeNr = 1;}
   else if(Type == "Acc"){ dir_OriginalLLAcc->cd(); TypeNr = 2;}
   h_LogLik->Write();
+  std::string YAxisTitle = "-ln(L) value ("+TypeName[TypeNr]+" -- evt "+EvtNumber+")";
 
   //Set name of chisquared distributions!
   if(evtCounter == 1){
@@ -114,7 +121,7 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
     h_PointsDelByFitDevRel[TypeNr] = new TH1F(("PointsDelBy"+Type+"FitDevRel").c_str(),("Overview of deleted points due to largest relative FitDeviation (norm = "+Type+")").c_str(),xBin,xLow,xHigh);
   }
  
-  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol4",Var[0],Var[NrConfigs-1]); 
   TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
   gr_LnLik->Fit(polFit_AllPoints,"Q");
   h_ChiSquaredFirstFit[TypeNr]->Fill(polFit_AllPoints->GetChisquare());
@@ -126,7 +133,10 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
   std::vector<std::pair<int, double> > FitDeviation, FitDeviationRel;
   double LogLikFit[NrConfigs] = {-9999}; 
   for(int iConfig = 0; iConfig < NrConfigs; iConfig++){
-    LogLikFit[iConfig] = polFit_AllPoints->GetParameter(0)+polFit_AllPoints->GetParameter(1)*Var[iConfig]+polFit_AllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig];
+    if(polFit_AllPoints->GetNpar() == 3)
+      LogLikFit[iConfig] = polFit_AllPoints->GetParameter(0)+polFit_AllPoints->GetParameter(1)*Var[iConfig]+polFit_AllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig];
+    else if(polFit_AllPoints->GetNpar() == 5)
+      LogLikFit[iConfig] = polFit_AllPoints->GetParameter(0)+polFit_AllPoints->GetParameter(1)*Var[iConfig]+polFit_AllPoints->GetParameter(2)*Var[iConfig]*Var[iConfig]+polFit_AllPoints->GetParameter(3)*pow(Var[iConfig],3)+polFit_AllPoints->GetParameter(4)*pow(Var[iConfig],4)+polFit_AllPoints->GetParameter(5)*pow(Var[iConfig],5);
     FitDeviation.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig]) ) );
     FitDeviationRel.push_back( std::make_pair(iConfig, abs(LogLikelihood[iConfig]-LogLikFit[iConfig])/LogLikelihood[iConfig] ) );
   }
@@ -158,14 +168,26 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
 
   //Define new TGraph and fit again
   TGraph* gr_ReducedLnLik = new TGraph(NrConfigs-NrToDel, ReducedVar, ReducedLogLik);
-  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]);
+  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol4",Var[0],Var[NrConfigs-1]); 
   gr_ReducedLnLik->Fit(polFit_ReducedPoints,"Q"); 
   h_ChiSquaredSecondFit[TypeNr]->Fill(polFit_ReducedPoints->GetChisquare());   //As expected NDF is always equal to NrConfigs-NrToDel-3 (= nr params needed to define a parabola)
   if(Type == "")         dir_SecondFit->cd();
   else if(Type == "XS")  dir_SecondFitXS->cd();
   else if(Type == "Acc") dir_SecondFitAcc->cd();
+  stringstream ssChiSq; ssChiSq << polFit_ReducedPoints->GetChisquare(); string sChiSq = ssChiSq.str();
+  h_LogLik->SetTitle(("Polynomial 2nd fit ("+TypeName[TypeNr]+" -- "+sNrRemaining+" used points -- #chi^{2} = "+sChiSq+")").c_str());
   polFit_ReducedPoints->Write();
   Tfile->cd();
+
+  if( storeStackedCanvas == true){
+    h_LogLik->GetYaxis()->SetTitle(YAxisTitle.c_str());
+    h_LogLik->GetYaxis()->SetTitleOffset(1.4);
+    h_LogLik->GetXaxis()->SetTitle(KinVar.c_str());
+    canv_StackedLL->cd(evtCounter - (xDivide*yDivide*NrCanvas) ); h_LogLik->Draw("p"); polFit_ReducedPoints->Draw("same"); canv_StackedLL->Update();
+  }
+
+  delete gr_ReducedLnLik;
+  delete gr_LnLik;
 }
 
 void fitDeviationMacro(){
@@ -269,11 +291,11 @@ void fitDeviationMacro(){
   TGraph *LnLikFctOuter = 0, *LnLikXSFctOuter = 0, *LnLikAccFctOuter = 0;
   
   //TDirectory* FitComp = Tfile->mkdir("FitComparison");
+  //TDirectory* LnLikAccDirVarVsUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanAvgUnc");
+  //TDirectory* LnLikAccDirVarVsDUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanTwiceAvgUnc");
   TDirectory* LnLikDir = Tfile->mkdir("LnLikDist");       TDirectory* LnLikStackDir = LnLikDir->mkdir("LnLikStackDist");
   TDirectory* LnLikXSDir = Tfile->mkdir("LnLikXSDist");   TDirectory* LnLikXSStackDir = LnLikXSDir->mkdir("LnLikXSStackDist");
   TDirectory* LnLikAccDir = Tfile->mkdir("LnLikAccDist"); TDirectory* LnLikAccStackDir = LnLikAccDir->mkdir("LnLikAccStackDist");
-  //TDirectory* LnLikAccDirVarVsUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanAvgUnc");
-  //TDirectory* LnLikAccDirVarVsDUnc = Tfile->mkdir("LnLikAccDist_VarLargerThanTwiceAvgUnc");
   TDirectory* FstDerDir = Tfile->mkdir("FirstDerivativeDist");
 
   //-----------------------------------//
@@ -301,14 +323,13 @@ void fitDeviationMacro(){
   vector<int> EvtsWithSmallFctDev;
   //double weightsValue[nEvts][NrConfigs];
   int consEvts = 0;
-  int NrCanvas = 0, xDivide = 5, yDivide = 4;
   TCanvas *StackCanvasLL = 0, *StackCanvasLLXS = 0, *StackCanvasLLAcc = 0; 
 
   double aHat[2] = {0.0}, aHatXS[2] = {0.0}, aHatAcc[2] = {0.0}, bHat[2] = {0.0}, bHatXS[2] = {0.0}, bHatAcc[2] = {0.0}, cHat[2] = {0.0}, cHatXS[2] = {0.0}, cHatAcc[2] = {0.0};
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/weights.out", std::ifstream::in); 
+  std::ifstream ifs ("Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/weights.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
@@ -355,10 +376,34 @@ void fitDeviationMacro(){
         vector<double> FctDevOuter, RelFctDevOuter,FctDevXSOuter, RelFctDevXSOuter , FctDevAccOuter, RelFctDevAccOuter;
         double TotalFctDevOuter = 0, TotalRelFctDevOuter = 0, TotalFctDevXSOuter = 0, TotalRelFctDevXSOuter = 0, TotalFctDevAccOuter = 0, TotalRelFctDevAccOuter = 0;
 
+        //Save xDivide*yDivide of these histograms in one TCanvas!
+        if( storeStackedCanvas == true){
+          if(consEvts == 1){
+            StackCanvasLL    = new TCanvas("StackCanvasLL_Nr0",   "StackCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide);    
+            StackCanvasLLXS  = new TCanvas("StackCanvasLLXS_Nr0", "StackCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);  
+            StackCanvasLLAcc = new TCanvas("StackCanvasLLAcc_Nr0","StackCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide); 
+          }
+        }
+
         //-- Send the array containing the log(weights) to the predefined function to define the TGraph, fit this, detect the deviation points and fit again! --//
-	calculateFit(LnLikDist,   sEvt,"",    consEvts);
-	calculateFit(LnLikXSDist, sEvt,"XS",  consEvts);
-        calculateFit(LnLikAccDist,sEvt,"Acc", consEvts);
+	calculateFit(LnLikDist,   sEvt,"",    consEvts, StackCanvasLL);
+	calculateFit(LnLikXSDist, sEvt,"XS",  consEvts, StackCanvasLLXS);
+        calculateFit(LnLikAccDist,sEvt,"Acc", consEvts, StackCanvasLLAcc);
+
+        if( storeStackedCanvas == true){
+          if( consEvts == (xDivide*yDivide*(NrCanvas+1)) || consEvts == nEvts){
+            //std::string NameTest = (StackCanvasLLAcc->GetTitle()+"_Nr"+sNrCanvas).c_str();   //Why can't the Title or name be used ... ?
+            StackCanvasLL->Print((StackedDir+"/StackCanvasLL_Nr"+sNrCanvas+".pdf").c_str());       LnLikStackDir->cd();    StackCanvasLL->Write();
+            StackCanvasLLXS->Print((StackedDir+"/StackCanvasLLXS_Nr"+sNrCanvas+".pdf").c_str());   LnLikXSStackDir->cd();  StackCanvasLLXS->Write();
+            StackCanvasLLAcc->Print((StackedDir+"/StackCanvasLLAcc_Nr"+sNrCanvas+".pdf").c_str()); LnLikAccStackDir->cd(); StackCanvasLLAcc->Write();
+            if( consEvts != nEvts){
+              NrCanvas++; stringstream ssNrCanvas; ssNrCanvas << NrCanvas; sNrCanvas = ssNrCanvas.str();
+              StackCanvasLL    = new TCanvas(("StackCanvasLL_Nr"+sNrCanvas).c_str(),   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide);   
+              StackCanvasLLXS  = new TCanvas(("StackCanvasLLXS_Nr"+sNrCanvas).c_str(), "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide); 
+              StackCanvasLLAcc = new TCanvas(("StackCanvasLLAcc_Nr"+sNrCanvas).c_str(),"StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
+            }
+          }
+        }//Draw the stacked canvasses!        
 
         for(int ii=0; ii < 2; ii++){
           cHat[ii] = LnLik[xNeg[ii]]*Var[xPos[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xNeg[ii]])*(Var[xMin]-Var[xNeg[ii]])) - LnLik[xMin]*Var[xNeg[ii]]*Var[xPos[ii]]/((Var[xMin]-Var[xNeg[ii]])*(Var[xPos[ii]]-Var[xMin])) + LnLik[xPos[ii]]*Var[xNeg[ii]]*Var[xMin]/((Var[xPos[ii]]-Var[xMin])*(Var[xPos[ii]]-Var[xNeg[ii]]));
@@ -415,34 +460,6 @@ void fitDeviationMacro(){
         LnLikXSCanv =  new TCanvas(("LnLikXSCanv_"+sEvt).c_str(),"LnLikXS");  LnLikXSCanv->cd(); LnLikXSFctOuter->Draw("AC*"); LnLikXSDist->Draw("samep"); LnLikXSDir->cd(); LnLikXSCanv->Write();
         LnLikAccCanv = new TCanvas(("LnLikAccCanv_"+sEvt).c_str(),"LnLikAcc");LnLikAccCanv->cd();LnLikAccFctOuter->Draw("AC*");LnLikAccDist->Draw("samep");LnLikAccDir->cd();LnLikAccCanv->Write();
 
-        //Save xDivide*yDivide of these histograms in one TCanvas!
-        if( storeStackedCanvas == true){
-          if( consEvts == 1){
-            StackCanvasLL    = new TCanvas("StackCanvasLL_Nr0",   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide, 0.00000002, 0.000000002);
-            StackCanvasLLXS  = new TCanvas("StackCanvasLLXS_Nr0", "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);
-            StackCanvasLLAcc = new TCanvas("StackCanvasLLAcc_Nr0","StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
-          }
-
-          StackCanvasLL->cd(consEvts - (xDivide*yDivide*NrCanvas) );LnLikFctOuter->Draw("AC*");    LnLikDist->Draw("samep");    StackCanvasLL->Update();
-          StackCanvasLLXS->cd(consEvts - (xDivide*yDivide*NrCanvas) );  LnLikXSFctOuter->Draw("AC*");  LnLikXSDist->Draw("samep");  StackCanvasLLXS->Update();
-          StackCanvasLLAcc->cd(consEvts - (xDivide*yDivide*NrCanvas) ); LnLikAccFctOuter->Draw("AC*"); LnLikAccDist->Draw("samep"); StackCanvasLLAcc->Update();
-  
-          if( consEvts == (xDivide*yDivide*(NrCanvas+1)) || consEvts == nEvts){
-            //std::string NameTest = (StackCanvasLLAcc->GetTitle()+"_Nr"+sNrCanvas).c_str();   //Why can't the Title or name be used ... ?
-            StackCanvasLL->Print((StackedDir+"/StackCanvasLL_Nr"+sNrCanvas+".pdf").c_str());
-            StackCanvasLLXS->Print((StackedDir+"/StackCanvasLLXS_Nr"+sNrCanvas+".pdf").c_str());
-            StackCanvasLLAcc->Print((StackedDir+"/StackCanvasLLAcc_Nr"+sNrCanvas+".pdf").c_str());
-            LnLikStackDir->cd();    StackCanvasLL->Write();
-            LnLikXSStackDir->cd();  StackCanvasLLXS->Write();
-            LnLikAccStackDir->cd(); StackCanvasLLAcc->Write();
-            if( consEvts != nEvts){
-              NrCanvas++; stringstream ssNrCanvas; ssNrCanvas << NrCanvas; sNrCanvas = ssNrCanvas.str();
-              StackCanvasLL    = new TCanvas(("StackCanvasLL_Nr"+sNrCanvas).c_str(),   "StackedCanvasLL");    StackCanvasLL->Divide(xDivide,yDivide);
-              StackCanvasLLXS  = new TCanvas(("StackCanvasLLXS_Nr"+sNrCanvas).c_str(), "StackedCanvasLLXS");  StackCanvasLLXS->Divide(xDivide,yDivide);
-              StackCanvasLLAcc = new TCanvas(("StackCanvasLLAcc_Nr"+sNrCanvas).c_str(),"StackedCanvasLLAcc"); StackCanvasLLAcc->Divide(xDivide,yDivide);
-            }
-          }
-        }//Draw the stacked canvasses!        
   
         //---  Calculate the first derivative distribution and save them in event-by-event plot  ---//
         FstDer->SetName(("FirstDerivative_Evt"+sEvt).c_str());
@@ -570,6 +587,11 @@ void fitDeviationMacro(){
   //--- Save all the histograms containing information about all the events! ---//
   Tfile->cd();
   LnLikAll->Write();                LnLikXSAll->Write();                LnLikAccAll->Write();
+  if(storeStackedCanvas == true){
+    TCanvas* LnLikAllCanv    = new TCanvas("LnLikAllCanv",   "LnLikAllCanv");    LnLikAllCanv->cd();    LnLikAll->Draw();    LnLikAllCanv->Print((StackedDir+"/TotalLnLik.pdf").c_str());
+    TCanvas* LnLikAllXSCanv  = new TCanvas("LnLikAllXSCanv", "LnLikAllXSCanv");  LnLikAllXSCanv->cd();  LnLikXSAll->Draw();  LnLikAllXSCanv->Print((StackedDir+"/TotalLnLikXS.pdf").c_str());
+    TCanvas* LnLikAllAccCanv = new TCanvas("LnLikAllAccCanv","LnLikAllAccCanv"); LnLikAllAccCanv->cd(); LnLikAccAll->Draw(); LnLikAllAccCanv->Print((StackedDir+"/TotalLnLikAcc.pdf").c_str());
+  }
   YPlusGausTest->Write();           YPlusGausTestXS->Write();           YPlusGausTestAcc->Write();
   YPlus->Write();                   YPlusXS->Write();                   YPlusAcc->Write();
   YPlusPlus->Write();               YPlusPlusXS->Write();               YPlusPlusAcc->Write();
