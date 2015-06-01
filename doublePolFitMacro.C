@@ -15,7 +15,7 @@
 
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
-bool storeSplittedCanvas = false; 
+bool storeSplittedCanvas = true; 
 std::string SplittedDir = "Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
@@ -218,7 +218,7 @@ void doublePolFitMacro(){
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/weights_NoUncompleteEvts.out", std::ifstream::in); 
+  std::ifstream ifs ("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/weights_NoZero.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
@@ -318,10 +318,10 @@ void doublePolFitMacro(){
   delete dir_FitDevDelete;
   delete dir_FitResults; 
   if(storeSplittedCanvas == true){
-    delete dir_SplitCanv;
     delete dir_LLSplit; 
     delete dir_LLXSSplit;
     delete dir_LLAccSplit;
+    delete dir_SplitCanv;
   }
 
   file_FitDist->Close();
