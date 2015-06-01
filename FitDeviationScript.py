@@ -222,7 +222,7 @@ elif int(weightsFileCounter) > 1:
   maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[int(fileNr)])+' | wc -l').read()
 
 #Check whether the file has enough events, otherwise use the maximum number
-if int(maxNrEvts) < nEvts:
+if int(maxNrEvts) < int(nEvts):
   print "File has less events than the requested number !! "
   nEvts = int(maxNrEvts)
 print "Will be using file : ",WeightsFile," with ",nEvts," events ! "
