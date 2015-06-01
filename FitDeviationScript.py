@@ -23,27 +23,31 @@ from array import array
 #Get all the input from the command line:
 if len(sys.argv) <= 1:
   print "Need to give the directory of interest, the considered kinematic variable and the number of events in the command line !"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ MTop #evts ForceFitUpdate(y/n) TexWanted(y/n)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
   sys.exit()
 elif len(sys.argv) == 2:
   print "Need to specify the considered kinematic variable (MTop or RVR)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ MTop #evts ForceFitUpdate(y/n) TexWanted(y/n)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
   sys.exit()
 elif len(sys.argv) == 3:
   print "Need to give the number of considered events !"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ MTop #evts ForceFitUpdate(y/n) TexWanted(y/n)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
   sys.exit()
 elif len(sys.argv) == 4:
   print "Need to specify whether the performed fits have to be updated (hence run fitDeviationMacro.C)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ MTop #evts ForceFitUpdate(y/n) TexWanted(y/n)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
   sys.exit()
 elif len(sys.argv) == 5:
   print "Need to mention whether Tex output is wanted (y/n)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ MTop #evts ForceFitUpdate(y/n) TexWanted(y/n)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+elif len(sys.argv) == 6:
+  print "Need to specify which analysis should be executed: fctDeviationMacro or doublePolFitMacro (fctDeviation/doublePolFit)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
 
 whichDir = sys.argv[1]
 KinVariable = sys.argv[2]
 nEvts = sys.argv[3]
+whichAnalysis = sys.argv[6]
 
 #Set the 'CreateTexFile' correctly:
 if sys.argv[5] == "y" or sys.argv[5] == "yes":
@@ -200,6 +204,9 @@ if int(weightsFileCounter) == 1:
   WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
   WeightsFileName = str(whichDir)+''+str(WeightsFileArray[0])
   LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
+
+  #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
+  maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[int(fileNr)])+' | wc -l').read()
 elif int(weightsFileCounter) == 0:
   print "No weights file found in this directory !"
   sys.exit()
@@ -210,7 +217,15 @@ elif int(weightsFileCounter) > 1:
   WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
   WeightsFileName = str(whichDir)+''+str(WeightsFileArray[int(fileNr)])
   LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
-print "Will be using file : ",WeightsFile
+
+  #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
+  maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[int(fileNr)])+' | wc -l').read()
+
+#Check whether the file has enough events, otherwise use the maximum number
+if int(maxNrEvts) < nEvts:
+  print "File has less events than the requested number !! "
+  nEvts = int(maxNrEvts)
+print "Will be using file : ",WeightsFile," with ",nEvts," events ! "
 
 #Set title of root file!
 title = ""
@@ -221,7 +236,7 @@ elif whichDir.find("MGSample") <= len(whichDir)  and whichDir.find("MGSample") >
   title = "MGSample"
   MGXSCut = MGXS
 
-if whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0: title += "Reco"
+if (whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0) or (whichDir.find("RECO") <= len(whichDir) and whichDir.find("RECO") > 0): title += "Reco"
 elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
   title += "Gen"
   MGXSCut = MGXS
@@ -242,11 +257,12 @@ elif sys.argv[4] == "n" or sys.argv[4] == "no":
 #-------------------------------------------------#
 #--  Pass on all variables to the ROOT macro !  --#
 #-------------------------------------------------#
-if not (os.path.exists(os.path.join(whichDir+'StackedCanvasses/')) ) and CreateTexFile == True and RunFitMacro == True:
-  os.makedirs(os.path.join(whichDir+'StackedCanvasses/'))
+if not (os.path.exists(os.path.join(whichDir+'SplittedCanvasses/')) ) and CreateTexFile == True and RunFitMacro == True:
+  os.makedirs(os.path.join(whichDir+'SplittedCanvasses/'))
 
 if RunFitMacro == True:
-  RootAnalyzer = open('fitDeviationMacro.C','r')
+#  RootAnalyzer = open('fitDeviationMacro.C','r')
+  RootAnalyzer = open(whichAnalysis,'r')
   NewRootAnalyzer = open('output.C','w')
   
   VarValuesLine = 'std::string VarValues[] = {"'
@@ -282,63 +298,70 @@ if RunFitMacro == True:
 
   for RootLine in RootAnalyzer:
     RootWord = RootLine.split()
-    if   re.search( r"int nEvts",             RootLine): NewRootAnalyzer.write('const int nEvts = '+str(nEvts)+'; \n')
-    elif re.search( r"int NrConfigs",         RootLine): NewRootAnalyzer.write('const int NrConfigs = '+str(NrConfigs)+'; \n')
-    elif re.search( r"int NrToDel",           RootLine): NewRootAnalyzer.write('const int NrToDel = '+str(NumberOfPointsToRemove)+'; \n') 
-    elif re.search( r"std::string VarValues", RootLine): NewRootAnalyzer.write(VarValuesLine)
-    elif re.search( r"double Var",            RootLine): NewRootAnalyzer.write(VarLine)
-    elif re.search( r"double MGXSCut",        RootLine): NewRootAnalyzer.write(MGXSCutLine)
-    elif re.search( r"double MGXS",           RootLine): NewRootAnalyzer.write(MGXSLine)
-    elif re.search( r"int xBin",              RootLine): NewRootAnalyzer.write('int xBin = '+str(xBin)+'; \n')
-    elif re.search( r"float xLow",            RootLine): NewRootAnalyzer.write('float xLow = '+str(xLow)+'; \n')
-    elif re.search( r"float xHigh",           RootLine): NewRootAnalyzer.write('float xHigh = '+str(xHigh)+'; \n')
-    elif re.search( r"int xMinValue",         RootLine): NewRootAnalyzer.write(xMinValueLine)
-    elif re.search( r"std::string KinVar",    RootLine): NewRootAnalyzer.write('std::string KinVar = "'+str(KinVar)+'"; \n')
-    elif re.search( r"int VarWindow",         RootLine): NewRootAnalyzer.write('int VarWindow = '+str(VarWindow)+'; \n')
-    elif re.search( r"int xPos",              RootLine): NewRootAnalyzer.write(xPosLine)
-    elif re.search( r"int xNeg",              RootLine): NewRootAnalyzer.write(xNegLine)
-    elif re.search( r"std::ifstream ifs",     RootLine): NewRootAnalyzer.write('  std::ifstream ifs ("'+str(WeightsFileName)+'", std::ifstream::in); \n')
-    elif re.search( r"std::string title",     RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
-    elif re.search( r"string StackedDir",     RootLine): NewRootAnalyzer.write('std::string StackedDir = "'+str(whichDir)+'StackedCanvasses"; \n')
-    elif re.search( r"new TF1",               RootLine): 
+
+    #Changes valid for both files!
+    if   re.search( r"int nEvts",          RootLine): NewRootAnalyzer.write('const int nEvts = '+str(nEvts)+'; \n')
+    elif re.search( r"int NrConfigs",      RootLine): NewRootAnalyzer.write('const int NrConfigs = '+str(NrConfigs)+'; \n')
+    elif re.search( r"string VarValues",   RootLine): NewRootAnalyzer.write(VarValuesLine)
+    elif re.search( r"double Var",         RootLine): NewRootAnalyzer.write(VarLine)
+    elif re.search( r"double MGXSCut",     RootLine): NewRootAnalyzer.write(MGXSCutLine)
+    elif re.search( r"double MGXS",        RootLine): NewRootAnalyzer.write(MGXSLine)
+    elif re.search( r"int xBin",           RootLine): NewRootAnalyzer.write('int xBin = '+str(xBin)+'; \n')
+    elif re.search( r"float xLow",         RootLine): NewRootAnalyzer.write('float xLow = '+str(xLow)+'; \n')
+    elif re.search( r"float xHigh",        RootLine): NewRootAnalyzer.write('float xHigh = '+str(xHigh)+'; \n')
+    elif re.search( r"int xMinValue",      RootLine): NewRootAnalyzer.write(xMinValueLine)
+    elif re.search( r"string KinVar",      RootLine): NewRootAnalyzer.write('std::string KinVar = "'+str(KinVar)+'"; \n')
+    elif re.search( r"int VarWindow",      RootLine): NewRootAnalyzer.write('int VarWindow = '+str(VarWindow)+'; \n')
+    elif re.search( r"int xPos",           RootLine): NewRootAnalyzer.write(xPosLine)
+    elif re.search( r"int xNeg",           RootLine): NewRootAnalyzer.write(xNegLine)
+    elif re.search( r"std::ifstream ifs",  RootLine): NewRootAnalyzer.write('  std::ifstream ifs ("'+str(WeightsFileName)+'", std::ifstream::in); \n')
+    elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
+    elif re.search( r"string SplittedDir", RootLine): NewRootAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
+    elif re.search( r"bool storeSplittedCanvas", RootLine):
+      if   CreateTexFile == True: NewRootAnalyzer.write('bool storeSplittedCanvas = true; \n')
+      else:                       NewRootAnalyzer.write('bool storeSplittedCanvas = false; \n')
+    #Changes specific for any of the two files
+    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"int NrToDel", RootLine): 
+      NewRootAnalyzer.write('const unsigned int NrToDel = '+str(NumberOfPointsToRemove)+'; \n')
+    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TF1",     RootLine):
       if   re.search( r"AllPoints",     RootLine): NewRootAnalyzer.write('  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
       elif re.search( r"ReducedPoints", RootLine): NewRootAnalyzer.write('  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
-    elif re.search( r"new TFile",             RootLine):
-      if   re.search( r"Tfile",        RootLine): NewRootAnalyzer.write('TFile* Tfile = new TFile("'+str(whichDir)+'FitDeviation_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
-      elif re.search( r"file_FitDist", RootLine): NewRootAnalyzer.write('TFile* file_FitDist = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n') 
-    elif re.search( r"bool storeStackedCanvas", RootLine):
-      if   CreateTexFile == True: NewRootAnalyzer.write('bool storeStackedCanvas = true; \n')
-      else:                       NewRootAnalyzer.write('bool storeStackedCanvas = false; \n')
-    else:                                                NewRootAnalyzer.write(RootLine)
+    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TFile", RootLine): 
+      NewRootAnalyzer.write('TFile* file_FitDist = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
+    elif whichAnalysis == "fctDeviationMacro.C" and re.search( r"new TFile", RootLine): 
+      NewRootAnalyzer.write('TFile* Tfile = new TFile("'+str(whichDir)+'FctDeviation_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
+    else:                                             NewRootAnalyzer.write(RootLine)
   NewRootAnalyzer.close()
   RootAnalyzer.close()
     
-  os.rename('output.C','fitDeviationMacro.C'), os.system("root -l -b -q fitDeviationMacro.C+")
-  
-PerformFitOptAnalyzer = open('PerformFitOptimization.C','r')
-NewPerformFitOptAnalyzer = open('fitOptimization.C','w')
+#  os.rename('output.C','fitDeviationMacro.C'), os.system("root -l -b -q fitDeviationMacro.C+")
+  os.rename('output.C',whichAnalysis), os.system("root -l -b -q "+whichAnalysis+"+")
+ 
+if whichAnalysis == "doublePolFitMacro.C": 
+  PerformFitOptAnalyzer = open('PerformFitOptimization.C','r')
+  NewPerformFitOptAnalyzer = open('fitOptimization.C','w')
 
-for FitOptLine in PerformFitOptAnalyzer:
-  FitOptWord = FitOptLine.split()
-  if   re.search( r"int nEvts",         FitOptLine): NewPerformFitOptAnalyzer.write('const int nEvts = '+str(nEvts)+'; \n')
-  elif re.search( r"int xBin",          FitOptLine): NewPerformFitOptAnalyzer.write('const int xBin = '+str(xBin)+'; \n')
-  elif re.search( r"float xLow",        FitOptLine): NewPerformFitOptAnalyzer.write('float xLow = '+str(xLow)+'; \n')
-  elif re.search( r"float xHigh",       FitOptLine): NewPerformFitOptAnalyzer.write('float xHigh = '+str(xHigh)+'; \n')
-  elif re.search( r"string StackedDir", FitOptLine): NewPerformFitOptAnalyzer.write('std::string StackedDir = "'+str(whichDir)+'StackedCanvasses"; \n')
-  elif re.search( r"new TFile",   FitOptLine):
-    if   re.search( r"inFile",     FitOptLine): NewPerformFitOptAnalyzer.write('TFile *inFile = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","READ"); \n')
-    elif re.search( r"outputFile", FitOptLine): NewPerformFitOptAnalyzer.write('TFile *outputFile = new TFile("'+str(whichDir)+'FitOptimizations_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
-  elif re.search( r"bool storeStackedCanvas", FitOptLine):
-    if   CreateTexFile == True: NewPerformFitOptAnalyzer.write('bool storeStackedCanvas = true; \n')
-    else:                       NewPerformFitOptAnalyzer.write('bool storeStackedCanvas = false; \n')
-  else:                                        NewPerformFitOptAnalyzer.write(FitOptLine)
-NewPerformFitOptAnalyzer.close()
-PerformFitOptAnalyzer.close()
-os.rename('fitOptimization.C','PerformFitOptimization.C'), os.system("root -l -b -q PerformFitOptimization.C+") 
+  for FitOptLine in PerformFitOptAnalyzer:
+    FitOptWord = FitOptLine.split()
+    if   re.search( r"int nEvts",         FitOptLine): NewPerformFitOptAnalyzer.write('const int nEvts = '+str(nEvts)+'; \n')
+    elif re.search( r"int xBin",          FitOptLine): NewPerformFitOptAnalyzer.write('const int xBin = '+str(xBin)+'; \n')
+    elif re.search( r"float xLow",        FitOptLine): NewPerformFitOptAnalyzer.write('float xLow = '+str(xLow)+'; \n')
+    elif re.search( r"float xHigh",       FitOptLine): NewPerformFitOptAnalyzer.write('float xHigh = '+str(xHigh)+'; \n')
+    elif re.search( r"string SplittedDir", FitOptLine): NewPerformFitOptAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
+    elif re.search( r"new TFile",   FitOptLine):
+      if   re.search( r"inFile",     FitOptLine): NewPerformFitOptAnalyzer.write('TFile *inFile = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","READ"); \n')
+      elif re.search( r"outputFile", FitOptLine): NewPerformFitOptAnalyzer.write('TFile *outputFile = new TFile("'+str(whichDir)+'FitOptimizations_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
+    elif re.search( r"bool storeSplittedCanvas", FitOptLine):
+      if   CreateTexFile == True: NewPerformFitOptAnalyzer.write('bool storeSplittedCanvas = true; \n')
+      else:                       NewPerformFitOptAnalyzer.write('bool storeSplittedCanvas = false; \n')
+    else:                                        NewPerformFitOptAnalyzer.write(FitOptLine)
+  NewPerformFitOptAnalyzer.close()
+  PerformFitOptAnalyzer.close()
+  os.rename('fitOptimization.C','PerformFitOptimization.C'), os.system("root -l -b -q PerformFitOptimization.C+") 
 
 #-- Now store the stacked canvasses in a .text file --#
 if CreateTexFile == True and RunFitMacro == True:
-  CanvasOutputFile = open(os.path.join(whichDir+'StackedCanvasses/FitDeviationStackCanvas_'+str(title)+'_'+str(nEvts)+'Evts.tex'),'w')
+  CanvasOutputFile = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts.tex'),'w')
 
   CanvasOutputFile.write('\\documentclass[a4paper,landscape]{article} \n')
   CanvasOutputFile.write('\\usepackage{graphicx} \n ')
@@ -349,7 +372,7 @@ if CreateTexFile == True and RunFitMacro == True:
   NormTypeName = ["","XS","Acc"]
   
   #Store the information in the correct directory:
-  Canvaslist_dir = os.listdir(os.path.join(whichDir+'StackedCanvasses/'))
+  Canvaslist_dir = os.listdir(os.path.join(whichDir+'SplittedCanvasses/'))
 
   OtherNorms = []
   for iNormType in range(len(NormType)):
