@@ -17,17 +17,17 @@
 
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
-bool storeStackedCanvas = true; 
-std::string StackedDir = "Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/StackedCanvasses"; 
+bool storeSplittedCanvas = false; 
+std::string SplittedDir = "Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-TFile *inFile = new TFile("Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/FitDistributions_MGSample_RVR_1000Evts.root","READ"); 
-TFile *outputFile = new TFile("Events/RVR_MGSampleCreatedWithNeg1_SingleGausTF_10000Evts_VeryWideRange/FitOptimizations_MGSample_RVR_1000Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/FitDistributions_MGSample_RVR_10000Evts.root","READ"); 
+TFile *outputFile = new TFile("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/FitOptimizations_MGSample_RVR_10000Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
-const int xBin = 7; 
-float xLow = -1.75; 
-float xHigh = 1.75; 
+const int xBin = 11; 
+float xLow = -0.55; 
+float xHigh = 0.55; 
 
 void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
@@ -142,7 +142,8 @@ void getIndividualDirObjects(TDirectory *dir){
 
         for(int iBin = 0; iBin < xBin; iBin++){
           double VarValue = xLow+(xHigh-xLow)/(2*xBin)+((xHigh-xLow)/xBin)*iBin;
-          VarBinValue[iBin] += fitFunc->GetParameter(0)+fitFunc->GetParameter(1)*VarValue+fitFunc->GetParameter(2)*VarValue*VarValue;
+          for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
+            VarBinValue[iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
         }
 
         //Apply the chi-sq cuts for each of the values requested:
@@ -176,11 +177,12 @@ void getIndividualDirObjects(TDirectory *dir){
         dir = outputFile->mkdir((FitNr+"FitDistributions").c_str());
       dir->cd();
 
-//      for(int iBin = 0; iBin < xBin; iBin++){
-//        if(h_FitSum->GetBinContent(iBin+1) != VarBinValue[iBin]){             //Why are they all different? (but printout gives same values ..) -->Something went wrong here ...
-//          h_FitSum->SetBinContent(iBin+1, VarBinValue[iBin]);
-//        }
-//      }
+      for(int iBin = 0; iBin < xBin; iBin++){      
+        if(abs((h_FitSum->GetBinContent(iBin+1)) - VarBinValue[iBin]) > 1){             //Why are they all different? (but printout gives same values ..) -->Something went wrong here ...
+          std::cout << iBin+1 << ") Difference between bincontent and calculated value is : " << h_FitSum->GetBinContent(iBin+1) << " <--> " << VarBinValue[iBin] << std::endl;
+          h_FitSum->SetBinContent(iBin+1, VarBinValue[iBin]);
+        }
+      }
 
       for(int ii = 0; ii < NrChiSqCuts; ii++){
         std::stringstream ssChiSqCut;               ssChiSqCut << ChiSqCuts[ii];                            std::string sChiSqCut = ssChiSqCut.str();
@@ -201,13 +203,16 @@ void getIndividualDirObjects(TDirectory *dir){
       PaintOverflow(h_SlopeFit,outputFile,"SlopeDistributions");
       PaintOverflow(h_ChiSq,outputFile,"ChiSqDistributions");
 
-      //Also save the fit-distributions in the StackedCanvasses directory!	
-      if(storeStackedCanvas == true){
-        TCanvas* FitFuncCanv = new TCanvas("FitFunc","FitFunc"); FitFuncCanv->cd(); h_FitSum->Draw(); FitFuncCanv->Print((StackedDir+"/"+FitNr+""+NormType+".pdf").c_str()); delete FitFuncCanv;
+      //Also save the fit-distributions in the SplittedCanvasses directory!	
+      if(storeSplittedCanvas == true){
+        TCanvas* FitFuncCanv = new TCanvas("FitFunc","FitFunc"); FitFuncCanv->cd(); h_FitSum->Draw(); FitFuncCanv->Print((SplittedDir+"/"+FitNr+""+NormType+".pdf").c_str()); delete FitFuncCanv;
       }
     }
     else{ 
       OrigDir->cd(); h_LLSum->Write(); outputFile->cd();
+      if(storeSplittedCanvas == true){
+        TCanvas* canv_LLSum = new TCanvas("LLSum","LLSum"); canv_LLSum->cd(); h_LLSum->Draw(); canv_LLSum->Print((SplittedDir+"/TotalLnLik"+NormType+".pdf").c_str()); delete canv_LLSum;
+      }
     }
   }
   else{
@@ -225,8 +230,13 @@ void PerformFitOptimization(){
   //while( (object_file = next() ) ){
   while( (object_file = next() ) ){
     std::cout << "  ** Name of directory : " << object_file->GetName() << std::endl;
-    dir_file = inFile->GetDirectory(object_file->GetName());
-    getIndividualDirObjects(dir_file);
+
+    //Convert name of directory (const char*) to a string:
+    std::string objectName(object_file->GetName(), 0, 100);
+    if (objectName != "SplitCanvasses" && objectName != "FitResults"){                  //Do not add the histograms in the SplitCanvasses and FitResults directories for the moment!
+      dir_file = inFile->GetDirectory(object_file->GetName());
+      getIndividualDirObjects(dir_file);
+    }
   }
 
   inFile->Close();
