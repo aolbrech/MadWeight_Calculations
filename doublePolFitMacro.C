@@ -15,8 +15,8 @@
 
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
-bool storeSplittedCanvas = true; 
-std::string SplittedDir = "Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
+bool storeSplittedCanvas = false; 
+std::string SplittedDir = "Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
 std::string VarValues[] = {"Re(V_{R}) = -0.5","Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = 0.0","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3","Re(V_{R}) = 0.5"}; 
@@ -31,16 +31,17 @@ std::string KinVar = "Re(V_{R})";
 int VarWindow = 1; 
 int xPos[] = {5,6}; 
 int xNeg[] = {3,2}; 
-std::string title = "MGSample_RVR"; 
+std::string title = "MGSample_NoLowPtEvts_Cut10_RVR"; 
+double CreatedVar = -0.3;
 
 //ROOT file to store the Fit functions --> Will fasten the study of the cut-influences ...
-TFile* file_FitDist = new TFile("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/FitDistributions_MGSample_RVR_10000Evts.root","RECREATE"); 
+TFile* file_FitDist = new TFile("Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/FitDistributions_MGSample_NoLowPtEvts_Cut10_RVR_8900Evts.root","RECREATE"); 
 TDirectory *dir_OriginalLL = file_FitDist->mkdir("OriginalLL"),        *dir_OriginalLLXS = file_FitDist->mkdir("OriginalLL_XS"),        *dir_OriginalLLAcc = file_FitDist->mkdir("OriginalLL_Acc");
 TDirectory *dir_FirstFit = file_FitDist->mkdir("FirstPolynomialFit"),  *dir_FirstFitXS = file_FitDist->mkdir("FirstPolynomialFit_XS"),  *dir_FirstFitAcc = file_FitDist->mkdir("FirstPolynomialFit_Acc");
 TDirectory *dir_SecondFit = file_FitDist->mkdir("SecondPolynomialFit"),*dir_SecondFitXS = file_FitDist->mkdir("SecondPolynomialFit_XS"),*dir_SecondFitAcc = file_FitDist->mkdir("SecondPolynomialFit_Acc");
 
 const int NrConfigs = 9; 
-const int nEvts = 10000; 
+const int nEvts = 8900; 
 const unsigned int NrToDel = 3; 
 int NrRemaining = NrConfigs-NrToDel;
 std::string sNrCanvas ="0";
@@ -53,6 +54,8 @@ TF1 *polFit_AllPoints, *polFit_ReducedPoints;
 TH1F *h_FitDeviation[NrConfigs], *h_FitDeviationRel[NrConfigs];
 TH1F *h_PointsDelByFitDev[3], *h_PointsDelByFitDevRel[3];
 TH1F *h_ChiSquaredFirstFit[3], *h_ChiSquaredSecondFit[3];
+TH2F* h_MinDevVSChiSq = new TH2F("MinDevVSChiSq","Deviation of minimum versus chi-squared",200,0,0.0001,200,0,0.5);
+TH2F* h_TotalFitDevVSChiSq = new TH2F("TotalFitDevVSChiSq","Total fit deviation versus chi-squared",200,0,0.00005, 200, 0, 0.0005);
 
 //Method to sort a pair based on the second element!
 struct sort_pred {
@@ -169,11 +172,13 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
 
   //Create new arrays with the reduced information!
   double ReducedVar[NrConfigs-NrToDel], ReducedLogLik[NrConfigs-NrToDel];
+  double TotalRelFitDeviation = 0;
   int iCounter = 0;
   for(int iConf = 0; iConf < NrConfigs; iConf++){
     if(!(std::find(FitDevPointsToDel.begin(), FitDevPointsToDel.end(), iConf) != FitDevPointsToDel.end()) ){
       ReducedVar[iCounter] = Var[iConf];
       ReducedLogLik[iCounter] = LogLikelihood[iConf];
+      TotalRelFitDeviation += (abs(LogLikelihood[iConf]-LogLikFit[iConf])/LogLikelihood[iConf]);
       iCounter++;
     }
   }
@@ -186,21 +191,32 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
   if(Type == "")         dir_SecondFit->cd();
   else if(Type == "XS")  dir_SecondFitXS->cd();
   else if(Type == "Acc") dir_SecondFitAcc->cd();
+  //Create a 2D-plot which contains the deviation of the expected minimum wrt the chi-squared of the fit
+  if(Type == "Acc"){
+//    std::cout << " Found minimum is : " << polFit_ReducedPoints->GetMinimumX(Var[0],Var[xMinValue[VarWindow]]) << " ==> -" << CreatedVar << " gives : " << abs( abs(polFit_ReducedPoints->GetMinimumX(Var[0],Var[xMinValue[VarWindow]])) - abs(CreatedVar)) << std::endl;
+    h_MinDevVSChiSq->Fill(polFit_ReducedPoints->GetChisquare(), abs( abs(polFit_ReducedPoints->GetMinimumX(Var[0],Var[xMinValue[VarWindow]])) - abs(CreatedVar)));
+    h_TotalFitDevVSChiSq->Fill(polFit_ReducedPoints->GetChisquare(), TotalRelFitDeviation);
+  }
+
   stringstream ssChiSq; ssChiSq << polFit_ReducedPoints->GetChisquare(); string sChiSq = ssChiSq.str();
   h_LogLik->SetTitle(("Polynomial 2nd fit ("+TypeName[TypeNr]+" -- "+sNrRemaining+" used points -- #chi^{2} = "+sChiSq+")").c_str());
   polFit_ReducedPoints->Write();
+
 
   if( storeSplittedCanvas == true){
     h_LogLik->GetYaxis()->SetTitle(YAxisTitle.c_str());
     h_LogLik->GetYaxis()->SetTitleOffset(1.4);
     h_LogLik->GetXaxis()->SetTitle(KinVar.c_str());
+    h_LogLik->SetMaximum(polFit_ReducedPoints->GetMaximum(Var[0], Var[NrConfigs-1]));
+    h_LogLik->SetMinimum(polFit_ReducedPoints->GetMinimum(Var[0], Var[NrConfigs-1]));
     canv_SplittedLL->cd(evtCounter - (xDivide*yDivide*NrCanvas) ); h_LogLik->Draw("p"); polFit_ReducedPoints->Draw("same"); canv_SplittedLL->Update();
   }
+  else
+    delete polFit_ReducedPoints;
 
   delete gr_ReducedLnLik;
   delete gr_LnLik;
   delete polFit_AllPoints;
-  delete polFit_ReducedPoints;
 }
 
 void doublePolFitMacro(){
@@ -218,7 +234,7 @@ void doublePolFitMacro(){
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/weights_NoZero.out", std::ifstream::in); 
+  std::ifstream ifs ("Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/weights_NoLowPt_Cut10.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
@@ -276,6 +292,7 @@ void doublePolFitMacro(){
             canv_SplitLL->Print((SplittedDir+"/SplitCanvasLL_Nr"+sNrCanvas+".pdf").c_str());       dir_LLSplit->cd();    canv_SplitLL->Write();    delete canv_SplitLL;
             canv_SplitLLXS->Print((SplittedDir+"/SplitCanvasLLXS_Nr"+sNrCanvas+".pdf").c_str());   dir_LLXSSplit->cd();  canv_SplitLLXS->Write();  delete canv_SplitLLXS;
             canv_SplitLLAcc->Print((SplittedDir+"/SplitCanvasLLAcc_Nr"+sNrCanvas+".pdf").c_str()); dir_LLAccSplit->cd(); canv_SplitLLAcc->Write(); delete canv_SplitLLAcc;
+            delete h_LnLik; delete h_LnLikXS; delete h_LnLikAcc;
             if( consEvts != nEvts){
               NrCanvas++; stringstream ssNrCanvas; ssNrCanvas << NrCanvas; sNrCanvas = ssNrCanvas.str();
               canv_SplitLL    = new TCanvas(("SplitCanvasLL_Nr"+sNrCanvas).c_str(),   "SplitCanvasLL");    canv_SplitLL->Divide(xDivide,yDivide);   
@@ -283,10 +300,10 @@ void doublePolFitMacro(){
               canv_SplitLLAcc = new TCanvas(("SplitCanvasLLAcc_Nr"+sNrCanvas).c_str(),"SplitCanvasLLAcc"); canv_SplitLLAcc->Divide(xDivide,yDivide);
             }
           }
-        }//Draw the stacked canvasses!        
-
-        delete h_LnLik; delete h_LnLikXS; delete h_LnLikAcc;
-
+        }//Draw the stacked canvasses!
+        else{
+          delete h_LnLik; delete h_LnLikXS; delete h_LnLikAcc;
+        }
       }
     }
   }
@@ -301,6 +318,9 @@ void doublePolFitMacro(){
   if (!dir_FitResults) dir_FitResults = file_FitDist->mkdir("FitResults");
   dir_FitResults->cd();
 
+  h_MinDevVSChiSq->Write();
+  h_TotalFitDevVSChiSq->Write();
+
   TDirectory *dir_FitDevDelete = dir_FitResults->GetDirectory("PointsDeletedByFitDev");
   if(!dir_FitDevDelete) dir_FitDevDelete = dir_FitResults->mkdir("PointsDeletedByFitDev");
 
@@ -314,18 +334,20 @@ void doublePolFitMacro(){
     PaintOverflow(h_ChiSquaredSecondFit[ii],file_FitDist, "FitResults_ChiSquaredFit"); delete h_ChiSquaredSecondFit[ii];
   }
   
-  delete dir_RelFitDevDelete;
-  delete dir_FitDevDelete;
-  delete dir_FitResults; 
-  if(storeSplittedCanvas == true){
+  file_FitDist->Close();
+
+//  delete dir_RelFitDevDelete;
+//  delete dir_FitDevDelete;
+  //delete dir_FitResults; 
+/*  if(storeSplittedCanvas == true){
     delete dir_LLSplit; 
     delete dir_LLXSSplit;
     delete dir_LLAccSplit;
-    delete dir_SplitCanv;
+    //delete dir_SplitCanv;
   }
+*/
 
-  file_FitDist->Close();
-  delete file_FitDist;
+  //delete file_FitDist;
 }
 
 
