@@ -119,7 +119,7 @@ if KinVariable == "RVR":
     Var     = array('d',[-0.3,    -0.275, -0.25,    -0.225,   -0.2,     -0.175,   -0.15,    -0.125,  -0.1,     -0.075,   -0.05,    -0.025,  0.0,      0.025,    0.05,     0.075,    0.1,      0.125,    0.15,     0.175,    0.2,      0.225,    0.25,     0.275,    0.3     ])
     MGXS    = array('d',[13.3944, 13.037, 12.66011, 12.37463, 12.06555, 11.83271, 11.60956, 11.4194, 11.25909, 11.12321, 11.02784, 10.9524, 10.90059, 10.87549, 10.88228, 10.93437, 10.97767, 11.07142, 11.17366, 11.32792, 11.49883, 11.69063, 11.90668, 12.18904, 12.49056])
     MGXSCut = array('d',[2.92922, 1,      1,        1,        2.62439,  1,        1,        1,       2.4352,   1,        2.38608,  1,       2.35285,  1,        2.35117,  1,        2.37359,  1,        1,        1,        2.49101,  1,        1,        1,        2.72632 ])
-    xBin, xLow, xHigh = 25, -0.3125, 0.3125
+    xBin, xLow, xHigh = 25, -0.3025, 0.3025
 
 elif KinVariable == "MTop":
   #Information about the scanned MTop values and the corresponding cross-section
@@ -206,7 +206,7 @@ if int(weightsFileCounter) == 1:
   LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
 
   #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
-  maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[int(fileNr)])+' | wc -l').read()
+  maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[0])+' | wc -l').read()
 elif int(weightsFileCounter) == 0:
   print "No weights file found in this directory !"
   sys.exit()
@@ -240,6 +240,12 @@ if (whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0) or (w
 elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
   title += "Gen"
   MGXSCut = MGXS
+
+#Current testing: Use full directory name as title
+title = str(whichDir)
+
+if WeightsFileName.find("NoLowPt") <= len(WeightsFileName) and WeightsFileName.find("NoLowPt") >= 0: 
+  title = title+"_"+"NoLowPtEvts"+WeightsFileName[WeightsFileName.find("_Cut"):-4]
 title = title+"_"+KinVariable
 
 #Set the 'RunFitMacro' correctly:
@@ -257,6 +263,22 @@ elif sys.argv[4] == "n" or sys.argv[4] == "no":
 #-------------------------------------------------#
 #--  Pass on all variables to the ROOT macro !  --#
 #-------------------------------------------------#
+
+if KinVariable == "RVR":
+  if   whichDir.find("Pos05") < len(whichDir) and whichDir.find("Pos05") >= 0: origValue = 0.5
+  elif whichDir.find("Pos03") < len(whichDir) and whichDir.find("Pos03") >= 0: origValue = 0.3
+  elif whichDir.find("Pos02") < len(whichDir) and whichDir.find("Pos02") >= 0: origValue = 0.2
+  elif whichDir.find("Pos01") < len(whichDir) and whichDir.find("Pos01") >= 0: origValue = 0.1
+  elif whichDir.find("SampleSM") < len(whichDir) and whichDir.find("SampleSM") >= 0: origValue = 0.0
+  elif whichDir.find("Neg01") < len(whichDir) and whichDir.find("Neg01") >= 0: origValue = -0.1
+  elif whichDir.find("Neg02") < len(whichDir) and whichDir.find("Neg02") >= 0: origValue = -0.2
+  elif whichDir.find("Neg03") < len(whichDir) and whichDir.find("Neg03") >= 0: origValue = -0.3
+  elif whichDir.find("Neg05") < len(whichDir) and whichDir.find("Neg05") >= 0: origValue = -0.5
+elif KinVariable == "MTop":
+  if   whichDir.find("172") < len(whichDir) and whichDir.find("172") >= 0: origValue = 172
+  elif whichDir.find("174") < len(whichDir) and whichDir.find("174") >= 0: origValue = 174
+
+
 if not (os.path.exists(os.path.join(whichDir+'SplittedCanvasses/')) ) and CreateTexFile == True and RunFitMacro == True:
   os.makedirs(os.path.join(whichDir+'SplittedCanvasses/'))
 
@@ -328,6 +350,8 @@ if RunFitMacro == True:
       elif re.search( r"ReducedPoints", RootLine): NewRootAnalyzer.write('  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
     elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TFile", RootLine): 
       NewRootAnalyzer.write('TFile* file_FitDist = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
+    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"double CreatedVar", RootLine):
+      NewRootAnalyzer.write('double CreatedVar = '+str(origValue)+';\n')
     elif whichAnalysis == "fctDeviationMacro.C" and re.search( r"new TFile", RootLine): 
       NewRootAnalyzer.write('TFile* Tfile = new TFile("'+str(whichDir)+'FctDeviation_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
     else:                                             NewRootAnalyzer.write(RootLine)
@@ -354,10 +378,44 @@ if whichAnalysis == "doublePolFitMacro.C":
     elif re.search( r"bool storeSplittedCanvas", FitOptLine):
       if   CreateTexFile == True: NewPerformFitOptAnalyzer.write('bool storeSplittedCanvas = true; \n')
       else:                       NewPerformFitOptAnalyzer.write('bool storeSplittedCanvas = false; \n')
+    elif re.search( r"float ChiSqCuts", FitOptLine):
+      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0): 
+        NewPerformFitOptAnalyzer.write('    float ChiSqCuts[3] = {0.0002, 0.00001, 0.000005}; \n')
+      else:
+        NewPerformFitOptAnalyzer.write('    float ChiSqCuts[3] = {0.0002, 0.001, 0.0005}; \n')
     else:                                        NewPerformFitOptAnalyzer.write(FitOptLine)
   NewPerformFitOptAnalyzer.close()
   PerformFitOptAnalyzer.close()
   os.rename('fitOptimization.C','PerformFitOptimization.C'), os.system("root -l -b -q PerformFitOptimization.C+") 
+
+  #-- Now plot the comparison of the different chisq-cut LL's
+  DrawLLAnalyzer = open('DrawNormalizedLL.C','r');
+  NewDrawAnalyzer = open('drawLL.C','w');
+
+  for DrawLine in DrawLLAnalyzer:
+    if   re.search( r"new TFile",                 DrawLine): NewDrawAnalyzer.write('  TFile* inFile = new TFile("'+str(whichDir)+'FitOptimizations_'+str(title)+'_'+str(nEvts)+'Evts.root","READ"); \n')
+    elif re.search( r"TH1F* h_OriginalScdPol",    DrawLine): NewDrawAnalyzer.write('  TH1F* h_OriginalScdPol = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq0"); \n')
+    elif re.search( r"TH1F* h_ScdPolSmallChiSq0", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq0 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq0"); \n')
+    elif re.search( r"TH1F* h_ScdPolSmallChiSq1", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq1 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq1"); \n')
+    elif re.search( r"TH1F* h_ScdPolSmallChiSq2", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq2 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq2"); \n')
+    elif re.search( r"coefficient",               DrawLine): NewDrawAnalyzer.write('  h_OriginalScdPol->GetXaxis()->SetTitle("'+str(KinVariable)+'coefficient"); \n')
+    elif re.search( r"SaveAs",                    DrawLine): NewDrawAnalyzer.write('  canvas->SaveAs("'+str(whichDir)+'LLComparison_ChiSqCuts'+str(title)+'_'+str(nEvts)+'Evts.pdf"); \n')
+    elif re.search( r"Likelihood shape",          DrawLine): NewDrawAnalyzer.write('  h_OriginalScdPol->SetTitle("-Likelihood shapes for different #chi^{2} cuts (Acc norm -- '+str(title)+' -- '+str(nEvts)+' evts)"); \n')
+    elif re.search( r"0.0005", DrawLine) or re.search( r"0.000005", DrawLine) or re.search( r"0.00005", DrawLine):
+      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0):
+        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq2,"Distribution when #chi^{2} < 0.000005","l"); \n')
+      else:
+        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq2,"Distribution when #chi^{2} < 0.0005","l"); \n')
+    elif re.search( r"0.001", DrawLine) or re.search( r"0.00001", DrawLine):
+      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0):
+        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq1,"Distribution when #chi^{2} < 0.00001","l"); \n')
+      else:
+        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq1,"Distribution when #chi^{2} < 0.001","l"); \n')
+    else:                                                    NewDrawAnalyzer.write(DrawLine) 
+    
+  NewDrawAnalyzer.close()
+  DrawLLAnalyzer.close()
+  os.rename('drawLL.C','DrawNormalizedLL.C'), os.system("root -l -b -q DrawNormalizedLL.C+")
 
 #-- Now store the stacked canvasses in a .text file --#
 if CreateTexFile == True and RunFitMacro == True:
