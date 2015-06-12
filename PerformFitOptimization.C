@@ -17,15 +17,16 @@
 
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
-bool storeSplittedCanvas = true; 
-std::string SplittedDir = "Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
+bool storeSplittedCanvas = false; 
+std::string SplittedDir = "Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-TFile *inFile = new TFile("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/FitDistributions_MGSample_RVR_10000Evts.root","READ"); 
-TFile *outputFile = new TFile("Events/RVR_MGSampleCreatedWithPos03_SingleGausTF_10000Evts_WideRange/FitOptimizations_MGSample_RVR_10000Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/FitDistributions_MGSample_NoLowPtEvts_Cut10_RVR_8900Evts.root","READ"); 
+TFile *outputFile = new TFile("Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/FitOptimizations_MGSample_NoLowPtEvts_Cut10_RVR_8900Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
 const int xBin = 11; 
+const int xFitBin = xBin*10; 
 float xLow = -0.55; 
 float xHigh = 0.55; 
 
@@ -82,7 +83,7 @@ void getIndividualDirObjects(TDirectory *dir){
     std::string dirName(dir->GetName(), 0, 100);
 
     //Specify which chi-sq cut values should be considered:
-    float ChiSqCuts[3] = {0.0002, 0.001, 0.0005};
+    float ChiSqCuts[3] = {0.0002, 0.00001, 0.000005}; 
     const int NrChiSqCuts = sizeof(ChiSqCuts)/sizeof(float);
 
     TH1F *h_LLSum = 0;
@@ -102,7 +103,7 @@ void getIndividualDirObjects(TDirectory *dir){
       h_LLSum = new TH1F(("LL"+NormType+"_Summed").c_str(), ("Distribution of "+dirName+" after summing over all "+sNkeys.c_str()+" events").c_str(), xBin, xLow, xHigh);
     else{
       lookAtFits = true;
-      h_FitSum = new TH1F((FitNr+""+NormType+"_Summed").c_str(),  "title",xBin,xLow,xHigh);
+      h_FitSum = new TH1F((FitNr+""+NormType+"_Summed").c_str(),  "title",xFitBin,xLow,xHigh);
       h_SlopeFit = new TH1F(("Slope_"+FitNr+""+NormType).c_str(), "title",200,-5.0, 5.0  );
       h_ChiSq = new TH1F( ("ChiSq"+NormType+"_"+FitNr).c_str(),   "title",200,0,    0.005);
       h_LLSumAll = new TH1F( ("Hist_"+FitNr+""+NormType+"_All").c_str(),"title",xBin,xLow,xHigh);
@@ -111,14 +112,14 @@ void getIndividualDirObjects(TDirectory *dir){
     //Initialize counters and histograms:
     int allEvts = 0;
     int evtsSmallChiSq[NrChiSqCuts] = {0}, evtsSmallChiSqPosSlope[NrChiSqCuts] = {0};
-    double VarBinValue[xBin] = {0.};
-    double VarBinValueSmallChiSq[NrChiSqCuts][xBin] = {{0.}};
-    double VarBinValueSmallChiSqPosSlope[NrChiSqCuts][xBin] = {{0.}};
+    double VarBinValue[xFitBin] = {0.};
+    double VarBinValueSmallChiSq[NrChiSqCuts][xFitBin] = {{0.}};
+    double VarBinValueSmallChiSqPosSlope[NrChiSqCuts][xFitBin] = {{0.}};
     for(int ii = 0; ii < NrChiSqCuts; ii++){
       std::stringstream ssii; ssii << ii; std::string sii = ssii.str();
-      h_FitSumSmallChiSq[ii]         = new TH1F((FitNr+""+NormType+"_SmallChiSq"+sii).c_str(),        "title",xBin,xLow,xHigh);
+      h_FitSumSmallChiSq[ii]         = new TH1F((FitNr+""+NormType+"_SmallChiSq"+sii).c_str(),        "title",xFitBin,xLow,xHigh);
       h_LLSumSmallChiSq[ii]          = new TH1F(("Hist_"+FitNr+""+NormType+"_SmallChiSq"+sii).c_str(),"title",xBin,xLow,xHigh);
-      h_FitSumSmallChiSqPosSlope[ii] = new TH1F((FitNr+""+NormType+"_SmallChiSqPosSlope"+sii).c_str(),"title",xBin,xLow,xHigh);
+      h_FitSumSmallChiSqPosSlope[ii] = new TH1F((FitNr+""+NormType+"_SmallChiSqPosSlope"+sii).c_str(),"title",xFitBin,xLow,xHigh);
     }
  
     std::string fitName = "";
@@ -142,8 +143,8 @@ void getIndividualDirObjects(TDirectory *dir){
         h_LLSumAll->Add(h_OrigLL);                      //Not possible to access the TH1F object at this point ??
 
 
-        for(int iBin = 0; iBin < xBin; iBin++){
-          double VarValue = xLow+(xHigh-xLow)/(2*xBin)+((xHigh-xLow)/xBin)*iBin;
+        for(int iBin = 0; iBin < xFitBin; iBin++){
+          double VarValue = xLow+(xHigh-xLow)/(2*xFitBin)+((xHigh-xLow)/xFitBin)*iBin;
           for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
             VarBinValue[iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
         }
@@ -153,8 +154,8 @@ void getIndividualDirObjects(TDirectory *dir){
           if(fitFunc->GetChisquare() < ChiSqCuts[iChiSq]){
             h_FitSumSmallChiSq[iChiSq]->Add(fitFunc); //h_LLSumSmallChiSq[iChiSq]->Add(h_OrigLL); 
             evtsSmallChiSq[iChiSq]++;
-            for(int iBin = 0; iBin < xBin; iBin++){
-              double VarValue = xLow+(xHigh-xLow)/(2*xBin)+((xHigh-xLow)/xBin)*iBin;
+            for(int iBin = 0; iBin < xFitBin; iBin++){
+              double VarValue = xLow+(xHigh-xLow)/(2*xFitBin)+((xHigh-xLow)/xFitBin)*iBin;
               for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
                 VarBinValueSmallChiSq[iChiSq][iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
             }
@@ -162,8 +163,8 @@ void getIndividualDirObjects(TDirectory *dir){
             if(fitFunc->GetParameter(2) > 0){                               //Does this requirement make any sense when a pol4 fit is applied ???
               h_FitSumSmallChiSqPosSlope[iChiSq]->Add(fitFunc);
               evtsSmallChiSqPosSlope[iChiSq]++;
-              for(int iBin = 0; iBin < xBin; iBin++){
-                double VarValue = xLow+(xHigh-xLow)/(2*xBin)+((xHigh-xLow)/xBin)*iBin;
+              for(int iBin = 0; iBin < xFitBin; iBin++){
+                double VarValue = xLow+(xHigh-xLow)/(2*xFitBin)+((xHigh-xLow)/xFitBin)*iBin;
                 for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
                   VarBinValueSmallChiSqPosSlope[iChiSq][iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
               }
@@ -188,22 +189,22 @@ void getIndividualDirObjects(TDirectory *dir){
         dir = outputFile->mkdir((FitNr+"FitDistributions").c_str());
       dir->cd();
 
-      for(int iBin = 0; iBin < xBin; iBin++){      
+      for(int iBin = 0; iBin < xFitBin; iBin++){      
         if(abs((h_FitSum->GetBinContent(iBin+1)) - VarBinValue[iBin]) > 1){             //Why are they all different? (but printout gives same values ..) -->Something went wrong here ...
-          std::cout << iBin+1 << ") Difference between bincontent and calculated value (FitSum) is : " << h_FitSum->GetBinContent(iBin+1) << " <--> " << VarBinValue[iBin] << std::endl;
+          //std::cout << iBin+1 << ") Difference between bincontent and calculated value (FitSum) is : " << h_FitSum->GetBinContent(iBin+1) << " <--> " << VarBinValue[iBin] << std::endl;
           h_FitSum->SetBinContent(iBin+1, VarBinValue[iBin]);
         }
       }
 
       for(int ii = 0; ii < NrChiSqCuts; ii++){
-        for(int iBin = 0; iBin < xBin; iBin++){
+        for(int iBin = 0; iBin < xFitBin; iBin++){
           if(abs((h_FitSumSmallChiSq[ii]->GetBinContent(iBin+1)) - VarBinValueSmallChiSq[ii][iBin]) > 1){  
-            cout << iBin+1 << " - " << ii << ") BinContent != VarBinValue (SmallChiSq) : " << h_FitSumSmallChiSq[ii]->GetBinContent(iBin+1) << " vs " << VarBinValueSmallChiSq[ii][iBin] << endl;
+            //cout << iBin+1 << " - " << ii << ") BinContent != VarBinValue (SmallChiSq) : " << h_FitSumSmallChiSq[ii]->GetBinContent(iBin+1) << " vs " << VarBinValueSmallChiSq[ii][iBin] << endl;
             h_FitSumSmallChiSq[ii]->SetBinContent(iBin+1, VarBinValueSmallChiSq[ii][iBin]);
           }
 
           if(abs((h_FitSumSmallChiSqPosSlope[ii]->GetBinContent(iBin+1)) - VarBinValueSmallChiSqPosSlope[ii][iBin]) > 1){  
-            cout << iBin+1 << " - " << ii << ") BinContent != VarBinValue (SmallChiSqPosSlope) : " << h_FitSumSmallChiSqPosSlope[ii]->GetBinContent(iBin+1) << " vs " << VarBinValueSmallChiSqPosSlope[ii][iBin] << endl;
+            //cout << iBin+1 << " - " << ii << ") BinContent != VarBinValue (SmallChiSqPosSlope) : " << h_FitSumSmallChiSqPosSlope[ii]->GetBinContent(iBin+1) << " vs " << VarBinValueSmallChiSqPosSlope[ii][iBin] << endl;
             h_FitSumSmallChiSqPosSlope[ii]->SetBinContent(iBin+1, VarBinValueSmallChiSqPosSlope[ii][iBin]);
           }
         }
