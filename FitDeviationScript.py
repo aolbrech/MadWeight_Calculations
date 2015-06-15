@@ -242,11 +242,25 @@ elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
   MGXSCut = MGXS
 
 #Current testing: Use full directory name as title
-title = str(whichDir)
+title = str(whichDir[whichDir.find("/")+1:-1])  #Only need the part after the "/"!!
+print "Part of whichDir name :",whichDir[whichDir.find("/")+1:-1]
 
 if WeightsFileName.find("NoLowPt") <= len(WeightsFileName) and WeightsFileName.find("NoLowPt") >= 0: 
   title = title+"_"+"NoLowPtEvts"+WeightsFileName[WeightsFileName.find("_Cut"):-4]
 title = title+"_"+KinVariable
+
+#Perform comparison between cos theta* reweighting and Acc-norm by applying the normalisation for some cases
+if whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormForCuts") >= 0:
+  print "Looking at directory containing name AccNormForCuts !! "
+  if WeightsFileName.find("Cut15") <= len(WeightsFileName) and WeightsFileName.find("Cut15") >= 0:
+    MGXSCut = array('d',[13.460863375, 10.01499288, 8.983043286, 8.376425187, 8.118650426, 8.174741519, 8.559729052, 9.324577757, 12.131027388]) 
+    title += "_AccNormApplied"
+    print " ---> Cut15 applied ! =====>       title = ",title
+  elif WeightsFileName.find("Cut30") <= len(WeightsFileName) and WeightsFileName.find("Cut30") >= 0:
+    MGXSCut = array('d',[4.772121225, 3.471694536, 3.103621427, 2.907659993, 2.789024957, 2.832458413, 2.945885258, 3.251167862, 4.277700888])
+    title += "_AccNormApplied"
+    print " ---> Cut30 applied ! " 
+print "\n ******* Final title : ",title," ************ \n"
 
 #Set the 'RunFitMacro' correctly:
 if sys.argv[4] == "y" or sys.argv[4] == "yes":
@@ -339,6 +353,11 @@ if RunFitMacro == True:
     elif re.search( r"std::ifstream ifs",  RootLine): NewRootAnalyzer.write('  std::ifstream ifs ("'+str(WeightsFileName)+'", std::ifstream::in); \n')
     elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
     elif re.search( r"string SplittedDir", RootLine): NewRootAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
+    elif re.search( r"log",                RootLine):
+      if   WeightsFileName.find("LnWeight") < len(WeightsFileName) and WeightsFileName.find("LnWeight") >= 0:
+        NewRootAnalyzer.write('      LnLik[config-1] = weight; LnLikXS[config-1] = weight+log(MGXS[config-1]); LnLikAcc[config-1] = weight+log(MGXSCut[config-1]); \n')
+      else:
+        NewRootAnalyzer.write('      LnLik[config-1] = -log(weight); LnLikXS[config-1] = -log(weight)+log(MGXS[config-1]); LnLikAcc[config-1] = -log(weight)+log(MGXSCut[config-1]); \n')
     elif re.search( r"bool storeSplittedCanvas", RootLine):
       if   CreateTexFile == True: NewRootAnalyzer.write('bool storeSplittedCanvas = true; \n')
       else:                       NewRootAnalyzer.write('bool storeSplittedCanvas = false; \n')
