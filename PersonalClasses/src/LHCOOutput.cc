@@ -11,7 +11,7 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
   WrongEvtCounter = 0;
   CorrectGenEvtContent = false;
   NumberNegRecoEl = 0;         NumberNegRecoMu = 0;     NumberPosRecoEl = 0;         NumberPosRecoMu = 0; 
-  NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; NrPosRecoMuUnmatched; 
+  NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; NrPosRecoMuUnmatched = 0; 
   genOutput_ = GenOutput; recoOutput_ = RecoOutput;
   verbose_ = verbosity;
 
@@ -33,6 +33,8 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     CorrectRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/CorrectRecoEvents_PositiveMuon.lhco");
   }
 
+  histo1D["Gen_TopMassLept"] = new TH1F("Gen_TopMassLept","Leptonic top-mass distribution for generator events",250,130,210);
+  histo1D["Gen_TopMassHadr"] = new TH1F("Gen_TopMassHadr","Hadronic top-mass distribution for generator events",250,130,210);
   histo1D["WrongGen_TopMassLept"] = new TH1F("WrongGen_TopMassLept","Leptonic top-mass distribution for wrong generator events",250,0,500);
   histo1D["WrongGen_TopMassHadr"] = new TH1F("WrongGen_TopMassHadr","Hadronic top-mass distribution for wrong generator events",250,0,500);
   histo1D["WrongReco_TopMassLept"] = new TH1F("WrongReco_TopMassLept","Leptonic top-mass distribution for wrong reco events",250,0,500);
@@ -258,6 +260,8 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 	  NumberPositiveMuons++;
           leptonType = muPlus;      //Enum information
 	  LHCOEventOutput(0, GenOutFile[0], NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
+          histo1D["Gen_TopMassLept"]->Fill( (*Bottom + *Lepton + *NeutrinoMC).M());
+          histo1D["Gen_TopMassHadr"]->Fill( (*BottomBar + *Light + *LightBar).M()); 	
 	}
       }//Positive muon
 	  
@@ -445,6 +449,7 @@ void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned in
     cout.precision(4);
     outputFile << "  " << fixed << showpoint << setprecision(4) << vector[ii]->Eta();
     if(vector[ii]->Phi() < -3.14) outputFile << "  " << setprecision(4) << -1*(vector[ii]->Phi());
+    else if(vector[ii]->Phi() < 0.0) outputFile << " " << setprecision(4) << vector[ii]->Phi()+6.28;
     else                          outputFile << "  " << setprecision(4) << vector[ii]->Phi();
     outputFile << "  " << setprecision(4) << vector[ii]->Pt();
     cout.setf(ios::fixed,ios::floatfield);  //Add zero to obtain the asked number of digits
