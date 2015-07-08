@@ -1,105 +1,97 @@
+############################################
+#                                          #
+#  RemoveLowPtEvents.py script             #
+#  --> Has a two-fold goal:                #
+#      1) Removing events below pt-value   #
+#      2) Include cos theta weight in file #
+#                                          #
+############################################
 #! python
 import os
 import sys
-from math import log
+from math import log,pow
 
-#Directory of interest:
-if len(sys.argv) <= 2:
-  print "Need to give the directory of interest and the desired pT-cut in command line !"
+#--------------------------------#
+#   Get input from command line  #
+#--------------------------------#
+if len(sys.argv) <= 3:
+  print "Need to give the directory of interest, the anomalous couplings coefficient, the desired pT-cut and the value of the configuration in command line !"
+  print "--> Syntax example: python RemoveLowPtEvents.py Events/blabla RVR 15/0/(Also)MET Pos05"
   sys.exit()
-if len(sys.argv) == 1:
-  print "Need to give the directory of interest AND the desired pT-cut in command line !"
-  sys.exit()
-whichDir = sys.argv[1] 
-ptCut = sys.argv[2]
-print " Interested in directory : ",whichDir
+whichDir, AnomCoef, ptCut, VarConfig = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 
-#Output file of interest:
+#----------------------------------#
+#   Set the correct output files   #
+#----------------------------------#
+#Set the correct names!
+PTCut = ""
+if ptCut == "0": PTCut = "NoPtCut"
+elif ptCut == "AlsoMET" or ptCut == "MET": PTCut = "PtCutsApplied_AlsoOnMET"
+else: PTCut = "PtCut"+str(ptCut)
+
 outfile = file(os.path.join(whichDir+'weights_NoLowPt_Cut'+str(ptCut)+'.out'),'w')
-outfileCorr = file(os.path.join(whichDir+'weights_NoLowPt_Cut'+str(ptCut)+'_CosThetaCorrection.out'),'w')
-outfileCorrLn = file(os.path.join(whichDir+'weights_NoLowPt_Cut'+str(ptCut)+'_CosThetaCorr_LnWeight.out'),'w')
+outfileCorrLn = file(os.path.join(whichDir+'weights_NoLowPt_'+PTCut+'_ApplyCosThetaReweighting.out'),'w')
+CosThetaCorrFile = file(os.path.join('/user/aolbrech/AnomalousCouplings/MadAnalysis_v112/RVRAcceptance/SampleAnalyzer/CosThetaReweighting_'+str(AnomCoef)+'/'+str(VarConfig)+'_'+str(AnomCoef)+'/CosThetaWeight_'+str(VarConfig)+'_'+str(AnomCoef)+'_'+PTCut+'.txt'),'r')
 
-VarConfig = ""
-if   whichDir.find("Pos05") < len(whichDir) and whichDir.find("Pos05") >= 0: VarConfig = "Pos05"
-elif whichDir.find("Pos03") < len(whichDir) and whichDir.find("Pos03") >= 0: VarConfig = "Pos03"
-elif whichDir.find("Pos02") < len(whichDir) and whichDir.find("Pos02") >= 0: VarConfig = "Pos02"
-elif whichDir.find("Pos01") < len(whichDir) and whichDir.find("Pos01") >= 0: VarConfig = "Pos01"
-elif whichDir.find("SampleSM") < len(whichDir) and whichDir.find("SampleSM") >= 0: VarConfig = "SM" 
-elif whichDir.find("Neg01") < len(whichDir) and whichDir.find("Neg01") >= 0: VarConfig = "Neg01"
-elif whichDir.find("Neg02") < len(whichDir) and whichDir.find("Neg02") >= 0: VarConfig = "Neg02"
-elif whichDir.find("Neg03") < len(whichDir) and whichDir.find("Neg03") >= 0: VarConfig = "Neg03"
-elif whichDir.find("Neg05") < len(whichDir) and whichDir.find("Neg05") >= 0: VarConfig = "Neg05"
-CosThetaCorrFile = file(os.path.join('/user/aolbrech/AnomalousCouplings/MadAnalysis_v112/RVRAcceptance/SampleAnalyzer/CosThetaReweighting/'+str(VarConfig)+'/CosThetaWeight_'+str(VarConfig)+'_PtCut'+str(ptCut)+'.txt'),'r')
-outputTest = file(os.path.join(whichDir+'outputTest.txt'),'w')
+print "Getting cos theta info from : ",CosThetaCorrFile
 
-#Input file of interest:
-list_dir = []
+#----------------------------------#
+#   Get the correct output files   #
+#----------------------------------#
 list_dir = os.listdir(whichDir)
-WeightsFileArray = []
-weightsFileCounter = 0
+WeightsFileArray, weightsFileCounter = [], 0
 for file in list_dir:
   if file.endswith("weights.out") and file.startswith("weights.out"): # eg: '.txt'
     weightsFileCounter += 1
     WeightsFileArray.append(file)
-  if file.endswith(".lhco"):
-    LHCOFile = open(os.path.join(whichDir+''+file),'r')
+  if file.endswith(".lhco"): LHCOFile = open(os.path.join(whichDir+''+file),'r')  #Only 1 lhco file should exist!
 
-if int(weightsFileCounter) == 1:
-  WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
-  secondWeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
-elif int(weightsFileCounter) == 0:
+if int(weightsFileCounter) == 0:
   print "No weights file found in this directory !"
   sys.exit()
+elif int(weightsFileCounter) == 1: WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
 elif int(weightsFileCounter) > 1:
   for ii in range(len(WeightsFileArray)):
     print " ",ii," ) ",WeightsFileArray[ii]
   fileNr = raw_input('Choose the number of the file of interest! : ')
   WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
-#  secondWeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
 
 print "Will be using file : ",WeightsFile," to delete events from !"
 print "Will be using lhco file : ",LHCOFile
 
+#-------------------------------#
+#   Perform the event deletion  #
+#-------------------------------#
 EventsToDelete = []
-#Loop over all lines in weights file:
 for lhcoLine in LHCOFile:
   lhcoWord = lhcoLine.split()
-  #Only interested in files starting with a number
-  if str(lhcoWord[0]) != "#":
-    if len(lhcoWord) == 3:
-      if str(lhcoWord[1]) != "0":
-        if SurvivedCut == True:
-          outputTest.write(EvtNr+' 1 \n')
-        elif SurvivedCut == False:
-          outputTest.write(EvtNr+' 0 \n')
-      EvtNr = lhcoWord[1]
-      SurvivedCut = True
+  if str(lhcoWord[0]) != "#":                                        #Only interested in lines starting with a number
+    if len(lhcoWord) == 3: EvtNr, SurvivedCut = lhcoWord[1], True    #Initialize for each event!
     if len(lhcoWord) == 11:
-      if SurvivedCut == True and str(lhcoWord[1]) != "6" and float(lhcoWord[4]) < float(ptCut):
+      if SurvivedCut == True and str(lhcoWord[1]) != "6" and PTCut != "PtCutsApplied_AlsoOnMET" and float(lhcoWord[4]) < float(ptCut):   #Currently pT-cut is not applied to MET ...
         SurvivedCut = False
         EventsToDelete.append(int(EvtNr))
-
-outputTest.close()
 print "Events with a particle with pT < ",str(ptCut)," GeV (excluding MET) :",len(EventsToDelete)
 
+#------------------------------#
+#   Save the cos theta weight  #
+#------------------------------#
+#First get the info from the output file of MadAnalysis calculation!
 CosThetaCorr = []
-for corrLine in CosThetaCorrFile:
-  corrWord = corrLine.split()
-  CosThetaCorr.append(float(corrWord[1]))
-
+for corrLine in CosThetaCorrFile: CosThetaCorr.append(float(corrLine.split()[1]))
 
 for line in WeightsFile:
   word = line.split()
   if str(word[0]) != "#":
     if not int(word[0]) in EventsToDelete:
       outfile.write(line)
-      #Get the correct correction factor for the considered event!
-      outfileCorr.write(line.replace(word[3],str(float(word[3])*CosThetaCorr[int(word[0])])))
-      outfileCorrLn.write(line.replace(word[3],str(-log(float(word[3]))*CosThetaCorr[int(word[0])])))
-  else:
-    outfile.write(line)   #Write the first two lines containing text!
-    outfileCorr.write(line)
-    outfileCorrLn.write(line)
+      outfileCorrLn.write(word[0]+'  '+word[1]+'  '+word[2]+'  '+word[3]+'  '+str(CosThetaCorr[int(word[0])])+'  '+word[4]+'\n')
+  else: outfile.write(line), outfileCorrLn.write(line)   #Write the first two lines containing text!
 
 outfile.close()
-outfileCorr.close()
+outfileCorrLn.close()
+
+#Delete the outfile (~ output file with events removed) when no events have actually been deleted!
+if len(EventsToDelete) == 0: 
+  print "Removing file",outfile.name," since no events have been deleted so it is identical to weights.out!",
+  os.remove(outfile.name)
