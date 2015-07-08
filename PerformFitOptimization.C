@@ -3,7 +3,6 @@
 #include <sstream>
 #include "TFile.h"
 #include "TH1F.h"
-#include "TH2F.h"
 #include "TF1.h"
 #include "TCanvas.h"
 #include "TGraph.h"
@@ -18,17 +17,17 @@
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
 bool storeSplittedCanvas = false; 
-std::string SplittedDir = "Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/SplittedCanvasses"; 
+std::string SplittedDir = "Events_RgRScan/RgR_RECO_SingleGausTF_10000Evts_FullRange/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-TFile *inFile = new TFile("Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/FitDistributions_MGSample_NoLowPtEvts_Cut10_RVR_8900Evts.root","READ"); 
-TFile *outputFile = new TFile("Events_RVRBiasScan_WithCuts/RVR_MGSampleNeg03_SingleGausTF_10000Evts_WideRange/FitOptimizations_MGSample_NoLowPtEvts_Cut10_RVR_8900Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events_RgRScan/RgR_RECO_SingleGausTF_10000Evts_FullRange/FitDistributions_RgR_RECO_SingleGausTF_10000Evts_FullRange_8602Evts.root","READ"); 
+TFile *outputFile = new TFile("Events_RgRScan/RgR_RECO_SingleGausTF_10000Evts_FullRange/FitOptimizations_RgR_RECO_SingleGausTF_10000Evts_FullRange_8602Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
-const int xBin = 11; 
+const int xBin = 41; 
 const int xFitBin = xBin*10; 
-float xLow = -0.55; 
-float xHigh = 0.55; 
+float xLow = -0.5125; 
+float xHigh = 0.5125; 
 
 void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
@@ -83,8 +82,12 @@ void getIndividualDirObjects(TDirectory *dir){
     std::string dirName(dir->GetName(), 0, 100);
 
     //Specify which chi-sq cut values should be considered:
-    float ChiSqCuts[3] = {0.0002, 0.00001, 0.000005}; 
-    const int NrChiSqCuts = sizeof(ChiSqCuts)/sizeof(float);
+    float ChiSqCutsFstPol[4] = {0.0002, 0.001, 0.0005, 0.005}; 
+    float ChiSqCutsScdPol[4] = {0.0002, 0.001, 0.0005, 0.005}; 
+    const int NrChiSqCutsFstPol = sizeof(ChiSqCutsFstPol)/sizeof(float);
+    const int NrChiSqCutsScdPol = sizeof(ChiSqCutsScdPol)/sizeof(float);
+    const int NrChiSqCuts = NrChiSqCutsFstPol;
+    //if(NrChiSqCutsFstPol > NrChiSqCutsScdPol) NrChiSqCuts = (const int) NrChiSqCutsScdPol;  //Take the lowest number as the number of cuts!
 
     TH1F *h_LLSum = 0;
     TH1F *h_FitSum = 0, *h_LLSumAll = 0;
@@ -96,8 +99,14 @@ void getIndividualDirObjects(TDirectory *dir){
     else if(dirName.find("XS") != std::string::npos) {NormType = "XS";  NormTypeDir = "_XS"; }
     else                                             {NormType = "";    NormTypeDir = "";    }
 
-    if(dirName.find("FirstPolynomial") != std::string::npos){       FitNr = "FirstPol";  NrUsedPoints = "all";    }
-    else if(dirName.find("SecondPolynomial") != std::string::npos){ FitNr = "SecondPol"; NrUsedPoints = "reduced";}
+    if(dirName.find("FirstPolynomial") != std::string::npos){                   FitNr = "FirstPol";           NrUsedPoints = "all";    }
+    else if(dirName.find("SecondPolynomial") != std::string::npos){             FitNr = "SecondPol";          NrUsedPoints = "reduced";}
+    else if(dirName.find("FirstFit_Acc_RejectedEvents") != std::string::npos){  FitNr = "FirstPol_RejEvts";   NrUsedPoints = "rejected";}
+    else if(dirName.find("FirstFit_Acc_FitDevCutLoose") != std::string::npos){  FitNr = "FirstPol_FitDevCutLoose"; NrUsedPoints = "fitdevCutLoose";}
+    else if(dirName.find("FirstFit_Acc_FitDevCutMedium") != std::string::npos){ FitNr = "FirstPol_FitDevCutMedium"; NrUsedPoints = "fitdevCutMedium";}
+    else if(dirName.find("FirstFit_Acc_FitDevCutTight") != std::string::npos){  FitNr = "FirstPol_FitDevCutTight"; NrUsedPoints = "fitdevCutTight";}
+    else if(dirName.find("FirstFit_Acc_MTop172") != std::string::npos){         FitNr = "FirstPol_MTop172"; NrUsedPoints = "mTop172";}
+    else if(dirName.find("FirstFit_Acc_MTop174") != std::string::npos){         FitNr = "FirstPol_MTop174"; NrUsedPoints = "mTop174";}
 
     if (dirName.find("LL") != std::string::npos)
       h_LLSum = new TH1F(("LL"+NormType+"_Summed").c_str(), ("Distribution of "+dirName+" after summing over all "+sNkeys.c_str()+" events").c_str(), xBin, xLow, xHigh);
@@ -105,7 +114,7 @@ void getIndividualDirObjects(TDirectory *dir){
       lookAtFits = true;
       h_FitSum = new TH1F((FitNr+""+NormType+"_Summed").c_str(),  "title",xFitBin,xLow,xHigh);
       h_SlopeFit = new TH1F(("Slope_"+FitNr+""+NormType).c_str(), "title",200,-5.0, 5.0  );
-      h_ChiSq = new TH1F( ("ChiSq"+NormType+"_"+FitNr).c_str(),   "title",200,0,    0.005);
+      h_ChiSq = new TH1F( ("ChiSq"+NormType+"_"+FitNr).c_str(),   "title",200,0,    0.0005);
       h_LLSumAll = new TH1F( ("Hist_"+FitNr+""+NormType+"_All").c_str(),"title",xBin,xLow,xHigh);
     }
    
@@ -114,12 +123,12 @@ void getIndividualDirObjects(TDirectory *dir){
     int evtsSmallChiSq[NrChiSqCuts] = {0}, evtsSmallChiSqPosSlope[NrChiSqCuts] = {0};
     double VarBinValue[xFitBin] = {0.};
     double VarBinValueSmallChiSq[NrChiSqCuts][xFitBin] = {{0.}};
-    double VarBinValueSmallChiSqPosSlope[NrChiSqCuts][xFitBin] = {{0.}};
+    //double VarBinValueSmallChiSqPosSlope[NrChiSqCuts][xFitBin] = {{0.}};
     for(int ii = 0; ii < NrChiSqCuts; ii++){
       std::stringstream ssii; ssii << ii; std::string sii = ssii.str();
       h_FitSumSmallChiSq[ii]         = new TH1F((FitNr+""+NormType+"_SmallChiSq"+sii).c_str(),        "title",xFitBin,xLow,xHigh);
       h_LLSumSmallChiSq[ii]          = new TH1F(("Hist_"+FitNr+""+NormType+"_SmallChiSq"+sii).c_str(),"title",xBin,xLow,xHigh);
-      h_FitSumSmallChiSqPosSlope[ii] = new TH1F((FitNr+""+NormType+"_SmallChiSqPosSlope"+sii).c_str(),"title",xFitBin,xLow,xHigh);
+      //h_FitSumSmallChiSqPosSlope[ii] = new TH1F((FitNr+""+NormType+"_SmallChiSqPosSlope"+sii).c_str(),"title",xFitBin,xLow,xHigh);
     }
  
     std::string fitName = "";
@@ -151,7 +160,7 @@ void getIndividualDirObjects(TDirectory *dir){
 
         //Apply the chi-sq cuts for each of the values requested:
         for(int iChiSq = 0; iChiSq < NrChiSqCuts; iChiSq++){
-          if(fitFunc->GetChisquare() < ChiSqCuts[iChiSq]){
+          if( (FitNr == "FirstPol" && fitFunc->GetChisquare() < ChiSqCutsFstPol[iChiSq]) || (FitNr == "SecondPol" && fitFunc->GetChisquare() < ChiSqCutsScdPol[iChiSq]) ){
             h_FitSumSmallChiSq[iChiSq]->Add(fitFunc); //h_LLSumSmallChiSq[iChiSq]->Add(h_OrigLL); 
             evtsSmallChiSq[iChiSq]++;
             for(int iBin = 0; iBin < xFitBin; iBin++){
@@ -160,15 +169,15 @@ void getIndividualDirObjects(TDirectory *dir){
                 VarBinValueSmallChiSq[iChiSq][iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
             }
 
-            if(fitFunc->GetParameter(2) > 0){                               //Does this requirement make any sense when a pol4 fit is applied ???
-              h_FitSumSmallChiSqPosSlope[iChiSq]->Add(fitFunc);
-              evtsSmallChiSqPosSlope[iChiSq]++;
-              for(int iBin = 0; iBin < xFitBin; iBin++){
-                double VarValue = xLow+(xHigh-xLow)/(2*xFitBin)+((xHigh-xLow)/xFitBin)*iBin;
-                for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
-                  VarBinValueSmallChiSqPosSlope[iChiSq][iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
-              }
-            }
+            //if(fitFunc->GetParameter(2) > 0){                               //Does this requirement make any sense when a pol4 fit is applied ???
+            //  h_FitSumSmallChiSqPosSlope[iChiSq]->Add(fitFunc);
+            //  evtsSmallChiSqPosSlope[iChiSq]++;
+            //  for(int iBin = 0; iBin < xFitBin; iBin++){
+            //    double VarValue = xLow+(xHigh-xLow)/(2*xFitBin)+((xHigh-xLow)/xFitBin)*iBin;
+            //    for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
+            //      VarBinValueSmallChiSqPosSlope[iChiSq][iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
+            //  }
+            //}
           }
         }
       }
@@ -203,23 +212,24 @@ void getIndividualDirObjects(TDirectory *dir){
             h_FitSumSmallChiSq[ii]->SetBinContent(iBin+1, VarBinValueSmallChiSq[ii][iBin]);
           }
 
-          if(abs((h_FitSumSmallChiSqPosSlope[ii]->GetBinContent(iBin+1)) - VarBinValueSmallChiSqPosSlope[ii][iBin]) > 1){  
+          //if(abs((h_FitSumSmallChiSqPosSlope[ii]->GetBinContent(iBin+1)) - VarBinValueSmallChiSqPosSlope[ii][iBin]) > 1){  
             //cout << iBin+1 << " - " << ii << ") BinContent != VarBinValue (SmallChiSqPosSlope) : " << h_FitSumSmallChiSqPosSlope[ii]->GetBinContent(iBin+1) << " vs " << VarBinValueSmallChiSqPosSlope[ii][iBin] << endl;
-            h_FitSumSmallChiSqPosSlope[ii]->SetBinContent(iBin+1, VarBinValueSmallChiSqPosSlope[ii][iBin]);
-          }
+          //  h_FitSumSmallChiSqPosSlope[ii]->SetBinContent(iBin+1, VarBinValueSmallChiSqPosSlope[ii][iBin]);
+          //}
         }
 
-
-        std::stringstream ssChiSqCut;               ssChiSqCut << ChiSqCuts[ii];                            std::string sChiSqCut = ssChiSqCut.str();
+        std::string sChiSqCut = "";
+        if( FitNr == "FirstPol")      { std::stringstream ssChiSqCut; ssChiSqCut << ChiSqCutsFstPol[ii]; sChiSqCut = ssChiSqCut.str();}
+        else if (FitNr == "SecondPol"){ std::stringstream ssChiSqCut; ssChiSqCut << ChiSqCutsScdPol[ii]; sChiSqCut = ssChiSqCut.str();}
         std::stringstream ssEvtsSmallChiSq;         ssEvtsSmallChiSq << evtsSmallChiSq[ii];                 std::string sEvtsSmallChiSq = ssEvtsSmallChiSq.str();
-        std::stringstream ssEvtsSmallChiSqPosSlope; ssEvtsSmallChiSqPosSlope << evtsSmallChiSqPosSlope[ii]; std::string sEvtsSmallChiSqPosSlope = ssEvtsSmallChiSqPosSlope.str();
+        //std::stringstream ssEvtsSmallChiSqPosSlope; ssEvtsSmallChiSqPosSlope << evtsSmallChiSqPosSlope[ii]; std::string sEvtsSmallChiSqPosSlope = ssEvtsSmallChiSqPosSlope.str();
 
         h_FitSumSmallChiSq[ii]->SetTitle(("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points (#chi^{2} <"+sChiSqCut+" -- "+sEvtsSmallChiSq+"/"+sAllEvts+" evts)").c_str());
         h_LLSumSmallChiSq[ii]->SetTitle(("Distribution of originalLL when applying cuts on "+FitNr+" (#chi^{2} <"+sChiSqCut+" -- "+sEvtsSmallChiSq+"/"+sAllEvts+" evts)").c_str());
-        h_FitSumSmallChiSqPosSlope[ii]->SetTitle(("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points (#chi^{2} < "+sChiSqCut+", slope > 0 -- "+sEvtsSmallChiSqPosSlope+"/"+sAllEvts+" evts)").c_str());
+        //h_FitSumSmallChiSqPosSlope[ii]->SetTitle(("Distribution of "+FitNr+" after summing over "+NrUsedPoints+" points (#chi^{2} < "+sChiSqCut+", slope > 0 -- "+sEvtsSmallChiSqPosSlope+"/"+sAllEvts+" evts)").c_str());
         h_FitSumSmallChiSq[ii]->Write();
         //h_LLSumSmallChiSq[ii]->Write();
-        h_FitSumSmallChiSqPosSlope[ii]->Write();
+        //h_FitSumSmallChiSqPosSlope[ii]->Write();
       }
       outputFile->cd();
 
