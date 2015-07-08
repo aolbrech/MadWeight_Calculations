@@ -44,10 +44,22 @@ elif len(sys.argv) == 6:
   print "Need to specify which analysis should be executed: fctDeviationMacro or doublePolFitMacro (fctDeviation/doublePolFit)"
   print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
 
+print "Length of argurments : ",len(sys.argv)
 whichDir = sys.argv[1]
 KinVariable = sys.argv[2]
 nEvts = sys.argv[3]
 whichAnalysis = sys.argv[6]
+
+NohupStyle = False
+if len(sys.argv) >= 9:
+  NohupStyle = True   #Don't ask any questions anymore!
+  if sys.argv[7] == "Wide" and KinVariable == "RVR":
+    VarWindow = "1"
+  WeightsFileName = sys.argv[8]
+  WeightsFile = open(os.path.join(WeightsFileName),'r')
+  #Apply the acceptance normalisation independent of the name of the considered directory
+  applyAccNorm = "n"
+  if len(sys.argv) == 10: applyAccNorm = sys.argv[9]
 
 #Set the 'CreateTexFile' correctly:
 if sys.argv[5] == "y" or sys.argv[5] == "yes":
@@ -75,8 +87,10 @@ if KinVariable == "RVR":
   Acceptance = array('d',[1,       1,        0.22164, 0.21742,  0.21672,  0.21737,    0.21614,  0.21670,   0.21531,  0.21677,   0.21437,   0.21793,   0.22205,  1,       1       ])
 
   #Select which window of RVR values was considered!
-  VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  3) Many   : [-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1] \n  4) Very wide : [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5] \n 5) Wide & Many : [-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3] \n --> Choose the correct number : ')
+  if NohupStyle == False:
+    VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  3) Many   : [-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1] \n  4) Very wide : [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5] \n 5) Wide & Many : [-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3] \n --> Choose the correct number : ')
 
+  print "VarWindow value for RVR : ",VarWindow
   xMinValue = [4, 4, 10, 3, 12]
   NrPointsToRemove = [3, 3, 7, 2, 7]
   KinVar = "Re(V_{R})"
@@ -131,7 +145,8 @@ elif KinVariable == "MTop":
   Acceptance = array('d',[0.16203,  0.19152,  0.21008,   0.21460,   0.21735,  0.21290,    0.21752,    0.22185,   0.23941,   0.26413 ])
 
   #Select which window of masses was considered!
-  VarWindow = raw_input('** Choose the correct mass-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [153, 163, 170, 171, 172, 173, 174, 175, 183, 193] \n  2) Normal : [153, 163, 171, 172, 173, 174, 175, 183, 193] \n  3) Narrow : [171, 172, 173, 174, 175] \n --> Choose the correct number : ')
+  if NohupStyle == False:
+    VarWindow = raw_input('** Choose the correct mass-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [153, 163, 170, 171, 172, 173, 174, 175, 183, 193] \n  2) Normal : [153, 163, 171, 172, 173, 174, 175, 183, 193] \n  3) Narrow : [171, 172, 173, 174, 175] \n --> Choose the correct number : ')
 
   xMinValue = [5, 4, 2]
   KinVar = "m_{top}"
@@ -152,30 +167,38 @@ elif KinVariable == "MTop":
     xBin, xLow, xHigh = 5, 170.5, 175.5
 
 elif KinVariable == "RgR":
-  VarValues = ["Re(g_{R}) = -0.5","Re(g_{R}) = -0.3","Re(g_{R}) = -0.2","Re(g_{R}) = -0.15","Re(g_{R}) = -0.1","Re(g_{R}) = -0.05","Re(g_{R}) = 0.0","Re(g_{R}) = 0.05","Re(g_{R}) = 0.1","Re(g_{R}) = 0.15","Re(g_{R}) = 0.2","Re(g_{R}) = 0.3","Re(g_{R}) = 0.5"]
-  Var =     array('d',[-0.5,     -0.3,     -0.2,    -0.15,   -0.1,    -0.05,   0.0,      0.05,    0.1,     0.15,    0.2,     0.3,     0.5     ])
-  MGXS =    array('d',[1.8647,   3.36424,  4.92909, 6.02588, 7.34593, 8.94878, 10.89487, 13.1987, 15.9457, 19.1623, 22.9185, 32.2975, 60.5617 ])
-  MGXSCut = array('d',[0.462736, 0.807034, 1.14397, 1,       1.6414,  1,       2.35719,  1,       3.34178, 1,       4.67808, 6.42868, 11.61381])
+  VarValues = ["Re(g_{R}) = -0.5","Re(g_{R}) = -0.3","Re(g_{R}) = -0.2","Re(g_{R}) = -0.15","Re(g_{R}) = -0.1","Re(g_{R}) = -0.05","Re(g_{R}) = -0.025","Re(g_{R}) = 0.0","Re(g_{R}) = 0.025","Re(g_{R}) = 0.05","Re(g_{R}) = 0.1","Re(g_{R}) = 0.15","Re(g_{R}) = 0.2","Re(g_{R}) = 0.3","Re(g_{R}) = 0.5"]
+  Var =     array('d',[-0.5,     -0.3,     -0.2,     -0.15,    -0.1,    -0.05,   -0.025,  0.0,      0.025,    0.05,    0.1,     0.15,    0.2,      0.3,     0.5     ])
+  MGXS =    array('d',[1.8647,   3.36424,  4.92909,  6.02588,  7.34593, 8.94878, 9.88333, 10.89487, 11.92922, 13.1987, 15.9457, 19.1623, 22.9185,  32.2975, 60.5617 ])
+  MGXSCut = array('d',[0.363334, 0.639413, 0.912292, 1.098184, 1.32024, 1.58727, 1.73857, 1.90447,  2.0856,   2.28471, 2.71983, 3.2418,  3.838581, 5.31357, 9.66734 ]) #Also MET cuts!
+#  MGXSCut = array('d',[0.462736, 0.807034,  1.14397,   1.37121,   1.6414,    1.96796,            2.35719,              2.80657,    3.34178,   3.96076,    4.67808,  6.42868,   11.61381  ])
 
-  VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different optiosn are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n --> Choose the correct number : ')
+  if NohupStyle == False:
+    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different optiosn are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) All    : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] --> Choose the correct number : ')
 
-  xMinValue = [4, 4]
+  xMinValue = [4, 4, 7]
   KinVar = "Re(g_{R})"
-  NrPointsToRemove = [2, 2]
+  NrPointsToRemove = [2, 2, 5]
   FitType = "pol2"
  
   if VarWindow == "1": 
-    Var.pop(9), VarValues.pop(9), MGXS.pop(9), MGXSCut.pop(9)
-    Var.pop(7), VarValues.pop(7), MGXS.pop(7), MGXSCut.pop(7)
-    Var.pop(5), VarValues.pop(5), MGXS.pop(5), MGXSCut.pop(5)
-    Var.pop(3), VarValues.pop(3), MGXS.pop(3), MGXSCut.pop(3)
+    Var.pop(11), VarValues.pop(11), MGXS.pop(11), MGXSCut.pop(11)
+    Var.pop(9),  VarValues.pop(9),  MGXS.pop(9),  MGXSCut.pop(9)
+    Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
+    Var.pop(5),  VarValues.pop(5),  MGXS.pop(5),  MGXSCut.pop(5)
+    Var.pop(3),  VarValues.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
     xBin, xLow, xHigh = 11, -0.55, 0.55
   elif VarWindow == "2":
-    Var.pop(12), VarValues.pop(12), MGXS.pop(12), MGXSCut.pop(12)
-    Var.pop(11), VarValues.pop(11), MGXS.pop(11), MGXSCut.pop(11)
+    Var.pop(14), VarValues.pop(14), MGXS.pop(14), MGXSCut.pop(14)
+    Var.pop(13), VarValues.pop(13), MGXS.pop(13), MGXSCut.pop(13)
+    Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
     Var.pop(1),  VarValues.pop(1),  MGXS.pop(1),  MGXSCut.pop(1)
     Var.pop(0),  VarValues.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 9, -0.225, 0.225
+  elif VarWindow == "3":
+    xBin, xLow, xHigh = 41, -0.5125, 0.5125	
 
 if KinVariable == "RVR" and VarWindow == "3":
   xPos = [15, 20]
@@ -191,41 +214,52 @@ NumberOfPointsToRemove = NrPointsToRemove[int(VarWindow)-1]
 xStep = [Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] ]
 print "Step size = ",xStep
 
-#File of interest:
-list_dir = os.listdir(whichDir)
-WeightsFileArray = []
-weightsFileCounter = 0
-for file in list_dir:
-  if file.endswith(".out") and file.startswith("weights"): # eg: '.txt'
-    weightsFileCounter += 1
-    WeightsFileArray.append(file)
+#File of interest (only search if NohupSyle is set to false):
+if NohupStyle == False:
+  list_dir = os.listdir(whichDir)
+  WeightsFileArray = []
+  weightsFileCounter = 0
+  for file in list_dir:
+    if file.endswith(".out") and file.startswith("weights"): # eg: '.txt'
+      weightsFileCounter += 1
+      WeightsFileArray.append(file)
 
-if int(weightsFileCounter) == 1:
-  WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
-  WeightsFileName = str(whichDir)+''+str(WeightsFileArray[0])
-  LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
-
-  #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
-  maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[0])+' | wc -l').read()
-elif int(weightsFileCounter) == 0:
-  print "No weights file found in this directory !"
-  sys.exit()
-elif int(weightsFileCounter) > 1:
-  for ii in range(len(WeightsFileArray)):
-    print " ",ii," ) ",WeightsFileArray[ii]
-  fileNr = raw_input('Choose the number of the file of interest! : ')
-  WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
-  WeightsFileName = str(whichDir)+''+str(WeightsFileArray[int(fileNr)])
-  LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
-
-  #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
-  maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[int(fileNr)])+' | wc -l').read()
+  if int(weightsFileCounter) == 1:
+    WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
+    WeightsFileName = str(whichDir)+''+str(WeightsFileArray[0])
+    LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[0]),'r')
+  
+    #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
+    maxNrEvts = os.popen('grep " 1 1 " '+str(whichDir)+''+str(WeightsFileArray[0])+' | wc -l').read()
+  elif int(weightsFileCounter) == 0:
+    print "No weights file found in this directory !"
+    sys.exit()
+  elif int(weightsFileCounter) > 1:
+    for ii in range(len(WeightsFileArray)):
+      print " ",ii," ) ",WeightsFileArray[ii]
+    fileNr = raw_input('Choose the number of the file of interest! : ')
+    WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
+    WeightsFileName = str(whichDir)+''+str(WeightsFileArray[int(fileNr)])
+    LikelihoodFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
+  
+#Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
+maxNrEvts = os.popen('grep " 1 1 " '+str(WeightsFileName)+' | wc -l').read()
 
 #Check whether the file has enough events, otherwise use the maximum number
 if int(maxNrEvts) < int(nEvts):
-  print "File has less events than the requested number !! "
   nEvts = int(maxNrEvts)
 print "Will be using file : ",WeightsFile," with ",nEvts," events ! "
+
+#Special case: Scaling the XS-array with a xx% function:
+TitleChange = ""
+if whichDir.find("ChangingXS") <= len(whichDir) and whichDir.find("ChangingXS") > 0:
+  MGXSScaled, MGXSCutScaled = [], []
+  for iVar in range(len(MGXS)):
+    if whichDir.find("CutsApplied") <= len(whichDir) and whichDir.find("CutsApplied") > 0: MGXSCutScaled.append(MGXSCut[iVar]*(1+Var[iVar]*(0.05)))
+    else:                                                                                  MGXSScaled.append(MGXS[iVar]*(1+Var[iVar]*(0.05)))
+  if whichDir.find("CutsApplied") <= len(whichDir) and whichDir.find("CutsApplied") > 0: MGXSCut = MGXSCutScaled
+  else:                                                                                  MGXS = MGXSScaled
+  TitleChange = "_XSScaledWithPos005"
 
 #Set title of root file!
 title = ""
@@ -234,7 +268,7 @@ elif whichDir.find("Wrong") <= len(whichDir)     and whichDir.find("Wrong") > 0:
 elif whichDir.find("Unmatched") <= len(whichDir) and whichDir.find("Unmatched") > 0: title = "Unmatched"
 elif whichDir.find("MGSample") <= len(whichDir)  and whichDir.find("MGSample") > 0:  
   title = "MGSample"
-  MGXSCut = MGXS
+  if WeightsFileName.find("CutsApplied") < 0: MGXSCut = MGXS  #Use the defined Acc-XS when 'CutsApplied' is in the name!
 
 if (whichDir.find("Reco") <= len(whichDir)  and whichDir.find("Reco") > 0) or (whichDir.find("RECO") <= len(whichDir) and whichDir.find("RECO") > 0): title += "Reco"
 elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
@@ -243,24 +277,22 @@ elif whichDir.find("Gen") <= len(whichDir) and whichDir.find("Gen") > 0:
 
 #Current testing: Use full directory name as title
 title = str(whichDir[whichDir.find("/")+1:-1])  #Only need the part after the "/"!!
-print "Part of whichDir name :",whichDir[whichDir.find("/")+1:-1]
 
 if WeightsFileName.find("NoLowPt") <= len(WeightsFileName) and WeightsFileName.find("NoLowPt") >= 0: 
   title = title+"_"+"NoLowPtEvts"+WeightsFileName[WeightsFileName.find("_Cut"):-4]
-title = title+"_"+KinVariable
 
 #Perform comparison between cos theta* reweighting and Acc-norm by applying the normalisation for some cases
-if whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormForCuts") >= 0:
-  print "Looking at directory containing name AccNormForCuts !! "
+if (whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormForCuts") >= 0) or (NohupStyle == True and (applyAccNorm == "y" or applyAccNorm == "Y" or applyAccNorm == "yes")):
   if WeightsFileName.find("Cut15") <= len(WeightsFileName) and WeightsFileName.find("Cut15") >= 0:
     MGXSCut = array('d',[13.460863375, 10.01499288, 8.983043286, 8.376425187, 8.118650426, 8.174741519, 8.559729052, 9.324577757, 12.131027388]) 
     title += "_AccNormApplied"
-    print " ---> Cut15 applied ! =====>       title = ",title
   elif WeightsFileName.find("Cut30") <= len(WeightsFileName) and WeightsFileName.find("Cut30") >= 0:
     MGXSCut = array('d',[4.772121225, 3.471694536, 3.103621427, 2.907659993, 2.789024957, 2.832458413, 2.945885258, 3.251167862, 4.277700888])
     title += "_AccNormApplied"
-    print " ---> Cut30 applied ! " 
-print "\n ******* Final title : ",title," ************ \n"
+#  elif WeightsFileName.find("Cut20") <= len(WeightsFileName) and WeightsFileName.find("Cut20") >= 0:
+
+if whichDir.find("ChangingXS") <= len(whichDir) and whichDir.find("ChangingXS") > 0:
+  title += TitleChange
 
 #Set the 'RunFitMacro' correctly:
 if sys.argv[4] == "y" or sys.argv[4] == "yes":
@@ -278,6 +310,7 @@ elif sys.argv[4] == "n" or sys.argv[4] == "no":
 #--  Pass on all variables to the ROOT macro !  --#
 #-------------------------------------------------#
 
+origValue = 0.0
 if KinVariable == "RVR":
   if   whichDir.find("Pos05") < len(whichDir) and whichDir.find("Pos05") >= 0: origValue = 0.5
   elif whichDir.find("Pos03") < len(whichDir) and whichDir.find("Pos03") >= 0: origValue = 0.3
@@ -351,13 +384,18 @@ if RunFitMacro == True:
     elif re.search( r"int xPos",           RootLine): NewRootAnalyzer.write(xPosLine)
     elif re.search( r"int xNeg",           RootLine): NewRootAnalyzer.write(xNegLine)
     elif re.search( r"std::ifstream ifs",  RootLine): NewRootAnalyzer.write('  std::ifstream ifs ("'+str(WeightsFileName)+'", std::ifstream::in); \n')
+#    elif re.search( r"ofstream file_Max",  RootLine): NewRootAnalyzer.write('std::ofstream file_MaxShapeEvts ("'+str(whichDir)+'MaxShapeEvts_'+str(title)+'.out", std::ofstream::out); \n')
+#    elif re.search( r"ofstream file_Min",  RootLine): NewRootAnalyzer.write('std::ofstream file_MinShapeEvts ("'+str(whichDir)+'MinShapeEvts_'+str(title)+'.out", std::ofstream::out); \n')
+#    elif re.search( r"ofstream file_MTop172", RootLine): NewRootAnalyzer.write('std::ofstream file_MTop172Evts ("'+str(whichDir)+'TopMass172Evts_'+str(title)+'.out", std::ofstream::out); \n')
+#    elif re.search( r"ofstream file_MTop174", RootLine): NewRootAnalyzer.write('std::ofstream file_MTop174Evts ("'+str(whichDir)+'TopMass174Evts_'+str(title)+'.out", std::ofstream::out); \n')
     elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
     elif re.search( r"string SplittedDir", RootLine): NewRootAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
-    elif re.search( r"log",                RootLine):
-      if   WeightsFileName.find("LnWeight") < len(WeightsFileName) and WeightsFileName.find("LnWeight") >= 0:
-        NewRootAnalyzer.write('      LnLik[config-1] = weight; LnLikXS[config-1] = weight+log(MGXS[config-1]); LnLikAcc[config-1] = weight+log(MGXSCut[config-1]); \n')
+    elif re.search( r"iss >> evt",         RootLine):
+      if WeightsFileName.find("ApplyCosThetaReweighting") < len(WeightsFileName) and WeightsFileName.find("ApplyCosThetaReweighting") >= 0:
+        NewRootAnalyzer.write('    if( iss >> evt >> config >> tf >> weight >> CosThetaCorr >> weightUnc){ \n')
+        print " \n ******************* Applying CosThetaCorr ************************ \n"
       else:
-        NewRootAnalyzer.write('      LnLik[config-1] = -log(weight); LnLikXS[config-1] = -log(weight)+log(MGXS[config-1]); LnLikAcc[config-1] = -log(weight)+log(MGXSCut[config-1]); \n')
+        NewRootAnalyzer.write('    if( iss >> evt >> config >> tf >> weight >> weightUnc){ \n') 
     elif re.search( r"bool storeSplittedCanvas", RootLine):
       if   CreateTexFile == True: NewRootAnalyzer.write('bool storeSplittedCanvas = true; \n')
       else:                       NewRootAnalyzer.write('bool storeSplittedCanvas = false; \n')
@@ -367,8 +405,10 @@ if RunFitMacro == True:
     elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TF1",     RootLine):
       if   re.search( r"AllPoints",     RootLine): NewRootAnalyzer.write('  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
       elif re.search( r"ReducedPoints", RootLine): NewRootAnalyzer.write('  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
-    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TFile", RootLine): 
+    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TFile", RootLine) and re.search( r"file_FitDist", RootLine):
       NewRootAnalyzer.write('TFile* file_FitDist = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
+#    elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TFile", RootLine) and re.search( r"file_FewEvts", RootLine):
+#      NewRootAnalyzer.write('TFile* file_FitDist = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
     elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"double CreatedVar", RootLine):
       NewRootAnalyzer.write('double CreatedVar = '+str(origValue)+';\n')
     elif whichAnalysis == "fctDeviationMacro.C" and re.search( r"new TFile", RootLine): 
@@ -397,11 +437,16 @@ if whichAnalysis == "doublePolFitMacro.C":
     elif re.search( r"bool storeSplittedCanvas", FitOptLine):
       if   CreateTexFile == True: NewPerformFitOptAnalyzer.write('bool storeSplittedCanvas = true; \n')
       else:                       NewPerformFitOptAnalyzer.write('bool storeSplittedCanvas = false; \n')
-    elif re.search( r"float ChiSqCuts", FitOptLine):
+    elif re.search( r"float ChiSqCutsFstPol", FitOptLine):
       if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0): 
-        NewPerformFitOptAnalyzer.write('    float ChiSqCuts[3] = {0.0002, 0.00001, 0.000005}; \n')
+        NewPerformFitOptAnalyzer.write('    float ChiSqCutsFstPol[4] = {0.0005, 0.00008, 0.00005, 0.00001}; \n')
       else:
-        NewPerformFitOptAnalyzer.write('    float ChiSqCuts[3] = {0.0002, 0.001, 0.0005}; \n')
+        NewPerformFitOptAnalyzer.write('    float ChiSqCutsFstPol[4] = {0.0002, 0.001, 0.0005, 0.005}; \n')
+    elif re.search( r"float ChiSqCutsScdPol", FitOptLine):
+      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0): 
+        NewPerformFitOptAnalyzer.write('    float ChiSqCutsScdPol[4] = {0.0002, 0.00005, 0.00001, 0.000005}; \n')
+      else:
+        NewPerformFitOptAnalyzer.write('    float ChiSqCutsScdPol[4] = {0.0002, 0.001, 0.0005, 0.005}; \n')
     else:                                        NewPerformFitOptAnalyzer.write(FitOptLine)
   NewPerformFitOptAnalyzer.close()
   PerformFitOptAnalyzer.close()
@@ -413,23 +458,38 @@ if whichAnalysis == "doublePolFitMacro.C":
 
   for DrawLine in DrawLLAnalyzer:
     if   re.search( r"new TFile",                 DrawLine): NewDrawAnalyzer.write('  TFile* inFile = new TFile("'+str(whichDir)+'FitOptimizations_'+str(title)+'_'+str(nEvts)+'Evts.root","READ"); \n')
-    elif re.search( r"TH1F* h_OriginalScdPol",    DrawLine): NewDrawAnalyzer.write('  TH1F* h_OriginalScdPol = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq0"); \n')
-    elif re.search( r"TH1F* h_ScdPolSmallChiSq0", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq0 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq0"); \n')
-    elif re.search( r"TH1F* h_ScdPolSmallChiSq1", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq1 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq1"); \n')
-    elif re.search( r"TH1F* h_ScdPolSmallChiSq2", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq2 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq2"); \n')
-    elif re.search( r"coefficient",               DrawLine): NewDrawAnalyzer.write('  h_OriginalScdPol->GetXaxis()->SetTitle("'+str(KinVariable)+'coefficient"); \n')
-    elif re.search( r"SaveAs",                    DrawLine): NewDrawAnalyzer.write('  canvas->SaveAs("'+str(whichDir)+'LLComparison_ChiSqCuts'+str(title)+'_'+str(nEvts)+'Evts.pdf"); \n')
-    elif re.search( r"Likelihood shape",          DrawLine): NewDrawAnalyzer.write('  h_OriginalScdPol->SetTitle("-Likelihood shapes for different #chi^{2} cuts (Acc norm -- '+str(title)+' -- '+str(nEvts)+' evts)"); \n')
-    elif re.search( r"0.0005", DrawLine) or re.search( r"0.000005", DrawLine) or re.search( r"0.00005", DrawLine):
-      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0):
-        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq2,"Distribution when #chi^{2} < 0.000005","l"); \n')
+#    elif re.search( r"TH1F* h_OriginalScdPol",    DrawLine): NewDrawAnalyzer.write('  TH1F* h_OriginalScdPol = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq0"); \n')
+#    elif re.search( r"TH1F* h_ScdPolSmallChiSq0", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq0 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq0"); \n')
+#    elif re.search( r"TH1F* h_ScdPolSmallChiSq1", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq1 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq1"); \n')
+#    elif re.search( r"TH1F* h_ScdPolSmallChiSq2", DrawLine): NewDrawAnalyzer.write('  TH1F* h_ScdPolSmallChiSq2 = (TH1F*) inFile->Get("SecondPolFitDistributions/SecondPolAcc_SmallChiSq2"); \n')
+    elif re.search( r"coefficient",               DrawLine): 
+      if   re.search( r"FstPol", DrawLine): NewDrawAnalyzer.write('  h_OriginalFstPol->GetXaxis()->SetTitle("'+str(KinVariable)+'coefficient"); \n')
+      elif re.search( r"ScdPol", DrawLine): NewDrawAnalyzer.write('  h_OriginalScdPol->GetXaxis()->SetTitle("'+str(KinVariable)+'coefficient"); \n')
+    elif re.search( r"LLFirstFit",                DrawLine): NewDrawAnalyzer.write('  canvas_FirstFit->SaveAs("'+str(whichDir)+'LLFirstFitComparison_ChiSqCuts'+str(title)+'_'+str(nEvts)+'Evts.pdf"); \n')
+    elif re.search( r"LLSecondFit",               DrawLine): NewDrawAnalyzer.write('  canvas_SecondFit->SaveAs("'+str(whichDir)+'LLSecondFitComparison_ChiSqCuts'+str(title)+'_'+str(nEvts)+'Evts.pdf"); \n')
+    elif re.search( r"Likelihood shape",          DrawLine): 
+      if   re.search( r"FstPol", DrawLine): NewDrawAnalyzer.write('  h_OriginalFstPol->SetTitle("-Likelihood shapes for different #chi^{2} cuts (Acc norm -- '+str(title)+' -- '+str(nEvts)+' evts)"); \n')
+      elif re.search( r"ScdPol", DrawLine): NewDrawAnalyzer.write('  h_OriginalScdPol->SetTitle("-Likelihood shapes for different #chi^{2} cuts (Acc norm -- '+str(title)+' -- '+str(nEvts)+' evts)"); \n')
+    elif re.search( r"float ChiSqCutsFstPol", DrawLine):
+      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0): 
+        NewDrawAnalyzer.write('  float ChiSqCutsFstPol[4] = {0.0005, 0.00008, 0.00005, 0.00001}; \n')
       else:
-        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq2,"Distribution when #chi^{2} < 0.0005","l"); \n')
-    elif re.search( r"0.001", DrawLine) or re.search( r"0.00001", DrawLine):
-      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0):
-        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq1,"Distribution when #chi^{2} < 0.00001","l"); \n')
+        NewDrawAnalyzer.write('  float ChiSqCutsFstPol[4] = {0.0002, 0.001, 0.0005, 0.005}; \n')
+    elif re.search( r"float ChiSqCutsScdPol", DrawLine):
+      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0): 
+        NewDrawAnalyzer.write('  float ChiSqCutsScdPol[4] = {0.0002, 0.00005, 0.00001, 0.000005}; \n')
       else:
-        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq1,"Distribution when #chi^{2} < 0.001","l"); \n')
+        NewDrawAnalyzer.write('  float ChiSqCutsScdPol[4] = {0.0002, 0.001, 0.0005, 0.005}; \n')
+#    elif re.search( r"0.0005", DrawLine) or re.search( r"0.000005", DrawLine) or re.search( r"0.00005", DrawLine):
+#      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0):
+#        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq2,"Distribution when #chi^{2} < 0.000005","l"); \n')
+#      else:
+#        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq2,"Distribution when #chi^{2} < 0.0005","l"); \n')
+#    elif re.search( r"0.001", DrawLine) or re.search( r"0.00001", DrawLine):
+#      if (title.find("Gen") <= len(title) and title.find("Gen") >= 0) or (title.find("MGSample") <= len(title) and title.find("MGSample") >= 0):
+#        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq1,"Distribution when #chi^{2} < 0.00001","l"); \n')
+#      else:
+#        NewDrawAnalyzer.write('  legend->AddEntry(h_ScdPolSmallChiSq1,"Distribution when #chi^{2} < 0.001","l"); \n')
     else:                                                    NewDrawAnalyzer.write(DrawLine) 
     
   NewDrawAnalyzer.close()
@@ -438,15 +498,13 @@ if whichAnalysis == "doublePolFitMacro.C":
 
 #-- Now store the stacked canvasses in a .text file --#
 if CreateTexFile == True and RunFitMacro == True:
-  CanvasOutputFile = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts.tex'),'w')
-
-  CanvasOutputFile.write('\\documentclass[a4paper,landscape]{article} \n')
-  CanvasOutputFile.write('\\usepackage{graphicx} \n ')
-  CanvasOutputFile.write('\\usepackage[top=.5in, bottom=1.25in, left=.5in, right=.5in,landscape]{geometry} \n \n')
-  CanvasOutputFile.write('\\begin{document} \n')
+  CanvasOutputFile_NoNorm  = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_NoNorm.tex'),'w')
+  CanvasOutputFile_XSNorm  = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_XSNorm.tex'),'w')
+  CanvasOutputFile_AccNorm = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_AccNorm.tex'),'w')
 
   NormType = ["no","XS","acceptance"]
   NormTypeName = ["","XS","Acc"]
+  CanvasOutputFile = [CanvasOutputFile_NoNorm, CanvasOutputFile_XSNorm, CanvasOutputFile_AccNorm]
   
   #Store the information in the correct directory:
   Canvaslist_dir = os.listdir(os.path.join(whichDir+'SplittedCanvasses/'))
@@ -456,25 +514,33 @@ if CreateTexFile == True and RunFitMacro == True:
     for ii in range(len(NormType)):
       if ii != iNormType:
         OtherNorms.append(ii)
-    CanvasOutputFile.write('\\section{Distributions of -ln(L) when '+NormType[iNormType]+' normalisation is applied} \n')
-    CanvasOutputFile.write('\n \\centering \n')
+    CanvasOutputFile[iNormType].write('\\documentclass[a4paper,landscape]{article} \n')
+    CanvasOutputFile[iNormType].write('\\usepackage{graphicx} \n ')
+    CanvasOutputFile[iNormType].write('\\usepackage[top=.5in, bottom=1.25in, left=.5in, right=.5in,landscape]{geometry} \n \n')
+    CanvasOutputFile[iNormType].write('\\begin{document} \n')
+
+    CanvasOutputFile[iNormType].write('\\section{Distributions of -ln(L) when '+NormType[iNormType]+' normalisation is applied} \n')
+    CanvasOutputFile[iNormType].write('\n \\centering \n')
 
     #Include the overall likelihood and secondPol distribution (together one 1 page!):
     if ("TotalLnLik"+NormTypeName[iNormType]+".pdf") in Canvaslist_dir and ("SecondPol"+NormTypeName[iNormType]+".pdf") in Canvaslist_dir:
-      CanvasOutputFile.write('\\includegraphics[width = 0.49 \\textwidth]{TotalLnLik'+NormTypeName[iNormType]+'.pdf} \n')
-      CanvasOutputFile.write('\\includegraphics[width = 0.49 \\textwidth]{SecondPol'+NormTypeName[iNormType]+'.pdf} \n')
+      CanvasOutputFile[iNormType].write('\\includegraphics[width = 0.32 \\textwidth]{TotalLnLik'+NormTypeName[iNormType]+'.pdf} \n')
+      CanvasOutputFile[iNormType].write('\\includegraphics[width = 0.32 \\textwidth]{FirstPol'+NormTypeName[iNormType]+'.pdf} \n')
+      CanvasOutputFile[iNormType].write('\\includegraphics[width = 0.32 \\textwidth]{SecondPol'+NormTypeName[iNormType]+'.pdf} \n')
 
     for file in Canvaslist_dir:
       #Include the stacked canvasses:
       if file.endswith(".pdf") and ("LL"+NormTypeName[iNormType] in file):
         if NormType[iNormType] == "no":
           if not (NormTypeName[OtherNorms[0]] in file) and not (NormTypeName[OtherNorms[1]] in file): # eg: '.txt'
-            CanvasOutputFile.write('\\includegraphics[width = 0.9 \\textwidth]{'+file+'} \n')
+            CanvasOutputFile[iNormType].write('\\includegraphics[width = 0.9 \\textwidth]{'+file+'} \n')
         else:
-          CanvasOutputFile.write('\\includegraphics[width = 0.9 \\textwidth]{'+file+'} \n')
+          CanvasOutputFile[iNormType].write('\\includegraphics[width = 0.9 \\textwidth]{'+file+'} \n')
     #Clear the contents of the OtherNorms array
     OtherNorms[:] = []
   
-  CanvasOutputFile.write('\\end{document} \n')
+  CanvasOutputFile_NoNorm.write('\\end{document} \n')
+  CanvasOutputFile_XSNorm.write('\\end{document} \n')
+  CanvasOutputFile_AccNorm.write('\\end{document} \n')
 
 print "\n --> All information is stored in : ", whichDir
