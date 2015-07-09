@@ -25,15 +25,15 @@ whichDir, AnomCoef, ptCut, VarConfig = sys.argv[1], sys.argv[2], sys.argv[3], sy
 #----------------------------------#
 #Set the correct names!
 PTCut = ""
-if ptCut == "0": PTCut = "NoPtCut"
-elif ptCut == "AlsoMET" or ptCut == "MET": PTCut = "PtCutsApplied_AlsoOnMET"
-else: PTCut = "PtCut"+str(ptCut)
+if ptCut == "0": PTCut, OutFileTitle = "NoPtCut", "NoPtCut"
+elif ptCut == "AlsoMET" or ptCut == "MET": PTCut, OutFileTitle = "PtCutsApplied_AlsoOnMET","PtCutsApplied_AlsoOnMET"
+else:  PTCut, OutFileTitle = "PtCut"+str(ptCut), 'NoLowPt_PtCut'+str(ptCut)
 
-outfile = file(os.path.join(whichDir+'weights_NoLowPt_Cut'+str(ptCut)+'.out'),'w')
-outfileCorrLn = file(os.path.join(whichDir+'weights_NoLowPt_'+PTCut+'_ApplyCosThetaReweighting.out'),'w')
+outfile = file(os.path.join(whichDir+'weights_'+OutFileTitle+'.out'),'w')
+outfileCorrLn = file(os.path.join(whichDir+'weights_'+OutFileTitle+'_ApplyCosThetaReweighting.out'),'w')
 CosThetaCorrFile = file(os.path.join('/user/aolbrech/AnomalousCouplings/MadAnalysis_v112/RVRAcceptance/SampleAnalyzer/CosThetaReweighting_'+str(AnomCoef)+'/'+str(VarConfig)+'_'+str(AnomCoef)+'/CosThetaWeight_'+str(VarConfig)+'_'+str(AnomCoef)+'_'+PTCut+'.txt'),'r')
 
-print "Getting cos theta info from : ",CosThetaCorrFile
+print "Getting cos theta info from : ",CosThetaCorrFile.name
 
 #----------------------------------#
 #   Get the correct output files   #
@@ -56,8 +56,8 @@ elif int(weightsFileCounter) > 1:
   fileNr = raw_input('Choose the number of the file of interest! : ')
   WeightsFile = open(os.path.join(whichDir+''+WeightsFileArray[int(fileNr)]),'r')
 
-print "Will be using file : ",WeightsFile," to delete events from !"
-print "Will be using lhco file : ",LHCOFile
+print "Will be using file : ",WeightsFile.name," to delete events from !"
+print "Will be using lhco file : ",LHCOFile.name
 
 #-------------------------------#
 #   Perform the event deletion  #
@@ -85,7 +85,7 @@ for line in WeightsFile:
   if str(word[0]) != "#":
     if not int(word[0]) in EventsToDelete:
       outfile.write(line)
-      outfileCorrLn.write(word[0]+'  '+word[1]+'  '+word[2]+'  '+word[3]+'  '+str(CosThetaCorr[int(word[0])])+'  '+word[4]+'\n')
+      outfileCorrLn.write(line.replace(word[4],str(CosThetaCorr[int(word[0])])+'  '+word[4]))
   else: outfile.write(line), outfileCorrLn.write(line)   #Write the first two lines containing text!
 
 outfile.close()
