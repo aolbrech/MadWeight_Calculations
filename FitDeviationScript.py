@@ -44,7 +44,6 @@ elif len(sys.argv) == 6:
   print "Need to specify which analysis should be executed: fctDeviationMacro or doublePolFitMacro (fctDeviation/doublePolFit)"
   print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
 
-print "Length of argurments : ",len(sys.argv)
 whichDir = sys.argv[1]
 KinVariable = sys.argv[2]
 nEvts = sys.argv[3]
@@ -52,18 +51,21 @@ whichAnalysis = sys.argv[6]
 
 #Special case when more than the obligatory number of input is given!
 #  --> This way it is possible to skip the questions asked by the script
-#  --> Correct syntax is : python FitDeviation.py(#0) Events/blabla/(#1) RVR(#2) 10000(#3) y(#4) n(#5) doublePolFit.C(#6) Wide(#7) Events/blabla/weights.out(#8) n(#9 - optional) n(#10 - optional) 
-FullInfoGiven = False
-if len(sys.argv) >= 9:
+#  --> Correct syntax is : python FitDeviation.py(#0) Events/blabla/(#1) RVR(#2) 10000(#3) y(#4) n(#5) doublePolFit.C(#6) Events/blabla/weights.out(#7) n(#8 - optional) n(#9 - optional) Range(#10)
+FullInfoGiven, VarWindowGiven = False, False
+if len(sys.argv) >= 8:
   FullInfoGiven = True   #Don't ask any questions anymore!
-  if sys.argv[7] == "Wide" and KinVariable == "RVR": VarWindow = "1"
-  elif sys.argv[7] == "Narrow" and KinVariable == "RgR": VarWindow = "1"
-  WeightsFileName = sys.argv[8]
+  WeightsFileName = sys.argv[7]
   WeightsFile = open(os.path.join(WeightsFileName),'r')
   #Apply the acceptance normalisation and cos theta* reweighting independent of the name of the considered directory
   applyAccNorm, applyCosTheta = "n","n"
-  if len(sys.argv) == 10: applyAccNorm = sys.argv[9]
-  if len(sys.argv) == 11: applyCosTheta = sys.argv[10]
+  if len(sys.argv) >= 9:  applyAccNorm = sys.argv[8]
+  if len(sys.argv) >= 10: applyCosTheta = sys.argv[9]
+  if len(sys.argv) >= 11:
+    VarWindowGiven = True
+    if sys.argv[10] == "Wide" and KinVariable == "RVR": VarWindow = "1"
+    elif sys.argv[10] == "Narrow" and KinVariable == "RgR": VarWindow = "1"
+    elif sys.argv[10] == "Full" and KinVariable == "RgR": VarWindow = "3"
 
 #Set the 'CreateTexFile' correctly:
 if sys.argv[5] == "y" or sys.argv[5] == "yes":  CreateTexFile = True
@@ -84,10 +86,9 @@ if KinVariable == "RVR":
   Acceptance = array('d',[1,       1,        0.22164, 0.21742,  0.21672,  0.21737,    0.21614,  0.21670,   0.21531,  0.21677,   0.21437,   0.21793,   0.22205,  1,       1       ])
 
   #Select which window of RVR values was considered!
-  if FullInfoGiven == False:
+  if VarWindowGiven == False:
     VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  3) Many   : [-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1] \n  4) Very wide : [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5] \n 5) Wide & Many : [-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3] \n --> Choose the correct number : ')
 
-  print "VarWindow value for RVR : ",VarWindow
   xMinValue = [4, 4, 10, 3, 12]
   NrPointsToRemove = [3, 3, 7, 2, 7]
   KinVar = "Re(V_{R})"
@@ -142,7 +143,7 @@ elif KinVariable == "MTop":
   Acceptance = array('d',[0.16203,  0.19152,  0.21008,   0.21460,   0.21735,  0.21290,    0.21752,    0.22185,   0.23941,   0.26413 ])
 
   #Select which window of masses was considered!
-  if FullInfoGiven == False:
+  if VarWindowGiven == False:
     VarWindow = raw_input('** Choose the correct mass-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [153, 163, 170, 171, 172, 173, 174, 175, 183, 193] \n  2) Normal : [153, 163, 171, 172, 173, 174, 175, 183, 193] \n  3) Narrow : [171, 172, 173, 174, 175] \n --> Choose the correct number : ')
 
   xMinValue = [5, 4, 2]
@@ -170,7 +171,7 @@ elif KinVariable == "RgR":
   MGXSCut = array('d',[0.363334, 0.639413, 0.912292, 1.098184, 1.32024, 1.58727, 1.73857, 1.90447,  2.0856,   2.28471, 2.71983, 3.2418,  3.838581, 5.31357, 9.66734 ]) #Also MET cuts!
 #  MGXSCut = array('d',[0.462736, 0.807034,  1.14397,   1.37121,   1.6414,    1.96796,            2.35719,              2.80657,    3.34178,   3.96076,    4.67808,  6.42868,   11.61381  ])
 
-  if FullInfoGiven == False:
+  if VarWindowGiven == False:
     VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different optiosn are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n --> Choose the correct number : ')
 
   xMinValue = [4, 4, 7]
@@ -221,7 +222,7 @@ if (whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormF
     title += "_AccNormApplied"
 #  elif WeightsFileName.find("Cut20") <= len(WeightsFileName) and WeightsFileName.find("Cut20") >= 0:
 
-print " List of considered Var values is : ",Var    
+print " List of considered Var values is : ",Var,"\n"
 NrConfigs = len(Var)
 xMin = xMinValue[int(VarWindow)-1]
 NumberOfPointsToRemove = NrPointsToRemove[int(VarWindow)-1]
@@ -250,6 +251,8 @@ WeightsFile, LikelihoodFile = open(WeightsFileName,'r'), open(WeightsFileName,'r
 #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
 #Check whether the file has enough events, otherwise use the maximum number
 maxNrEvts = os.popen('grep " 1 1 " '+str(WeightsFileName)+' | wc -l').read()
+print "Command is : ",str('grep " 1 1 " '+str(WeightsFileName)+' | wc -l')
+print "Output of maxNrEvts : ",maxNrEvts
 if int(maxNrEvts) < int(nEvts): nEvts = int(maxNrEvts)
 print " Will be using file : ",WeightsFileName," with ",nEvts," events ! "
 
@@ -267,9 +270,12 @@ if whichDir.find("ChangingXS") <= len(whichDir) and whichDir.find("ChangingXS") 
 #----------------------------#
 #   Setting output title     #
 #   --> Use directory name   #
+#   --> Add weightsFileName  #
 #----------------------------#
 title = str(whichDir[whichDir.find("/")+1:-1])  #Only need the part after the "/"!!
 #Special cases!
+#*** Indicating that the cos theta* reweighting has been applied
+if FullInfoGiven == True and (applyCosTheta == "y" or applyCosTheta == "yes" or applyCosTheta == "Y" or applyCosTheta == "Yes"): title += "_CosThetaReweightingApplied"
 #*** Indicating that XS-values are changed!
 if whichDir.find("ChangingXS") <= len(whichDir) and whichDir.find("ChangingXS") > 0:
   title += TitleChange
@@ -339,7 +345,7 @@ if RunFitMacro == True:
     elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
     elif re.search( r"string SplittedDir", RootLine): NewRootAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
     elif re.search( r"iss >> evt",         RootLine):
-      if (WeightsFileName.find("CosTheta") < len(WeightsFileName) and WeightsFileName.find("CosTheta") >= 0) or (FullInfoGiven == True and (applyCosTheta == "y" or applyCosTheta == "Y")):
+      if FullInfoGiven == True and (applyCosTheta == "y" or applyCosTheta == "Y"):
         NewRootAnalyzer.write('    if( iss >> evt >> config >> tf >> weight >> CosThetaCorr >> weightUnc){ \n')
         print " Cos theta* reweighting will be applied! \n"
       else:
