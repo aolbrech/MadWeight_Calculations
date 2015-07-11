@@ -18,6 +18,7 @@
 import os
 import sys
 import re
+import shutil
 from array import array
 
 #Get all the input from the command line:
@@ -251,8 +252,6 @@ WeightsFile, LikelihoodFile = open(WeightsFileName,'r'), open(WeightsFileName,'r
 #Count the number of events actually present in the WeightsFile as the maximum numbers which can actually be used:
 #Check whether the file has enough events, otherwise use the maximum number
 maxNrEvts = os.popen('grep " 1 1 " '+str(WeightsFileName)+' | wc -l').read()
-print "Command is : ",str('grep " 1 1 " '+str(WeightsFileName)+' | wc -l')
-print "Output of maxNrEvts : ",maxNrEvts
 if int(maxNrEvts) < int(nEvts): nEvts = int(maxNrEvts)
 print " Will be using file : ",WeightsFileName," with ",nEvts," events ! "
 
@@ -322,6 +321,10 @@ if RunFitMacro == True:
     else:
       xPosLine += str(xPos[ii])+'}; \n'
       xNegLine += str(xNeg[ii])+'}; \n'
+  
+  #-->Create the directory SplittedCanvasses if needed!
+  if CreateTexFile == True:
+    if not (os.path.exists(os.path.join(whichDir+'SplittedCanvasses/')) ): os.makedirs(os.path.join(whichDir+'SplittedCanvasses/'))
 
   for RootLine in RootAnalyzer:
     RootWord = RootLine.split()
@@ -431,18 +434,20 @@ if whichAnalysis == "doublePolFitMacro.C":
 
 #-- Now store the stacked canvasses in a .txt file --#
 if CreateTexFile == True and RunFitMacro == True:
-  CanvasOutputFile_NoNorm  = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_NoNorm.tex'),'w')
-  CanvasOutputFile_XSNorm  = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_XSNorm.tex'),'w')
-  CanvasOutputFile_AccNorm = open(os.path.join(whichDir+'SplittedCanvasses/FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_AccNorm.tex'),'w')
 
+  #Change the working directory of the script!
+  os.chdir(os.path.join(whichDir+'SplittedCanvasses/'))
+  CanvasOutputFile_NoNorm  = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_NoNorm.tex'),'w')
+  CanvasOutputFile_XSNorm  = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_XSNorm.tex'),'w')
+  CanvasOutputFile_AccNorm = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_AccNorm.tex'),'w')
+
+  print " Current working directory is : ", os.getcwd()
   NormType = ["no","XS","acceptance"]
   NormTypeName = ["","XS","Acc"]
   CanvasOutputFile = [CanvasOutputFile_NoNorm, CanvasOutputFile_XSNorm, CanvasOutputFile_AccNorm]
   
   #Store the information in the correct directory:
-  #-->Create the directory SplittedCanvasses if needed!
-  if not (os.path.exists(os.path.join(whichDir+'SplittedCanvasses/')) ): os.makedirs(os.path.join(whichDir+'SplittedCanvasses/'))
-  Canvaslist_dir = os.listdir(os.path.join(whichDir+'SplittedCanvasses/'))
+  Canvaslist_dir = os.listdir('.') #os.path.join(whichDir+'SplittedCanvasses/'))
 
   OtherNorms = []
   for iNormType in range(len(NormType)):
@@ -477,5 +482,11 @@ if CreateTexFile == True and RunFitMacro == True:
     
     #Write the \end document sentence:
     CanvasOutputFile[iNormType].write('\\end{document} \n')
+    CanvasOutputFile[iNormType].close()
 
+    #Now create the PDF document using pdflatex!
+    os.system('pdflatex -interaction=batchmode '+CanvasOutputFile[iNormType].name)
+    print "Want to move file with name : ",(CanvasOutputFile[iNormType].name[:-4]+".pdf")
+    shutil.move(CanvasOutputFile[iNormType].name[:-4]+".pdf","..");
+    
 print "\n --> All information is stored in : ", whichDir
