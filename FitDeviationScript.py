@@ -324,9 +324,12 @@ if RunFitMacro == True:
       xPosLine += str(xPos[ii])+'}; \n'
       xNegLine += str(xNeg[ii])+'}; \n'
   
-  #-->Create the directory SplittedCanvasses if needed!
+  #-->Create the directory SplittedCanvasses if needed (otherwise delete the created pdf files ...)!
   if CreateTexFile == True:
     if not (os.path.exists(os.path.join(whichDir+'SplittedCanvasses/')) ): os.makedirs(os.path.join(whichDir+'SplittedCanvasses/'))
+    else:
+      print "Deleting the existing SplitCanvas files ! "
+      os.system('rm '+whichDir+'SplittedCanvasses/SplitCanvasLL*.pdf')
 
   for RootLine in RootAnalyzer:
     RootWord = RootLine.split()
@@ -443,6 +446,7 @@ if CreateTexFile == True and RunFitMacro == True:
   CanvasOutputFile_XSNorm  = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_XSNorm.tex'),'w')
   CanvasOutputFile_AccNorm = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_AccNorm.tex'),'w')
 
+
   print " Current working directory is : ", os.getcwd()
   NormType = ["no","XS","acceptance"]
   NormTypeName = ["","XS","Acc"]
@@ -456,6 +460,9 @@ if CreateTexFile == True and RunFitMacro == True:
     for ii in range(len(NormType)):
       if ii != iNormType:
         OtherNorms.append(ii)
+
+    #Check whether these output files already exist, otherwise delete them !	
+    if os.path.isfile(os.path.join("../"+CanvasOutputFile[iNormType].name[:-4]+".pdf") ): os.system('rm ../'+CanvasOutputFile[iNormType].name[:-4]+'.pdf')
 
     CanvasOutputFile[iNormType].write('\\documentclass[a4paper,landscape]{article} \n')
     CanvasOutputFile[iNormType].write('\\usepackage{graphicx} \n ')
