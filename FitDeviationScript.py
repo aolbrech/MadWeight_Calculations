@@ -24,49 +24,55 @@ from array import array
 #Get all the input from the command line:
 if len(sys.argv) <= 1:
   print "Need to give the directory of interest, the considered kinematic variable and the number of events in the command line !"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
   sys.exit()
 elif len(sys.argv) == 2:
   print "Need to specify the considered kinematic variable (MTop or RVR)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
   sys.exit()
 elif len(sys.argv) == 3:
   print "Need to give the number of considered events !"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
   sys.exit()
 elif len(sys.argv) == 4:
   print "Need to specify whether the performed fits have to be updated (hence run fitDeviationMacro.C)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
   sys.exit()
 elif len(sys.argv) == 5:
   print "Need to mention whether Tex output is wanted (y/n)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
 elif len(sys.argv) == 6:
   print "Need to specify which analysis should be executed: fctDeviationMacro or doublePolFitMacro (fctDeviation/doublePolFit)"
-  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
+elif len(sys.argv) == 7:
+  print "Need to specify which whether the acceptance normalisation should be applied! (y/n)"
+  print " Correct syntax is : python FitDeviation.py Events/blabla/ Var(MTop/RVR/RgR) #evts ForceFitUpdate(y/n) TexWanted(y/n) WhichAnalysis(fctDeviation.C/doublePolFit.C) applyAccNorm(y/n)"
 
 whichDir = sys.argv[1]
 KinVariable = sys.argv[2]
 nEvts = sys.argv[3]
 whichAnalysis = sys.argv[6]
+applyAccNorm = sys.argv[7]
 
+applyCosTheta = "n"   #Initialized to "no"!
+WeightsFileGiven, VarWindowGiven = False, False
 #Special case when more than the obligatory number of input is given!
 #  --> This way it is possible to skip the questions asked by the script
-#  --> Correct syntax is : python FitDeviation.py(#0) Events/blabla/(#1) RVR(#2) 10000(#3) y(#4) n(#5) doublePolFit.C(#6) Events/blabla/weights.out(#7) n(#8 - optional) n(#9 - optional) Range(#10)
-FullInfoGiven, VarWindowGiven = False, False
-if len(sys.argv) >= 8:
-  FullInfoGiven = True   #Don't ask any questions anymore!
-  WeightsFileName = sys.argv[7]
+#  --> Correct syntax is : python FitDeviation.py(#0) Events/blabla/(#1) RVR(#2) 10000(#3) y(#4) n(#5) doublePolFit.C(#6) n(#7) n(#8-optional) Events/blabla/weights.out(#9-optional) Range(#10-optional)
+#
+#-- Cos theta normalisation
+if len(sys.argv) >= 9: applyCosTheta = sys.argv[8]
+#-- Specific weights file
+if len(sys.argv) >= 10:
+  WeightsFileGiven = True
+  WeightsFileName = sys.argv[9]
   WeightsFile = open(os.path.join(WeightsFileName),'r')
-  #Apply the acceptance normalisation and cos theta* reweighting independent of the name of the considered directory
-  applyAccNorm, applyCosTheta = "n","n"
-  if len(sys.argv) >= 9:  applyAccNorm = sys.argv[8]
-  if len(sys.argv) >= 10: applyCosTheta = sys.argv[9]
-  if len(sys.argv) >= 11:
-    VarWindowGiven = True
-    if sys.argv[10] == "Wide" and KinVariable == "RVR": VarWindow = "1"
-    elif sys.argv[10] == "Narrow" and KinVariable == "RgR": VarWindow = "1"
-    elif sys.argv[10] == "Full" and KinVariable == "RgR": VarWindow = "3"
+#-- Specific range
+if len(sys.argv) >= 11:
+  VarWindowGiven == True
+  if sys.argv[10] == "Wide" and KinVariable == "RVR": VarWindow = "1"
+  elif sys.argv[10] == "Narrow" and KinVariable == "RgR": VarWindow = "1"
+  elif sys.argv[10] == "Full" and KinVariable == "RgR": VarWindow = "3"
 
 #Set the 'CreateTexFile' correctly:
 if sys.argv[5] == "y" or sys.argv[5] == "yes":  CreateTexFile = True
@@ -173,11 +179,11 @@ elif KinVariable == "RgR":
 #  MGXSCut = array('d',[0.462736, 0.807034,  1.14397,   1.37121,   1.6414,    1.96796,            2.35719,              2.80657,    3.34178,   3.96076,    4.67808,  6.42868,   11.61381  ])
 
   if VarWindowGiven == False:
-    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different optiosn are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n --> Choose the correct number : ')
+    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different options are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n  4) Wide narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n--> Choose the correct number : ')
 
-  xMinValue = [4, 4, 7]
+  xMinValue = [4, 4, 7, 4]
   KinVar = "Re(g_{R})"
-  NrPointsToRemove = [2, 2, 5]
+  NrPointsToRemove = [2, 2, 5, 2]
   FitType = "pol2"
  
   if VarWindow == "1": 
@@ -197,7 +203,15 @@ elif KinVariable == "RgR":
     Var.pop(0),  VarValues.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 9, -0.225, 0.225
   elif VarWindow == "3":
-    xBin, xLow, xHigh = 41, -0.5125, 0.5125	
+    xBin, xLow, xHigh = 41, -0.5125, 0.5125
+  elif VarWindow == "4":
+    Var.pop(14), VarValues.pop(14), MGXS.pop(14), MGXSCut.pop(14)
+    Var.pop(11), VarValues.pop(11), MGXS.pop(11), MGXSCut.pop(11)
+    Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
+    Var.pop(4),  VarValues.pop(4),  MGXS.pop(4),  MGXSCut.pop(4)
+    Var.pop(0),  VarValues.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
+    xBin, xLow, xHigh = 13, -0.325, 0.325
 
 if KinVariable == "RVR" and VarWindow == "3":
   xPos = [15, 20]
@@ -210,19 +224,24 @@ else:
 #   Special cases for MGXSCut initialization  #
 #---------------------------------------------#
 #In the case that MGSample or GEN info is used, the acceptance-normalisation shouldn't be applied
-if ( (whichDir.find("MGSample") <= len(whichDir) and whichDir.find("MGSample") > 0) or (whichDir.find("GEN") <= len(whichDir) and whichDir.find("GEN") > 0) ) and FullInfoGiven == True and (applyAccNorm == "n" or applyAccNorm == "no" or applyAccNorm == "No"):
+if applyAccNorm == "n"or applyAccNorm == "no" or applyAccNorm == "No":
   MGXSCut = MGXS
-  print " Looking at MG sample or GEN-level events ==> No acceptance normalisation will be applied! \n"
+  print "  ==> No acceptance normalisation will be applied! \n"
+  if (whichDir.find("RECO") <= len(whichDir) and whichDir.find("RECO") > 0) or (whichDir.find("Reco") <= len(whichDir) and whichDir.find("Reco") > 0):
+    print " \n ************************* ERROR **************************** \n -----> Applying no Acceptance normalisation for reco-level events .... \n"
 else:
-  print " Applying acceptance normalisation ! \n"	
+  print " Applying acceptance normalisation ! \n"
+  if (whichDir.find("MGSample") <= len(whichDir) and whichDir.find("MGSample") > 0 and whichDir.find("Cut") < 0) or (whichDir.find("GEN") <= len(whichDir) and whichDir.find("GEN") > 0):
+    print " \n ************************* ERROR **************************** \n -----> Applying Acceptance normalisation to generator-level events .... \n"
+
 #Perform Acc-norm by applying the normalisation for some cases
-if (whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormForCuts") >= 0) or (FullInfoGiven == True and (applyAccNorm == "y" or applyAccNorm == "Y" or applyAccNorm == "yes")):
-  if WeightsFileName.find("Cut15") <= len(WeightsFileName) and WeightsFileName.find("Cut15") >= 0:
-    MGXSCut = array('d',[13.460863375, 10.01499288, 8.983043286, 8.376425187, 8.118650426, 8.174741519, 8.559729052, 9.324577757, 12.131027388]) 
-    title += "_AccNormApplied"
-  elif WeightsFileName.find("Cut30") <= len(WeightsFileName) and WeightsFileName.find("Cut30") >= 0:
-    MGXSCut = array('d',[4.772121225, 3.471694536, 3.103621427, 2.907659993, 2.789024957, 2.832458413, 2.945885258, 3.251167862, 4.277700888])
-    title += "_AccNormApplied"
+#if (whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormForCuts") >= 0) or (FullInfoGiven == True and (applyAccNorm == "y" or applyAccNorm == "Y" or applyAccNorm == "yes")):
+#  if WeightsFileName.find("Cut15") <= len(WeightsFileName) and WeightsFileName.find("Cut15") >= 0:
+#    MGXSCut = array('d',[13.460863375, 10.01499288, 8.983043286, 8.376425187, 8.118650426, 8.174741519, 8.559729052, 9.324577757, 12.131027388]) 
+#    title += "_AccNormApplied"
+#  elif WeightsFileName.find("Cut30") <= len(WeightsFileName) and WeightsFileName.find("Cut30") >= 0:
+#    MGXSCut = array('d',[4.772121225, 3.471694536, 3.103621427, 2.907659993, 2.789024957, 2.832458413, 2.945885258, 3.251167862, 4.277700888])
+#    title += "_AccNormApplied"
 #  elif WeightsFileName.find("Cut20") <= len(WeightsFileName) and WeightsFileName.find("Cut20") >= 0:
 
 print " List of considered Var values is : ",Var,"\n"
@@ -231,8 +250,8 @@ xMin = xMinValue[int(VarWindow)-1]
 NumberOfPointsToRemove = NrPointsToRemove[int(VarWindow)-1]
 xStep = [Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] ]
 
-#File of interest (only search if FullInfoGiven is set to false):
-if FullInfoGiven == False:
+#File of interest (only search if WeightsFileGiven is set to false):
+if WeightsFileGiven == False:
   list_dir = os.listdir(whichDir)
   WeightsFileArray, weightsFileCounter = [], 0
   for file in list_dir:
@@ -276,7 +295,7 @@ if whichDir.find("ChangingXS") <= len(whichDir) and whichDir.find("ChangingXS") 
 title = str(whichDir[whichDir.find("/")+1:-1])  #Only need the part after the "/"!!
 #Special cases!
 #*** Indicating that the cos theta* reweighting has been applied
-if FullInfoGiven == True and (applyCosTheta == "y" or applyCosTheta == "yes" or applyCosTheta == "Y" or applyCosTheta == "Yes"): title += "_CosThetaReweightingApplied"
+if applyCosTheta == "y" or applyCosTheta == "yes" or applyCosTheta == "Y" or applyCosTheta == "Yes": title += "_CosThetaReweightingApplied"
 #*** Indicating that XS-values are changed!
 if whichDir.find("ChangingXS") <= len(whichDir) and whichDir.find("ChangingXS") > 0:
   title += TitleChange
@@ -353,7 +372,7 @@ if RunFitMacro == True:
     elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
     elif re.search( r"string SplittedDir", RootLine): NewRootAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
     elif re.search( r"iss >> evt",         RootLine):
-      if FullInfoGiven == True and (applyCosTheta == "y" or applyCosTheta == "Y"):
+      if applyCosTheta == "y" or applyCosTheta == "Y":
         NewRootAnalyzer.write('    if( iss >> evt >> config >> tf >> weight >> CosThetaCorr >> weightUnc){ \n')
         print " Cos theta* reweighting will be applied! \n"
       else:
@@ -445,7 +464,6 @@ if CreateTexFile == True and RunFitMacro == True:
   CanvasOutputFile_NoNorm  = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_NoNorm.tex'),'w')
   CanvasOutputFile_XSNorm  = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_XSNorm.tex'),'w')
   CanvasOutputFile_AccNorm = open(os.path.join('FitDeviationSplitCanvas_'+str(title)+'_'+str(nEvts)+'Evts_AccNorm.tex'),'w')
-
 
   print " Current working directory is : ", os.getcwd()
   NormType = ["no","XS","acceptance"]
