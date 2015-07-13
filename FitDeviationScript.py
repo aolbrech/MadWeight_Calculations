@@ -213,6 +213,8 @@ else:
 if ( (whichDir.find("MGSample") <= len(whichDir) and whichDir.find("MGSample") > 0) or (whichDir.find("GEN") <= len(whichDir) and whichDir.find("GEN") > 0) ) and FullInfoGiven == True and (applyAccNorm == "n" or applyAccNorm == "no" or applyAccNorm == "No"):
   MGXSCut = MGXS
   print " Looking at MG sample or GEN-level events ==> No acceptance normalisation will be applied! \n"
+else:
+  print " Applying acceptance normalisation ! \n"	
 #Perform Acc-norm by applying the normalisation for some cases
 if (whichDir.find("AccNormForCuts") <= len(whichDir) and whichDir.find("AccNormForCuts") >= 0) or (FullInfoGiven == True and (applyAccNorm == "y" or applyAccNorm == "Y" or applyAccNorm == "yes")):
   if WeightsFileName.find("Cut15") <= len(WeightsFileName) and WeightsFileName.find("Cut15") >= 0:
