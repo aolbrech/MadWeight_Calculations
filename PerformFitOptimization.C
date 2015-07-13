@@ -17,17 +17,17 @@
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
 bool storeSplittedCanvas = false; 
-std::string SplittedDir = "Events_RgRScan/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/SplittedCanvasses"; 
+std::string SplittedDir = "Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-TFile *inFile = new TFile("Events_RgRScan/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/FitDistributions_RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET_CosThetaReweightingApplied_10000Evts.root","READ"); 
-TFile *outputFile = new TFile("Events_RgRScan/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/FitOptimizations_RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET_CosThetaReweightingApplied_10000Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/FitDistributions_TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts_5000Evts.root","READ"); 
+TFile *outputFile = new TFile("Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/FitOptimizations_TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts_5000Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
-const int xBin = 9; 
+const int xBin = 41; 
 const int xFitBin = xBin*10; 
-float xLow = -0.225; 
-float xHigh = 0.225; 
+float xLow = -0.5125; 
+float xHigh = 0.5125; 
 
 void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
@@ -107,6 +107,8 @@ void getIndividualDirObjects(TDirectory *dir){
     else if(dirName.find("FirstFit_Acc_FitDevCutTight") != std::string::npos){  FitNr = "FirstPol_FitDevCutTight"; NrUsedPoints = "fitdevCutTight";}
     else if(dirName.find("FirstFit_Acc_MTop172") != std::string::npos){         FitNr = "FirstPol_MTop172"; NrUsedPoints = "mTop172";}
     else if(dirName.find("FirstFit_Acc_MTop174") != std::string::npos){         FitNr = "FirstPol_MTop174"; NrUsedPoints = "mTop174";}
+    else if(dirName.find("FirstFit_Acc_PosScdDerAndSlope") != std::string::npos){ FitNr = "FirstPol_PosScdDerAndSlope"; NrUsedPoints = "all";}
+    else if(dirName.find("FirstFit_Acc_PosScdDerAndBothSlope") != std::string::npos){ FitNr = "FirstPol_PosScdDerAndBothSlope"; NrUsedPoints = "all";}
 
     if (dirName.find("LL") != std::string::npos)
       h_LLSum = new TH1F(("LL"+NormType+"_Summed").c_str(), ("Distribution of "+dirName+" after summing over all "+sNkeys.c_str()+" events").c_str(), xBin, xLow, xHigh);
@@ -155,9 +157,10 @@ void getIndividualDirObjects(TDirectory *dir){
 
         for(int iBin = 0; iBin < xFitBin; iBin++){
           double VarValue = xLow+(xHigh-xLow)/(2*xFitBin)+((xHigh-xLow)/xFitBin)*iBin;
-          for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++)
+          for(int iPar = 0; iPar < fitFunc->GetNpar(); iPar++){
             VarBinValue[iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
-            if(fitFunc->GetParameter(2) > 0) VarBinValuePosSlope += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
+            if(fitFunc->GetParameter(2) > 0) VarBinValuePosSlope[iBin] += fitFunc->GetParameter(iPar)*pow(VarValue,iPar);
+          }
         }
 
         //Apply the chi-sq cuts for each of the values requested:
