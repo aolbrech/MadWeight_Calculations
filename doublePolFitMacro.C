@@ -16,13 +16,13 @@
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
 bool storeSplittedCanvas = false; 
-std::string SplittedDir = "Events_RgRScan/RgR_MGSampleNeg015_SingleGausTF_10000Evts_FullRange_CutsAppliedAlsoOnMET/SplittedCanvasses"; 
+std::string SplittedDir = "Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
 std::string VarValues[] = {"Re(g_{R}) = -0.5","Re(g_{R}) = -0.3","Re(g_{R}) = -0.2","Re(g_{R}) = -0.15","Re(g_{R}) = -0.1","Re(g_{R}) = -0.05","Re(g_{R}) = -0.025","Re(g_{R}) = 0.0","Re(g_{R}) = 0.025","Re(g_{R}) = 0.05","Re(g_{R}) = 0.1","Re(g_{R}) = 0.15","Re(g_{R}) = 0.2","Re(g_{R}) = 0.3","Re(g_{R}) = 0.5"};
 double Var[] = {-0.5,-0.3,-0.2,-0.15,-0.1,-0.05,-0.025,0.0,0.025,0.05,0.1,0.15,0.2,0.3,0.5};
 double MGXS[] = {1.8647,3.36424,4.92909,6.02588,7.34593,8.94878,9.88333,10.89487,11.92922,13.1987,15.9457,19.1623,22.9185,32.2975,60.5617};
-double MGXSCut[] = {0.363334,0.639413,0.912292,1.098184,1.32024,1.58727,1.73857,1.90447,2.0856,2.28471,2.71983,3.2418,3.838581,5.31357,9.66734};
+double MGXSCut[] = {1.8647,3.36424,4.92909,6.02588,7.34593,8.94878,9.88333,10.89487,11.92922,13.1987,15.9457,19.1623,22.9185,32.2975,60.5617};
 int xBin = 41; 
 float xLow = -0.5125; 
 float xHigh = 0.5125; 
@@ -31,7 +31,7 @@ std::string KinVar = "Re(g_{R})";
 int VarWindow = 3; 
 int xPos[] = {8,9}; 
 int xNeg[] = {6,5}; 
-std::string title = "RgR_MGSampleNeg015_SingleGausTF_10000Evts_FullRange_CutsAppliedAlsoOnMET"; 
+std::string title = "TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts"; 
 //double CreatedVar = 0.0;
 //std::ofstream file_MaxShapeEvts ("Events_RgRScan_ChangingXS/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/MaxShapeEvts_RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET_XSScaledWithPos01.out", std::ofstream::out); 
 //std::ofstream file_MinShapeEvts ("Events_RgRScan_ChangingXS/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/MinShapeEvts_RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET_XSScaledWithPos01.out", std::ofstream::out); 
@@ -41,7 +41,7 @@ std::string title = "RgR_MGSampleNeg015_SingleGausTF_10000Evts_FullRange_CutsApp
 //TFile* file_FewEvts = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/LogLikDistributions.root","RECREATE"); 
 
 //ROOT file to store the Fit functions --> Will fasten the study of the cut-influences ...
-TFile* file_FitDist = new TFile("Events_RgRScan/RgR_MGSampleNeg015_SingleGausTF_10000Evts_FullRange_CutsAppliedAlsoOnMET/FitDistributions_RgR_MGSampleNeg015_SingleGausTF_10000Evts_FullRange_CutsAppliedAlsoOnMET_10000Evts.root","RECREATE"); 
+TFile* file_FitDist = new TFile("Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/FitDistributions_TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts_5000Evts.root","RECREATE"); 
 TDirectory *dir_OriginalLL = file_FitDist->mkdir("OriginalLL"),        *dir_OriginalLLXS = file_FitDist->mkdir("OriginalLL_XS"),        *dir_OriginalLLAcc = file_FitDist->mkdir("OriginalLL_Acc");
 TDirectory *dir_FirstFit = file_FitDist->mkdir("FirstPolynomialFit"),  *dir_FirstFitXS = file_FitDist->mkdir("FirstPolynomialFit_XS"),  *dir_FirstFitAcc = file_FitDist->mkdir("FirstPolynomialFit_Acc");
 TDirectory *dir_SecondFit = file_FitDist->mkdir("SecondPolynomialFit"),*dir_SecondFitXS = file_FitDist->mkdir("SecondPolynomialFit_XS"),*dir_SecondFitAcc = file_FitDist->mkdir("SecondPolynomialFit_Acc");
@@ -54,9 +54,11 @@ TDirectory *dir_FirstFitAcc_FitDevCutTight = file_FitDist->mkdir("FirstFit_Acc_F
 //TDirectory *dir_SecondFitAcc_HighChiSq = dir_SecondFitAcc->mkdir("RejectedEvents");
 TDirectory *dir_MTop172 = file_FitDist->mkdir("FirstFit_Acc_MTop172");
 TDirectory *dir_MTop174 = file_FitDist->mkdir("FirstFit_Acc_MTop174");
+TDirectory *dir_FirstFitAcc_PosScdDerAndSlope = file_FitDist->mkdir("FirstFit_Acc_PosScdDerAndSlope");
+TDirectory *dir_FirstFitAcc_PosScdDerAndBothSlopes = file_FitDist->mkdir("FirstFit_Acc_PosScdDerAndBothSlope");
 
 const int NrConfigs = 15; 
-const int nEvts = 10000; 
+const int nEvts = 5000; 
 const unsigned int NrToDel = 5; 
 int NrRemaining = NrConfigs-NrToDel;
 std::string sNrCanvas ="0";
@@ -76,6 +78,8 @@ TH1F* h_TotalRelFitDeviation = new TH1F("TotalRelFitDeviation","TotalRelFitDevia
 TH1F* h_MinLikelihoodValue = new TH1F("MinLikelihoodValue","Distribution of the minimum log(likelihood) value for each event",200,0,100);
 TH2F* h_MinLogLikVSChiSq = new TH2F("MinLikelihoodValueVSChiSq","Distribution of the minimum log(likelihood) value versus chi-squared of first fit",200,0,0.00005,200,0,100);
 TH1F* h_SlopeShape = new TH1F("SlopeShape","Steepness of slope",200,-5,5);
+TH1F* h_SlopeShapePosScdDer = new TH1F("SlopeShapePosScdDer","Steepness of slope (events with positive scd der)",200,-5,5);
+TH1F* h_SlopeShapeNegScdDer = new TH1F("SlopeShapeNegScdDer","Steepness of slope (events with negative scd der)",200,-5,5);
 TH1F* h_ScdDerShapeEvts = new TH1F("ScdDerShapeEvts","2^{nd} derivative of events with min or max at VR = 0.0",500,-5,5);
 TH1F* h_ScdDerMaxShapeEvts = new TH1F("ScdDerMaxShapeEvts","2^{nd} derivative of events with max at VR = 0.0",500,-5,5);
 TH1F* h_ScdDerMinShapeEvts = new TH1F("ScdDerMinShapeEvts","2^{nd} derivative of events with min at VR = 0.0",500,-5,5);
@@ -174,13 +178,22 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
     delete canv_FewEvts;
   }*/
 
-  if(polFit_AllPoints->GetChisquare() > 0.00008 and Type == "Acc"){
+  if(polFit_AllPoints->GetChisquare() > 0.00008 && Type == "Acc"){
     dir_FirstFitAcc_HighChiSq->cd();
     //TCanvas* canv_RejEvts = new TCanvas(("RejectedEvents_"+EvtNumber).c_str(),("RejectedEvents_"+EvtNumber).c_str()); canv_RejEvts->cd();
     //gr_LnLik->Draw("AC*");
     //polFit_AllPoints->Draw("same");
     //canv_RejEvts->Write();
     //delete canv_RejEvts;
+    polFit_AllPoints->Write();
+  }
+
+  if(polFit_AllPoints->GetParameter(2) > 0 && LogLikelihood[0]-LogLikelihood[xMinValue[VarWindow]] > 0 && Type == "Acc"){
+    dir_FirstFitAcc_PosScdDerAndSlope->cd();
+    polFit_AllPoints->Write();
+  }
+  if(polFit_AllPoints->GetParameter(2) > 0 && LogLikelihood[0]-LogLikelihood[xMinValue[VarWindow]] > 0 && LogLikelihood[xMinValue[VarWindow]]-LogLikelihood[NrConfigs-1] < 0 && Type == "Acc"){
+    dir_FirstFitAcc_PosScdDerAndBothSlopes->cd();
     polFit_AllPoints->Write();
   }
   
@@ -198,9 +211,13 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
       binNr_LnLikMin = iConf+1;
     }
   }
-  h_MinLikelihoodValue->Fill(LnLikMin);
-  h_MinLogLikVSChiSq->Fill(polFit_AllPoints->GetChisquare(),LnLikMin);
-  h_SlopeShape->Fill(LogLikelihood[0]-LogLikelihood[xMinValue[VarWindow]]);
+  if(Type == "Acc"){
+    h_MinLikelihoodValue->Fill(LnLikMin);
+    h_MinLogLikVSChiSq->Fill(polFit_AllPoints->GetChisquare(),LnLikMin);
+    h_SlopeShape->Fill(LogLikelihood[0]-LogLikelihood[xMinValue[VarWindow]]);
+    if( polFit_AllPoints->GetParameter(2) > 0) h_SlopeShapePosScdDer->Fill(LogLikelihood[0]-LogLikelihood[xMinValue[VarWindow]]);
+    if( polFit_AllPoints->GetParameter(2) < 0) h_SlopeShapeNegScdDer->Fill(LogLikelihood[0]-LogLikelihood[xMinValue[VarWindow]]);
+  }
 
   std::vector<std::pair<int, double> > FitDeviation, FitDeviationRel;
   double LogLikFit[NrConfigs] = {-9999};
@@ -286,7 +303,7 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
   std::ostringstream osParam4; osParam4 << polFit_AllPoints->GetParameter(4); std::string sParam4 = osParam4.str();
   h_LogLik->SetTitle(("FitInfo (slope req): "+sParam0+", "+sParam1+", "+sParam2+", "+sParam3+" & "+sParam4).c_str());
 
-  h_ScdDerAllEvts->Fill(polFit_AllPoints->GetParameter(2));
+  if(Type == "Acc") h_ScdDerAllEvts->Fill(polFit_AllPoints->GetParameter(2));
   //Write away the events which show minimum- and maximum-shape of Likelihood!                            --> Wrong numbers in case of Full range!
   //if(Type == "Acc" && LogLikelihood[0] < LogLikelihood[2] && LogLikelihood[2] < LogLikelihood[4]){
   //  h_ScdDerShapeEvts->Fill(polFit_AllPoints->GetParameter(2));
@@ -347,7 +364,7 @@ void doublePolFitMacro(){
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events_RgRScan/RgR_MGSampleNeg015_SingleGausTF_10000Evts_FullRange_CutsAppliedAlsoOnMET/weights_PtCutsApplied_AlsoOnMET_ApplyCosThetaReweighting.out", std::ifstream::in); 
+  std::ifstream ifs ("Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/weights.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
@@ -440,7 +457,9 @@ void doublePolFitMacro(){
   h_TotalRelFitDeviation->Write();
   h_MinLogLikVSChiSq->Write();
   PaintOverflow(h_MinLikelihoodValue, file_FitDist, "FitResults");
-  PaintOverflow(h_SlopeShape, file_FitDist, "FitResults");
+  PaintOverflow(h_SlopeShape, file_FitDist, "FitResults");         delete h_SlopeShape;
+  PaintOverflow(h_SlopeShapePosScdDer,file_FitDist,"FitResults");  delete h_SlopeShapePosScdDer;
+  PaintOverflow(h_SlopeShapeNegScdDer, file_FitDist,"FitResults"); delete h_SlopeShapeNegScdDer;
   PaintOverflow(h_ScdDerShapeEvts, file_FitDist,"FitResults");
   PaintOverflow(h_ScdDerMaxShapeEvts, file_FitDist,"FitResults");
   PaintOverflow(h_ScdDerMinShapeEvts, file_FitDist,"FitResults");
