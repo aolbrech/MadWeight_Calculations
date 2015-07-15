@@ -209,7 +209,7 @@ elif KinVariable == "RgR":
     Var.pop(11), VarValues.pop(11), MGXS.pop(11), MGXSCut.pop(11)
     Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
     Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(4),  VarValues.pop(4),  MGXS.pop(4),  MGXSCut.pop(4)
+    Var.pop(3),  VarValues.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
     Var.pop(0),  VarValues.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 13, -0.325, 0.325
 
