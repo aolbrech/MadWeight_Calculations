@@ -85,7 +85,6 @@ if KinVariable != "MTop" and KinVariable != "RVR" and KinVariable != "RgR":
 
 if KinVariable == "RVR":
   #Information about the scanned RVR values and the corresponding cross-section
-  VarValues =  ["Re(V_{R}) = -1.5","Re(V_{R}) = -1.0","Re(V_{R}) = -0.5","Re(V_{R}) = -0.3","Re(V_{R}) = -0.2","Re(V_{R}) = -0.1","Re(V_{R}) = -0.05","Re(V_{R}) = 0.0","Re(V_{R}) = 0.05","Re(V_{R}) = 0.1","Re(V_{R}) = 0.2","Re(V_{R}) = 0.3", "Re(V_{R}) = 0.5","Re(V_{R}) = 1.0","Re(V_{R}) = 1.5"]
   Var =        array('d',[-1.5,    -1.0,     -0.5,    -0.3,     -0.2,     -0.1,       -0.05,    0.0,       0.05,     0.1,       0.2,       0.3,       0.5,      1.0,     1.5     ])
   MGXS =       array('d',[122.082, 46.4474,  17.9275, 13.3944,  12.06555, 11.25909,   11.02784, 10.90059,  10.88228, 10.97767,  11.49883,  12.49056,  16.1508,  40.8074, 108.249 ])
   MGXSCut =    array('d',[28.507,  10.63436, 3.95435, 2.92922,  2.62439,  2.4352,     2.38608,  2.35285,   2.35117,  2.37359,   2.49101,   2.72632,   3.58445,  9.36921, 25.4672 ])
@@ -102,47 +101,44 @@ if KinVariable == "RVR":
   FitType = "pol4"
 
   if VarWindow == "1":
-    VarValues.pop(14), Var.pop(14), MGXS.pop(14), MGXSe.pop(14), MGXSCut.pop(14), Acceptance.pop(14)
-    VarValues.pop(13), Var.pop(13), MGXS.pop(13), MGXSe.pop(13), MGXSCut.pop(13), Acceptance.pop(13)
-    VarValues.pop(8),  Var.pop(8),  MGXS.pop(8),  MGXSe.pop(8),  MGXSCut.pop(8),  Acceptance.pop(8)
-    VarValues.pop(6),  Var.pop(6),  MGXS.pop(6),  MGXSe.pop(6),  MGXSCut.pop(6),  Acceptance.pop(6)
-    VarValues.pop(1),  Var.pop(1),  MGXS.pop(1),  MGXSe.pop(1),  MGXSCut.pop(1),  Acceptance.pop(1)
-    VarValues.pop(0),  Var.pop(0),  MGXS.pop(0),  MGXSe.pop(0),  MGXSCut.pop(0),  Acceptance.pop(0)
+    Var.pop(14), MGXS.pop(14), MGXSe.pop(14), MGXSCut.pop(14)
+    Var.pop(13), MGXS.pop(13), MGXSe.pop(13), MGXSCut.pop(13)
+    Var.pop(8),  MGXS.pop(8),  MGXSe.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  MGXS.pop(6),  MGXSe.pop(6),  MGXSCut.pop(6)
+    Var.pop(1),  MGXS.pop(1),  MGXSe.pop(1),  MGXSCut.pop(1)
+    Var.pop(0),  MGXS.pop(0),  MGXSe.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 11, -0.55, 0.55
   elif VarWindow == "2":
-    VarValues.pop(14), Var.pop(14), MGXS.pop(14), MGXSe.pop(14), MGXSCut.pop(14), Acceptance.pop(14)
-    VarValues.pop(13), Var.pop(13), MGXS.pop(13), MGXSe.pop(13), MGXSCut.pop(13), Acceptance.pop(13)
-    VarValues.pop(12), Var.pop(12), MGXS.pop(12), MGXSe.pop(12), MGXSCut.pop(12), Acceptance.pop(12)
-    VarValues.pop(2),  Var.pop(2),  MGXS.pop(2),  MGXSe.pop(2),  MGXSCut.pop(2),  Acceptance.pop(2)
-    VarValues.pop(1),  Var.pop(1),  MGXS.pop(1),  MGXSe.pop(1),  MGXSCut.pop(1),  Acceptance.pop(1)
-    VarValues.pop(0),  Var.pop(0),  MGXS.pop(0),  MGXSe.pop(0),  MGXSCut.pop(0),  Acceptance.pop(0)
+    Var.pop(14), MGXS.pop(14), MGXSe.pop(14), MGXSCut.pop(14)
+    Var.pop(13), MGXS.pop(13), MGXSe.pop(13), MGXSCut.pop(13)
+    Var.pop(12), MGXS.pop(12), MGXSe.pop(12), MGXSCut.pop(12)
+    Var.pop(2),  MGXS.pop(2),  MGXSe.pop(2),  MGXSCut.pop(2)
+    Var.pop(1),  MGXS.pop(1),  MGXSe.pop(1),  MGXSCut.pop(1)
+    Var.pop(0),  MGXS.pop(0),  MGXSe.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 13, -0.325, 0.325
   elif VarWindow == "3":
-    VarValues =["Re(V_{R}) = -0.1","Re(V_{R}) = -0.09","Re(VR) = -0.08","Re(V_{R}) = -0.07","Re(VR) = -0.06","Re(V_{R}) = -0.05","Re(V_{R}) = -0.04","Re(V_{R}) = -0.03","Re(V_{R}) = -0.02","Re(V_{R}) = -0.01","Re(VR) = 0.0","Re(V_{R}) = 0.01","Re(VR) = 0.02","Re(V_{R}) = 0.03","Re(V_{R}) = 0.04","Re(V_{R}) = 0.05","Re(V_{R}) = 0.06","Re(V_{R}) = 0.07","Re(V_{R}) = 0.08","Re(V_{R}) = 0.09","Re(V_{R}) = 0.1"]
     Var = array('d',[-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1])
     MGXS = array('d',[11.25909, 11.19599, 11.14075, 11.10667, 11.06145, 11.02784, 10.99474, 10.9534, 10.93846, 10.91787, 10.90059, 10.89643, 10.86829, 10.87792, 10.87266, 10.88228, 10.87684, 10.89534, 10.91641, 10.9317, 10.97767])
     MGXSCut = array('d',[2.43546, 2.42182, 2.41059, 2.40057, 2.38839, 2.38187, 2.36976, 2.36513, 2.35512, 2.35666, 2.35415, 2.35694, 2.35174, 2.34909, 2.34392, 2.35108, 2.34767, 2.35477, 2.36148, 2.3643, 2.37424])
     xBin, xLow, xHigh = 21, -0.105, 0.105
   elif VarWindow == "4":
-    VarValues.pop(11), Var.pop(11), MGXS.pop(11), MGXSe.pop(11), Acceptance.pop(11)
-    VarValues.pop(10), Var.pop(10), MGXS.pop(10), MGXSe.pop(10), Acceptance.pop(10)
-    VarValues.pop(9),  Var.pop(9),  MGXS.pop(9),  MGXSe.pop(9),  Acceptance.pop(9)
-    VarValues.pop(8),  Var.pop(8),  MGXS.pop(8),  MGXSe.pop(8),  Acceptance.pop(8)
-    VarValues.pop(6),  Var.pop(6),  MGXS.pop(6),  MGXSe.pop(6),  Acceptance.pop(6)
-    VarValues.pop(5),  Var.pop(5),  MGXS.pop(5),  MGXSe.pop(5),  Acceptance.pop(5)
-    VarValues.pop(4),  Var.pop(4),  MGXS.pop(4),  MGXSe.pop(4),  Acceptance.pop(4)
-    VarValues.pop(3),  Var.pop(3),  MGXS.pop(3),  MGXSe.pop(3),  Acceptance.pop(3)
+    Var.pop(11), MGXS.pop(11), MGXSe.pop(11)
+    Var.pop(10), MGXS.pop(10), MGXSe.pop(10)
+    Var.pop(9),  MGXS.pop(9),  MGXSe.pop(9)
+    Var.pop(8),  MGXS.pop(8),  MGXSe.pop(8)
+    Var.pop(6),  MGXS.pop(6),  MGXSe.pop(6)
+    Var.pop(5),  MGXS.pop(5),  MGXSe.pop(5)
+    Var.pop(4),  MGXS.pop(4),  MGXSe.pop(4)
+    Var.pop(3),  MGXS.pop(3),  MGXSe.pop(3)
     xBin, xLow, xHigh = 7, -1.75, 1.75
   elif VarWindow == "5":
-    VarValues = ["Re(V_{R}) = -0.3","Re(V_{R}) = -0.275","Re(V_{R}) = -0.25","Re(V_{R}) = -0.225","Re(V_{R}) = -0.2","Re(V_{R}) = -0.175","Re(V_{R}) = -0.15","Re(V_{R}) = -0.125","Re(V_{R}) = -0.1","Re(V_{R}) = -0.075","Re(V_{R}) = -0.05","Re(V_{R}) = -0.025","Re(V_{R}) = 0.0","Re(V_{R}) = 0.025","Re(V_{R}) = 0.05","Re(V_{R}) = 0.075","Re(V_{R}) = 0.1","Re(V_{R}) = 0.125","Re(V_{R}) = 0.15","Re(V_{R}) = 0.175","Re(V_{R}) = 0.2","Re(V_{R}) = 0.225","Re(V_{R}) = 0.25","Re(V_{R}) = 0.275","Re(V_{R}) = 0.3"]
-    Var = array('d',[-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3])
-    MGXS    = array('d',[13.3944, 13.037, 12.66011, 12.37463, 12.06555, 11.83271, 11.60956, 11.4194, 11.25909, 11.12321, 11.02784, 10.9524, 10.90059, 10.87549, 10.88228, 10.93437, 10.97767, 11.07142, 11.17366, 11.32792, 11.49883, 11.69063, 11.90668, 12.18904, 12.49056])
+    Var  = array('d',[-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3])
+    MGXS = array('d',[13.3944, 13.037, 12.66011, 12.37463, 12.06555, 11.83271, 11.60956, 11.4194, 11.25909, 11.12321, 11.02784, 10.9524, 10.90059, 10.87549, 10.88228, 10.93437, 10.97767, 11.07142, 11.17366, 11.32792, 11.49883, 11.69063, 11.90668, 12.18904, 12.49056])
     MGXSCut = array('d',[2.92922, 1,      1,        1,        2.62439,  1,        1,        1,       2.4352,   1,        2.38608,  1,       2.35285,  1,        2.35117,  1,        2.37359,  1,        1,        1,        2.49101,  1,        1,        1,        2.72632 ])
     xBin, xLow, xHigh = 25, -0.3025, 0.3025
 
 elif KinVariable == "MTop":
   #Information about the scanned MTop values and the corresponding cross-section
-  VarValues = ["m_{top} = 153","m_{top} = 163","m_{top} = 170","m_{top} = 171","m_{top} = 172","m_{top} = 173","m_{top} = 174","m_{top} = 175","m_{top} = 183","m_{top} = 193"]
   Var =        array('d',[153,      163,      170,       171,       172,      173,        174,        175,       183,       193     ])
   MGXS =       array('d',[8.20916,  9.6299,   10.57123,  10.70485,  10.8257,  10.96469,   11.08428,   11.22448,  12.18068,  13.3046 ])
   MGXSCut =    array('d',[1.35059,  1.85406,  2.21902,   2.27174,   2.32261,  2.38097,    2.43678,    2.49254,   2.93184,   3.50146 ])
@@ -161,18 +157,17 @@ elif KinVariable == "MTop":
   if VarWindow == "1":
     xBin, xLow, xHigh = 41, 152.5, 193.5
   elif VarWindow == "2":
-    VarValues.pop(2), Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2), Acceptance.pop(2)
+    Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2)
     xBin, xLow, xHigh = 41, 152.5, 193.5
   elif VarWindow == "3":
-    VarValues.pop(9), Var.pop(9), MGXS.pop(9), MGXSe.pop(9), MGXSCut.pop(9), Acceptance.pop(9)
-    VarValues.pop(8), Var.pop(8), MGXS.pop(8), MGXSe.pop(8), MGXSCut.pop(8), Acceptance.pop(8)
-    VarValues.pop(2), Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2), Acceptance.pop(2)
-    VarValues.pop(1), Var.pop(1), MGXS.pop(1), MGXSe.pop(1), MGXSCut.pop(1), Acceptance.pop(1)
-    VarValues.pop(0), Var.pop(0), MGXS.pop(0), MGXSe.pop(0), MGXSCut.pop(0), Acceptance.pop(0)
-    xBin, xLow, xHigh = 5, 170.5, 175.5
+    Var.pop(9), MGXS.pop(9), MGXSe.pop(9), MGXSCut.pop(9)
+    Var.pop(8), MGXS.pop(8), MGXSe.pop(8), MGXSCut.pop(8)
+    Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2)
+    Var.pop(1), MGXS.pop(1), MGXSe.pop(1), MGXSCut.pop(1)
+    Var.pop(0), MGXS.pop(0), MGXSe.pop(0), MGXSCut.pop(0)
+    Bin, xLow, xHigh = 5, 170.5, 175.5
 
 elif KinVariable == "RgR":
-  VarValues = ["Re(g_{R}) = -0.5","Re(g_{R}) = -0.3","Re(g_{R}) = -0.2","Re(g_{R}) = -0.15","Re(g_{R}) = -0.1","Re(g_{R}) = -0.05","Re(g_{R}) = -0.025","Re(g_{R}) = 0.0","Re(g_{R}) = 0.025","Re(g_{R}) = 0.05","Re(g_{R}) = 0.1","Re(g_{R}) = 0.15","Re(g_{R}) = 0.2","Re(g_{R}) = 0.3","Re(g_{R}) = 0.5"]
   Var =     array('d',[-0.5,     -0.3,     -0.2,     -0.15,    -0.1,    -0.05,   -0.025,  0.0,      0.025,    0.05,    0.1,     0.15,    0.2,      0.3,     0.5     ])
   MGXS =    array('d',[1.8647,   3.36424,  4.92909,  6.02588,  7.34593, 8.94878, 9.88333, 10.89487, 11.92922, 13.1987, 15.9457, 19.1623, 22.9185,  32.2975, 60.5617 ])
   MGXSCut = array('d',[0.363334, 0.639413, 0.912292, 1.098184, 1.32024, 1.58727, 1.73857, 1.90447,  2.0856,   2.28471, 2.71983, 3.2418,  3.838581, 5.31357, 9.66734 ]) #Also MET cuts!
@@ -187,30 +182,30 @@ elif KinVariable == "RgR":
   FitType = "pol2"
  
   if VarWindow == "1": 
-    Var.pop(11), VarValues.pop(11), MGXS.pop(11), MGXSCut.pop(11)
-    Var.pop(9),  VarValues.pop(9),  MGXS.pop(9),  MGXSCut.pop(9)
-    Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(5),  VarValues.pop(5),  MGXS.pop(5),  MGXSCut.pop(5)
-    Var.pop(3),  VarValues.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
+    Var.pop(11), MGXS.pop(11), MGXSCut.pop(11)
+    Var.pop(9),  MGXS.pop(9),  MGXSCut.pop(9)
+    Var.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
+    Var.pop(5),  MGXS.pop(5),  MGXSCut.pop(5)
+    Var.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
     xBin, xLow, xHigh = 11, -0.55, 0.55
   elif VarWindow == "2":
-    Var.pop(14), VarValues.pop(14), MGXS.pop(14), MGXSCut.pop(14)
-    Var.pop(13), VarValues.pop(13), MGXS.pop(13), MGXSCut.pop(13)
-    Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(1),  VarValues.pop(1),  MGXS.pop(1),  MGXSCut.pop(1)
-    Var.pop(0),  VarValues.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
+    Var.pop(14), MGXS.pop(14), MGXSCut.pop(14)
+    Var.pop(13), MGXS.pop(13), MGXSCut.pop(13)
+    Var.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
+    Var.pop(1),  MGXS.pop(1),  MGXSCut.pop(1)
+    Var.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 9, -0.225, 0.225
   elif VarWindow == "3":
     xBin, xLow, xHigh = 41, -0.5125, 0.5125
   elif VarWindow == "4":
-    Var.pop(14), VarValues.pop(14), MGXS.pop(14), MGXSCut.pop(14)
-    Var.pop(11), VarValues.pop(11), MGXS.pop(11), MGXSCut.pop(11)
-    Var.pop(8),  VarValues.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  VarValues.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(3),  VarValues.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
-    Var.pop(0),  VarValues.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
+    Var.pop(14), MGXS.pop(14), MGXSCut.pop(14)
+    Var.pop(11), MGXS.pop(11), MGXSCut.pop(11)
+    Var.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
+    Var.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
+    Var.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
+    Var.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
     xBin, xLow, xHigh = 13, -0.325, 0.325
 
 if KinVariable == "RVR" and VarWindow == "3":
@@ -321,13 +316,12 @@ elif sys.argv[4] == "n" or sys.argv[4] == "no":
 if RunFitMacro == True:
   RootAnalyzer, NewRootAnalyzer = open(whichAnalysis,'r'), open('output.C','w')
   
-  VarValLine = 'std::string VarValues[] = {"'
   VarLine = 'double Var[] = {'
   MGXSLine, MGXSCutLine = 'double MGXS[] = {', 'double MGXSCut[] = {'
-  for ii in range(len(VarValues)):
-    VarValLine, VarLine, MGXSLine, MGXSCutLine = VarValLine+str(VarValues[ii]), VarLine+str(Var[ii]), MGXSLine+str(MGXS[ii]), MGXSCutLine+str(MGXSCut[ii])
-    if ii < len(VarValues)-1: VarValLine, VarLine, MGXSLine, MGXSCutLine = VarValLine+'","',    VarLine+',',   MGXSLine+',',    MGXSCutLine+','
-    else:                     VarValLine, VarLine, MGXSLine, MGXSCutLine = VarValLine+'"};\n', VarLine+'};\n', MGXSLine+'};\n', MGXSCutLine+'};\n'
+  for ii in range(len(Var)):
+    VarLine, MGXSLine, MGXSCutLine = VarLine+str(Var[ii]), MGXSLine+str(MGXS[ii]), MGXSCutLine+str(MGXSCut[ii])
+    if ii < len(Var)-1: VarLine, MGXSLine, MGXSCutLine = VarLine+',',   MGXSLine+',',    MGXSCutLine+','
+    else:               VarLine, MGXSLine, MGXSCutLine = VarLine+'};\n', MGXSLine+'};\n', MGXSCutLine+'};\n'
 
   xMinValueLine = 'int xMinValue[] = {'
   for ii in range(len(xMinValue)):
@@ -356,7 +350,6 @@ if RunFitMacro == True:
     #Changes valid for both files!
     if   re.search( r"int nEvts",          RootLine): NewRootAnalyzer.write('const int nEvts = '+str(nEvts)+'; \n')
     elif re.search( r"int NrConfigs",      RootLine): NewRootAnalyzer.write('const int NrConfigs = '+str(NrConfigs)+'; \n')
-    elif re.search( r"string VarValues",   RootLine): NewRootAnalyzer.write(VarValLine)
     elif re.search( r"double Var",         RootLine): NewRootAnalyzer.write(VarLine)
     elif re.search( r"double MGXSCut",     RootLine): NewRootAnalyzer.write(MGXSCutLine)
     elif re.search( r"double MGXS",        RootLine): NewRootAnalyzer.write(MGXSLine)
