@@ -83,6 +83,7 @@ if KinVariable != "MTop" and KinVariable != "RVR" and KinVariable != "RgR":
   print "Need to specify which kinematic variable should be considered (MTop, RVR or RgR are the only options!!)"
   KinVariable = raw_input('--> Choose one of the three : ')
 
+ValuesToDelete = []
 if KinVariable == "RVR":
   #Information about the scanned RVR values and the corresponding cross-section
   Var =        array('d',[-1.5,    -1.0,     -0.5,    -0.3,     -0.2,     -0.1,       -0.05,    0.0,       0.05,     0.1,       0.2,       0.3,       0.5,      1.0,     1.5     ])
@@ -101,20 +102,10 @@ if KinVariable == "RVR":
   FitType = "pol4"
 
   if VarWindow == "1":
-    Var.pop(14), MGXS.pop(14), MGXSe.pop(14), MGXSCut.pop(14)
-    Var.pop(13), MGXS.pop(13), MGXSe.pop(13), MGXSCut.pop(13)
-    Var.pop(8),  MGXS.pop(8),  MGXSe.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  MGXS.pop(6),  MGXSe.pop(6),  MGXSCut.pop(6)
-    Var.pop(1),  MGXS.pop(1),  MGXSe.pop(1),  MGXSCut.pop(1)
-    Var.pop(0),  MGXS.pop(0),  MGXSe.pop(0),  MGXSCut.pop(0)
+    ValuesToDelete = [-1.5, -1.0, -0.05, 0.05, 1.0, 1.5]
     xBin, xLow, xHigh = 11, -0.55, 0.55
   elif VarWindow == "2":
-    Var.pop(14), MGXS.pop(14), MGXSe.pop(14), MGXSCut.pop(14)
-    Var.pop(13), MGXS.pop(13), MGXSe.pop(13), MGXSCut.pop(13)
-    Var.pop(12), MGXS.pop(12), MGXSe.pop(12), MGXSCut.pop(12)
-    Var.pop(2),  MGXS.pop(2),  MGXSe.pop(2),  MGXSCut.pop(2)
-    Var.pop(1),  MGXS.pop(1),  MGXSe.pop(1),  MGXSCut.pop(1)
-    Var.pop(0),  MGXS.pop(0),  MGXSe.pop(0),  MGXSCut.pop(0)
+    ValuesToDelete = [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5]
     xBin, xLow, xHigh = 13, -0.325, 0.325
   elif VarWindow == "3":
     Var = array('d',[-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1])
@@ -122,14 +113,7 @@ if KinVariable == "RVR":
     MGXSCut = array('d',[2.43546, 2.42182, 2.41059, 2.40057, 2.38839, 2.38187, 2.36976, 2.36513, 2.35512, 2.35666, 2.35415, 2.35694, 2.35174, 2.34909, 2.34392, 2.35108, 2.34767, 2.35477, 2.36148, 2.3643, 2.37424])
     xBin, xLow, xHigh = 21, -0.105, 0.105
   elif VarWindow == "4":
-    Var.pop(11), MGXS.pop(11), MGXSe.pop(11)
-    Var.pop(10), MGXS.pop(10), MGXSe.pop(10)
-    Var.pop(9),  MGXS.pop(9),  MGXSe.pop(9)
-    Var.pop(8),  MGXS.pop(8),  MGXSe.pop(8)
-    Var.pop(6),  MGXS.pop(6),  MGXSe.pop(6)
-    Var.pop(5),  MGXS.pop(5),  MGXSe.pop(5)
-    Var.pop(4),  MGXS.pop(4),  MGXSe.pop(4)
-    Var.pop(3),  MGXS.pop(3),  MGXSe.pop(3)
+    ValuesToDelete = [-0.3, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.3]
     xBin, xLow, xHigh = 7, -1.75, 1.75
   elif VarWindow == "5":
     Var  = array('d',[-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3])
@@ -157,14 +141,10 @@ elif KinVariable == "MTop":
   if VarWindow == "1":
     xBin, xLow, xHigh = 41, 152.5, 193.5
   elif VarWindow == "2":
-    Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2)
+    ValuesToDelete = [170]
     xBin, xLow, xHigh = 41, 152.5, 193.5
   elif VarWindow == "3":
-    Var.pop(9), MGXS.pop(9), MGXSe.pop(9), MGXSCut.pop(9)
-    Var.pop(8), MGXS.pop(8), MGXSe.pop(8), MGXSCut.pop(8)
-    Var.pop(2), MGXS.pop(2), MGXSe.pop(2), MGXSCut.pop(2)
-    Var.pop(1), MGXS.pop(1), MGXSe.pop(1), MGXSCut.pop(1)
-    Var.pop(0), MGXS.pop(0), MGXSe.pop(0), MGXSCut.pop(0)
+    ValuesToDelete = [153, 163, 170, 183, 193]
     Bin, xLow, xHigh = 5, 170.5, 175.5
 
 elif KinVariable == "RgR":
@@ -181,32 +161,21 @@ elif KinVariable == "RgR":
   NrPointsToRemove = [2, 2, 5, 2]
   FitType = "pol2"
  
-  if VarWindow == "1": 
-    Var.pop(11), MGXS.pop(11), MGXSCut.pop(11)
-    Var.pop(9),  MGXS.pop(9),  MGXSCut.pop(9)
-    Var.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(5),  MGXS.pop(5),  MGXSCut.pop(5)
-    Var.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
+  if VarWindow == "1":
+    ValuesToDelete = [-0.15, -0.05, -0.025, 0.025, 0.05, 0.15]
     xBin, xLow, xHigh = 11, -0.55, 0.55
   elif VarWindow == "2":
-    Var.pop(14), MGXS.pop(14), MGXSCut.pop(14)
-    Var.pop(13), MGXS.pop(13), MGXSCut.pop(13)
-    Var.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(1),  MGXS.pop(1),  MGXSCut.pop(1)
-    Var.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
+    ValuesToDelete = [-0.5, -0.3, -0.025, 0.025, 0.3, 0.5]
     xBin, xLow, xHigh = 9, -0.225, 0.225
   elif VarWindow == "3":
     xBin, xLow, xHigh = 41, -0.5125, 0.5125
   elif VarWindow == "4":
-    Var.pop(14), MGXS.pop(14), MGXSCut.pop(14)
-    Var.pop(11), MGXS.pop(11), MGXSCut.pop(11)
-    Var.pop(8),  MGXS.pop(8),  MGXSCut.pop(8)
-    Var.pop(6),  MGXS.pop(6),  MGXSCut.pop(6)
-    Var.pop(3),  MGXS.pop(3),  MGXSCut.pop(3)
-    Var.pop(0),  MGXS.pop(0),  MGXSCut.pop(0)
+    ValuesToDelete = [-0.5, -0.15, -0.025, 0.025, 0.15, 0.5]
     xBin, xLow, xHigh = 13, -0.325, 0.325
+
+#Now delete the values stored in array 'ValuesToDelete'
+for iVar in range(len(ValuesToDelete)):
+  MGXS.pop(Var.index(ValuesToDelete[iVar])), MGXSCut.pop(Var.index(ValuesToDelete[iVar])), Var.pop(Var.index(ValuesToDelete[iVar])) 
 
 if KinVariable == "RVR" and VarWindow == "3":
   xPos = [15, 20]
