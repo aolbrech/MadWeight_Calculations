@@ -183,13 +183,6 @@ elif KinVariable == "RgR":
 for iVar in range(len(ValuesToDelete)):
   MGXS.pop(Var.index(ValuesToDelete[iVar])), MGXSCut.pop(Var.index(ValuesToDelete[iVar])), Var.pop(Var.index(ValuesToDelete[iVar])) 
 
-#if KinVariable == "RVR" and VarWindow == "3":
-#  xPos = [15, 20]
-#  xNeg = [5, 0]
-#else:
-#  xPos = [xMinValue[int(VarWindow)-1]+1,xMinValue[int(VarWindow)-1]+2]
-#  xNeg = [xMinValue[int(VarWindow)-1]-1,xMinValue[int(VarWindow)-1]-2]
-
 #---------------------------------------------#
 #   Special cases for MGXSCut initialization  #
 #---------------------------------------------#
@@ -218,7 +211,6 @@ print " List of considered Var values is : ",Var,"\n"
 NrConfigs = len(Var)
 xMin = xMinValue[int(VarWindow)-1]
 NumberOfPointsToRemove = NrPointsToRemove[int(VarWindow)-1]
-#xStep = [Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] ]
 
 #File of interest (only search if WeightsFileGiven is set to false):
 if WeightsFileGiven == False:
@@ -303,15 +295,6 @@ if RunFitMacro == True:
     if ii < len(xMinValue)-1: xMinValueLine += str(xMinValue[ii])+','
     else:                     xMinValueLine += str(xMinValue[ii])+'}; \n'
 
-#  xPosLine, xNegLine = 'int xPos[] = {', 'int xNeg[] = {'
-#  for ii in range(len(xPos)):
-#    if ii < len(xPos)-1:
-#      xPosLine += str(xPos[ii])+','
-#      xNegLine += str(xNeg[ii])+','
-#    else:
-#      xPosLine += str(xPos[ii])+'}; \n'
-#      xNegLine += str(xNeg[ii])+'}; \n'
-  
   #-->Create the directory SplittedCanvasses if needed (otherwise delete the created pdf files ...)!
   if CreateTexFile == True:
     if not (os.path.exists(os.path.join(whichDir+'SplittedCanvasses/')) ): os.makedirs(os.path.join(whichDir+'SplittedCanvasses/'))
@@ -334,8 +317,6 @@ if RunFitMacro == True:
     elif re.search( r"int xMinValue",      RootLine): NewRootAnalyzer.write(xMinValueLine)
     elif re.search( r"string KinVar",      RootLine): NewRootAnalyzer.write('std::string KinVar = "'+str(KinVar)+'"; \n')
     elif re.search( r"int VarWindow",      RootLine): NewRootAnalyzer.write('int VarWindow = '+str(VarWindow)+'; \n')
-    #elif re.search( r"int xPos",           RootLine): NewRootAnalyzer.write(xPosLine)
-    elif re.search( r"int xNeg",           RootLine): NewRootAnalyzer.write(xNegLine)
     elif re.search( r"std::ifstream ifs",  RootLine): NewRootAnalyzer.write('  std::ifstream ifs ("'+str(WeightsFileName)+'", std::ifstream::in); \n')
     elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
     elif re.search( r"string SplittedDir", RootLine): NewRootAnalyzer.write('std::string SplittedDir = "'+str(whichDir)+'SplittedCanvasses"; \n')
