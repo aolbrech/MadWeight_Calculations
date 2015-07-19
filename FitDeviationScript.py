@@ -94,10 +94,10 @@ if KinVariable == "RVR":
 
   #Select which window of RVR values was considered!
   if VarWindowGiven == False:
-    VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  3) Many   : [-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1] \n  4) Very wide : [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5] \n 5) Wide & Many : [-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3] \n --> Choose the correct number : ')
+    VarWindow = raw_input('** Choose the correct RVR-window corresponding to the studied file ** \n** Different options are : \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  3) Many   : [-0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1] \n  4) Very wide : [-1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5] \n 5) Wide & Many : [-0.3, -0.275, -0.25, -0.225, -0.2, -0.175, -0.15, -0.125, -0.1, -0.075, -0.05, -0.025, 0.0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3] \n 6) Narrow short : [-0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3] \n --> Choose the correct number : ')
 
-  xMinValue = [4, 4, 10, 3, 12]
-  NrPointsToRemove = [3, 3, 7, 2, 7]
+  xMinValue = [4, 4, 10, 3, 12, 3]
+  NrPointsToRemove = [3, 3, 7, 2, 7, 1]
   KinVar = "Re(V_{R})"
   FitType = "pol4"
 
@@ -120,7 +120,9 @@ if KinVariable == "RVR":
     MGXS = array('d',[13.3944, 13.037, 12.66011, 12.37463, 12.06555, 11.83271, 11.60956, 11.4194, 11.25909, 11.12321, 11.02784, 10.9524, 10.90059, 10.87549, 10.88228, 10.93437, 10.97767, 11.07142, 11.17366, 11.32792, 11.49883, 11.69063, 11.90668, 12.18904, 12.49056])
     MGXSCut = array('d',[2.92922, 1,      1,        1,        2.62439,  1,        1,        1,       2.4352,   1,        2.38608,  1,       2.35285,  1,        2.35117,  1,        2.37359,  1,        1,        1,        2.49101,  1,        1,        1,        2.72632 ])
     xBin, xLow, xHigh = 25, -0.3025, 0.3025
-
+  elif VarWindow == "6":
+    ValuesToDelete = [-1.5, -1.0, -0.5, -0.05, 0.05, 0.5, 1.0, 1.5]
+    xBin, xLow, xHigh = 7, -0.35, 0.35
 elif KinVariable == "MTop":
   #Information about the scanned MTop values and the corresponding cross-section
   Var =        array('d',[153,      163,      170,       171,       172,      173,        174,        175,       183,       193     ])
@@ -148,13 +150,13 @@ elif KinVariable == "MTop":
     Bin, xLow, xHigh = 5, 170.5, 175.5
 
 elif KinVariable == "RgR":
-  Var =     array('d',[-0.5,     -0.3,     -0.2,     -0.15,    -0.1,    -0.05,   -0.025,  0.0,      0.025,    0.05,    0.1,     0.15,    0.2,      0.3,     0.5     ])
-  MGXS =    array('d',[1.8647,   3.36424,  4.92909,  6.02588,  7.34593, 8.94878, 9.88333, 10.89487, 11.92922, 13.1987, 15.9457, 19.1623, 22.9185,  32.2975, 60.5617 ])
-  MGXSCut = array('d',[0.363334, 0.639413, 0.912292, 1.098184, 1.32024, 1.58727, 1.73857, 1.90447,  2.0856,   2.28471, 2.71983, 3.2418,  3.838581, 5.31357, 9.66734 ]) #Also MET cuts!
+  Var =     array('d',[-0.5,     -0.4,     -0.3,     -0.2,     -0.15,    -0.1,    -0.05,   -0.025,  0.0,      0.025,    0.05,    0.1,     0.15,    0.2,      0.3,     0.4,     0.5     ])
+  MGXS =    array('d',[1.8647,   1.97357,  3.36424,  4.92909,  6.02588,  7.34593, 8.94878, 9.88333, 10.89487, 11.92922, 13.1987, 15.9457, 19.1623, 22.9185,  32.2975, 38.8312, 60.5617 ])
+  MGXSCut = array('d',[0.363334, 0.465328, 0.639413, 0.912292, 1.098184, 1.32024, 1.58727, 1.73857, 1.90447,  2.0856,   2.28471, 2.71983, 3.2418,  3.838581, 5.31357, 7.23931, 9.66734 ]) #Also MET cuts!
 #  MGXSCut = array('d',[0.462736, 0.807034,  1.14397,   1.37121,   1.6414,    1.96796,            2.35719,              2.80657,    3.34178,   3.96076,    4.67808,  6.42868,   11.61381  ])
 
   if VarWindowGiven == False:
-    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different options are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n  4) Wide narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n--> Choose the correct number : ')
+    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different options are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n  4) Wide narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  5) Calibration Curve range : [-0.4, -0.3, -0.2, -0.15, 0.1, 0.05, 0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4] \n --> Choose the correct number : ')
 
   xMinValue = [4, 4, 7, 4]
   KinVar = "Re(g_{R})"
@@ -162,27 +164,31 @@ elif KinVariable == "RgR":
   FitType = "pol2"
  
   if VarWindow == "1":
-    ValuesToDelete = [-0.15, -0.05, -0.025, 0.025, 0.05, 0.15]
+    ValuesToDelete = [-0.4, -0.15, -0.05, -0.025, 0.025, 0.05, 0.15, 0.4]
     xBin, xLow, xHigh = 11, -0.55, 0.55
   elif VarWindow == "2":
-    ValuesToDelete = [-0.5, -0.3, -0.025, 0.025, 0.3, 0.5]
+    ValuesToDelete = [-0.5, -0.4, -0.3, -0.025, 0.025, 0.3, 0.4, 0.5]
     xBin, xLow, xHigh = 9, -0.225, 0.225
   elif VarWindow == "3":
+    ValuesToDelete = [-0.4, 0.4]
     xBin, xLow, xHigh = 41, -0.5125, 0.5125
   elif VarWindow == "4":
-    ValuesToDelete = [-0.5, -0.15, -0.025, 0.025, 0.15, 0.5]
+    ValuesToDelete = [-0.5, -0.4, -0.15, -0.025, 0.025, 0.15, 0.4, 0.5]
     xBin, xLow, xHigh = 13, -0.325, 0.325
+  elif VarWindow == "5":
+    ValuesToDelete = [-0.5, -0.025, 0.025, 0.5]
+    xBin, xLow, xHigh = 17, -0.425, 0.425
 
 #Now delete the values stored in array 'ValuesToDelete'
 for iVar in range(len(ValuesToDelete)):
   MGXS.pop(Var.index(ValuesToDelete[iVar])), MGXSCut.pop(Var.index(ValuesToDelete[iVar])), Var.pop(Var.index(ValuesToDelete[iVar])) 
 
-if KinVariable == "RVR" and VarWindow == "3":
-  xPos = [15, 20]
-  xNeg = [5, 0]
-else:
-  xPos = [xMinValue[int(VarWindow)-1]+1,xMinValue[int(VarWindow)-1]+2]
-  xNeg = [xMinValue[int(VarWindow)-1]-1,xMinValue[int(VarWindow)-1]-2]
+#if KinVariable == "RVR" and VarWindow == "3":
+#  xPos = [15, 20]
+#  xNeg = [5, 0]
+#else:
+#  xPos = [xMinValue[int(VarWindow)-1]+1,xMinValue[int(VarWindow)-1]+2]
+#  xNeg = [xMinValue[int(VarWindow)-1]-1,xMinValue[int(VarWindow)-1]-2]
 
 #---------------------------------------------#
 #   Special cases for MGXSCut initialization  #
@@ -212,7 +218,7 @@ print " List of considered Var values is : ",Var,"\n"
 NrConfigs = len(Var)
 xMin = xMinValue[int(VarWindow)-1]
 NumberOfPointsToRemove = NrPointsToRemove[int(VarWindow)-1]
-xStep = [Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] ]
+#xStep = [Var[xNeg[0]]-Var[xNeg[1]], Var[xMin]-Var[xNeg[0]], Var[xPos[0]]-Var[xMin], Var[xPos[1]]-Var[xPos[0]] ]
 
 #File of interest (only search if WeightsFileGiven is set to false):
 if WeightsFileGiven == False:
@@ -297,14 +303,14 @@ if RunFitMacro == True:
     if ii < len(xMinValue)-1: xMinValueLine += str(xMinValue[ii])+','
     else:                     xMinValueLine += str(xMinValue[ii])+'}; \n'
 
-  xPosLine, xNegLine = 'int xPos[] = {', 'int xNeg[] = {'
-  for ii in range(len(xPos)):
-    if ii < len(xPos)-1:
-      xPosLine += str(xPos[ii])+','
-      xNegLine += str(xNeg[ii])+','
-    else:
-      xPosLine += str(xPos[ii])+'}; \n'
-      xNegLine += str(xNeg[ii])+'}; \n'
+#  xPosLine, xNegLine = 'int xPos[] = {', 'int xNeg[] = {'
+#  for ii in range(len(xPos)):
+#    if ii < len(xPos)-1:
+#      xPosLine += str(xPos[ii])+','
+#      xNegLine += str(xNeg[ii])+','
+#    else:
+#      xPosLine += str(xPos[ii])+'}; \n'
+#      xNegLine += str(xNeg[ii])+'}; \n'
   
   #-->Create the directory SplittedCanvasses if needed (otherwise delete the created pdf files ...)!
   if CreateTexFile == True:
@@ -328,7 +334,7 @@ if RunFitMacro == True:
     elif re.search( r"int xMinValue",      RootLine): NewRootAnalyzer.write(xMinValueLine)
     elif re.search( r"string KinVar",      RootLine): NewRootAnalyzer.write('std::string KinVar = "'+str(KinVar)+'"; \n')
     elif re.search( r"int VarWindow",      RootLine): NewRootAnalyzer.write('int VarWindow = '+str(VarWindow)+'; \n')
-    elif re.search( r"int xPos",           RootLine): NewRootAnalyzer.write(xPosLine)
+    #elif re.search( r"int xPos",           RootLine): NewRootAnalyzer.write(xPosLine)
     elif re.search( r"int xNeg",           RootLine): NewRootAnalyzer.write(xNegLine)
     elif re.search( r"std::ifstream ifs",  RootLine): NewRootAnalyzer.write('  std::ifstream ifs ("'+str(WeightsFileName)+'", std::ifstream::in); \n')
     elif re.search( r"std::string title",  RootLine): NewRootAnalyzer.write('std::string title = "'+str(title)+'"; \n')
