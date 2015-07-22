@@ -217,7 +217,7 @@ if WeightsFileGiven == False:
   list_dir = os.listdir(whichDir)
   WeightsFileArray, weightsFileCounter = [], 0
   for file in list_dir:
-    if file.endswith(".out") and file.startswith("weights"):
+    if (applyCosTheta == "n" and file.endswith(".out") or applyCosTheta == "y" and file.endswith("ApplyCosThetaReweighting.out") ) and file.startswith("weights"):
       weightsFileCounter += 1
       WeightsFileArray.append(file)
 
