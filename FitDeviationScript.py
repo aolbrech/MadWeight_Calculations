@@ -61,6 +61,7 @@ WeightsFileGiven, VarWindowGiven = False, False
 #  --> Correct syntax is : python FitDeviation.py(#0) Events/blabla/(#1) RVR(#2) 10000(#3) y(#4) n(#5) doublePolFit.C(#6) n(#7) n(#8-optional) Events/blabla/weights.out(#9-optional) Range(#10-optional)
 #
 #-- Cos theta normalisation
+
 if len(sys.argv) >= 9: applyCosTheta = sys.argv[8]
 #-- Specific weights file
 if len(sys.argv) >= 10:
@@ -69,10 +70,11 @@ if len(sys.argv) >= 10:
   WeightsFile = open(os.path.join(WeightsFileName),'r')
 #-- Specific range
 if len(sys.argv) >= 11:
-  VarWindowGiven == True
+  VarWindowGiven = True
   if sys.argv[10] == "Wide" and KinVariable == "RVR": VarWindow = "1"
   elif sys.argv[10] == "Narrow" and KinVariable == "RgR": VarWindow = "1"
   elif sys.argv[10] == "Full" and KinVariable == "RgR": VarWindow = "3"
+  elif sys.argv[10] == "CalibCurve" and KinVariable == "RgR": VarWindow = "5"
 
 #Set the 'CreateTexFile' correctly:
 if sys.argv[5] == "y" or sys.argv[5] == "yes":  CreateTexFile = True
@@ -158,9 +160,9 @@ elif KinVariable == "RgR":
   if VarWindowGiven == False:
     VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different options are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n  4) Wide narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  5) Calibration Curve range : [-0.4, -0.3, -0.2, -0.15, 0.1, 0.05, 0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4] \n --> Choose the correct number : ')
 
-  xMinValue = [4, 4, 7, 4]
+  xMinValue = [4, 4, 7, 4, 6]
   KinVar = "Re(g_{R})"
-  NrPointsToRemove = [2, 2, 5, 2]
+  NrPointsToRemove = [2, 2, 5, 2, 4]
   FitType = "pol2"
  
   if VarWindow == "1":
@@ -333,8 +335,9 @@ if RunFitMacro == True:
     elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"int NrToDel", RootLine): 
       NewRootAnalyzer.write('const unsigned int NrToDel = '+str(NumberOfPointsToRemove)+'; \n')
     elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TF1",     RootLine):
-      if   re.search( r"AllPoints",     RootLine): NewRootAnalyzer.write('  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
-      elif re.search( r"ReducedPoints", RootLine): NewRootAnalyzer.write('  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[0],Var[NrConfigs-1]); \n')
+      print "\n ---> Fit will go between ",Var[1]," and ",Var[NrConfigs-2],"\n"
+      if   re.search( r"AllPoints",     RootLine): NewRootAnalyzer.write('  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[1],Var[NrConfigs-2]); \n')
+      elif re.search( r"ReducedPoints", RootLine): NewRootAnalyzer.write('  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"'+str(FitType)+'",Var[1],Var[NrConfigs-2]); \n')
     elif whichAnalysis == "doublePolFitMacro.C" and re.search( r"new TFile", RootLine) and re.search( r"file_FitDist", RootLine):
       NewRootAnalyzer.write('TFile* file_FitDist = new TFile("'+str(whichDir)+'FitDistributions_'+str(title)+'_'+str(nEvts)+'Evts.root","RECREATE"); \n')
     elif whichAnalysis == "fctDeviationMacro.C" and re.search( r"new TFile", RootLine): 
