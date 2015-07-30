@@ -17,17 +17,17 @@
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
 bool storeSplittedCanvas = false; 
-std::string SplittedDir = "Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/SplittedCanvasses"; 
+std::string SplittedDir = "Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-TFile *inFile = new TFile("Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/FitDistributions_TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts_5000Evts.root","READ"); 
-TFile *outputFile = new TFile("Events_TFInfluence/TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts/FitOptimizations_TFFunctionTest_RgRMGSampleNeg02_SingleGausPtDep_RhoUsed_5000Evts_FullRange_NoCuts_5000Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/FitDistributions_RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts_25000Evts.root","READ"); 
+TFile *outputFile = new TFile("Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/FitOptimizations_RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts_25000Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
-const int xBin = 41; 
-const int xFitBin = xBin*10; 
-float xLow = -0.5125; 
-float xHigh = 0.5125; 
+const int xBin = 17; 
+const int xFitBin = xBin*75; 
+float xLow = -0.425; 
+float xHigh = 0.425; 
 
 void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
