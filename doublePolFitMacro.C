@@ -16,20 +16,20 @@
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
 bool storeSplittedCanvas = false; 
-std::string SplittedDir = "Events_TFInfluence/BJetPermutationTest_OnlyLightPerms_AllDeltaTF_RgRMGSampleSM_2500Evts_NarrowWideRange_NoCuts/SplittedCanvasses"; 
+std::string SplittedDir = "Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
 //std::string VarValues[] = {"Re(g_{R}) = -0.3","Re(g_{R}) = -0.2","Re(g_{R}) = -0.1","Re(g_{R}) = -0.05","Re(g_{R}) = 0.0","Re(g_{R}) = 0.05","Re(g_{R}) = 0.1","Re(g_{R}) = 0.2","Re(g_{R}) = 0.3"};
-double Var[] = {-0.3,-0.2,-0.1,-0.05,0.0,0.05,0.1,0.2,0.3};
-double MGXS[] = {3.36424,4.92909,7.34593,8.94878,10.89487,13.1987,15.9457,22.9185,32.2975};
-double MGXSCut[] = {3.36424,4.92909,7.34593,8.94878,10.89487,13.1987,15.9457,22.9185,32.2975};
-int xBin = 13; 
-float xLow = -0.325; 
-float xHigh = 0.325; 
-int xMinValue[] = {4,4,7,4}; 
+double Var[] = {-0.4,-0.3,-0.2,-0.15,-0.1,-0.05,0.0,0.05,0.1,0.15,0.2,0.3,0.4};
+double MGXS[] = {1.97357,3.36424,4.92909,6.02588,7.34593,8.94878,10.89487,13.1987,15.9457,19.1623,22.9185,32.2975,38.8312};
+double MGXSCut[] = {1.97357,3.36424,4.92909,6.02588,7.34593,8.94878,10.89487,13.1987,15.9457,19.1623,22.9185,32.2975,38.8312};
+int xBin = 17; 
+float xLow = -0.425; 
+float xHigh = 0.425; 
+int xMinValue[] = {4,4,7,4,6}; 
 std::string KinVar = "Re(g_{R})"; 
-int VarWindow = 4; 
-std::string title = "BJetPermutationTest_OnlyLightPerms_AllDeltaTF_RgRMGSampleSM_2500Evts_NarrowWideRange_NoCuts"; 
+int VarWindow = 5; 
+std::string title = "RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts"; 
 //double CreatedVar = 0.0;
 //std::ofstream file_MaxShapeEvts ("Events_RgRScan_ChangingXS/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/MaxShapeEvts_RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET_XSScaledWithPos01.out", std::ofstream::out); 
 //std::ofstream file_MinShapeEvts ("Events_RgRScan_ChangingXS/RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET/MinShapeEvts_RgR_MGSamplePos005_SingleGausTF_10000Evts_NarrowRange_CutsAppliedAlsoOnMET_XSScaledWithPos01.out", std::ofstream::out); 
@@ -39,7 +39,7 @@ std::string title = "BJetPermutationTest_OnlyLightPerms_AllDeltaTF_RgRMGSampleSM
 //TFile* file_FewEvts = new TFile("Events/MTop_MGSampleCreatedWith174_SingleGausTF_10000Evts_Narrow/LogLikDistributions.root","RECREATE"); 
 
 //ROOT file to store the Fit functions --> Will fasten the study of the cut-influences ...
-TFile* file_FitDist = new TFile("Events_TFInfluence/BJetPermutationTest_OnlyLightPerms_AllDeltaTF_RgRMGSampleSM_2500Evts_NarrowWideRange_NoCuts/FitDistributions_BJetPermutationTest_OnlyLightPerms_AllDeltaTF_RgRMGSampleSM_2500Evts_NarrowWideRange_NoCuts_2500Evts.root","RECREATE"); 
+TFile* file_FitDist = new TFile("Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/FitDistributions_RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts_25000Evts.root","RECREATE"); 
 TDirectory *dir_OriginalLL = file_FitDist->mkdir("OriginalLL"),        *dir_OriginalLLXS = file_FitDist->mkdir("OriginalLL_XS"),        *dir_OriginalLLAcc = file_FitDist->mkdir("OriginalLL_Acc");
 TDirectory *dir_FirstFit = file_FitDist->mkdir("FirstPolynomialFit"),  *dir_FirstFitXS = file_FitDist->mkdir("FirstPolynomialFit_XS"),  *dir_FirstFitAcc = file_FitDist->mkdir("FirstPolynomialFit_Acc");
 TDirectory *dir_SecondFit = file_FitDist->mkdir("SecondPolynomialFit"),*dir_SecondFitXS = file_FitDist->mkdir("SecondPolynomialFit_XS"),*dir_SecondFitAcc = file_FitDist->mkdir("SecondPolynomialFit_Acc");
@@ -55,9 +55,9 @@ TDirectory *dir_MTop174 = file_FitDist->mkdir("FirstFit_Acc_MTop174");
 TDirectory *dir_FirstFitAcc_PosScdDerAndSlope = file_FitDist->mkdir("FirstFit_Acc_PosScdDerAndSlope");
 TDirectory *dir_FirstFitAcc_PosScdDerAndBothSlopes = file_FitDist->mkdir("FirstFit_Acc_PosScdDerAndBothSlope");
 
-const int NrConfigs = 9; 
-const int nEvts = 2500; 
-const unsigned int NrToDel = 2; 
+const int NrConfigs = 13; 
+const int nEvts = 25000; 
+const unsigned int NrToDel = 4; 
 int NrRemaining = NrConfigs-NrToDel;
 std::string sNrCanvas ="0";
 std::string sNrRemaining = ""; std::stringstream ssNrRemaining; 
@@ -167,9 +167,9 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
     h_PointsDelByFitDevRel[TypeNr] = new TH1F(("PointsDelBy"+Type+"FitDevRel").c_str(),("Overview of deleted points due to largest relative FitDeviation (norm = "+Type+")").c_str(),xBin,xLow,xHigh);
   }
  
-  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]); 
+  polFit_AllPoints = new TF1(("polFit"+Type+"_AllPoints_Evt"+EvtNumber).c_str(),"pol2",Var[1],Var[NrConfigs-2]); 
   TGraph* gr_LnLik = new TGraph(NrConfigs,Var, LogLikelihood);
-  gr_LnLik->Fit(polFit_AllPoints,"Q");
+  gr_LnLik->Fit(polFit_AllPoints,"Q","",polFit_AllPoints->GetXmin(), polFit_AllPoints->GetXmax());
   h_ChiSquaredFirstFit[TypeNr]->Fill(polFit_AllPoints->GetChisquare());
 
 /*  if(evtCounter < 100 and Type == "Acc"){
@@ -285,8 +285,8 @@ void calculateFit(TH1F *h_LogLik, string EvtNumber, std::string Type, int evtCou
 
   //Define new TGraph and fit again
   TGraph* gr_ReducedLnLik = new TGraph(NrConfigs-NrToDel, ReducedVar, ReducedLogLik);
-  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol2",Var[0],Var[NrConfigs-1]); 
-  gr_ReducedLnLik->Fit(polFit_ReducedPoints,"Q"); 
+  polFit_ReducedPoints = new TF1(("polFit"+Type+"_"+sNrRemaining+"ReducedPoints_Evt"+EvtNumber).c_str(),"pol2",Var[1],Var[NrConfigs-2]); 
+  gr_ReducedLnLik->Fit(polFit_ReducedPoints,"Q","",polFit_AllPoints->GetXmin(), polFit_AllPoints->GetXmax()); 
   h_ChiSquaredSecondFit[TypeNr]->Fill(polFit_ReducedPoints->GetChisquare());   //As expected NDF is always equal to NrConfigs-NrToDel-3 (= nr params needed to define a parabola)
   if(Type == "")         dir_SecondFit->cd();
   else if(Type == "XS")  dir_SecondFitXS->cd();
@@ -368,7 +368,7 @@ void doublePolFitMacro(){
   double LnLik[NrConfigs] = {0.0}, LnLikXS[NrConfigs] = {0.0}, LnLikAcc[NrConfigs] = {0.0};        
 
   //--- Read all likelihood values ! ---//
-  std::ifstream ifs ("Events_TFInfluence/BJetPermutationTest_OnlyLightPerms_AllDeltaTF_RgRMGSampleSM_2500Evts_NarrowWideRange_NoCuts/weights.out", std::ifstream::in); 
+  std::ifstream ifs ("Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/weights.out", std::ifstream::in); 
   std::cout << " Value of ifs : " << ifs.eof() << std::endl;
   std::string line;
   int evt,config,tf;
