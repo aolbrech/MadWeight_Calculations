@@ -88,7 +88,6 @@ int main (int argc, char *argv[]){
   ///////////////////////////////
   bool GenLHCOOutput = true;
   bool RecoLHCOOutput = true;  
-  bool CalculateResolutions = false; // If false, the resolutions will be loaded from a previous calculation
   bool CalculateTF = false;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
@@ -291,31 +290,6 @@ int main (int argc, char *argv[]){
     MSPlot["nLightJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
   }
   
-  /////////////////////////////
-  /// ResolutionFit Stuff
-  /////////////////////////////
-  ResolutionFit *resFitLightJets = 0, *resFitBJets = 0, *resFitMuon = 0, *resFitElectron = 0, *resFitNeutrinoMu = 0, *resFitNeutrinoEl = 0;
-    
-  resFitLightJets = new ResolutionFit("LightJet");
-  resFitBJets = new ResolutionFit("BJet");
-  resFitMuon = new ResolutionFit("Muon");
-  resFitElectron = new ResolutionFit("Electron");
-  resFitNeutrinoMu = new ResolutionFit("NeutrinoMu");
-  resFitNeutrinoEl = new ResolutionFit("NeutrinoEl");
-
-  if(!CalculateResolutions && !CalculateTF){
-    resFitLightJets->LoadResolutions("PersonalClasses/resolutions/lightJetReso.root");
-    resFitBJets->LoadResolutions("PersonalClasses/resolutions/bJetReso.root");
-    resFitMuon->LoadResolutions("PersonalClasses/resolutions/muonReso.root");
-    resFitNeutrinoMu->LoadResolutions("PersonalClasses/resolutions/neutrinoSemiMuReso.root");  //Once resolutions are newly created they will be split up for SemiMu and SemiEl for Neutrino !!
-    resFitNeutrinoEl->LoadResolutions("PersonalClasses/resolutions/neutrinoSemiElReso.root");
-    resFitElectron->LoadResolutions("PersonalClasses/resolutions/electronReso.root");
-    std::cout << " Resolutions loaded " << std::endl;
-  }
-
-  if (verbose > 0)
-    cout << " - ResolutionFit instantiated ..." << endl;  
-
   ////////////////////////////////////
   /// Selection table
   ////////////////////////////////////
@@ -934,18 +908,6 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
 	  histo1D["MlbMass"]->Fill((*selectedJets[jetCombi[0]]+*selectedLepton).M());
 	  histo1D["MqqbMass"]->Fill((*selectedJets[jetCombi[2]]+*selectedJets[jetCombi[3]]+*selectedJets[jetCombi[1]]).M());
 	
-	  if(CalculateResolutions){
-	    // Fill the resolution-stuff for events where the 4 ttbar semi-lep partons are all matched to jets
-	    resFitLightJets->Fill(selectedJets[jetCombi[2]], mcParticles[hadronicWJet1_.second]);
-	    resFitLightJets->Fill(selectedJets[jetCombi[3]], mcParticles[hadronicWJet2_.second]);
-	    resFitBJets->Fill(selectedJets[jetCombi[1]], mcParticles[hadronicBJet_.second]);
-	    resFitBJets->Fill(selectedJets[jetCombi[0]], mcParticles[leptonicBJet_.second]);
-	    if(decayChannel == 0){//semiMu case
-	      resFitMuon->Fill(selectedMuons[0], lhcoOutput.getGenLepton());         resFitNeutrinoMu->Fill(mets[0], lhcoOutput.getGenNeutrino());}
-	    else if(decayChannel == 1){
-	      resFitElectron->Fill(selectedElectrons[0], lhcoOutput.getGenLepton()); resFitNeutrinoEl->Fill(mets[0], lhcoOutput.getGenNeutrino());}
-	  }//End of calculate Resolutions
-
 	  if(CalculateTF){
 	    if(decayChannel == 0){ histo1D["genPt_Muon"]->Fill( lhcoOutput.getGenLepton()->Pt() ); histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());}	    
 	    if(decayChannel == 1){ histo1D["genPt_Elec"]->Fill( lhcoOutput.getGenLepton()->Pt() ); histo1D["recoPt_Elec"]->Fill(selectedLepton->Pt());}	    
@@ -1160,34 +1122,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
   /////////////////////////
   // Write out the plots //
   /////////////////////////
-  // Fill the resolution histograms and calculate the resolutions
-  //
   string pathPNG = "PlotsMacro";
-  if(CalculateResolutions){    
-    mkdir((pathPNG+"/resFit_LightJet/").c_str(),0777);
-    mkdir((pathPNG+"/resFit_BJet/").c_str(),0777);
-    mkdir((pathPNG+"/resFit_Muon/").c_str(),0777);
-    mkdir((pathPNG+"/resFit_NeutrinoSemiMu/").c_str(),0777);     
-    mkdir((pathPNG+"/resFit_NeutrinoSemiEl/").c_str(),0777);
-    mkdir((pathPNG+"/resFit_Electron/").c_str(),0777);
-
-    resFitMuon->WritePlots(fout, true, pathPNG+"resFit_Muon/");
-    resFitMuon->WriteResolutions("PersonalClasses/resolutions/Calculated/muonReso.root");
-    resFitNeutrinoMu->WritePlots(fout, true, pathPNG+"/resFit_NeutrinoSemiMu/");
-    resFitNeutrinoMu->WriteResolutions("PersonalClasses/resolutions/Calculated/neutrinoSemiMuReso.root");
-
-    resFitNeutrinoEl->WritePlots(fout, true, pathPNG+"/resFit_Neutrino/");
-    resFitNeutrinoEl->WriteResolutions("PersonalClasses/resolutions/Calculated/neutrinoSemiElReso.root");
-
-    resFitElectron->WritePlots(fout, true, pathPNG+"/resFit_Electron/");
-    resFitElectron->WriteResolutions("PersonalClasses/resolutions/Calculated/electronReso.root");      
-      
-    resFitLightJets->WritePlots(fout, true, pathPNG+"/resFit_LightJet/");
-    resFitLightJets->WriteResolutions("PersonalClasses/resolutions/Calculated/lightJetReso.root");
-
-    resFitBJets->WritePlots(fout, true, pathPNG+"/resFit_BJet/");
-    resFitBJets->WriteResolutions("PersonalClasses/resolutions/Calculated/bJetReso.root");
-  }
 
   //Write away the MSPlots, the histo1D's and the histo2D's!!
   fout -> cd();
