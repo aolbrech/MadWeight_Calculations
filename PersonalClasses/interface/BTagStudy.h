@@ -7,6 +7,9 @@
 #include <fstream>
 #include <sstream>
 #include <math.h>
+#include "TH1.h"
+#include "TH2.h"
+#include "TFile.h"
 
 #include "TopTreeProducer/interface/TRootJet.h"
 
@@ -22,8 +25,8 @@ class BTagStudy{
     void CalculateJets(vector<TRootJet*>, vector<int> jetCombi, TLorentzVector* lepton);
     void ReturnBTagTable();
     void ReturnThirdJetTable();    //Still to fill
-    void CreateChiSqHistograms();  //Still to fill
-
+    void CreateHistograms(TFile*); 
+ 
     int getBHadrIndex(int bTagNr)  {return bHadrIndex[bTagNr];};
     int getBLeptIndex(int bTagNr)  {return bLeptIndex[bTagNr];};
     int getLight1Index4Jets(int bTagNr) {return light1Index4Jets[bTagNr];};   //Need to think how to return the light jets ... (not possible to differentiate between 4 and 5 jet case)
@@ -42,7 +45,7 @@ class BTagStudy{
     void CompareJetCombi(vector<int> jetCombi, int bTagNr, int jetCase, int lightJetOne, int lightJetTwo);
     void InitializeBegin();
     void ResetEventArrays();
-    void CalculateMlbChiSq( int bTagNr, TLorentzVector* lepton, vector<TRootJet*> Jets); 
+    void CalculateMlbChiSq( int bTagNr, TLorentzVector* lepton, vector<TRootJet*> Jets, vector<int>); 
     vector<int> CalculateMqqbChiSq( int bTagNr, vector<TRootJet*> Jets); 
 
     int LowestChiSqMlb[6], LowestChiSqMqqb[6];
@@ -52,7 +55,7 @@ class BTagStudy{
 
     int verbose;
     float BJetWP[6], LightJetWP[6];  
-    std::string OptionName[6];
+    std::string OptionName[6], BTitle[6], BName[6];
     ofstream evtSelOutput[2];
     vector<int> bTaggedJetNr[6], NonbTaggedJetNr[6], LightJetNr[6];
 
@@ -64,6 +67,9 @@ class BTagStudy{
     //int thirdJetIsActualQuark[6][2], secondJetIsActualQuark[6][2], firstJetIsActualQuark[6][2];
     //int thirdJetIsCorrectQuark[6];
     //int thirdJetIsGoodQuark[6];    //3rd quark is one of the quarks when the two b-jets are correctly matched!
+
+    map<string,TH1F*> histo1D;
+    map<string,TH2F*> histo2D;
 
 };
 

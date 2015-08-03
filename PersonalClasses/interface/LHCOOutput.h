@@ -7,6 +7,9 @@
 #include "TopTreeProducer/interface/TRootMCParticle.h"
 #include "TopTreeProducer/interface/TRootJet.h"
 #include "TLorentzVector.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TFile.h"
 
 using namespace std;
 using namespace TopTree;
@@ -18,7 +21,8 @@ public:
   ~LHCOOutput();
 
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
-  void StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge); 
+  void StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge, vector<int> jetCombi); 
+  void WriteLHCOPlots(TFile*);
 
   bool GenEventContentCorrect()    {return CorrectGenEvtContent;};
   int getLeptonType()              {return leptonType;};
@@ -35,15 +39,18 @@ private:
   TRootMCParticle *Top,*TopBar,*Bottom, *BottomBar,*Lepton,*NeutrinoMC,*WPlus,*WMinus,*Light,*LightBar;
   TLorentzVector *GenLeptonicTop, *GenLeptonicW, *GenLepton, *GenNeutrino;
   //TLorentzVector *GenHadronicTop, *GenHadronicW;
-  unsigned int NumberNegativeElectrons, NumberNegativeMuons, NumberPositiveElectrons, NumberPositiveMuons;
-  unsigned int NumberNegRecoEl, NumberNegRecoMu, NumberPosRecoEl, NumberPosRecoMu;
+  unsigned int NumberNegativeElectrons, NumberNegativeMuons, NumberPositiveElectrons, NumberPositiveMuons, WrongEvtCounter;
+  unsigned int NumberNegRecoEl, NumberNegRecoMu, NumberPosRecoEl, NumberPosRecoMu, NrPosRecoMuCorrect, NrPosRecoMuWrong, NrPosRecoMuUnmatched;
   bool CorrectGenEvtContent;
-  ofstream GenOutFile[4], RecoOutFile[4];
+  ofstream GenOutFile[4], RecoOutFile[4], WrongGenFile, CorrectRecoMuPosFile, WrongRecoMuPosFile, UnmatchedRecoMuPosFile;
   int verbose_, LeptonCharge;
   bool genOutput_, recoOutput_;
 
   enum LeptonType_t {muPlus, muMinus, elPlus, elMinus};
   LeptonType_t leptonType;
+
+  map<string,TH1F*> histo1D;
+  map<string,TH2F*> histo2D;
 };
 
 #endif

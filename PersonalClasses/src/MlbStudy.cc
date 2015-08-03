@@ -1,14 +1,60 @@
 #include "../interface/MlbStudy.h"
 
 MlbStudy::MlbStudy(int NrBTags){
-    MlbStudy::initializeBegin(NrBTags);
+    //MlbStudy::initializeBegin(NrBTags);
 }
 
 MlbStudy::~MlbStudy(){
 
 }
 
-void MlbStudy::initializePerEvent(){
+//void MlbStudy::CalculateMasses(){  //Possible to calculate the Mlb and Mqqb masses within this class?  -->NO ...
+//}
+
+void MlbStudy::InitializeMlb(){
+    //---  This will distinguish the leptonic and hadronic b-jets  ---//
+    //---     ==> Identical for 4- and 5-jet case                  ---//
+    Mlb = 103.286;
+    SigmaMlb = 26.7764;
+}
+
+//void MlbStudy::InitializeMqqb(){
+//    //---  This option chooses 2 out of three light jets  ---//
+//    //---     ==> Only considered in 5-jet case           ---//
+//    Mqqb = 178.722;
+//    SigmaMqqb = 18.1385;
+//}
+
+void MlbStudy::CalculateMlbChiSq( vector<int> bJetIndex, TLorentzVector* lepton, vector<TRootJet*> Jets){
+
+  if(bJetIndex.size() >= 2){
+    float MlbValues[2]  = {(*lepton+*Jets[bJetIndex[0]]).M(), (*lepton+*Jets[bJetIndex[1]]).M()};
+       
+    LowestChiSqMlb = 0;
+    bHadrIndex = bJetIndex[1];
+    for(int ii = 0; ii<2; ii++){
+      ChiSquaredMlb[ii] = ((Mlb-MlbValues[ii])/SigmaMlb)*((Mlb-MlbValues[ii])/SigmaMlb);  // + ((MassMqqb - MqqbValues[ii])/SigmaMqqb)*((MassMqqb - MqqbValues[ii])/SigmaMqqb);
+      if(ChiSquaredMlb[ii] < ChiSquaredMlb[LowestChiSqMlb]){
+        LowestChiSqMlb = ii;
+        bHadrIndex = bJetIndex[0];
+      }
+    }
+    //std::cout << " (Mlb class) -- ChiSquared values : " << ChiSquaredMlb[0] << " & " << ChiSquaredMlb[1] << std::endl;
+    bLeptIndex = bJetIndex[LowestChiSqMlb];
+  }
+  else{
+    bHadrIndex = 999;
+    bLeptIndex = 999;
+    LowestChiSqMlb = 999;
+    ChiSquaredMlb[0] = 999;
+    ChiSquaredMlb[1] = 999;
+  }
+}
+
+//void MlbStudy::CalculateMqqbChiSq(){
+//}
+
+/*void MlbStudy::initializePerEvent(){
  
   for(int ii = 0; ii < 6; ii++){
      ChiSquared[ii] = 999.;
@@ -386,4 +432,4 @@ void MlbStudy::WritePlots(TFile* outfile){
 	}
 	outfile->cd(); //Step out from 2D_histograms_graphs directory!
 }
-
+*/

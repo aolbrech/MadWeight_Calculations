@@ -8,8 +8,10 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     
   //Constructor: Define variables which have to be initialized in the beginning!
   NumberNegativeElectrons = 0; NumberNegativeMuons = 0; NumberPositiveElectrons = 0; NumberPositiveMuons = 0;
+  WrongEvtCounter = 0;
   CorrectGenEvtContent = false;
   NumberNegRecoEl = 0;         NumberNegRecoMu = 0;     NumberPosRecoEl = 0;         NumberPosRecoMu = 0; 
+  NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; NrPosRecoMuUnmatched = 0; 
   genOutput_ = GenOutput; recoOutput_ = RecoOutput;
   verbose_ = verbosity;
 
@@ -18,6 +20,7 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     GenOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeMuon.lhco");
     GenOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveElectron.lhco");
     GenOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeElectron.lhco");
+    WrongGenFile.open("MadWeightInput/AnalyzerOutput/WrongGeneratorEvents.lhco");
   }
 
   if(recoOutput_){
@@ -25,7 +28,66 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
     RecoOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeMuon.lhco");
     RecoOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElec.lhco");
     RecoOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeElec.lhco");
+    WrongRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/WrongRecoEvents_PositiveMuon.lhco");
+    UnmatchedRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/UnmatchedRecoEvents_PositiveMuon.lhco");
+    CorrectRecoMuPosFile.open("MadWeightInput/AnalyzerOutput/CorrectRecoEvents_PositiveMuon.lhco");
   }
+
+  histo1D["Gen_TopMassLept"] = new TH1F("Gen_TopMassLept","Leptonic top-mass distribution for generator events",250,130,210);
+  histo1D["Gen_TopMassHadr"] = new TH1F("Gen_TopMassHadr","Hadronic top-mass distribution for generator events",250,130,210);
+  histo1D["WrongGen_TopMassLept"] = new TH1F("WrongGen_TopMassLept","Leptonic top-mass distribution for wrong generator events",250,0,500);
+  histo1D["WrongGen_TopMassHadr"] = new TH1F("WrongGen_TopMassHadr","Hadronic top-mass distribution for wrong generator events",250,0,500);
+  histo1D["WrongReco_TopMassLept"] = new TH1F("WrongReco_TopMassLept","Leptonic top-mass distribution for wrong reco events",250,0,500);
+  histo1D["WrongReco_TopMassHadr"] = new TH1F("WrongReco_TopMassHadr","Hadronic top-mass distribution for wrong reco events",250,0,500);
+  histo1D["CorrectReco_TopMassLept"] = new TH1F("CorrectReco_TopMassLept","Leptonic top-mass distribution for correct reco events",250,0,500);
+  histo1D["CorrectReco_TopMassHadr"] = new TH1F("CorrectReco_TopMassHadr","Hadronic top-mass distribution for correct reco events",250,0,500);
+  histo1D["UnmatchedReco_TopMassLept"] = new TH1F("UnmatchedReco_TopMassLept","Leptonic top-mass distribution for unmatched reco events",250,0,500);
+  histo1D["UnmatchedReco_TopMassHadr"] = new TH1F("UnmatchedReco_TopMassHadr","Hadronic top-mass distribution for unmatched reco events",250,0,500);
+
+  histo1D["PtDistrGen_LightJets"] = new TH1F("PtDistrGen_LightJets","Pt-distribution for light jets",500,0,250);
+  histo1D["PtDistrGen_BJets"] = new TH1F("PtDistrGen_BJets","Pt-distribution for b-jets",500,0,250);
+  histo1D["PtDistrGen_Muon"] = new TH1F("PtDistrGen_Muon","Pt-distribution for muons",500,0,250);
+  histo1D["PtDistrGen_Electron"] = new TH1F("PtDistrGen_Electron","Pt-distribution for electrons",500,0,250);
+  histo1D["PtDistrGen_MET"] = new TH1F("PtDistrGen_MET","Pt-distribution for neutrinos",500,0,250);
+
+  histo1D["MassDistrGen_BJets"]    = new TH1F("MassDistrGen_BJets","Mass distribution for b-jets",150,-0.5,5.5);
+  histo1D["MassDistrGen_Muon"]     = new TH1F("MassDistrGen_Muon","Mass distribution for muons",150,-0.1,0.2);
+  histo1D["MassDistrGen_Electron"] = new TH1F("MassDistrGen_Electron","Mass distribution for electrons",150,-0.0001,0.001);
+
+  histo1D["EtaDistrGen_LightJets"] = new TH1F("EtaDistrGen_LightJets","Eta-distribution for light jets",250,-5,5);
+  histo1D["EtaDistrGen_BJets"] = new TH1F("EtaDistrGen_BJets","Eta-distribution for b-jets",250,-5,5);
+  histo1D["EtaDistrGen_Muon"] = new TH1F("EtaDistrGen_Muon","Eta-distribution for muons",250,-5,5);
+  histo1D["EtaDistrGen_Electron"] = new TH1F("EtaDistrGen_Electron","Eta-distribution for electrons",250,-5,5);
+  histo1D["EtaDistrGen_MET"] = new TH1F("EtaDistrGen_MET","Eta-distribution for neutrinos",250,-5,5);
+
+  histo1D["deltaRDistrGen_LightJets"] = new TH1F("deltaRDistrGen_LightJets","deltaR distribution between both light jets",250,0,10);
+  histo1D["deltaRDistrGen_BJets"] = new TH1F("deltaRDistrGen_BJets","deltaR distribution between both b-jets",250,0,10);
+  histo1D["deltaRDistrGen_LightWithB"] = new TH1F("deltaRDistrGen_LightWithB","deltaR distribution between light and b-jet",250,0,10);
+  histo1D["deltaRDistrGen_MuonWithJet"] = new TH1F("deltaRDistrGen_MuonWithJet","deltaR distribution between muon and light jet",250,0,10);
+  histo1D["deltaRDistrGen_MuonWithB"] = new TH1F("deltaRDistrGen_MuonWithB","deltaR distribution between muon and b-jet",250,0,10);
+  histo1D["deltaRDistrGen_ElectronWithJet"] = new TH1F("deltaRDistrGen_ElectronWithJet","deltaR distribution between electron and jet",250,0,10);
+  histo1D["deltaRDistrGen_ElectronWithB"] = new TH1F("deltaRDistrGen_ElectronWithB","deltaR distribution between electron and b-jet",250,0,10);
+
+  histo1D["PtDistrReco_LightJets"] = new TH1F("PtDistrReco_LightJets","Pt-distribution for light jets",500,0,250);
+  histo1D["PtDistrReco_BJets"] = new TH1F("PtDistrReco_BJets","Pt-distribution for b-jets",500,0,250);
+  histo1D["PtDistrReco_Muon"] = new TH1F("PtDistrReco_Muon","Pt-distribution for muons",500,0,250);
+  histo1D["PtDistrReco_Electron"] = new TH1F("PtDistrReco_Electron","Pt-distribution for electrons",500,0,250);
+  histo1D["PtDistrReco_MET"] = new TH1F("PtDistrReco_MET","Pt-distribution for neutrinos",500,0,250);
+
+  histo1D["EtaDistrReco_LightJets"] = new TH1F("EtaDistrReco_LightJets","Eta-distribution for light jets",250,-5,5);
+  histo1D["EtaDistrReco_BJets"] = new TH1F("EtaDistrReco_BJets","Eta-distribution for b-jets",250,-5,5);
+  histo1D["EtaDistrReco_Muon"] = new TH1F("EtaDistrReco_Muon","Eta-distribution for muons",250,-5,5);
+  histo1D["EtaDistrReco_Electron"] = new TH1F("EtaDistrReco_Electron","Eta-distribution for electrons",250,-5,5);
+  histo1D["EtaDistrReco_MET"] = new TH1F("EtaDistrReco_MET","Eta-distribution for neutrinos",250,-5,5);
+
+  histo1D["deltaRDistrReco_LightJets"] = new TH1F("deltaRDistrReco_LightJets","deltaR distribution between both light jets",250,0,10);
+  histo1D["deltaRDistrReco_BJets"] = new TH1F("deltaRDistrReco_BJets","deltaR distribution between both b-jets",250,0,10);
+  histo1D["deltaRDistrReco_LightWithB"] = new TH1F("deltaRDistrReco_LightWithB","deltaR distribution between light and b-jet",250,0,10);
+  histo1D["deltaRDistrReco_MuonWithJet"] = new TH1F("deltaRDistrReco_MuonWithJet","deltaR distribution between muon and light jet",250,0,10);
+  histo1D["deltaRDistrReco_MuonWithB"] = new TH1F("deltaRDistrReco_MuonWithB","deltaR distribution between muon and b-jet",250,0,10);
+  histo1D["deltaRDistrReco_ElectronWithJet"] = new TH1F("deltaRDistrReco_ElectronWithJet","deltaR distribution between electron and jet",250,0,10);
+  histo1D["deltaRDistrReco_ElectronWithB"] = new TH1F("deltaRDistrReco_ElectronWithB","deltaR distribution between electron and b-jet",250,0,10);
+
 }
 
 LHCOOutput::~LHCOOutput(){
@@ -35,6 +97,8 @@ LHCOOutput::~LHCOOutput(){
     if(genOutput_) GenOutFile[ii].close();
     if(recoOutput_) RecoOutFile[ii].close();
   }
+  if(genOutput_) WrongGenFile.close();
+  if(recoOutput_){ WrongRecoMuPosFile.close(); CorrectRecoMuPosFile.close();UnmatchedRecoMuPosFile.close();}
 
 }
 
@@ -117,6 +181,34 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
     //Save the lepton and neutrino as TLorentzVectors
     GenLepton = (TLorentzVector*) Lepton;
     GenNeutrino = (TLorentzVector*) NeutrinoMC;
+
+    //--- Plot the generator-level distributions for Pt, eta and dR ---//
+    //---   --> Will be used for MG cuts comparison                 ---//
+    histo1D["PtDistrGen_LightJets"]->Fill(Light->Pt()); histo1D["PtDistrGen_LightJets"]->Fill(LightBar->Pt());
+    histo1D["PtDistrGen_BJets"]->Fill(Bottom->Pt());    histo1D["PtDistrGen_BJets"]->Fill(BottomBar->Pt()); 
+    histo1D["MassDistrGen_BJets"]->Fill(Bottom->M());   histo1D["MassDistrGen_BJets"]->Fill(BottomBar->M());
+    if(fabs(Lepton->type()) == 13){ histo1D["PtDistrGen_Muon"]->Fill(Lepton->Pt());     histo1D["MassDistrGen_Muon"]->Fill(Lepton->M());    } 
+    if(fabs(Lepton->type()) == 11){ histo1D["PtDistrGen_Electron"]->Fill(Lepton->Pt()); histo1D["MassDistrGen_Electron"]->Fill(Lepton->M());}
+    histo1D["PtDistrGen_MET"]->Fill(NeutrinoMC->Pt());
+
+    histo1D["EtaDistrGen_LightJets"]->Fill(Light->Eta()); histo1D["EtaDistrGen_LightJets"]->Fill(LightBar->Eta());
+    histo1D["EtaDistrGen_BJets"]->Fill(Bottom->Eta());    histo1D["EtaDistrGen_BJets"]->Fill(BottomBar->Eta());
+    if(fabs(Lepton->type()) == 13) histo1D["EtaDistrGen_Muon"]->Fill(Lepton->Eta());
+    if(fabs(Lepton->type()) == 11) histo1D["EtaDistrGen_Electron"]->Fill(Lepton->Eta());
+    histo1D["EtaDistrGen_MET"]->Fill(NeutrinoMC->Eta());
+
+    histo1D["deltaRDistrGen_LightJets"]->Fill(Light->DeltaR(*LightBar));
+    histo1D["deltaRDistrGen_BJets"]->Fill(Bottom->DeltaR(*BottomBar));
+    histo1D["deltaRDistrGen_LightWithB"]->Fill(Light->DeltaR(*Bottom)); histo1D["deltaRDistrGen_LightWithB"]->Fill(Light->DeltaR(*BottomBar)); 
+    histo1D["deltaRDistrGen_LightWithB"]->Fill(LightBar->DeltaR(*Bottom)); histo1D["deltaRDistrGen_LightWithB"]->Fill(LightBar->DeltaR(*BottomBar));
+    if(fabs(Lepton->type()) == 13){
+      histo1D["deltaRDistrGen_MuonWithJet"]->Fill(Lepton->DeltaR(*Light)); histo1D["deltaRDistrGen_MuonWithJet"]->Fill(Lepton->DeltaR(*LightBar));
+      histo1D["deltaRDistrGen_MuonWithB"]->Fill(Lepton->DeltaR(*Bottom)); histo1D["deltaRDistrGen_MuonWithB"]->Fill(Lepton->DeltaR(*BottomBar));
+    }
+    if(fabs(Lepton->type()) == 11){
+      histo1D["deltaRDistrGen_ElectronWithJet"]->Fill(Lepton->DeltaR(*Light)); histo1D["deltaRDistrGen_ElectronWithJet"]->Fill(Lepton->DeltaR(*LightBar));
+      histo1D["deltaRDistrGen_ElectronWithB"]->Fill(Lepton->DeltaR(*Bottom)); histo1D["deltaRDistrGen_ElectronWithB"]->Fill(Lepton->DeltaR(*BottomBar));
+    }
 	
     //Create the lhco file for pp > t t~:
     if(Lepton->type() == 13 || Lepton->type() == 11){ //Negative lepton, hence t~ > b~ W-, W- > e/mu- ve/vm
@@ -173,6 +265,8 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 	  NumberPositiveMuons++;
           leptonType = muPlus;      //Enum information
 	  LHCOEventOutput(0, GenOutFile[0], NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
+          histo1D["Gen_TopMassLept"]->Fill( (*Bottom + *Lepton + *NeutrinoMC).M());
+          histo1D["Gen_TopMassHadr"]->Fill( (*BottomBar + *Light + *LightBar).M()); 	
 	}
       }//Positive muon
 	  
@@ -186,6 +280,7 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
   }//Correct event content found
   else{
     CorrectGenEvtContent = false;
+    WrongEvtCounter++;
 
     //Output in case wrong event content needs to be double-checked
     if(verbose_>4){
@@ -195,10 +290,30 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
       cout << " Number of W-bosons        : " << EventContent[3] << endl;
       cout << " Number of lepton/neutrino : " << EventContent[4] << endl;
     }
+
+    //---  Also create a .lhco file for wrong Gen events! ---//
+    vector<TLorentzVector*> LHCOVectorWrongGen(6);
+    vector<int> MadGraphIdWrongGen(6,4);
+    vector<float> MGBtagWrongGen(6,0.0);
+    MadGraphIdWrongGen[1] = 2; MadGraphIdWrongGen[2] = 6;    //Consider the event as a semi-mu (+) event
+    MGBtagWrongGen[0] = 2.0; MGBtagWrongGen[3] = 2.0;     
+
+    LHCOVectorWrongGen[0] = (TLorentzVector*) mcParticles[0];
+    LHCOVectorWrongGen[1] = (TLorentzVector*) mcParticles[1];
+    LHCOVectorWrongGen[2] = (TLorentzVector*) mcParticles[2];
+    LHCOVectorWrongGen[3] = (TLorentzVector*) mcParticles[3];
+    LHCOVectorWrongGen[4] = (TLorentzVector*) mcParticles[4];
+    LHCOVectorWrongGen[5] = (TLorentzVector*) mcParticles[5];
+
+    if(WrongEvtCounter <= 10000){
+      LHCOEventOutput(2, WrongGenFile, WrongEvtCounter, LHCOVectorWrongGen, MadGraphIdWrongGen, MGBtagWrongGen);
+      histo1D["WrongGen_TopMassLept"]->Fill( (*mcParticles[0]+*mcParticles[1]+*mcParticles[2]).M());
+      histo1D["WrongGen_TopMassHadr"]->Fill( (*mcParticles[3]+*mcParticles[4]+*mcParticles[5]).M()); 	
+    }
   }			    
 }//End of class StoreGenInfo
 
-void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptonCharge){
+void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptonCharge, vector<int> jetCombi){
 
   //--- Reconstruct neutrino partially ---//
   //---   (Neutrino Pt and M needed)   ---//
@@ -215,7 +330,46 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
   vector<int> MadGraphRecoId(6,4);
   vector<float> MGRecoBtagId(6,0.0);
   if(Jets[bLeptIndex]->btag_combinedSecondaryVertexBJetTags() > 0 && Jets[bHadrIndex]->btag_combinedSecondaryVertexBJetTags() > 0)
-    MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;     
+    MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;
+
+  //--- Check whether the event is correctly reconstructed  ---// 
+  //---  (jetCombi is initialized to 9999 for all dataSets) ---//
+  bool jetCombiFound = false;
+  bool EventCorrectlyMatched = false;
+  if(jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999){
+    jetCombiFound = true;
+    if( bLeptIndex == jetCombi[0] && bHadrIndex == jetCombi[1]    &&
+       (light1Index == jetCombi[2] || light1Index == jetCombi[3]) &&
+       (light2Index == jetCombi[3] || light2Index == jetCombi[3]) )
+      EventCorrectlyMatched = true;
+  }
+    
+  //--- Plot the generator-level distributions for Pt, eta and dR ---//
+  //---   --> Will be used for MG cuts comparison                 ---//
+  histo1D["PtDistrReco_LightJets"]->Fill(Jets[light1Index]->Pt()); histo1D["PtDistrReco_LightJets"]->Fill(Jets[light2Index]->Pt());
+  histo1D["PtDistrReco_BJets"]->Fill(Jets[bHadrIndex]->Pt());    histo1D["PtDistrReco_BJets"]->Fill(Jets[bLeptIndex]->Pt()); 
+  if(fabs(Lepton->type()) == 13) histo1D["PtDistrReco_Muon"]->Fill(lepton->Pt());
+  if(fabs(Lepton->type()) == 11) histo1D["PtDistrReco_Electron"]->Fill(lepton->Pt());
+  histo1D["PtDistrReco_MET"]->Fill(Neutrino.Pt());
+
+  histo1D["EtaDistrReco_LightJets"]->Fill(Jets[light1Index]->Eta()); histo1D["EtaDistrReco_LightJets"]->Fill(Jets[light2Index]->Eta());
+  histo1D["EtaDistrReco_BJets"]->Fill(Jets[bHadrIndex]->Eta());      histo1D["EtaDistrReco_BJets"]->Fill(Jets[bLeptIndex]->Eta());
+  if(fabs(Lepton->type()) == 13) histo1D["EtaDistrReco_Muon"]->Fill(lepton->Eta());
+  if(fabs(Lepton->type()) == 11) histo1D["EtaDistrReco_Electron"]->Fill(lepton->Eta());
+  histo1D["EtaDistrReco_MET"]->Fill(Neutrino.Eta());
+
+  histo1D["deltaRDistrReco_LightJets"]->Fill(Jets[light1Index]->DeltaR(*Jets[light2Index]));
+  histo1D["deltaRDistrReco_BJets"]->Fill(Jets[bHadrIndex]->DeltaR(*Jets[bLeptIndex]));
+  histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light1Index]->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light1Index]->DeltaR(*Jets[bLeptIndex])); 
+  histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light2Index]->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_LightWithB"]->Fill(Jets[light2Index]->DeltaR(*Jets[bLeptIndex]));
+  if(fabs(Lepton->type()) == 13){
+    histo1D["deltaRDistrReco_MuonWithJet"]->Fill(lepton->DeltaR(*Jets[light1Index])); histo1D["deltaRDistrReco_MuonWithJet"]->Fill(lepton->DeltaR(*Jets[light2Index]));
+    histo1D["deltaRDistrReco_MuonWithB"]->Fill(lepton->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_MuonWithB"]->Fill(lepton->DeltaR(*Jets[bLeptIndex]));
+  }
+  if(fabs(Lepton->type()) == 11){
+    histo1D["deltaRDistrReco_ElectronWithJet"]->Fill(lepton->DeltaR(*Jets[light1Index])); histo1D["deltaRDistrReco_ElectronWithJet"]->Fill(lepton->DeltaR(*Jets[light2Index]));
+    histo1D["deltaRDistrReco_ElectronWithB"]->Fill(lepton->DeltaR(*Jets[bHadrIndex])); histo1D["deltaRDistrReco_ElectronWithB"]->Fill(lepton->DeltaR(*Jets[bLeptIndex]));
+  }
 	
   //---  Filling of LHCO files for reco events  ---//
   if(leptonCharge < 0.0 ){ //Negative lepton events
@@ -256,6 +410,24 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
       MadGraphRecoId[1] = 2;
       NumberPosRecoMu++;
       LHCOEventOutput(0, RecoOutFile[0], NumberPosRecoMu, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+      if(EventCorrectlyMatched == true && jetCombiFound == true){
+        NrPosRecoMuCorrect++; 
+        LHCOEventOutput(0, CorrectRecoMuPosFile, NrPosRecoMuCorrect, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+        histo1D["CorrectReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
+        histo1D["CorrectReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());
+      }
+      else if(EventCorrectlyMatched == false && jetCombiFound == true){ 
+        NrPosRecoMuWrong++;   
+        LHCOEventOutput(0, WrongRecoMuPosFile, NrPosRecoMuWrong, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+        histo1D["WrongReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
+        histo1D["WrongReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());
+      }
+      else if(jetCombiFound == false){
+        NrPosRecoMuUnmatched++;
+        LHCOEventOutput(0, UnmatchedRecoMuPosFile, NrPosRecoMuUnmatched, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+        histo1D["UnmatchedReco_TopMassLept"]->Fill( (*LHCORecoVector[0]+*LHCORecoVector[1]+*LHCORecoVector[2]).M());
+        histo1D["UnmatchedReco_TopMassHadr"]->Fill( (*LHCORecoVector[3]+*LHCORecoVector[4]+*LHCORecoVector[5]).M());       
+      }
     }
   }//End of positive lepton
 
@@ -282,6 +454,7 @@ void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned in
     cout.precision(4);
     outputFile << "  " << fixed << showpoint << setprecision(4) << vector[ii]->Eta();
     if(vector[ii]->Phi() < -3.14) outputFile << "  " << setprecision(4) << -1*(vector[ii]->Phi());
+    else if(vector[ii]->Phi() < 0.0) outputFile << " " << setprecision(4) << vector[ii]->Phi()+6.28;
     else                          outputFile << "  " << setprecision(4) << vector[ii]->Phi();
     outputFile << "  " << setprecision(4) << vector[ii]->Pt();
     cout.setf(ios::fixed,ios::floatfield);  //Add zero to obtain the asked number of digits
@@ -292,4 +465,30 @@ void LHCOOutput::LHCOEventOutput(int LHCOIndex, ostream &outputFile, unsigned in
     else                               outputFile << "    0.00";
     outputFile << " " << MGBtag[ii] << "     0.00  0.00  0.00" << endl;
   }
+}
+
+void LHCOOutput::WriteLHCOPlots(TFile* outfile){
+  //--- Use this function to create ChiSq histograms ---//
+  outfile->cd();
+  std::cout << " Inside WriteLHCOPlots function of LHCOOutput class ! " << std::endl;
+  std::cout << " Histograms will be filled in file : " << outfile->GetName() << " ************************************" << std::endl;
+
+  TDirectory* th1dir = outfile->mkdir("1D_histograms_LHCOOutput");
+  th1dir->cd();
+  for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
+    TH1F *temp = it->second;
+    int N = temp->GetNbinsX();
+    temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+    temp->SetBinContent(N+1,0);
+    temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+    temp->Write();
+  }
+  TDirectory* th2dir = outfile->mkdir("2D_histograms_LHCOOutput");
+  th2dir->cd();
+  for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){    
+    TH2F *temp = it->second;
+    temp->Write();
+  }
+  outfile->cd(); 
+
 }
