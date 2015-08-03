@@ -31,7 +31,6 @@
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
 #include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
-#include "AnomalousCouplings/PersonalClasses/interface/MlbStudy.h"
 #include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 #include "AnomalousCouplings/PersonalClasses/interface/KinematicFunctions.h"
 
@@ -407,8 +406,6 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
     //  Used classes   //
     /////////////////////  
     BTagStudy bTagStudy(verbose);  
-    //MlbStudy mlbStudy(6);//NrConsideredBTagOptions);
-    //mlbStudy.InitializeMlb();
     LHCOOutput lhcoOutput(verbose, GenLHCOOutput, RecoLHCOOutput); 
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
     TFnTuple* tfNTuple = 0;
@@ -1097,11 +1094,6 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
     //--- Get output from LHCOOutput class ---//
     lhcoOutput.WriteLHCOPlots(fout);	
         
-    //---  Mlb combination output  ---//
-    //mlbStudy.saveNumbers(OptionName, 0, NrConsideredBTagOptions, ChosenBTag, ChiSqCutValueStr );  //All 4 jets correctly matched
-    //mlbStudy.saveNumbers(OptionName, 1, 6, ChosenBTag, ChiSqCutValueStr); //NrConsideredBTagOptions, ChosenBTag, ChiSqCutValueStr );  //Also get table for "only b-jets correctly matched"
-    //mlbStudy.WritePlots(fout);
-
     if(GenLHCOOutput == true) EventInfoFile.close();
 
     //////////////
