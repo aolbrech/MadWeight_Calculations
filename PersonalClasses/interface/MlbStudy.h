@@ -17,10 +17,28 @@ using namespace TopTree;
 
 class MlbStudy{
 
+  private:
+    float Mlb, Mqqb, SigmaMlb, SigmaMqqb;
+    int bLeptIndex, bHadrIndex;
+    int LowestChiSqMlb;
+    float ChiSquaredMlb[2];
+  
   public:
-   MlbStudy(int);
-   ~MlbStudy();
+    MlbStudy(int);
+    ~MlbStudy();
+    void CalculateMlbChiSq( vector<int> bJetIndex, TLorentzVector* lepton, vector<TRootJet*> Jets); 
+    //void CalculateMqqbChiSq( vector<int> lightJetIndex, vector<TRootJet*> Jets); 
+    void InitializeMlb();
+    //void InitializeMqqb();
 
+    int getBLept() {return bLeptIndex;};
+    int getBHadr() {return bHadrIndex;}; 
+    
+    float getMlbFit()  {return Mlb;};
+    float getMqqbFit() {return Mqqb;};
+
+    //------------------------------------------------------------------------------------------------------------------------------------------//
+/*
    void calculateChiSquared(vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, TLorentzVector* lepton, vector<TRootJet*> Jets, float MassMlb, float SigmaMlb, float MassMqqb, float SigmaMqqb);
    void getIndices(int LowestChiSqIndex);
    void calculateEfficiency(int option, vector<int> CorrectValues, vector<int> bTaggedJets, vector<int> lightJets, int NrConsideredBTagOptions, int ChiSqCutValue);
@@ -78,7 +96,7 @@ class MlbStudy{
     map<string,TH1F*> histo1D;
     map<string,TH2F*> histo2D;
     std::string Title[3], Name[3];
-
+*/
 };
 
 #endif
