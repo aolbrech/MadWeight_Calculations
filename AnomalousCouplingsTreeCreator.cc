@@ -195,9 +195,6 @@ int main (int argc, char *argv[]){
   
   TFile *fout = new TFile (rootFileName.c_str(), "RECREATE");
   
-  //Global variable
-  //TRootEvent* event = 0;
-  
   //nof selected events
   double NEvtsData = 0;
   Double_t *nEvents = new Double_t[datasets.size()];
@@ -219,25 +216,26 @@ int main (int argc, char *argv[]){
   histo1D["genPt_Elec"] = new TH1F("genPt_Elec","genPt_Elec",400,0,200);
   histo1D["recoPt_Elec"] = new TH1F("recoPt_Elec","recoPt_Elec",400,0,200);
 
-  histo1D["StCosTheta_BeforeEvtSel"] = new TH1F("StCosTheta_BeforeEvtSel","StCosTheta_BeforeEvtSel",200,-1,1);
+//  histo1D["StCosTheta_BeforeEvtSel"] = new TH1F("StCosTheta_BeforeEvtSel","StCosTheta_BeforeEvtSel",200,-1,1);
+  histo1D["StCosTheta"] = new TH1F("StCosTheta","StCosTheta",200,-1,1);
   histo1D["StCosThetaNoBTag"] = new TH1F("StCosThetaNoBTag","StCosThetaNoBTag",200,-1,1);
-  histo1D["StCosThetaLCSV"] = new TH1F("StCosThetaLCSV","StCosThetaLCSV",200,-1,1);
-  histo1D["StCosThetaAllLCSV"] = new TH1F("StCosThetaAllLCSV","StCosThetaAllLCSV",200,-1,1);
-  histo1D["StCosThetaMCSV"] = new TH1F("StCosThetaMCSV","StCosThetaMCSV",200,-1,1);
-  histo1D["StCosThetaTCSV"] = new TH1F("StCosThetaTCSV","StCosThetaTCSV",200,-1,1);
-  histo1D["JetTypeLargeLCSVEvents"] = new TH1F("JetTypeLargeLCSVEvents","JetTypeLargeLCSVEvents",51,-25.5,25.5);
-  histo1D["JetTypeLargeLCSVLeadingPtEvents"] = new TH1F("JetTypeLargeLCSVLeadingPtEvents","JetTypeLargeLCSVLeadingPtEvents",51,-25.5,25.5);
-  histo1D["JetTypeLCSVLightJetsLeadingPt"] = new TH1F("JetTypeLCSVLightJetsLeadingPt","JetTypeLCSVLightJetsLeadingPt",51,-25.5,25.5);
-  histo1D["JetTypeLargeMCSVEvents"] = new TH1F("JetTypeLargeMCSVEvents","JetTypeLargeMCSVEvents",51,-25.5,25.5);
-  histo1D["JetTypeLargeMCSVLeadingPtEvents"] = new TH1F("JetTypeLargeMCSVLeadingPtEvents","JetTypeLargeMCSVLeadingPtEvents",51,-25.5,25.5);
-  histo1D["JetTypeLargeTCSVEvents"] = new TH1F("JetTypeLargeTCSVEvents","JetTypeLargeTCSVEvents",51,-25.5,25.5);
-  histo1D["JetTypeLargeTCSVLeadingPtEvents"] = new TH1F("JetTypeLargeTCSVLeadingPtEvents","JetTypeLargeTCSVLeadingPtEvents",51,-25.5,25.5);
-  histo1D["JetTypeLCSV"] = new TH1F("JetTypeLCSV","JetTypeLCSV",51,-25.5,25.5);
-  histo1D["JetTypeMCSV"] = new TH1F("JetTypeMCSV","JetTypeMCSV",51,-25.5,25.5);
-  histo1D["JetTypeTCSV"] = new TH1F("JetTypeTCSV","JetTypeTCSV",51,-25.5,25.5);
-  histo1D["JetTypeLCSVLightJets"] = new TH1F("JetTypeLCSVLightJets","JetTypeLCSVLightJets",51,-25.5,25.5);
-  histo1D["CSVDiscrLCSVLightJets"] = new TH1F("CSVDiscrLCSVLightJets","CSVDiscrLCSVLightJets",400,-2.5,1.5);
-  histo1D["CSVDiscrLCSVLightJetsLeadingPt"] = new TH1F("CSVDiscrLCSVLightJetsLeadingPt","CSVDiscrLCSVLightJetsLeadingPt", 400, -2.5, 1.5);
+//  histo1D["StCosThetaLCSV"] = new TH1F("StCosThetaLCSV","StCosThetaLCSV",200,-1,1);
+//  histo1D["StCosThetaAllLCSV"] = new TH1F("StCosThetaAllLCSV","StCosThetaAllLCSV",200,-1,1);
+//  histo1D["StCosThetaMCSV"] = new TH1F("StCosThetaMCSV","StCosThetaMCSV",200,-1,1);
+//  histo1D["StCosThetaTCSV"] = new TH1F("StCosThetaTCSV","StCosThetaTCSV",200,-1,1);
+//  histo1D["JetTypeLargeLCSVEvents"] = new TH1F("JetTypeLargeLCSVEvents","JetTypeLargeLCSVEvents",51,-25.5,25.5);
+//  histo1D["JetTypeLargeLCSVLeadingPtEvents"] = new TH1F("JetTypeLargeLCSVLeadingPtEvents","JetTypeLargeLCSVLeadingPtEvents",51,-25.5,25.5);
+//  histo1D["JetTypeLCSVLightJetsLeadingPt"] = new TH1F("JetTypeLCSVLightJetsLeadingPt","JetTypeLCSVLightJetsLeadingPt",51,-25.5,25.5);
+//  histo1D["JetTypeLargeMCSVEvents"] = new TH1F("JetTypeLargeMCSVEvents","JetTypeLargeMCSVEvents",51,-25.5,25.5);
+//  histo1D["JetTypeLargeMCSVLeadingPtEvents"] = new TH1F("JetTypeLargeMCSVLeadingPtEvents","JetTypeLargeMCSVLeadingPtEvents",51,-25.5,25.5);
+//  histo1D["JetTypeLargeTCSVEvents"] = new TH1F("JetTypeLargeTCSVEvents","JetTypeLargeTCSVEvents",51,-25.5,25.5);
+//  histo1D["JetTypeLargeTCSVLeadingPtEvents"] = new TH1F("JetTypeLargeTCSVLeadingPtEvents","JetTypeLargeTCSVLeadingPtEvents",51,-25.5,25.5);
+//  histo1D["JetTypeLCSV"] = new TH1F("JetTypeLCSV","JetTypeLCSV",51,-25.5,25.5);
+//  histo1D["JetTypeMCSV"] = new TH1F("JetTypeMCSV","JetTypeMCSV",51,-25.5,25.5);
+//  histo1D["JetTypeTCSV"] = new TH1F("JetTypeTCSV","JetTypeTCSV",51,-25.5,25.5);
+//  histo1D["JetTypeLCSVLightJets"] = new TH1F("JetTypeLCSVLightJets","JetTypeLCSVLightJets",51,-25.5,25.5);
+//  histo1D["CSVDiscrLCSVLightJets"] = new TH1F("CSVDiscrLCSVLightJets","CSVDiscrLCSVLightJets",400,-2.5,1.5);
+//  histo1D["CSVDiscrLCSVLightJetsLeadingPt"] = new TH1F("CSVDiscrLCSVLightJetsLeadingPt","CSVDiscrLCSVLightJetsLeadingPt", 400, -2.5, 1.5);
   histo1D["CorrectBLeptCSVDiscr"] = new TH1F("CorrectBLeptCSVDiscr","CorrectBLeptCSVDiscr",400,-2.5,1.5);
   histo1D["CorrectBHadrCSVDiscr"] = new TH1F("CorrectBHadrCSVDiscr","CorrectBHadrCSVDiscr",400,-2.5,1.5);
   histo1D["CorrectQuark1CSVDiscr"] = new TH1F("CorrectQuark1CSVDiscr","CorrectQuark1CSVDiscr",400,-2.5,1.5);
@@ -246,8 +244,8 @@ int main (int argc, char *argv[]){
   histo1D["Quark1JetNumber"] = new TH1F("Quark1JetNumber","Quark1JetNumber",12,-1.5,10.5);
   histo1D["Quark2JetNumber"] = new TH1F("Quark2JetNumber","Quark2JetNumber",12,-1.5,10.5);
 
-  histo1D["CosThetaReco"] = new TH1F("CosThetaReco","CosThetaReco",200,-1,1);
-  histo1D["NeutrinoEta"] = new TH1F("NeutrinoEta","NeutrinoEta",200,-8,8);
+//  histo1D["CosThetaReco"] = new TH1F("CosThetaReco","CosThetaReco",200,-1,1);
+//  histo1D["NeutrinoEta"] = new TH1F("NeutrinoEta","NeutrinoEta",200,-8,8);
 
   histo1D["lumiWeights"] = new TH1F("lumiWeights","lumiWeights", 200,-100,100);
 
@@ -662,6 +660,7 @@ for (unsigned int d = 0; d < datasets.size (); d++) {
       // Write this information to LHCO Output for MW       //
       ////////////////////////////////////////////////////////         -->This part only needs mcParticles information so can be moved to class!!
       lhcoOutput.StoreGenInfo(mcParticles);
+      if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosTheta"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
       
       //Accessing information and store in EventInfoFile    
       std::string leptonTypeString[4] = {"muPlus","muMinus","elPlus","elMinus"};      //Not possible to define this in header file of LHCOOutput ...
