@@ -47,7 +47,7 @@
   }
 
   //***********************//
-  int usedEta = 0;
+  int usedEta = 4;
   //***********************//
   Directory = Directory+EtaBin[usedEta];
 
@@ -274,9 +274,8 @@
         stackedGausCanvas = (TCanvas*) histoFile->Get( (Title+"/"+Title+"_StackCanvas_WideAndNarrowGaussian").c_str() );
         if(drawPNG) stackedGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_WideAndNarrowGaussian.png").c_str() );
         stackedGausCanvas->SaveAs( (Directory+"/"+Title+"/Overview_WideAndNarrowGaussian.pdf").c_str());
-        delete stackedGausCanvas;
+        //delete *stackedGausCanvas;
       }
-
     }//End of loop over NrFitHistos
     
     if(drawPNG) twoDCanvas->SaveAs( (Directory+"/"+"ColorPlots.png").c_str() );
