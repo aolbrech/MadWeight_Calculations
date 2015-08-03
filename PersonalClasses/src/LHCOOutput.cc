@@ -50,6 +50,10 @@ LHCOOutput::LHCOOutput(int verbosity, bool GenOutput, bool RecoOutput){
   histo1D["PtDistrGen_Electron"] = new TH1F("PtDistrGen_Electron","Pt-distribution for electrons",500,0,250);
   histo1D["PtDistrGen_MET"] = new TH1F("PtDistrGen_MET","Pt-distribution for neutrinos",500,0,250);
 
+  histo1D["MassDistrGen_BJets"]    = new TH1F("MassDistrGen_BJets","Mass distribution for b-jets",150,-0.5,5.5);
+  histo1D["MassDistrGen_Muon"]     = new TH1F("MassDistrGen_Muon","Mass distribution for muons",150,-0.1,0.2);
+  histo1D["MassDistrGen_Electron"] = new TH1F("MassDistrGen_Electron","Mass distribution for electrons",150,-0.0001,0.001);
+
   histo1D["EtaDistrGen_LightJets"] = new TH1F("EtaDistrGen_LightJets","Eta-distribution for light jets",250,-5,5);
   histo1D["EtaDistrGen_BJets"] = new TH1F("EtaDistrGen_BJets","Eta-distribution for b-jets",250,-5,5);
   histo1D["EtaDistrGen_Muon"] = new TH1F("EtaDistrGen_Muon","Eta-distribution for muons",250,-5,5);
@@ -182,8 +186,9 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
     //---   --> Will be used for MG cuts comparison                 ---//
     histo1D["PtDistrGen_LightJets"]->Fill(Light->Pt()); histo1D["PtDistrGen_LightJets"]->Fill(LightBar->Pt());
     histo1D["PtDistrGen_BJets"]->Fill(Bottom->Pt());    histo1D["PtDistrGen_BJets"]->Fill(BottomBar->Pt()); 
-    if(fabs(Lepton->type()) == 13) histo1D["PtDistrGen_Muon"]->Fill(Lepton->Pt());
-    if(fabs(Lepton->type()) == 11) histo1D["PtDistrGen_Electron"]->Fill(Lepton->Pt());
+    histo1D["MassDistrGen_BJets"]->Fill(Bottom->M());   histo1D["MassDistrGen_BJets"]->Fill(BottomBar->M());
+    if(fabs(Lepton->type()) == 13){ histo1D["PtDistrGen_Muon"]->Fill(Lepton->Pt());     histo1D["MassDistrGen_Muon"]->Fill(Lepton->M());    } 
+    if(fabs(Lepton->type()) == 11){ histo1D["PtDistrGen_Electron"]->Fill(Lepton->Pt()); histo1D["MassDistrGen_Electron"]->Fill(Lepton->M());}
     histo1D["PtDistrGen_MET"]->Fill(NeutrinoMC->Pt());
 
     histo1D["EtaDistrGen_LightJets"]->Fill(Light->Eta()); histo1D["EtaDistrGen_LightJets"]->Fill(LightBar->Eta());
