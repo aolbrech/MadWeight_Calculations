@@ -138,54 +138,52 @@ int main (int argc, char *argv[]){
     
     for (unsigned int d = 0; d < datasets.size (); d++) {
       
-      if(Luminosity > datasets[d]->EquivalentLumi() ){
-        Luminosity = datasets[d]->EquivalentLumi();
-        LuminosityMu = datasets[d]->EquivalentLumi(); LuminosityEl = datasets[d]->EquivalentLumi(); //This way EventSelectionTable info is set correctly !
-      }
-      string dataSetName = datasets[d]->Name();
+        if(Luminosity > datasets[d]->EquivalentLumi() ){
+            Luminosity = datasets[d]->EquivalentLumi();
+            LuminosityMu = datasets[d]->EquivalentLumi(); LuminosityEl = datasets[d]->EquivalentLumi(); //This way EventSelectionTable info is set correctly !
+        }
+        string dataSetName = datasets[d]->Name();
       
-      if(dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) {
-	LuminosityMu = datasets[d]->EquivalentLumi();
-	foundMu=true;
-      }  
-      if(dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0) {
-	LuminosityEl = datasets[d]->EquivalentLumi();
-	foundEl=true;  
-      }  
+        if(dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) {
+	    LuminosityMu = datasets[d]->EquivalentLumi();
+	    foundMu=true;
+          }  
+          if(dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0) {
+	    LuminosityEl = datasets[d]->EquivalentLumi();
+    	    foundEl=true;  
+          }  
+          
+        if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) { // when only using one channel
+	    Luminosity = datasets[d]->EquivalentLumi();
+        }   
       
-      if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) { // when only using one channel
-	Luminosity = datasets[d]->EquivalentLumi();
-      }   
-      
-      if(dataSetName.find("QCD") == 0)                                      datasets[d]->SetColor(kYellow);
-      if(dataSetName.find("TT") == 0)                                       datasets[d]->SetColor(kRed+1);
-      if(dataSetName.find("TTbarJets_Other") == 0)                          datasets[d]->SetColor(kRed-7);
-      if(dataSetName.find("ST") == 0 || dataSetName.find("SingleTop") == 0) datasets[d]->SetColor(kMagenta);
-      if(dataSetName.find("WJets") == 0){                                   datasets[d]->SetColor(kGreen-3); datasets[d]->SetTitle("W#rightarrowl#nu");}      
-      if(dataSetName.find("ZJets") == 0){                                   datasets[d]->SetColor(kAzure-2); datasets[d]->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");}
+        if(dataSetName.find("QCD") == 0)                                      datasets[d]->SetColor(kYellow);
+        if(dataSetName.find("TT") == 0)                                       datasets[d]->SetColor(kRed+1);
+        if(dataSetName.find("TTbarJets_Other") == 0)                          datasets[d]->SetColor(kRed-7);
+        if(dataSetName.find("ST") == 0 || dataSetName.find("SingleTop") == 0) datasets[d]->SetColor(kMagenta);
+        if(dataSetName.find("WJets") == 0){                                   datasets[d]->SetColor(kGreen-3); datasets[d]->SetTitle("W#rightarrowl#nu");}      
+        if(dataSetName.find("ZJets") == 0){                                   datasets[d]->SetColor(kAzure-2); datasets[d]->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");}
     }
   
     if(!foundMu && !foundEl && Luminosity != oldLuminosity) cout << "changed analysis environment luminosity to "<< Luminosity << endl;
     else {
-      if(LuminosityMu != oldLuminosity) cout << "Muon PD: changed analysis environment luminosity to "<< LuminosityMu << endl;
-      if(LuminosityEl != oldLuminosity) cout << "Electron PD: changed analysis environment luminosity to "<< LuminosityEl << endl;
+        if(LuminosityMu != oldLuminosity) cout << "Muon PD: changed analysis environment luminosity to "<< LuminosityMu << endl;
+        if(LuminosityEl != oldLuminosity) cout << "Electron PD: changed analysis environment luminosity to "<< LuminosityEl << endl;
     }
     
     // make a datasets vector only for 
     if (foundMu) {
-      for (unsigned int d = 0; d < datasets.size (); d++) {
-	string dataSetName = datasets[d]->Name();
-	if ( ! (dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0) ) 
-	  datasetsMu.push_back(datasets[d]);
-      }
+        for (unsigned int d = 0; d < datasets.size (); d++) {
+    	    string dataSetName = datasets[d]->Name();
+	    if ( ! (dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0) ) datasetsMu.push_back(datasets[d]);
+        }
     }
     
     if (foundEl) {
-      for (unsigned int d = 0; d < datasets.size (); d++) {
-	string dataSetName = datasets[d]->Name();
-	if ( ! (dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) ) 
-	  datasetsEl.push_back(datasets[d]);
-      }
+        for (unsigned int d = 0; d < datasets.size (); d++) {
+	    string dataSetName = datasets[d]->Name();
+	    if ( ! (dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) ) datasetsEl.push_back(datasets[d]);
+        }
     }
     
     //nof selected events
@@ -267,21 +265,21 @@ int main (int argc, char *argv[]){
     
     string leptFlavs[3]={"_other","_mu","_el"};
     for(int ii = 0; ii < 3; ii++){
-      string leptFlav = leptFlavs[ii];
-      MSPlot["Selected_Events_pT_jet1"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet1"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_jet2"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet2"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_jet3"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet3"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_jet4"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet4"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_4leadingjets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_4leadingjets"+leptFlav,60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_alljets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_alljets"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
-      MSPlot["Selected_Events_pT_lepton"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_lepton"+leptFlav,150,-100,350,"p_{t} (GeV)");
+        string leptFlav = leptFlavs[ii];
+        MSPlot["Selected_Events_pT_jet1"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet1"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+        MSPlot["Selected_Events_pT_jet2"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet2"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+        MSPlot["Selected_Events_pT_jet3"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet3"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+        MSPlot["Selected_Events_pT_jet4"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet4"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
+        MSPlot["Selected_Events_pT_4leadingjets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_4leadingjets"+leptFlav,60, 0, 600, "p_{T} (GeV)");
+        MSPlot["Selected_Events_pT_alljets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_alljets"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
+        MSPlot["Selected_Events_pT_lepton"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_lepton"+leptFlav,150,-100,350,"p_{t} (GeV)");
       
-      MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
-      MSPlot["nSelectedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
-      MSPlot["nBTaggedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
-      MSPlot["nBTaggedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
-      MSPlot["nLightJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
-      MSPlot["nLightJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
+        MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
+        MSPlot["nSelectedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
+        MSPlot["nBTaggedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
+        MSPlot["nBTaggedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
+        MSPlot["nLightJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
+        MSPlot["nLightJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
     }
     
     ////////////////////////////////////
@@ -348,190 +346,187 @@ int main (int argc, char *argv[]){
     
     for (unsigned int d = 0; d < datasets.size (); d++) {
       
-      string previousFilename = "";
-      int iFile = -1;
-      string dataSetName = datasets[d]->Name();
+        string previousFilename = "";
+        int iFile = -1;
+        string dataSetName = datasets[d]->Name();
       
-      int nSelectedMu=0, nSelectedMuLCSV=0, nSelectedMuMCSV=0, nSelectedMuTCSV=0;
-      int nSelectedEl=0, nSelectedElLCSV=0, nSelectedElMCSV=0, nSelectedElTCSV=0;
-      int nLargeLCSVEvents = 0, nLargeMCSVEvents = 0, nLargeTCSVEvents = 0;
+        int nSelectedMu=0, nSelectedMuLCSV=0, nSelectedMuMCSV=0, nSelectedMuTCSV=0;
+        int nSelectedEl=0, nSelectedElLCSV=0, nSelectedElMCSV=0, nSelectedElTCSV=0;
+        int nLargeLCSVEvents = 0, nLargeMCSVEvents = 0, nLargeTCSVEvents = 0;
       
-      if (verbose > 1){
-	cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
-	std::cout<<"      -> This sample contains, " << datasets[d]->NofEvtsToRunOver() << " events." << endl;
-      }
+        if (verbose > 1){
+	    cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
+	    std::cout<<"      -> This sample contains, " << datasets[d]->NofEvtsToRunOver() << " events." << endl;
+        }
       
-      //open files and load
-      treeLoader.LoadDataset (datasets[d], anaEnv);
+        //open files and load
+        treeLoader.LoadDataset (datasets[d], anaEnv);
       
-      /////////////////////////////////////
-      /// Initialize JEC factors            --> Updated on 5/08/2014
-      /////////////////////////////////////
-      vector<JetCorrectorParameters> vCorrParam;
+        /////////////////////////////////////
+        /// Initialize JEC factors            --> Updated on 5/08/2014
+        /////////////////////////////////////
+        vector<JetCorrectorParameters> vCorrParam;
       
-      if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){// Data!
-	JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
-	vCorrParam.push_back(*L1JetCorPar);
-	JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
-	vCorrParam.push_back(*L2JetCorPar);
-	JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
-	vCorrParam.push_back(*L3JetCorPar);
-	JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
-	vCorrParam.push_back(*L2L3ResJetCorPar);
-      }
-      else{
-	JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
-	vCorrParam.push_back(*L1JetCorPar);
-	JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
-	vCorrParam.push_back(*L2JetCorPar);
-	JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
-	vCorrParam.push_back(*L3JetCorPar);
-      }
-      JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
-      //JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "SubTotalMC")));
-      //JetCorrectionUncertainty *jecUncTotal = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
+        if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){// Data!
+	    JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
+	    vCorrParam.push_back(*L1JetCorPar);
+	    JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
+	    vCorrParam.push_back(*L2JetCorPar);
+	    JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
+	    vCorrParam.push_back(*L3JetCorPar);
+	    JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
+	    vCorrParam.push_back(*L2L3ResJetCorPar);
+        }
+        else{
+	    JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
+	    vCorrParam.push_back(*L1JetCorPar);
+	    JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
+	    vCorrParam.push_back(*L2JetCorPar);
+	    JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
+	    vCorrParam.push_back(*L3JetCorPar);
+        }
+        JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
+        //JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "SubTotalMC")));
+        //JetCorrectionUncertainty *jecUncTotal = new JetCorrectionUncertainty(*(new JetCorrectorParameters("JECFiles/Fall12_V7_DATA_UncertaintySources_AK5PFchs.txt", "Total")));
       
-      //True means also redo L1        
-      JetTools *jetTools = new JetTools(vCorrParam, jecUnc, true);
+        //True means also redo L1        
+        JetTools *jetTools = new JetTools(vCorrParam, jecUnc, true);
       
-      /////////////////////
-      //  Used classes   //
-      /////////////////////  
-      BTagStudy bTagStudy(verbose);  
-      LHCOOutput lhcoOutput(verbose, GenLHCOOutput, RecoLHCOOutput); 
-      KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
-      TFnTuple* tfNTuple = 0;
+        /////////////////////
+        //  Used classes   //
+        /////////////////////  
+        BTagStudy bTagStudy(verbose);  
+        LHCOOutput lhcoOutput(verbose, GenLHCOOutput, RecoLHCOOutput); 
+        KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
+        TFnTuple* tfNTuple = 0;
       
-      //Initialize TFnTuple specific stuff:
-      TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
-      TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
-      TFile* TFTreeFile = new TFile("TFInformation/TransferFunctionTree.root","RECREATE");
+        //Initialize TFnTuple specific stuff:
+        TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
+        TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
+        TFile* TFTreeFile = new TFile("TFInformation/TransferFunctionTree.root","RECREATE");
       
-      /////////////////////////////////////////
-      //  LHCO Output files + GeneratorInfo  //
-      /////////////////////////////////////////
-      ofstream EventInfoFile;
-      if(GenLHCOOutput == true){	
-	EventInfoFile.open("MadWeightInput/AnalyzerOutput/EventNumberInformation.lhco");
-	EventInfoFile << " Event Number      Lepton Type       Event selection       selectedChannelNumber " << endl;
-      }
-      unsigned int NumberCorrectEvents = 0; //Counts the number of semi-leptonic events
+        /////////////////////////////////////////
+        //  LHCO Output files + GeneratorInfo  //
+        /////////////////////////////////////////
+        ofstream EventInfoFile;
+        if(GenLHCOOutput == true){	
+    	    EventInfoFile.open("MadWeightInput/AnalyzerOutput/EventNumberInformation.lhco");
+            EventInfoFile << " Event Number      Lepton Type       Event selection       selectedChannelNumber " << endl;
+        }
+        unsigned int NumberCorrectEvents = 0; //Counts the number of semi-leptonic events
       
-      ////////////////////////////////////
-      //	loop on events
-      ////////////////////////////////////
+        ////////////////////////////////////
+        //	loop on events
+        ////////////////////////////////////
       
-      nEvents[d] = 0;
-      int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
-      if (verbose > 1) cout << "	Loop over events " << endl;
+        nEvents[d] = 0;
+        int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
+        if (verbose > 1) cout << "	Loop over events " << endl;
       
-      for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+        for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
 	//for (unsigned int ievt = 0; ievt < 5000; ievt++){
 	
-	if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
-	vector < TRootVertex* > vertex;
-	vector < TRootMuon* > init_muons;
-	vector < TRootElectron* > init_electrons;
-	vector < TRootJet* > init_jets_corrected;
-	vector < TRootJet* > init_jets;
-	vector < TRootMET* > mets;
-	vector < TRootGenJet* > genjets;
-	vector<int> jetCombi(4,9999);;   //Define this here and just initialize to 9999 such that it also can be used for other datasets!
+	    if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
+	    vector < TRootVertex* > vertex;
+	    vector < TRootMuon* > init_muons;
+	    vector < TRootElectron* > init_electrons;
+	    vector < TRootJet* > init_jets_corrected;
+	    vector < TRootJet* > init_jets;
+	    vector < TRootMET* > mets;
+	    vector < TRootGenJet* > genjets;
+	    vector<int> jetCombi(4,9999);;   //Define this here and just initialize to 9999 such that it also can be used for other datasets!
 	
-	nEvents[d]++;
+	    nEvents[d]++;
 	
-	if(ievt%1000 == 0)
-	  std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)datasets[d]->NofEvtsToRunOver())*100  << "%)" << " +> # selected: " << nSelectedMu << " (mu+jets) " << nSelectedEl << " (e+jets)" << flush<<"\r";
+	    if(ievt%1000 == 0)
+	    std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)datasets[d]->NofEvtsToRunOver())*100  << "%)"<<" +> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
 	
-	////////////////
-	// LOAD EVENT //
-	////////////////
+	    ////////////////
+	    // LOAD EVENT //
+	    ////////////////
 	
-	//TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  //Use uncorrected jets ...
-	TRootEvent* event = treeLoader.LoadEvent(ievt, vertex, init_muons, init_electrons, init_jets, mets);
+	    //TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  //Use uncorrected jets ...
+	    TRootEvent* event = treeLoader.LoadEvent(ievt, vertex, init_muons, init_electrons, init_jets, mets);
 	
-	if(! (dataSetName.find("Data")==0 || dataSetName.find("DATA")==0  || dataSetName.find("data")==0 ) ) {
-	  genjets = treeLoader.LoadGenJet(ievt,false);
-	  sort(genjets.begin(),genjets.end(),HighestPt()); // HighestPt() is included from the Selection class
-	}
+	    if(! (dataSetName.find("Data")==0 || dataSetName.find("DATA")==0  || dataSetName.find("data")==0 ) ) {
+	        genjets = treeLoader.LoadGenJet(ievt,false);
+	        sort(genjets.begin(),genjets.end(),HighestPt()); // HighestPt() is included from the Selection class
+	    }
 	
-	vector<TRootMCParticle*> mcParticles;      
-	if(dataSetName.find("TTbarJets") == 0){	
-	  treeLoader.LoadMCEvent(ievt, 0, 0, mcParticles,false);  
-	  sort(mcParticles.begin(),mcParticles.end(),HighestPt()); // HighestPt() is included from the Selection class
-	}
+	    vector<TRootMCParticle*> mcParticles;      
+	    if(dataSetName.find("TTbarJets") == 0){	
+	        treeLoader.LoadMCEvent(ievt, 0, 0, mcParticles,false);  
+	        sort(mcParticles.begin(),mcParticles.end(),HighestPt()); // HighestPt() is included from the Selection class
+	    }
 	
-	// check with genEvent which ttbar channel it is
-	if(dataSetName.find("TTbarJets") == 0)  {
-	  TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
-	  if( genEvt->isSemiLeptonic(TRootGenEvent::kMuon) ) {
-	    isSemiMu=true;
-	    isSemiE=false;
-	  }
-	  else if( genEvt->isSemiLeptonic(TRootGenEvent::kElec) ) {
-	    isSemiMu=false;
-	    isSemiE=true;
-	  }
-	  else {
-	    isSemiMu=false;
-	    isSemiE=false;
-	  }
-	}
+	    // check with genEvent which ttbar channel it is
+	    if(dataSetName.find("TTbarJets") == 0)  {
+	        TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
+	        if( genEvt->isSemiLeptonic(TRootGenEvent::kMuon) ) {
+	            isSemiMu=true;
+	            isSemiE=false;
+	        }
+	        else if( genEvt->isSemiLeptonic(TRootGenEvent::kElec) ) {
+	            isSemiMu=false;
+	            isSemiE=true;
+	        }
+	        else {
+	            isSemiMu=false;
+	            isSemiE=false;
+	        }
+	    }
 	
-	/////////////////////////////////
-	// DETERMINE EVENT SCALEFACTOR //
-	/////////////////////////////////
+	    /////////////////////////////////
+	    // DETERMINE EVENT SCALEFACTOR //
+	    /////////////////////////////////
 	
-	// scale factor for the event
-	float scaleFactor = 1.;
+	    // scale factor for the event
+	    float scaleFactor = 1.;
 	
-	// Load the GenEvent and calculate the branching ratio correction
-	if(dataSetName.find("TTbarJets") == 0){
-	  //cout << "LOADING GenEvent" << endl;
-	  TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
-	  if( genEvt->isSemiLeptonic() )
-	    scaleFactor *= (0.108*9.)*(0.676*1.5);
-	  else if( genEvt->isFullHadronic() )
-	    scaleFactor *= (0.676*1.5)*(0.676*1.5);
-	  else if( genEvt->isFullLeptonic() )
-	    scaleFactor *= (0.108*9.)*(0.108*9.);
-	}
-	MSPlot["InitJets_METPt"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	if(init_jets.size() > 0) MSPlot["InitJets_Pt_jet1"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	if(init_jets.size() > 1) MSPlot["InitJets_Pt_jet2"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	if(init_jets.size() > 2) MSPlot["InitJets_Pt_jet3"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	if(init_jets.size() > 3) MSPlot["InitJets_Pt_jet4"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	    // Load the GenEvent and calculate the branching ratio correction
+	    if(dataSetName.find("TTbarJets") == 0){
+	        //cout << "LOADING GenEvent" << endl;
+	        TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
+	        if( genEvt->isSemiLeptonic() )
+	            scaleFactor *= (0.108*9.)*(0.676*1.5);
+	        else if( genEvt->isFullHadronic() )
+	            scaleFactor *= (0.676*1.5)*(0.676*1.5);
+	        else if( genEvt->isFullLeptonic() )
+	            scaleFactor *= (0.108*9.)*(0.108*9.);
+	    }
+	    MSPlot["InitJets_METPt"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	    if(init_jets.size() > 0) MSPlot["InitJets_Pt_jet1"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	    if(init_jets.size() > 1) MSPlot["InitJets_Pt_jet2"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	    if(init_jets.size() > 2) MSPlot["InitJets_Pt_jet3"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	    if(init_jets.size() > 3) MSPlot["InitJets_Pt_jet4"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 	
-	//////////////////////////////////////
-	// Apply Jet Corrections on-the-fly //   
-	//////////////////////////////////////
-	if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){
-	  jetTools->unCorrectMETTypeOne(init_jets, mets[0], true);
-	  jetTools->correctJets(init_jets, event->kt6PFJets_rho(), true);
-	  jetTools->correctMETTypeOne(init_jets, mets[0], true);
-	}
-	else{
-	  jetTools->unCorrectMETTypeOne(init_jets, mets[0], false);
-	  jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
-	  jetTools->correctMETTypeOne(init_jets, mets[0], false);
-	}
-	MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	    //////////////////////////////////////
+	    // Apply Jet Corrections on-the-fly //   
+	    //////////////////////////////////////
+	    if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){
+	        jetTools->unCorrectMETTypeOne(init_jets, mets[0], true);
+	        jetTools->correctJets(init_jets, event->kt6PFJets_rho(), true);
+	        jetTools->correctMETTypeOne(init_jets, mets[0], true);
+	    }
+	    else{
+	        jetTools->unCorrectMETTypeOne(init_jets, mets[0], false);
+	        jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
+	        jetTools->correctMETTypeOne(init_jets, mets[0], false);
+	    }
+	    MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 	
-	////////////////////////////////////////
-	//  Beam scraping and PU reweighting
-	////////////////////////////////////////
-	double lumiWeight = 1;
-	if(! (dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA") ){   
-	  if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-	  else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
-	  else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
-	}
-	histo1D["lumiWeights"]->Fill(lumiWeight);	
+	    ////////////////////////////////////////
+	    //  Beam scraping and PU reweighting
+	    ////////////////////////////////////////
+	    double lumiWeight = 1;
+	    if(! (dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA") ){   
+	        if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
+	        else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
+	        else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
+	    }
+	    histo1D["lumiWeights"]->Fill(lumiWeight);	
 	
-	// up syst -> lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
-	// down syst -> lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
-	
-	///////////////////
+	    ///////////////////
 	// TRIGGER SETUP //
 	///////////////////
 	
@@ -923,7 +918,8 @@ int main (int argc, char *argv[]){
 	  if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosThetaNoBTag"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
 	  
 	  //---  Get the b-jet and light information for all six b-tag options!  ---//
-	  bTagStudy.CalculateJets(selectedJets, jetCombi, selectedLepton);
+        
+	  bTagStudy.CalculateJets(selectedJets, jetCombi, selectedLepton, genInfoAccessible);
 	  float bTagLeptIndex = bTagStudy.getBLeptIndex(3);
 	  
 	  //////////////////////////////////////////////////////
