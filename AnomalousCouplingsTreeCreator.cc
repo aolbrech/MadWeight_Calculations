@@ -323,15 +323,13 @@ int main (int argc, char *argv[]){
   CutsSelecTableSemiMu.push_back(string(LabelNJets));
   CutsSelecTableSemiEl.push_back(string(LabelNJets));
 
-  if (verbose > 0)
-    cout << " - CutsSelectionTable instantiated ..." << endl;
+  if (verbose > 0) cout << " - CutsSelectionTable instantiated ..." << endl;
   SelectionTable selecTableSemiMu(CutsSelecTableSemiMu, datasets);
   selecTableSemiMu.SetLuminosity(LuminosityMu);
   SelectionTable selecTableSemiEl(CutsSelecTableSemiEl, datasets);
   selecTableSemiEl.SetLuminosity(LuminosityEl);
 
-  if (verbose > 0)
-    cout << " - SelectionTable instantiated ..." << endl;
+  if (verbose > 0) cout << " - SelectionTable instantiated ..." << endl;
 
   ////////////////////////
   // PileUp Reweighting //
@@ -351,10 +349,9 @@ int main (int argc, char *argv[]){
   ////////////////////////////////////
   //	Loop on datasets
   ////////////////////////////////////
-  if (verbose > 0)
-    cout << " - Loop over datasets ... " << datasets.size () << " datasets !" << endl;
+  if (verbose > 0) cout << " - Loop over datasets ... " << datasets.size () << " datasets !" << endl;
   
-for (unsigned int d = 0; d < datasets.size (); d++) {
+  for (unsigned int d = 0; d < datasets.size (); d++) {
     
     string previousFilename = "";
     int iFile = -1;
