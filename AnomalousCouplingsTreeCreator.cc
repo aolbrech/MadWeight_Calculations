@@ -938,7 +938,7 @@ int main (int argc, char *argv[]){
       anomCoupLight->setNTruePU(event->nTruePU());
       anomCoupLight->setScaleFactor(scaleFactor);
 
-      /*anomCoupLight->setSelectedJets(SelectedJets);
+      anomCoupLight->setSelectedJets(SelectedJets);
       anomCoupLight->setBTagCSV(CSVbTagValues);
       anomCoupLight->setSelectedLepton(*selectedLepton);
       anomCoupLight->setDecayChannel(decayChannel);
@@ -946,8 +946,7 @@ int main (int argc, char *argv[]){
       anomCoupLight->setHadrBJet(jetCombi[1]);
       anomCoupLight->setLeptBJet(jetCombi[0]);
       anomCoupLight->setQuark1(jetCombi[2]);
-      anomCoupLight->setQuark2(jetCombi[3]);
-      */
+      anomCoupLight->setQuark2(jetCombi[3]);      
 
       //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
