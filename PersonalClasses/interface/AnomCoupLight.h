@@ -27,12 +27,12 @@ class AnomCoupLight : public TObject
     unsigned int runID()       const {return runID_;}
     unsigned int lumiBlockID() const {return lumiBlockID_;}
     unsigned int nPV()         const {return nPV_;}
-    unsigned int nTruePU       const {return nTruePU_;}
-    unsigned int scaleFactor   const {return scaleFactor_;}
+    unsigned int nTruePU()     const {return nTruePU_;}
+    unsigned int scaleFactor() const {return scaleFactor_;}
 
     void setEventId(unsigned int eventID) {eventID_ = eventID;}
     void setRunId(unsigned int runID) {runID_ = runID;}
-    void setLumiBlockId(unsigned int lumiBlockID_ = lumiBlockID;}
+    void setLumiBlockId(unsigned int lumiBlockID) {lumiBlockID_ = lumiBlockID;}
     void setNPV(unsigned int nPV) {nPV_ = nPV;}
     void setNTruePU(unsigned int nTruePU) {nTruePU_ = nTruePU;}
     void setScaleFactor(unsigned int scaleFactor) {scaleFactor_ = scaleFactor;}
