@@ -17,7 +17,7 @@ using namespace TopTree;
 class LHCOOutput{
 
 public:
-  LHCOOutput(int, bool, bool);
+  LHCOOutput(int, std::string, bool);
   ~LHCOOutput();
 
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
@@ -44,7 +44,8 @@ private:
   bool CorrectGenEvtContent;
   ofstream GenOutFile[4], RecoOutFile[4], WrongGenFile, CorrectRecoMuPosFile, WrongRecoMuPosFile, UnmatchedRecoMuPosFile;
   int verbose_, LeptonCharge;
-  bool genOutput_, recoOutput_;
+  bool writeOutput_;
+  std::string GenOrReco_;
 
   enum LeptonType_t {muPlus, muMinus, elPlus, elMinus};
   LeptonType_t leptonType;

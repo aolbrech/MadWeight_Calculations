@@ -30,7 +30,6 @@
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
-//#include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
 #include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
 #include "AnomalousCouplings/PersonalClasses/interface/KinematicFunctions.h"
@@ -86,8 +85,9 @@ int main (int argc, char *argv[]){
   ///////////////////////////////
   //  Run specific parts only  //
   ///////////////////////////////
-  bool GenLHCOOutput = true;
-  bool RecoLHCOOutput = true;  
+  std::string GenOrReco = "Gen";
+  bool getLHCOOutput = true;
+  bool getEventInfo = true;
   bool CalculateTF = false;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
@@ -367,8 +367,7 @@ int main (int argc, char *argv[]){
     /////////////////////
     //  Used classes   //
     /////////////////////  
-    //BTagStudy bTagStudy(verbose);  
-    LHCOOutput lhcoOutput(verbose, GenLHCOOutput, RecoLHCOOutput); 
+    LHCOOutput lhcoOutput(verbose, GenOrReco, getLHCOOutput); 
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
     TFnTuple* tfNTuple = 0;
     AnomCoupLight* anomCoupLight = 0;
@@ -387,7 +386,7 @@ int main (int argc, char *argv[]){
     //  LHCO Output files + GeneratorInfo  //
     /////////////////////////////////////////
     ofstream EventInfoFile;
-    if(GenLHCOOutput == true){	
+    if(getEventInfo == true){	
       EventInfoFile.open("MadWeightInput/AnalyzerOutput/EventNumberInformation.lhco");
       EventInfoFile << " Event Number      Lepton Type       Event selection       selectedChannelNumber " << endl;
     }
@@ -592,7 +591,7 @@ int main (int argc, char *argv[]){
       //Accessing information and store in EventInfoFile    
       std::string leptonTypeString[4] = {"muPlus","muMinus","elPlus","elMinus"};      //Not possible to define this in header file of LHCOOutput ...
       
-      if( GenLHCOOutput == true){
+      if( getEventInfo == true){
         EventInfoFile << "     " << ievt << "         ";
         if( lhcoOutput.GenEventContentCorrect() ){
 	  NumberCorrectEvents++;
@@ -726,11 +725,11 @@ int main (int argc, char *argv[]){
       
       //--- Only continue with events passing one of the two event selections!  ---//
       if (!eventselectedSemiMu && !eventselectedSemiEl){
-        if(RecoLHCOOutput == true) EventInfoFile << "        failed       "<<endl;
+        if(getEventInfo == true) EventInfoFile << "        failed       "<<endl;
         continue;
       }
       
-      if(RecoLHCOOutput == true) EventInfoFile << "        passed            ";  
+      if(getEventInfo == true) EventInfoFile << "        passed            ";  
       //--- do some data-mc ---//
       if (!foundMu && !foundEl) datasetsPlot = datasets;    //Data!
       string leptonFlav="_other";
@@ -954,7 +953,7 @@ int main (int argc, char *argv[]){
     //////////////
     // CLEANING //
     //////////////
-    if(GenLHCOOutput == true) EventInfoFile.close();
+    if(getEventInfo == true) EventInfoFile.close();
     
     if (jecUnc) delete jecUnc;
     if (jetTools) delete jetTools;
