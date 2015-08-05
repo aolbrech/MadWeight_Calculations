@@ -428,7 +428,6 @@ int main (int argc, char *argv[]){
     ////////////////////////////////////
     //	loop on events
     ////////////////////////////////////
-    
     nEvents[d] = 0;
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
     if (verbose > 1) cout << "	Loop over events " << endl;
@@ -454,7 +453,6 @@ int main (int argc, char *argv[]){
       ////////////////
       // LOAD EVENT //
       ////////////////
-      
       //TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  //Use uncorrected jets ...
       TRootEvent* event = treeLoader.LoadEvent(ievt, vertex, init_muons, init_electrons, init_jets, mets);
       
@@ -489,13 +487,10 @@ int main (int argc, char *argv[]){
       /////////////////////////////////
       // DETERMINE EVENT SCALEFACTOR //
       /////////////////////////////////
-      
-      // scale factor for the event
       float scaleFactor = 1.;
       
       // Load the GenEvent and calculate the branching ratio correction
       if(dataSetName.find("TTbarJets") == 0){
-	//cout << "LOADING GenEvent" << endl;
 	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
 	if( genEvt->isSemiLeptonic() )
 	  scaleFactor *= (0.108*9.)*(0.676*1.5);
@@ -526,9 +521,9 @@ int main (int argc, char *argv[]){
       MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 
       ////////////////////////////////////////
-      //  Beam scraping and PU reweighting
+      //  Beam scraping and PU reweighting      --> Will be moved to nTuple analyzer!
       ////////////////////////////////////////
-      double lumiWeight = 1;
+      double lumiWeight = 1;  
       if(! (dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA") ){   
         if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
         else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
@@ -536,13 +531,9 @@ int main (int argc, char *argv[]){
       }
       histo1D["lumiWeights"]->Fill(lumiWeight);	
       
-      // up syst -> lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
-      // down syst -> lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
-      
       ///////////////////
       // TRIGGER SETUP //
       ///////////////////
-      
       string currentFilename = datasets[d]->eventTree()->GetFile()->GetName();
       if(previousFilename != currentFilename){
 	previousFilename = currentFilename;
@@ -557,7 +548,6 @@ int main (int argc, char *argv[]){
 	//semi-mu
 	if(dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) {
 	  
-	  // 2.7/fb recalib 
 	  if( event->runId() >= 190456 && event->runId() <= 190738 )
 	    itriggerSemiMu = treeLoader.iTrigger (string ("HLT_IsoMu24_eta2p1_v11"), currentRun, iFile);
 	  else if( event->runId() >= 190782 && event->runId() <= 193621)
@@ -582,7 +572,6 @@ int main (int argc, char *argv[]){
 	// semi-electron
         if(dataSetName.find("Data_El") == 0 || dataSetName.find("data_El") == 0 || dataSetName.find("DATA_El") == 0 ) {
 	  
-	  // 2.7/fb recalib 
 	  if( event->runId() <= 190738 )
 	    itriggerSemiEl = treeLoader.iTrigger (string ("HLT_Ele27_WP80_v8"), currentRun, iFile);
 	  else if( event->runId() >= 190782 && event->runId() <= 191411 )
@@ -616,20 +605,19 @@ int main (int argc, char *argv[]){
       //     - JES Corrections: The nominal corrections are already applied at PAT level   //
       //       so these tools should only be used for studies of the effect of systematics //
       ///////////////////////////////////////////////////////////////////////////////////////
-      
       //JER Smearing:
       if( ! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) ) {
 	
-	jetTools->correctJetJER(init_jets, genjets, mets[0], doJERShift, false); //false means don't use old numbers but newer ones ...
+	jetTools->correctJetJER(init_jets, genjets, mets[0], doJERShift, false); //false means don't use old numbers but newer ones (~8TeV recommendation of 2014!) 
 	if (doJESShift != "nominal")
-	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //1 = nSigma
+	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //last integer (1) = nSigma
       }
       MSPlot["InitJets_METPt_JerSmearingApplied"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       
       ////////////////////////////////////////////////////////
       // Access particle information before event selection //
       // Write this information to LHCO Output for MW       //
-      ////////////////////////////////////////////////////////         -->This part only needs mcParticles information so can be moved to class!!
+      ////////////////////////////////////////////////////////
       lhcoOutput.StoreGenInfo(mcParticles);
       if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosTheta"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
       
@@ -649,7 +637,6 @@ int main (int argc, char *argv[]){
       /////////////////////
       // EVENT SELECTION //
       /////////////////////
-
       if(init_jets.size() >=4){ // MSPlots before 'basic' event selection (no b-tag)
 	MSPlot["InitJets_pT_jet1_beforeEvtSel"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
 	MSPlot["InitJets_pT_jet2_beforeEvtSel"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
@@ -697,12 +684,11 @@ int main (int argc, char *argv[]){
       //////////////////////
       // Event selection  //
       //////////////////////
-      bool eventselectedSemiMu = false;
-      bool eventselectedSemiEl = false;
+      bool eventselectedSemiMu = false, eventselectedSemiEl = false;
       enum DecayChannel_t {semiMu, semiEl};
       DecayChannel_t decayChannel;
 
-      if (dataSetName != "Data"&&  selectedElectrons.size() ==1 ) {
+      if (dataSetName != "Data" &&  selectedElectrons.size() ==1 ) {
 	scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift );
 	//histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift));
       }
@@ -811,7 +797,7 @@ int main (int argc, char *argv[]){
       ////////////////////////////////////////////////////////////////////
       //   Use genEvent information to get the correct event topology   //
       ////////////////////////////////////////////////////////////////////    
-      if(dataSetName.find("TTbarJets") == 0){
+      if(dataSetName.find("TTbarJets_SemiLept") == 0){
         vector<TRootMCParticle> mcParticlesMatching;      	
         vector< pair<unsigned int, unsigned int> > JetPartonPair, ISRJetPartonPair; // First one is jet number, second one is mcParticle number
 	
