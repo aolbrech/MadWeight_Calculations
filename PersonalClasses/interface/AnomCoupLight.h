@@ -36,7 +36,7 @@ class AnomCoupLight : public TObject
     unsigned int lumiBlockID() const {return lumiBlockID_;}
     unsigned int nPV()         const {return nPV_;}
     unsigned int nTruePU()     const {return nTruePU_;}
-    unsigned int scaleFactor() const {return scaleFactor_;}
+    float scaleFactor()        const {return scaleFactor_;}
 
     vector<TLorentzVector> selectedJets() const {return selectedJets_;}
     vector<float> CSVbTag() const {return CSVbTag_;}
@@ -53,7 +53,7 @@ class AnomCoupLight : public TObject
     void setLumiBlockId(unsigned int lumiBlockID) {lumiBlockID_ = lumiBlockID;}
     void setNPV(unsigned int nPV) {nPV_ = nPV;}
     void setNTruePU(unsigned int nTruePU) {nTruePU_ = nTruePU;}
-    void setScaleFactor(unsigned int scaleFactor) {scaleFactor_ = scaleFactor;}
+    void setScaleFactor(float scaleFactor) {scaleFactor_ = scaleFactor;}
 
     void setSelectedJets(vector<TLorentzVector> selectedJets) {selectedJets_ = selectedJets;}
     void setBTagCSV(vector<float> CSVbTag) {CSVbTag_ = CSVbTag;}
@@ -71,7 +71,7 @@ class AnomCoupLight : public TObject
     unsigned int lumiBlockID_;
     unsigned int nPV_;
     unsigned int nTruePU_;
-    unsigned int scaleFactor_;
+    float scaleFactor_;
 
     vector<TLorentzVector> selectedJets_;
     vector<float> CSVbTag_;
