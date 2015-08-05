@@ -144,7 +144,10 @@ int main (int argc, char *argv[]){
 
   for (unsigned int d = 0; d < datasets.size (); d++) {
     
-    if(Luminosity > datasets[d]->EquivalentLumi() ) Luminosity = datasets[d]->EquivalentLumi();
+    if(Luminosity > datasets[d]->EquivalentLumi() ){
+      Luminosity = datasets[d]->EquivalentLumi();
+      LuminosityMu = datasets[d]->EquivalentLumi(); LuminosityEl = datasets[d]->EquivalentLumi(); //This way EventSelectionTable info is set correctly !
+    }
     string dataSetName = datasets[d]->Name();
     
     if(dataSetName.find("Data_Mu") == 0 || dataSetName.find("data_Mu") == 0 || dataSetName.find("DATA_Mu") == 0) {
