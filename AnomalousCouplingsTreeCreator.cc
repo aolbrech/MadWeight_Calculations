@@ -208,36 +208,12 @@ int main (int argc, char *argv[]){
   map<string,TH1F*> histo1D;     
   map<string,TH2F*> histo2D;  
   
-  // Histograms needed to calculate the sigma and Mc mass (from mean value) for W and top mass distribution
-  //   --> Comment out after initializing most recent values ( also lines 1046 and 1356 )
-  histo1D["MlbMass"]= new TH1F("MlbMass","MlbMass",200,0,300);
-  histo1D["MqqbMass"]= new TH1F("MqqbMass","MqqbMass",400,0,500);
-
   histo1D["genPt_Muon"] = new TH1F("genPt_Muon","genPt_Muon",400,0,200);
   histo1D["recoPt_Muon"] = new TH1F("recoPt_Muon","recoPt_Muon",400,0,200);
   histo1D["genPt_Elec"] = new TH1F("genPt_Elec","genPt_Elec",400,0,200);
   histo1D["recoPt_Elec"] = new TH1F("recoPt_Elec","recoPt_Elec",400,0,200);
 
-//  histo1D["StCosTheta_BeforeEvtSel"] = new TH1F("StCosTheta_BeforeEvtSel","StCosTheta_BeforeEvtSel",200,-1,1);
   histo1D["StCosTheta"] = new TH1F("StCosTheta","StCosTheta",200,-1,1);
-  histo1D["StCosThetaNoBTag"] = new TH1F("StCosThetaNoBTag","StCosThetaNoBTag",200,-1,1);
-//  histo1D["StCosThetaLCSV"] = new TH1F("StCosThetaLCSV","StCosThetaLCSV",200,-1,1);
-//  histo1D["StCosThetaAllLCSV"] = new TH1F("StCosThetaAllLCSV","StCosThetaAllLCSV",200,-1,1);
-//  histo1D["StCosThetaMCSV"] = new TH1F("StCosThetaMCSV","StCosThetaMCSV",200,-1,1);
-//  histo1D["StCosThetaTCSV"] = new TH1F("StCosThetaTCSV","StCosThetaTCSV",200,-1,1);
-//  histo1D["JetTypeLargeLCSVEvents"] = new TH1F("JetTypeLargeLCSVEvents","JetTypeLargeLCSVEvents",51,-25.5,25.5);
-//  histo1D["JetTypeLargeLCSVLeadingPtEvents"] = new TH1F("JetTypeLargeLCSVLeadingPtEvents","JetTypeLargeLCSVLeadingPtEvents",51,-25.5,25.5);
-//  histo1D["JetTypeLCSVLightJetsLeadingPt"] = new TH1F("JetTypeLCSVLightJetsLeadingPt","JetTypeLCSVLightJetsLeadingPt",51,-25.5,25.5);
-//  histo1D["JetTypeLargeMCSVEvents"] = new TH1F("JetTypeLargeMCSVEvents","JetTypeLargeMCSVEvents",51,-25.5,25.5);
-//  histo1D["JetTypeLargeMCSVLeadingPtEvents"] = new TH1F("JetTypeLargeMCSVLeadingPtEvents","JetTypeLargeMCSVLeadingPtEvents",51,-25.5,25.5);
-//  histo1D["JetTypeLargeTCSVEvents"] = new TH1F("JetTypeLargeTCSVEvents","JetTypeLargeTCSVEvents",51,-25.5,25.5);
-//  histo1D["JetTypeLargeTCSVLeadingPtEvents"] = new TH1F("JetTypeLargeTCSVLeadingPtEvents","JetTypeLargeTCSVLeadingPtEvents",51,-25.5,25.5);
-//  histo1D["JetTypeLCSV"] = new TH1F("JetTypeLCSV","JetTypeLCSV",51,-25.5,25.5);
-//  histo1D["JetTypeMCSV"] = new TH1F("JetTypeMCSV","JetTypeMCSV",51,-25.5,25.5);
-//  histo1D["JetTypeTCSV"] = new TH1F("JetTypeTCSV","JetTypeTCSV",51,-25.5,25.5);
-//  histo1D["JetTypeLCSVLightJets"] = new TH1F("JetTypeLCSVLightJets","JetTypeLCSVLightJets",51,-25.5,25.5);
-//  histo1D["CSVDiscrLCSVLightJets"] = new TH1F("CSVDiscrLCSVLightJets","CSVDiscrLCSVLightJets",400,-2.5,1.5);
-//  histo1D["CSVDiscrLCSVLightJetsLeadingPt"] = new TH1F("CSVDiscrLCSVLightJetsLeadingPt","CSVDiscrLCSVLightJetsLeadingPt", 400, -2.5, 1.5);
   histo1D["CorrectBLeptCSVDiscr"] = new TH1F("CorrectBLeptCSVDiscr","CorrectBLeptCSVDiscr",400,-2.5,1.5);
   histo1D["CorrectBHadrCSVDiscr"] = new TH1F("CorrectBHadrCSVDiscr","CorrectBHadrCSVDiscr",400,-2.5,1.5);
   histo1D["CorrectQuark1CSVDiscr"] = new TH1F("CorrectQuark1CSVDiscr","CorrectQuark1CSVDiscr",400,-2.5,1.5);
@@ -246,16 +222,7 @@ int main (int argc, char *argv[]){
   histo1D["Quark1JetNumber"] = new TH1F("Quark1JetNumber","Quark1JetNumber",12,-1.5,10.5);
   histo1D["Quark2JetNumber"] = new TH1F("Quark2JetNumber","Quark2JetNumber",12,-1.5,10.5);
 
-//  histo1D["CosThetaReco"] = new TH1F("CosThetaReco","CosThetaReco",200,-1,1);
-//  histo1D["NeutrinoEta"] = new TH1F("NeutrinoEta","NeutrinoEta",200,-8,8);
-
   histo1D["lumiWeights"] = new TH1F("lumiWeights","lumiWeights", 200,-100,100);
-
-  //Mlb and Mqqb information:
-  histo2D["MlbMqqbCorrectChosen"] = new TH2F("MlbMqqbCorrectChosen","MlbMqqbCorrectChosen",200,0,500,200,0,300);
-  histo2D["MlbMqqbCorrectAll"] = new TH2F("MlbMqqbCorrectAll","MlbMqqbCorrectAll",200,0,500,200,0,300);
-  histo2D["MlbMqqbWrongOne"] = new TH2F("MlbMqqbWrongOne","MlbMqqbWrongOne",200,0,500,200,0,300);
-  histo2D["MlbMqqbWrongTwo"] = new TH2F("MlbMqqbWrongTwo","MlbMqqbWrongTwo",200,0,500,200,0,300);
 
   ////////////////////////////////////
   /// MultiSamplePlot
@@ -274,8 +241,9 @@ int main (int argc, char *argv[]){
   MSPlot["InitJets_METPt_METTypeOneCorrected"] = new MultiSamplePlot(datasets, "InitJets_METPt_METTypeOneCorrected", 60,0,300, "p_{T} (GeV)");
   MSPlot["InitJets_METPt_JerSmearingApplied"] = new MultiSamplePlot(datasets, "InitJets_METPt_JerSmearingApplied", 60,0,300, "p_{T} (GeV)");
 
-  string leptFlavs[3]={"_other","_mu","_el"};
-  for(int ii = 0; ii < 3; ii++){
+  //string leptFlavs[3]={"_other","_mu","_el"};
+  string leptFlavs[2]={"_mu","_el"};
+  for(int ii = 0; ii < 2; ii++){
     string leptFlav = leptFlavs[ii];
     MSPlot["Selected_Events_pT_jet1"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet1"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
     MSPlot["Selected_Events_pT_jet2"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_jet2"+leptFlav, 60, -150, 650, "p_{T} (GeV)");
@@ -284,13 +252,6 @@ int main (int argc, char *argv[]){
     MSPlot["Selected_Events_pT_4leadingjets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_4leadingjets"+leptFlav,60, 0, 600, "p_{T} (GeV)");
     MSPlot["Selected_Events_pT_alljets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_alljets"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
     MSPlot["Selected_Events_pT_lepton"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_lepton"+leptFlav,150,-100,350,"p_{t} (GeV)");
-          
-    MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
-    MSPlot["nSelectedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
-    MSPlot["nBTaggedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
-    MSPlot["nBTaggedJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# b-tagged jets");
-    MSPlot["nLightJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
-    MSPlot["nLightJets_AfterBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,14, -3.5, 10.5, "# light jets");
   }
   
   ////////////////////////////////////
@@ -406,7 +367,7 @@ int main (int argc, char *argv[]){
     /////////////////////
     //  Used classes   //
     /////////////////////  
-    BTagStudy bTagStudy(verbose);  
+    //BTagStudy bTagStudy(verbose);  
     LHCOOutput lhcoOutput(verbose, GenLHCOOutput, RecoLHCOOutput); 
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
     TFnTuple* tfNTuple = 0;
@@ -439,8 +400,8 @@ int main (int argc, char *argv[]){
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
     if (verbose > 1) cout << "	Loop over events " << endl;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    for (unsigned int ievt = 0; ievt < 5000; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -917,8 +878,6 @@ int main (int argc, char *argv[]){
 	  }//End of calculate Transfer Functions
 	}//End of matched particles reconstructed
       
-	if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosThetaNoBTag"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
-
       }//End of TTbarJets!
 
       //------- Fill the Tree file for the LightAnomCoupAnalyzer file -------//
@@ -932,7 +891,7 @@ int main (int argc, char *argv[]){
       }
 
       anomCoupLight->setEventId(event->eventId());
-      anomCoupLight->setRunId(event->runId();
+      anomCoupLight->setRunId(event->runId());
       anomCoupLight->setLumiBlockId(event->lumiBlockId());
       anomCoupLight->setNPV(vertex.size());
       anomCoupLight->setNTruePU(event->nTruePU());
@@ -948,6 +907,8 @@ int main (int argc, char *argv[]){
       anomCoupLight->setQuark1(jetCombi[2]);
       anomCoupLight->setQuark2(jetCombi[3]);      
 
+      LightTree->Fill();
+      delete anomCoupLight;
       //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
     } //loop on events
@@ -966,7 +927,7 @@ int main (int argc, char *argv[]){
     configTreeLightFile->Fill();
     configTreeLightFile->Write();
     LightTree->Write();
-    LightTree->Close();
+    LightFile->Close();
     delete LightFile;
     
     //----  End of storing Tree  ----//
