@@ -913,137 +913,14 @@ int main (int argc, char *argv[]){
 	  }//End of calculate Transfer Functions
 	}//End of matched particles reconstructed
       
-        //----------------------------------------------------------------------------------------------------------------------------------- Start of bTagStudy class stuff!!      	
 	if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosThetaNoBTag"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
-	
-	//---  Get the b-jet and light information for all six b-tag options!  ---//
-	bTagStudy.CalculateJets(selectedJets, jetCombi, selectedLepton);
-        float bTagLeptIndex = bTagStudy.getBLeptIndex(3);
 
-	//////////////////////////////////////////////////////
-	//  Kinematic information for specific b-tag cases   //
-	///////////////////////////////////////////////////////
-	//
-	/*
-        for(int jj = 0; jj < 2; jj++){      //Only look at the two leading jets!
-	    
-	  //Kinematic information for the light (= Non LCSV) jets
-	  if((bTagStudy.getLightJets(0)).size()>=2){
-	    histo1D["CSVDiscrLCSVLightJets"]->Fill(selectedJets[(bTagStudy.getLightJets(0))[jj]]->btag_combinedSecondaryVertexBJetTags());   
-    	    //--> check whether the so-called light jets don't all have discr -1 ...		
-	    for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-	      if((bTagStudy.getLightJets(0))[jj] == JetPartonPair[ii].first)  //Check whether the considered jet can be matched!
-	        histo1D["JetTypeLCSVLightJets"]->Fill(mcParticlesMatching[JetPartonPair[ii].second].type());	
-	      else    //Unmatched jets!
-	        histo1D["JetTypeLCSVLightJets"]->Fill(25.);	      
-	    }
-	  }//End of light (= non LCSV) jets
-
-	  //Kinematic information for the Loose b-jets
-	  if((bTagStudy.getbTaggedJets(0)).size() >=2){
-	    if(lhcoOutput.GenEventContentCorrect()){ histo1D["StCosThetaLCSV"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); std::cout << " LCSV event found with cos theta = " << kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()) << std::endl;}
-	    for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-	      if((bTagStudy.getbTaggedJets(0))[jj] == JetPartonPair[ii].first)  //Check whether the considered jet can be matched!
-	        histo1D["JetTypeLCSV"]->Fill(mcParticlesMatching[JetPartonPair[ii].second].type());	    
-	      else
-	        histo1D["JetTypeLCSV"]->Fill(25.);	      
-	    }
-	  }//End of Loose b-jets 
-
-	  //Kinematic information for the Medium b-jets
-	  if((bTagStudy.getbTaggedJets(1)).size() >=2){
-	    if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosThetaMCSV"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
-	    for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-  	      if((bTagStudy.getbTaggedJets(1))[jj] == JetPartonPair[ii].first)  //Check whether the considered jet can be matched!
-	        histo1D["JetTypeMCSV"]->Fill(mcParticlesMatching[JetPartonPair[ii].second].type());	    
-	      else
-	        histo1D["JetTypeMCSV"]->Fill(25.);	    
-	    }
-	  }//End of Medium b-jets 
-
-	  //Kinematic information for the Tight b-jets
-	  if((bTagStudy.getbTaggedJets(3)).size() >=2){
-	    if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosThetaTCSV"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
-	    for(int ii = 0; ii<JetPartonPair.size(); ii++){ //Look at all the matched jets
-	      if((bTagStudy.getbTaggedJets(3))[jj] == JetPartonPair[ii].first)  //Check whether the considered jet can be matched!
-	        histo1D["JetTypeTCSV"]->Fill(mcParticlesMatching[JetPartonPair[ii].second].type());	    
-	      else
-	        histo1D["JetTypeTCSV"]->Fill(25.);	      
-	    }
-	  }//End of Tight b-jets 
-        }//Only look at the two leading jets!
-
-        /////////////////////////////////////////////
-        //   Count the selected number of events   //
-        /////////////////////////////////////////////
-        // 2 Loose CSV b-tags
-        if((bTagStudy.getbTaggedJets(0)).size() >= 2 && decayChannel == 0) nSelectedMuLCSV++;
-        if((bTagStudy.getbTaggedJets(0)).size() >= 2 && decayChannel == 1) nSelectedElLCSV++;
-        if((bTagStudy.getbTaggedJets(0)).size() > 2) nLargeLCSVEvents++;
-
-        // 2 Medium CSV b-tags
-        if((bTagStudy.getbTaggedJets(1)).size() >= 2 && decayChannel == 0) nSelectedMuMCSV++;
-        if((bTagStudy.getbTaggedJets(1)).size() >= 2 && decayChannel == 1) nSelectedElMCSV++;
-        if((bTagStudy.getbTaggedJets(1)).size() > 2) nLargeMCSVEvents++;
-
-        // 2 Tight CSV b-tags
-        if((bTagStudy.getbTaggedJets(3)).size() >= 2 && decayChannel == 0) nSelectedMuTCSV++;
-        if((bTagStudy.getbTaggedJets(3)).size() >= 2 && decayChannel == 1) nSelectedElTCSV++;
-        if((bTagStudy.getbTaggedJets(3)).size() > 2) nLargeTCSVEvents++;
-	*/
-      
-        //---------------------------------------------------------------------------------------------------------------------------- End of bTagStudy class stuff
-
-        ////////////////////////////////
-        //  Mlb and Mqqb information  //
-        ////////////////////////////////
-        float MlbCorrect = 0, MqqbCorrect = 0;
-        if(jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999){
-	  MlbCorrect = (*selectedLepton+*selectedJets[jetCombi[0]]).M();
-	  MqqbCorrect = (*selectedJets[jetCombi[1]] + *selectedJets[jetCombi[2]] + *selectedJets[jetCombi[3]]).M();
-	  histo2D["MlbMqqbCorrectAll"]->Fill(MqqbCorrect,MlbCorrect);
-        }
-      
       }//End of TTbarJets!
-      
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
-      //  Event selection choice (17/06/2014)  //
-      //   --> Continue with 2 T b-tags        //
-      //   --> No veto on light jets!          //
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
-      ChosenBTag = 3;
 
-      //MSPlots with number of jets information before requiring at least two b-jets and at least 2 light jets!
-      MSPlot["nSelectedJets_BeforeBTag"+leptonFlav]->Fill(selectedJets.size(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["nBTaggedJets_BeforeBTag"+leptonFlav]->Fill( (bTagStudy.getbTaggedJets(ChosenBTag)).size(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["nLightJets_BeforeBTag"+leptonFlav]->Fill( (bTagStudy.getLightJets(ChosenBTag)).size(), datasets[d], true, Luminosity*scaleFactor);
-
-      //---  Require two b-jets and two light jets!  ---//
-      if( (bTagStudy.getbTaggedJets(ChosenBTag)).size() < 2 || (bTagStudy.getLightJets(ChosenBTag)).size() < 2 ){
-	if(RecoLHCOOutput == true) EventInfoFile<<"    B-tag failed "<<endl;
-	continue;
-      }      
-            
-      //Identical MSPlots with number of jets information after requiring at least two b-jets and at least 2 light jets!
-      MSPlot["nSelectedJets_AfterBTag"+leptonFlav]->Fill(selectedJets.size(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["nBTaggedJets_AfterBTag"+leptonFlav]->Fill( (bTagStudy.getbTaggedJets(ChosenBTag)).size(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["nLightJets_AfterBTag"+leptonFlav]->Fill( (bTagStudy.getLightJets(ChosenBTag)).size(), datasets[d], true, Luminosity*scaleFactor);
-      
-      // Count the number of events:
-      if(decayChannel == 0) nSelectedMu++;
-      if(decayChannel == 1) nSelectedEl++;
-      
-      //****************************//   
-      //  Produce Reco LHCO Output  //
-      //  --> Last integer = mode   //
-      //       * 0 ~ all events     //
-      //       * 1 ~ good combi's   //
-      //       * 2 ~ bad combi's    //
-      //****************************//
-      if( RecoLHCOOutput == true)
-        lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, LeptonRecoCharge, jetCombi);
+      //------- Fill the Tree file for the LightAnomCoupAnalyzer file -------\\
 
     } //loop on events
+    cout << "\n -> " << nSelectedMu << " mu+jets and " << nSelectedEl << " e+jets events where selected" << endl;
 
     // -------- Calculate TF MadWeight  --------//
     if(CalculateTF){
@@ -1062,29 +939,12 @@ int main (int argc, char *argv[]){
       TFTree->Write();
       TFTreeFile->Close();
       delete TFTreeFile;
-
     }
-
-    //---  Mlb and Mqqb fit result ---//
-    histo1D["MlbMass"]->Fit("gaus","Q");
-    histo1D["MqqbMass"]->Fit("gaus","Q");
-    cout <<"\n values for Mlb :"<< histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(2) << endl;
-    cout <<" values for Mqqb :" << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(2) << endl;
-
-    cout << "\n -> " << nSelectedMu << " mu+jets and " << nSelectedEl << " e+jets events where selected" << endl;
-
-    //--- Get output from bTagStudy class ---//
-    bTagStudy.ReturnBTagTable();
-    bTagStudy.CreateHistograms(fout);
-
-    //--- Get output from LHCOOutput class ---//
-    lhcoOutput.WriteLHCOPlots(fout);	
-        
-    if(GenLHCOOutput == true) EventInfoFile.close();
 
     //////////////
     // CLEANING //
     //////////////
+    if(GenLHCOOutput == true) EventInfoFile.close();
     
     if (jecUnc) delete jecUnc;
     if (jetTools) delete jetTools;
@@ -1094,8 +954,7 @@ int main (int argc, char *argv[]){
   }  //loop on datasets
   
   //Once everything is filled ...
-  if(verbose > 0)
-    cout << " We ran over all the data ;-)" << endl;
+  if(verbose > 0) cout << " We ran over all the data ;-)" << endl;
   
   /////////////////////////
   // Write out the plots //
