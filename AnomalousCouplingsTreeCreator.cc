@@ -375,7 +375,7 @@ int main (int argc, char *argv[]){
     //Initialize LightTuple (AnomCoupTree) specific stuff:
     TTree* LightTree = new TTree("LightTree","Tree containing the AnomCoup information");
     LightTree->Branch("TheAnomCoupLight","AnomCoupLight",&anomCoupLight);
-    TFile* LightFile = new TFile(("LightTree/AnomalousCouplings_Light_"+dataSetName+".root").c_str(),"RECREATE");
+    TFile* LightFile = new TFile(("LightTree/AnomalousCouplingsLight_"+dataSetName+".root").c_str(),"RECREATE");
 
     //Initialize TFnTuple specific stuff:
     TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
@@ -904,7 +904,8 @@ int main (int argc, char *argv[]){
       anomCoupLight->setHadrBJet(jetCombi[1]);
       anomCoupLight->setLeptBJet(jetCombi[0]);
       anomCoupLight->setQuark1(jetCombi[2]);
-      anomCoupLight->setQuark2(jetCombi[3]);      
+      anomCoupLight->setQuark2(jetCombi[3]);
+      anomCoupLight->setMET(*mets[0]);
 
       LightTree->Fill();
       delete anomCoupLight;

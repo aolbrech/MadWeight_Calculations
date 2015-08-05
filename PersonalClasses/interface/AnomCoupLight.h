@@ -28,6 +28,7 @@ class AnomCoupLight : public TObject
       ,leptBJet_(0)
       ,quark1_(0)
       ,quark2_(0)
+      ,met_()
       {;}
     ~AnomCoupLight() {;}
 
@@ -46,7 +47,8 @@ class AnomCoupLight : public TObject
     int hadrBJet() const {return hadrBJet_;}
     int leptBJet() const {return leptBJet_;}
     int quark1() const {return quark1_;}
-    int quark2() const {return quark2_;} 
+    int quark2() const {return quark2_;}
+    TLorentzVector met() const {return met_;}
 
     void setEventId(unsigned int eventID) {eventID_ = eventID;}
     void setRunId(unsigned int runID) {runID_ = runID;}
@@ -64,6 +66,7 @@ class AnomCoupLight : public TObject
     void setLeptBJet( int leptBJet) {leptBJet_ = leptBJet;}
     void setQuark1(int quark1) {quark1_ = quark1;}
     void setQuark2(int quark2) {quark2_ = quark2;}
+    void setMET(TLorentzVector met) {met_ = met;}
 
   protected:
     unsigned int eventID_;
@@ -82,6 +85,7 @@ class AnomCoupLight : public TObject
     int leptBJet_;
     int quark1_;
     int quark2_;
+    TLorentzVector met_;
 
   ClassDef(AnomCoupLight,2); 
 };
