@@ -30,8 +30,9 @@
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
-#include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
+//#include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
 #include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
+#include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
 #include "AnomalousCouplings/PersonalClasses/interface/KinematicFunctions.h"
 
 using namespace std;
@@ -409,6 +410,7 @@ int main (int argc, char *argv[]){
     LHCOOutput lhcoOutput(verbose, GenLHCOOutput, RecoLHCOOutput); 
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
     TFnTuple* tfNTuple = 0;
+    AnomCoupLight* anomCoupLight = 0;
 
     //Initialize LightTuple (AnomCoupTree) specific stuff:
     TTree* LightTree = new TTree("LightTree","Tree containing the AnomCoup information");
@@ -920,6 +922,32 @@ int main (int argc, char *argv[]){
       }//End of TTbarJets!
 
       //------- Fill the Tree file for the LightAnomCoupAnalyzer file -------//
+      anomCoupLight = new AnomCoupLight();
+
+      std::vector<float> CSVbTagValues;
+      vector<TLorentzVector> SelectedJets;
+      for(int iJet = 0; iJet < selectedJets.size(); iJet++){
+        CSVbTagValues.push_back(selectedJets[iJet]->btag_combinedSecondaryVertexBJetTags());
+        SelectedJets.push_back(*selectedJets[iJet]);
+      }
+
+      anomCoupLight->setEventId(event->eventId());
+      anomCoupLight->setRunId(event->runId();
+      anomCoupLight->setLumiBlockId(event->lumiBlockId());
+      anomCoupLight->setNPV(vertex.size());
+      anomCoupLight->setNTruePU(event->nTruePU());
+      anomCoupLight->setScaleFactor(scaleFactor);
+
+      /*anomCoupLight->setSelectedJets(SelectedJets);
+      anomCoupLight->setBTagCSV(CSVbTagValues);
+      anomCoupLight->setSelectedLepton(*selectedLepton);
+      anomCoupLight->setDecayChannel(decayChannel);
+      anomCoupLight->setLeptonCharge(LeptonRecoCharge);
+      anomCoupLight->setHadrBJet(jetCombi[1]);
+      anomCoupLight->setLeptBJet(jetCombi[0]);
+      anomCoupLight->setQuark1(jetCombi[2]);
+      anomCoupLight->setQuark2(jetCombi[3]);
+      */
 
       //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
