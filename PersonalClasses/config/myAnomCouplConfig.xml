@@ -13,7 +13,7 @@ beta_QCD = 2.09
 
 <!-- Simulation samples : -->
 <!-- TTbarJets samples were created without HLT trigger HENCE can be used for both applied triggers !! -->
-<d name="TTbarJets" title="t#bar{t}+jets" add="1" color="4" ls="1" lw="2" normf="1" xsection="110.61" EqLumi="974.7" filenames="dcap://maite.iihe.ac.be//pnfs/iihe/cms/store/user/aolbrech/Skimmed-TopTrees/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7C-v1_ID3422_NoPreselection_14March2014/14032014_151053/TopTree_Skimmed_1.root"/>
+<d name="TTbarJets_SemiLept" title="t#bar{t}+jets (semi-lept)" add="1" color="4" ls="1" lw="2" normf="1" xsection="110.61" EqLumi="974.7" filenames="dcap://maite.iihe.ac.be//pnfs/iihe/cms/store/user/aolbrech/Skimmed-TopTrees/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7C-v1_ID3422_NoPreselection_14March2014/14032014_151053/TopTree_Skimmed_1.root"/>
 
 <!-- QCD Samples were created without HLT trigger HENCE can be used for both applied triggers !! -->
 <!-- QCD for muon channel HENCE MuEnriched DataDriven -->
