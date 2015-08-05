@@ -410,6 +410,11 @@ int main (int argc, char *argv[]){
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
     TFnTuple* tfNTuple = 0;
 
+    //Initialize LightTuple (AnomCoupTree) specific stuff:
+    TTree* LightTree = new TTree("LightTree","Tree containing the AnomCoup information");
+    LightTree->Branch("TheAnomCoupLight","AnomCoupLight",&anomCoupLight);
+    TFile* LightFile = new TFile(("LightTree/AnomalousCouplings_Light_"+dataSetName+".root").c_str(),"RECREATE");
+
     //Initialize TFnTuple specific stuff:
     TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
     TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
@@ -888,9 +893,6 @@ int main (int argc, char *argv[]){
  	
 	//Working on generator level (i.e. parton level):  
 	if(jetCombi[0]!=9999 && jetCombi[1]!=9999 && jetCombi[2]!=9999 && jetCombi[3]!=9999){    
-	  histo1D["MlbMass"]->Fill((*selectedJets[jetCombi[0]]+*selectedLepton).M());
-	  histo1D["MqqbMass"]->Fill((*selectedJets[jetCombi[2]]+*selectedJets[jetCombi[3]]+*selectedJets[jetCombi[1]]).M());
-	
 	  if(CalculateTF){
 	    if(decayChannel == 0){ histo1D["genPt_Muon"]->Fill( lhcoOutput.getGenLepton()->Pt() ); histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());}	    
 	    if(decayChannel == 1){ histo1D["genPt_Elec"]->Fill( lhcoOutput.getGenLepton()->Pt() ); histo1D["recoPt_Elec"]->Fill(selectedLepton->Pt());}	    
@@ -917,10 +919,30 @@ int main (int argc, char *argv[]){
 
       }//End of TTbarJets!
 
-      //------- Fill the Tree file for the LightAnomCoupAnalyzer file -------\\
+      //------- Fill the Tree file for the LightAnomCoupAnalyzer file -------//
+
+      //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
     } //loop on events
     cout << "\n -> " << nSelectedMu << " mu+jets and " << nSelectedEl << " e+jets events where selected" << endl;
+
+    //------ Store the LightAnomCoupAnalyzer tree ------//
+    LightFile->cd();
+    TTree* configTreeLightFile = new TTree("configTreeLightFile","configuration Tree in Light File");
+    TClonesArray* tcdatasetlightfile = new TClonesArray("Dataset",1);
+    configTreeLightFile->Branch("Dataset","TClonesArray",&tcdatasetlightfile);
+    new ((*tcdatasetlightfile)[0]) Dataset(*datasets[d]);
+    //TClonesArray* tcanaenvlightfile = new TClonesArray("AnalysisEnvironment",1);   --> Needed?
+    //configTreeLightFile->Branch("AnaEnv","TClonesArray",&tcanaenvlightfile);
+    //new ((*tcanaenvlightfile)[0]) AnalysisEnvironment(anaEnv);
+
+    configTreeLightFile->Fill();
+    configTreeLightFile->Write();
+    LightTree->Write();
+    LightTree->Close();
+    delete LightFile;
+    
+    //----  End of storing Tree  ----//
 
     // -------- Calculate TF MadWeight  --------//
     if(CalculateTF){
