@@ -24,10 +24,7 @@ class AnomCoupLight : public TObject
       ,selectedLepton_()
       ,decayChannel_(0)
       ,leptonCharge_(0)
-      ,hadrBJet_(0)
-      ,leptBJet_(0)
-      ,quark1_(0)
-      ,quark2_(0)
+      ,correctJetCombi_()
       ,met_()
       ,genVectorLight1_()
       ,genVectorLight2_()
@@ -49,10 +46,7 @@ class AnomCoupLight : public TObject
     TLorentzVector selectedLepton() const {return selectedLepton_;}
     unsigned int decayChannel() const {return decayChannel_;}
     float leptonCharge() const {return leptonCharge_;}
-    int hadrBJet() const {return hadrBJet_;}
-    int leptBJet() const {return leptBJet_;}
-    int quark1() const {return quark1_;}
-    int quark2() const {return quark2_;}
+    vector<int> correctJetCombi() const {return correctJetCombi_;}
     TLorentzVector met() const {return met_;}
 
     TLorentzVector genVectorLight1() const {return genVectorLight1_;}
@@ -73,10 +67,7 @@ class AnomCoupLight : public TObject
     void setSelectedLepton( TLorentzVector selectedLepton) {selectedLepton_ = selectedLepton;}
     void setDecayChannel(unsigned int decayChannel) {decayChannel_ = decayChannel;}
     void setLeptonCharge( float leptonCharge) {leptonCharge_ = leptonCharge;}
-    void setHadrBJet( int hadrBJet) {hadrBJet_ = hadrBJet;}
-    void setLeptBJet( int leptBJet) {leptBJet_ = leptBJet;}
-    void setQuark1(int quark1) {quark1_ = quark1;}
-    void setQuark2(int quark2) {quark2_ = quark2;}
+    void setCorrectJetCombi( vector<int> correctJetCombi) {correctJetCombi_ = correctJetCombi;}
     void setMET(TLorentzVector met) {met_ = met;}
 
     void setGenVectorLight1(TLorentzVector genVectorLight1) {genVectorLight1_ = genVectorLight1;}
@@ -98,10 +89,7 @@ class AnomCoupLight : public TObject
     TLorentzVector selectedLepton_;
     unsigned int decayChannel_;
     float leptonCharge_;
-    int hadrBJet_;
-    int leptBJet_;
-    int quark1_;
-    int quark2_;
+    vector<int> correctJetCombi_;
     TLorentzVector met_;
 
     TLorentzVector genVectorLight1_;

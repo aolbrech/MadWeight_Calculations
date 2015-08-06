@@ -77,13 +77,17 @@ int main (int argc, char **argv)
 
 	inputTFTree->GetEvent(iEvt);
         vector<TLorentzVector> selectedJets = light->selectedJets();
-
-        std::cout << " Indices are : " << light->quark1() << ", " << light->quark2() << ", " << light->hadrBJet() << " & " << light->leptBJet() << std::endl;
-        if( light->quark1() != 9999 && light->quark2() != 9999 && light->hadrBJet() != 9999 && light->leptBJet() != 9999){
-    	  recoPart[0] = selectedJets[light->quark1()];
-	  recoPart[1] = selectedJets[light->quark2()];
-	  recoPart[2] = selectedJets[light->hadrBJet()];
-	  recoPart[3] = selectedJets[light->leptBJet()];
+        vector<int> correctJetCombi = light->jetCombi();
+        int correctLeptBIndex = correctJetCombi[0];
+        int correctHadrBIndex = correctJetCombi[1];
+        int correctQuark1Index = correctJetCombi[2];
+        int correctQuark2Index = correctJetCombi[3];
+        
+        if( correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999 && correctJetCombi[2] != 9999 && correctJetCombi[3] != 9999){
+    	  recoPart[0] = selectedJets[correctQuark1Index];
+	  recoPart[1] = selectedJets[correctQuark2Index];
+	  recoPart[2] = selectedJets[correctHadrBIndex];
+	  recoPart[3] = selectedJets[correctLeptBIndex];
 	  recoPart[4] = light->selectedLepton();
 
 	  genPart[0] = light->genVectorLight1();

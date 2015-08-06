@@ -887,10 +887,7 @@ int main (int argc, char *argv[]){
       anomCoupLight->setSelectedLepton(*selectedLepton);
       anomCoupLight->setDecayChannel(decayChannel);
       anomCoupLight->setLeptonCharge(LeptonRecoCharge);
-      anomCoupLight->setHadrBJet(jetCombi[1]);
-      anomCoupLight->setLeptBJet(jetCombi[0]);
-      anomCoupLight->setQuark1(jetCombi[2]);
-      anomCoupLight->setQuark2(jetCombi[3]);
+      anomCoupLight->setCorrectJetCombi(jetCombi);
       anomCoupLight->setMET(*mets[0]);
 	
       //Store the information needed for the TF (but only has value when dataset is ttbar)
