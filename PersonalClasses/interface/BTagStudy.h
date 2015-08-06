@@ -23,7 +23,7 @@ class BTagStudy{
     ~BTagStudy();
 
     void CalculateJets(vector<TLorentzVector>, vector<float> bTagValues, vector<int> jetCombi, TLorentzVector lepton);
-    void ReturnBTagTable();
+    void ReturnBTagTable(std::string);
     void ReturnThirdJetTable();    //Still to fill
     void CreateHistograms(TFile*); 
  
