@@ -8,13 +8,16 @@
 #include "TStyle.h"
 #include "TDirectory.h"
 #include "TClonesArray.h"
+#include "TopTreeAnalysisBase/Content/interface/Dataset.h"
 
-//#include "TLorentzVector.h"
+#include "TLorentzVector.h"
 
 #include "TROOT.h"
 #include "TH1F.h"
+#include "PersonalClasses/Style.C"                                                 //CHECK if this works!
 
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
+#include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
 
 using namespace std;
 
@@ -29,12 +32,15 @@ int main (int argc, char *argv[])
   //setTDRStyle(); 
   setMyStyle();
 
+  int verbose = 1;
+
   TFile* outputFile = new TFile("LightAnomCoup_Analysis.root","RECREATE");
 
   vector<string> inputFiles;
   vector<Dataset*> datasets;
-  inputFiles.push_back("/home/annik/MMachineMount/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/LightTree/AnomalousCouplings_Light_TTbarJets_SemiLept.root");
+  inputFiles.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root");
 
+  BTagStudy bTagStudy(verbose);
   //-----------------------//
   // Initialize histograms //
   //-----------------------//
@@ -55,12 +61,13 @@ int main (int argc, char *argv[])
     //EqLumi = dataSet->EquivalentLumi();        
 
     int color = 0;
-    if(dataSet->Name().find("QCD") == 0)                                    color = kYellow;
-    if(dataSet->Name.find("TT") == 0)                                       color = kRed+1;
-    if(dataSet->Name.find("TTbarJets_Other") == 0)                          color = kRed-7;
-    if(dataSet->Name.find("ST") == 0 || dataSetName.find("SingleTop") == 0) color = kMagenta;
-    if(dataSet->Name.find("WJets") == 0){                                   color = kGreen-3; dataSet->SetTitle("W#rightarrowl#nu");}      
-    if(dataSet->Name.find("ZJets") == 0){                                   color = kAzure-2; dataSet->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");}
+    if(dataSet->Name().find("QCD") == 0)             color = kYellow;
+    if(dataSet->Name().find("TT") == 0)              color = kRed+1;
+    if(dataSet->Name().find("TTbarJets_Other") == 0) color = kRed-7;
+    if(dataSet->Name().find("ST") == 0 || 
+       dataSet->Name().find("SingleTop") == 0)       color = kMagenta;
+    if(dataSet->Name().find("WJets") == 0){          color = kGreen-3; dataSet->SetTitle("W#rightarrowl#nu");}      
+    if(dataSet->Name().find("ZJets") == 0){          color = kAzure-2; dataSet->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");}
 
     Dataset* tmpDS = new Dataset(dataSet->Name(), dataSet->Title(), dataSet->DoIt(), color, dataSet->LineStyle(), dataSet->LineWidth(), dataSet->NormFactor(), dataSet->Xsection());
     tmpDS->SetEquivalentLuminosity( dataSet->EquivalentLumi() );
@@ -83,34 +90,44 @@ int main (int argc, char *argv[])
 
     TFile* inputFile = new TFile(inputFiles[iDataSet].c_str(),"READ");
 
-    TTree* inLightTree = (TTree*) inFile->Get("LightTree");
+    TTree* inLightTree = (TTree*) inputFile->Get("LightTree");
     TBranch* light_br = (TBranch*) inLightTree->GetBranch("TheAnomCoupLight");
     AnomCoupLight* light = 0;
     light_br->SetAddress(&light);
   
     //Number of events that will be used in the "loop on events"
     int nEvent = inLightTree->GetEntries();
-    //int nEvent = 1000;
+    //int nEvent = 10;
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
     std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputFiles.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
     for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
+      inLightTree->GetEvent(iEvt);	
 
-      float nPrimVertices = light->nPV();
+      int eventId = light->eventID();
+      int runId = light->runID();
+      int nTruePU = light->nTruePU();
+      int nPrimVertices = light->nPV();
+      float scaleFactor = light->scaleFactor();
+
       vector<float> bTagCSV = light->CSVbTag();
       vector<TLorentzVector> selectedJets = light->selectedJets();
-
-      std::cout << " Pt of first leading jet is : " << selectedJets[0]->Pt() << std::endl;
+      TLorentzVector selectedLepton = light->selectedLepton();
+      TLorentzVector MET = light->met();
+      int decayChannel = light->decayChannel();  //0 = semiMu and 1 = semiEl
+      vector<int> correctJetCombi = light->correctJetCombi();    //0 = LeptB, 1 = HadrB, 2 = Quark1 & 3 = Quark2
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
       //ooOOooOOoo      Reading out nTuples done           ooOOooOOoo
       //ooOOooOOoo-----------------------------------------ooOOooOOoo
       //ooOOooOOoo      Start of actual analysis           ooOOooOOoo
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
-
-
+      bTagStudy.CalculateJets(selectedJets, bTagCSV, correctJetCombi, selectedLepton);
+      float bTagLeptIndex = bTagStudy.getBLeptIndex(3);          //-->Filled with which value in case only 4 jets are considered ... ?
+      std::cout << " bTagLeptIndex obtained from bTagStudy is : " << bTagLeptIndex << std::endl;
+  
     }//End of loop on events
 
   }//End of loop on datasets

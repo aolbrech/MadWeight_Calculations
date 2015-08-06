@@ -22,7 +22,7 @@ class BTagStudy{
     BTagStudy(int);
     ~BTagStudy();
 
-    void CalculateJets(vector<TRootJet*>, vector<int> jetCombi, TLorentzVector* lepton);
+    void CalculateJets(vector<TLorentzVector>, vector<float> bTagValues, vector<int> jetCombi, TLorentzVector lepton);
     void ReturnBTagTable();
     void ReturnThirdJetTable();    //Still to fill
     void CreateHistograms(TFile*); 
@@ -45,8 +45,8 @@ class BTagStudy{
     void CompareJetCombi(vector<int> jetCombi, int bTagNr, int jetCase, int lightJetOne, int lightJetTwo);
     void InitializeBegin();
     void ResetEventArrays();
-    void CalculateMlbChiSq( int bTagNr, TLorentzVector* lepton, vector<TRootJet*> Jets, vector<int>); 
-    vector<int> CalculateMqqbChiSq( int bTagNr, vector<TRootJet*> Jets); 
+    void CalculateMlbChiSq( int bTagNr, TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int>); 
+    vector<int> CalculateMqqbChiSq( int bTagNr, vector<TLorentzVector> Jets); 
 
     int LowestChiSqMlb[6], LowestChiSqMqqb[6];
     int bHadrIndex[6], bLeptIndex[6], light1Index4Jets[6], light2Index4Jets[6], light1Index5Jets[6], light2Index5Jets[6], light1IndexMqqb[6], light2IndexMqqb[6];
@@ -68,7 +68,7 @@ class BTagStudy{
     //int thirdJetIsCorrectQuark[6];
     //int thirdJetIsGoodQuark[6];    //3rd quark is one of the quarks when the two b-jets are correctly matched!
 
-    map<string,TH1F*> histo1D;
+    map<std::string,TH1F*> histo1D;
     map<string,TH2F*> histo2D;
 
 };

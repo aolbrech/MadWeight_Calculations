@@ -21,11 +21,6 @@ void BTagStudy::InitializeBegin(){
         CorrectlyMatched[kk][ii][jj]=0;
         atLeastOneWrongMatch[kk][ii][jj] = 0;
       }
-      /*EventWithTwoLightJets[ii] = 0;
-      EventWithThreeLightJets[ii] = 0;
-      EventWithTwoLightJetsAndBTagged[ii] = 0;
-      EventWithThreeLightJetsAndBTagged[ii] = 0;*/
-      //thirdJetIsActualQuark[ii][jj] = 0; secondJetIsActualQuark[ii][jj] = 0; firstJetIsActualQuark[ii][jj] = 0;
     }
   }
 
@@ -54,7 +49,6 @@ void BTagStudy::InitializeBegin(){
     histo1D["Mlb_ChiSqDistribution_"+BTitle[itBTag]] = new TH1F(("Mlb_ChiSqDistribution_"+BTitle[itBTag]).c_str(),("#chi^{2}_{mlb} distribution for b-jet choice "+BName[itBTag]).c_str(),        150,0,10);
     histo1D["Mlb_CorrectCombiChiSq_"+BTitle[itBTag]] = new TH1F(("Mlb_CorrectCombiChiSq_"+BTitle[itBTag]).c_str(),("#chi^{2}_{mlb} distribution for correct b-jet choice "+BName[itBTag]).c_str(),150,0,10);
     histo1D["Mlb_WrongCombiChiSq_"+BTitle[itBTag]]   = new TH1F(("Mlb_WrongCombiChiSq_"+BTitle[itBTag]).c_str(),  ("#chi^{2}_{mlb} distribution for wrong b-jet choice "+BName[itBTag]).c_str(),  150,0,10);
-
     histo1D["Mlb_MassDistribution_"+BTitle[itBTag]] = new TH1F(("Mlb_MassDistribution_"+BTitle[itBTag]).c_str(), ("Mass distribution of lepton and leptonic b-jet "+BName[itBTag]).c_str(), 150, 50, 180);
   }
 }
@@ -70,20 +64,20 @@ void BTagStudy::ResetEventArrays(){
   }
 }
 
-void BTagStudy::CalculateJets(vector<TRootJet*> Jets, vector<int> jetCombi, TLorentzVector* lepton){      //, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr){
+void BTagStudy::CalculateJets(vector<TLorentzVector> Jets, vector<float> CSVbTagValues, vector<int> jetCombi, TLorentzVector lepton){      //, float BTagWorkingPoint, float LightWorkingPoint, int OptionNr){
 
   ResetEventArrays();
 
   for (unsigned int bTagOption = 0; bTagOption < 6; bTagOption++){
-    for(unsigned int ii = 0; ii<Jets.size();ii++){
-      if(Jets[ii]->btag_combinedSecondaryVertexBJetTags() >= BJetWP[bTagOption])
-        bTaggedJetNr[bTagOption].push_back(ii);            
+    for(unsigned int iJet = 0; iJet<Jets.size();iJet++){
+      if(CSVbTagValues[iJet] >= BJetWP[bTagOption])
+        bTaggedJetNr[bTagOption].push_back(iJet);            
       else
-        NonbTaggedJetNr[bTagOption].push_back(ii);            
+        NonbTaggedJetNr[bTagOption].push_back(iJet);            
 
       //Calculate the light jets when an additional working point is required for these:
-      if(BJetWP[bTagOption] != LightJetWP[bTagOption] && Jets[ii]->btag_combinedSecondaryVertexBJetTags() < LightJetWP[bTagOption])
-	LightJetNr[bTagOption].push_back(ii);
+      if(BJetWP[bTagOption] != LightJetWP[bTagOption] && CSVbTagValues[iJet] < LightJetWP[bTagOption])
+	LightJetNr[bTagOption].push_back(iJet);
     }
 
     //Copy the Nonbtagged vector into the light one in case the two b-tags are the same!	
@@ -141,11 +135,11 @@ void BTagStudy::CalculateJets(vector<TRootJet*> Jets, vector<int> jetCombi, TLor
   }//Loop over all btag options!
 }
 
-void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector* lepton, vector<TRootJet*> Jets, vector<int> correctJetCombi){
+void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> correctJetCombi){
 
   //---  This will distinguish the leptonic and hadronic b-jets  ---//
   //---     ==> Identical for 4- and 5-jet case                  ---//
-  float MlbValues[2]  = {(*lepton+*Jets[(bTaggedJetNr[bTagNr])[0]]).M(), (*lepton+*Jets[(bTaggedJetNr[bTagNr])[1]]).M()};
+  float MlbValues[2]  = {(lepton+Jets[(bTaggedJetNr[bTagNr])[0]]).M(), (lepton+Jets[(bTaggedJetNr[bTagNr])[1]]).M()};
  
   LowestChiSqMlb[bTagNr] = 0;
   bHadrIndex[bTagNr] = (bTaggedJetNr[bTagNr])[1];
@@ -157,7 +151,7 @@ void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector* lepton, vector<TRo
     }
   }
   bLeptIndex[bTagNr] = (bTaggedJetNr[bTagNr])[LowestChiSqMlb[bTagNr]];
-  histo1D["Mlb_MassDistribution_"+BTitle[bTagNr]]->Fill( (*lepton+*Jets[bLeptIndex[bTagNr]]).M() );
+  histo1D["Mlb_MassDistribution_"+BTitle[bTagNr]]->Fill( (lepton+Jets[bLeptIndex[bTagNr]]).M() );
 
   //--- Save information in histograms ---//
   //jet combi order is : 0 = BLeptonic & 1 = BHadronic
@@ -168,15 +162,15 @@ void BTagStudy::CalculateMlbChiSq(int bTagNr, TLorentzVector* lepton, vector<TRo
   }
 }
 
-vector<int> BTagStudy::CalculateMqqbChiSq(int bTagNr, vector<TRootJet*> Jets){
+vector<int> BTagStudy::CalculateMqqbChiSq(int bTagNr, vector<TLorentzVector> Jets){
   //---  This option chooses 2 out of three light jets  ---//
   //---     ==> Only considered in 5-jet case           ---//
   vector<int> lightIndices;
   lightIndices.clear();
 
-  float MqqbValues[3] = {(*Jets[bHadrIndex[bTagNr]] + *Jets[(LightJetNr[bTagNr])[0]] + *Jets[(LightJetNr[bTagNr])[1]]).M(), 
-                         (*Jets[bHadrIndex[bTagNr]] + *Jets[(LightJetNr[bTagNr])[0]] + *Jets[(LightJetNr[bTagNr])[2]]).M(),
-                         (*Jets[bHadrIndex[bTagNr]] + *Jets[(LightJetNr[bTagNr])[1]] + *Jets[(LightJetNr[bTagNr])[2]]).M()};
+  float MqqbValues[3] = {(Jets[bHadrIndex[bTagNr]] + Jets[(LightJetNr[bTagNr])[0]] + Jets[(LightJetNr[bTagNr])[1]]).M(), 
+                         (Jets[bHadrIndex[bTagNr]] + Jets[(LightJetNr[bTagNr])[0]] + Jets[(LightJetNr[bTagNr])[2]]).M(),
+                         (Jets[bHadrIndex[bTagNr]] + Jets[(LightJetNr[bTagNr])[1]] + Jets[(LightJetNr[bTagNr])[2]]).M()};
   
   LowestChiSqMqqb[bTagNr] = 0;
   for(int ii = 0; ii<3; ii++){
@@ -187,7 +181,7 @@ vector<int> BTagStudy::CalculateMqqbChiSq(int bTagNr, vector<TRootJet*> Jets){
   }
   
   //Set the light jet indices:
-  if(LowestChiSqMqqb[bTagNr] == 0)     { lightIndices.push_back( (LightJetNr[bTagNr])[0]); lightIndices.push_back((LightJetNr[bTagNr])[1]);}
+  if(     LowestChiSqMqqb[bTagNr] == 0){ lightIndices.push_back( (LightJetNr[bTagNr])[0]); lightIndices.push_back((LightJetNr[bTagNr])[1]);}
   else if(LowestChiSqMqqb[bTagNr] == 1){ lightIndices.push_back( (LightJetNr[bTagNr])[0]); lightIndices.push_back((LightJetNr[bTagNr])[2]);}
   else if(LowestChiSqMqqb[bTagNr] == 2){ lightIndices.push_back( (LightJetNr[bTagNr])[1]); lightIndices.push_back((LightJetNr[bTagNr])[2]);} 
 
