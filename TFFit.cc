@@ -4,6 +4,7 @@
 #include "TH2.h"
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #include "TROOT.h"
 #include "TH1F.h"
@@ -20,7 +21,7 @@
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
-#include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
+#include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
 
 using namespace std;
 //using namespace TopTree;
@@ -40,7 +41,7 @@ int main (int argc, char **argv)
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
   bool CreateTFFromTree = true;
-  bool RunFitForTF = true;
+  bool RunFitForTF = false;
   int nEtaBins = 4;
   //Used classes
   TFCreation tfCreation(nEtaBins);
@@ -48,15 +49,15 @@ int main (int argc, char **argv)
   if(CreateTFFromTree){
     //Load the TFTree information
     vector<string> inputTFRoot;
-    inputTFRoot.push_back("TFInformation/TransferFunctionTree_AllEvts.root");
+    inputTFRoot.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root"); 
 
     for(unsigned int iDataSet = 0; iDataSet <inputTFRoot.size(); iDataSet++){
       TFile* inputTFFile = new TFile(inputTFRoot[iDataSet].c_str(),"READ");
 
-      TTree* inputTFTree = (TTree*) inputTFFile->Get("TFTree");
-      TBranch* m_br = (TBranch*) inputTFTree->GetBranch("TheTFTree");
-      TFnTuple* tfNTuple = 0;
-      m_br->SetAddress(&tfNTuple);
+      TTree* inputTFTree = (TTree*) inputTFFile->Get("LightTree");
+      TBranch* m_br = (TBranch*) inputTFTree->GetBranch("TheAnomCoupLight");
+      AnomCoupLight* light = 0;
+      m_br->SetAddress(&light);
 
       //Set the number of selected events (for loop on events):
       int nEvent = inputTFTree->GetEntries(); 
@@ -75,26 +76,34 @@ int main (int argc, char **argv)
 	  std::cout<<"Processing the "<<iEvt<<"th event (" << ((double)iEvt/(double)inputTFTree->GetEntries())*100  << "%)" << flush<<"\r";
 
 	inputTFTree->GetEvent(iEvt);
-	genPart[0] = tfNTuple->genVectorLight1();
-	genPart[1] = tfNTuple->genVectorLight2();
-	genPart[2] = tfNTuple->genVectorHadrB();
-	genPart[3] = tfNTuple->genVectorLeptB();
-	genPart[4] = tfNTuple->genVectorLepton();
+        vector<TLorentzVector> selectedJets = light->selectedJets();
 
-	recoPart[0] = tfNTuple->recoVectorLight1();
-	recoPart[1] = tfNTuple->recoVectorLight2();
-	recoPart[2] = tfNTuple->recoVectorHadrB();
-	recoPart[3] = tfNTuple->recoVectorLeptB();
-	recoPart[4] = tfNTuple->recoVectorLepton();
+        std::cout << " Indices are : " << light->quark1() << ", " << light->quark2() << ", " << light->hadrBJet() << " & " << light->leptBJet() << std::endl;
+        if( light->quark1() != 9999 && light->quark2() != 9999 && light->hadrBJet() != 9999 && light->leptBJet() != 9999){
+    	  recoPart[0] = selectedJets[light->quark1()];
+	  recoPart[1] = selectedJets[light->quark2()];
+	  recoPart[2] = selectedJets[light->hadrBJet()];
+	  recoPart[3] = selectedJets[light->leptBJet()];
+	  recoPart[4] = light->selectedLepton();
 
-	if(genPart[4].M() <= 0.05) decayChannel = isSemiEl; //Electron channel --> decayChannel == 1
-	else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
+	  genPart[0] = light->genVectorLight1();
+	  genPart[1] = light->genVectorLight2();
+	  genPart[2] = light->genVectorHadrB();
+	  genPart[3] = light->genVectorLeptB();
+	  genPart[4] = light->genVectorLepton();
+  
+          std::cout << " Pt of genVectorLeptB : " << genPart[3].Pt() << std::endl;
 
-	//Fill the histograms of the TFCreation class!
-	tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, nEtaBins);
+	  if(genPart[4].M() <= 0.05) decayChannel = isSemiEl; //Electron channel --> decayChannel == 1
+	  else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
+
+	  //Fill the histograms of the TFCreation class!
+	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, nEtaBins);
+
+        }//Only for matched particles reconstructed!
       }//Loop on events
 
-      TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions_FromTree.root","RECREATE");
+      TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions_FromLightTree.root","RECREATE");
       std::cout << "    ----> Information writen in file : " << fillFile->GetName() << std::endl << std::endl;
       tfCreation.WritePlots(fillFile);
       fillFile->Close();
@@ -246,7 +255,7 @@ int main (int argc, char **argv)
       if(NrFitHistos == 1) iHisto = ConsHisto;
 
       //Set the correct startValues and fit the distribution
-      for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = std::stof(HistoInfo[iHisto][1+jj]);
+      for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = atof((HistoInfo[iHisto][1+jj]).c_str());
     
       for(int iEtaBin = 0; iEtaBin <= nEtaBins; iEtaBin++)
 	tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, writeFile, iEtaBin, readFile);

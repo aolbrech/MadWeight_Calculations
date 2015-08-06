@@ -30,7 +30,7 @@
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
-#include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
+//#include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
 #include "AnomalousCouplings/PersonalClasses/interface/KinematicFunctions.h"
 
@@ -88,7 +88,7 @@ int main (int argc, char *argv[]){
   std::string GenOrReco = "Gen";
   bool getLHCOOutput = true;
   bool getEventInfo = true;
-  bool CalculateTF = false;
+  //bool CalculateTF = true;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   int ChosenBTag;
@@ -369,7 +369,7 @@ int main (int argc, char *argv[]){
     /////////////////////  
     LHCOOutput lhcoOutput(verbose, GenOrReco, getLHCOOutput); 
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
-    TFnTuple* tfNTuple = 0;
+    //TFnTuple* tfNTuple = 0;
     AnomCoupLight* anomCoupLight = 0;
 
     //Initialize LightTuple (AnomCoupTree) specific stuff:
@@ -378,9 +378,9 @@ int main (int argc, char *argv[]){
     TFile* LightFile = new TFile(("LightTree/AnomalousCouplingsLight_"+dataSetName+".root").c_str(),"RECREATE");
 
     //Initialize TFnTuple specific stuff:
-    TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
-    TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
-    TFile* TFTreeFile = new TFile("TFInformation/TransferFunctionTree.root","RECREATE");
+    //TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
+    //TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
+    //TFile* TFTreeFile = new TFile("TFInformation/TransferFunctionTree.root","RECREATE");
 
     /////////////////////////////////////////
     //  LHCO Output files + GeneratorInfo  //
@@ -763,7 +763,8 @@ int main (int argc, char *argv[]){
       
       ////////////////////////////////////////////////////////////////////
       //   Use genEvent information to get the correct event topology   //
-      ////////////////////////////////////////////////////////////////////    
+      ////////////////////////////////////////////////////////////////////
+      TLorentzVector genLight1 = 0., genLight2 = 0., genHadrB = 0., genLeptB = 0., genLepton = 0.;
       if(dataSetName.find("TTbarJets_SemiLept") == 0){
         vector<TRootMCParticle> mcParticlesMatching;      	
         vector< pair<unsigned int, unsigned int> > JetPartonPair, ISRJetPartonPair; // First one is jet number, second one is mcParticle number
@@ -854,27 +855,12 @@ int main (int argc, char *argv[]){
 	else                   {histo1D["CorrectQuark2CSVDiscr"]->Fill(-2);                                                                histo1D["Quark2JetNumber"]->Fill(-1);}
  	
 	//Working on generator level (i.e. parton level):  
-	if(jetCombi[0]!=9999 && jetCombi[1]!=9999 && jetCombi[2]!=9999 && jetCombi[3]!=9999){    
-	  if(CalculateTF){
-	    if(decayChannel == 0){ histo1D["genPt_Muon"]->Fill( lhcoOutput.getGenLepton()->Pt() ); histo1D["recoPt_Muon"]->Fill(selectedLepton->Pt());}	    
-	    if(decayChannel == 1){ histo1D["genPt_Elec"]->Fill( lhcoOutput.getGenLepton()->Pt() ); histo1D["recoPt_Elec"]->Fill(selectedLepton->Pt());}	    
-	    
-	    //Fill the Transfer Function Tree file!
-	    tfNTuple = new TFnTuple();
-	    tfNTuple->setEventID( event->eventId() );
-	    tfNTuple->setRecoVectorLight1( (TLorentzVector) *selectedJets[jetCombi[2]] );
-	    tfNTuple->setRecoVectorLight2( (TLorentzVector) *selectedJets[jetCombi[3]] );
-	    tfNTuple->setRecoVectorHadrB(  (TLorentzVector) *selectedJets[jetCombi[1]] );
-	    tfNTuple->setRecoVectorLeptB(  (TLorentzVector) *selectedJets[jetCombi[0]] );
-	    tfNTuple->setRecoVectorLepton( (TLorentzVector) *selectedLepton            );
-	    tfNTuple->setGenVectorLight1(  (TLorentzVector) mcParticlesMatching[hadronicWJet1_.second] );
-	    tfNTuple->setGenVectorLight2(  (TLorentzVector) mcParticlesMatching[hadronicWJet2_.second] );
-	    tfNTuple->setGenVectorHadrB(   (TLorentzVector) mcParticlesMatching[hadronicBJet_.second]  );
-	    tfNTuple->setGenVectorLeptB(   (TLorentzVector) mcParticlesMatching[leptonicBJet_.second]  );
-	    tfNTuple->setGenVectorLepton(  *lhcoOutput.getGenLepton()                                   );
-	    TFTree->Fill();
-	    delete tfNTuple;
-	  }//End of calculate Transfer Functions
+	if(jetCombi[0]!=9999 && jetCombi[1]!=9999 && jetCombi[2]!=9999 && jetCombi[3]!=9999){
+          genLight1 = (TLorentzVector) mcParticlesMatching[hadronicWJet1_.second];
+          genLight2 = (TLorentzVector) mcParticlesMatching[hadronicWJet2_.second];
+          genHadrB = (TLorentzVector) mcParticlesMatching[hadronicBJet_.second];
+          genLeptB = (TLorentzVector) mcParticlesMatching[leptonicBJet_.second];
+          genLepton = (TLorentzVector) *lhcoOutput.getGenLepton();
 	}//End of matched particles reconstructed
       
       }//End of TTbarJets!
@@ -906,6 +892,13 @@ int main (int argc, char *argv[]){
       anomCoupLight->setQuark1(jetCombi[2]);
       anomCoupLight->setQuark2(jetCombi[3]);
       anomCoupLight->setMET(*mets[0]);
+	
+      //Store the information needed for the TF (but only has value when dataset is ttbar)
+      anomCoupLight->setGenVectorLight1( genLight1 );
+      anomCoupLight->setGenVectorLight2( genLight2 );
+      anomCoupLight->setGenVectorHadrB( genHadrB );
+      anomCoupLight->setGenVectorLeptB( genLeptB );
+      anomCoupLight->setGenVectorLepton( genLepton);
 
       LightTree->Fill();
       delete anomCoupLight;
@@ -929,27 +922,7 @@ int main (int argc, char *argv[]){
     LightTree->Write();
     LightFile->Close();
     delete LightFile;
-    
     //----  End of storing Tree  ----//
-
-    // -------- Calculate TF MadWeight  --------//
-    if(CalculateTF){
-      TFTreeFile->cd();
-      
-      TTree *configTreeTFFile = new TTree("configTreeTFFile","configuration Tree in Transfer Function Tree file");
-      TClonesArray* tcdatasetTFFile = new TClonesArray("Dataset",1);
-      configTreeTFFile->Branch("Dataset","TClonesArray",&tcdatasetTFFile);
-      TClonesArray* tcAnaEnvTFFile = new TClonesArray("AnalysisEnvironment",1);
-      configTreeTFFile->Branch("AnaEnv","TClonesArray",&tcAnaEnvTFFile);
-      new ((*tcdatasetTFFile)[0]) Dataset(*datasets[d]);
-      new ((*tcAnaEnvTFFile)[0]) AnalysisEnvironment(anaEnv);
-
-      configTreeTFFile->Fill();
-      configTreeTFFile->Write();
-      TFTree->Write();
-      TFTreeFile->Close();
-      delete TFTreeFile;
-    }
 
     //////////////
     // CLEANING //

@@ -29,6 +29,11 @@ class AnomCoupLight : public TObject
       ,quark1_(0)
       ,quark2_(0)
       ,met_()
+      ,genVectorLight1_()
+      ,genVectorLight2_()
+      ,genVectorHadrB_()
+      ,genVectorLeptB_()
+      ,genVectorLepton_()
       {;}
     ~AnomCoupLight() {;}
 
@@ -50,6 +55,12 @@ class AnomCoupLight : public TObject
     int quark2() const {return quark2_;}
     TLorentzVector met() const {return met_;}
 
+    TLorentzVector genVectorLight1() const {return genVectorLight1_;}
+    TLorentzVector genVectorLight2() const {return genVectorLight2_;}
+    TLorentzVector genVectorHadrB()  const {return genVectorHadrB_;}
+    TLorentzVector genVectorLeptB()  const {return genVectorLeptB_;}
+    TLorentzVector genVectorLepton() const {return genVectorLepton_;}
+
     void setEventId(unsigned int eventID) {eventID_ = eventID;}
     void setRunId(unsigned int runID) {runID_ = runID;}
     void setLumiBlockId(unsigned int lumiBlockID) {lumiBlockID_ = lumiBlockID;}
@@ -67,6 +78,12 @@ class AnomCoupLight : public TObject
     void setQuark1(int quark1) {quark1_ = quark1;}
     void setQuark2(int quark2) {quark2_ = quark2;}
     void setMET(TLorentzVector met) {met_ = met;}
+
+    void setGenVectorLight1(TLorentzVector genVectorLight1) {genVectorLight1_ = genVectorLight1;}
+    void setGenVectorLight2(TLorentzVector genVectorLight2) {genVectorLight2_ = genVectorLight2;}
+    void setGenVectorHadrB( TLorentzVector genVectorHadrB)  {genVectorHadrB_  = genVectorHadrB;}
+    void setGenVectorLeptB( TLorentzVector genVectorLeptB)  {genVectorLeptB_  = genVectorLeptB;}
+    void setGenVectorLepton(TLorentzVector genVectorLepton) {genVectorLepton_ = genVectorLepton;}
 
   protected:
     unsigned int eventID_;
@@ -86,6 +103,12 @@ class AnomCoupLight : public TObject
     int quark1_;
     int quark2_;
     TLorentzVector met_;
+
+    TLorentzVector genVectorLight1_;
+    TLorentzVector genVectorLight2_;
+    TLorentzVector genVectorHadrB_;
+    TLorentzVector genVectorLeptB_;
+    TLorentzVector genVectorLepton_;
 
   ClassDef(AnomCoupLight,2); 
 };
