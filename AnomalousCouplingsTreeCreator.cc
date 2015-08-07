@@ -30,7 +30,6 @@
 
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
-//#include "AnomalousCouplings/PersonalClasses/interface/TFnTuple.h"
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
 #include "AnomalousCouplings/PersonalClasses/interface/KinematicFunctions.h"
 
@@ -85,10 +84,9 @@ int main (int argc, char *argv[]){
   ///////////////////////////////
   //  Run specific parts only  //
   ///////////////////////////////
-  std::string GenOrReco = "Gen";
   bool getLHCOOutput = true;
   bool getEventInfo = true;
-  //bool CalculateTF = true;
+  bool saveAsPDF = false;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   int ChosenBTag;
@@ -322,9 +320,7 @@ int main (int argc, char *argv[]){
     int iFile = -1;
     string dataSetName = datasets[d]->Name();
     
-    int nSelectedMu=0, nSelectedMuLCSV=0, nSelectedMuMCSV=0, nSelectedMuTCSV=0;
-    int nSelectedEl=0, nSelectedElLCSV=0, nSelectedElMCSV=0, nSelectedElTCSV=0;
-    int nLargeLCSVEvents = 0, nLargeMCSVEvents = 0, nLargeTCSVEvents = 0;
+    int nSelectedMu=0, nSelectedEl=0;
     
     if (verbose > 1){
       cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
@@ -366,21 +362,16 @@ int main (int argc, char *argv[]){
    
     /////////////////////
     //  Used classes   //
-    /////////////////////  
-    LHCOOutput lhcoOutput(verbose, GenOrReco, getLHCOOutput); 
+    /////////////////////
+    LHCOOutput lhcoOutput(verbose, getLHCOOutput); 
+    if(dataSetName.find("TTbarJets") == 0) lhcoOutput.Initialize("Gen");
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
-    //TFnTuple* tfNTuple = 0;
     AnomCoupLight* anomCoupLight = 0;
 
     //Initialize LightTuple (AnomCoupTree) specific stuff:
     TTree* LightTree = new TTree("LightTree","Tree containing the AnomCoup information");
     LightTree->Branch("TheAnomCoupLight","AnomCoupLight",&anomCoupLight);
     TFile* LightFile = new TFile(("LightTree/AnomalousCouplingsLight_"+dataSetName+".root").c_str(),"RECREATE");
-
-    //Initialize TFnTuple specific stuff:
-    //TTree* TFTree = new TTree("TFTree","Tree containing the Transfer Function information");
-    //TFTree->Branch("TheTFTree","TFnTuple",&tfNTuple);
-    //TFile* TFTreeFile = new TFile("TFInformation/TransferFunctionTree.root","RECREATE");
 
     /////////////////////////////////////////
     //  LHCO Output files + GeneratorInfo  //
@@ -397,7 +388,6 @@ int main (int argc, char *argv[]){
     ////////////////////////////////////
     nEvents[d] = 0;
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
-    if (verbose > 1) cout << "	Loop over events " << endl;
 
     //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
     for (unsigned int ievt = 0; ievt < 5000; ievt++){
@@ -754,7 +744,7 @@ int main (int argc, char *argv[]){
       MSPlot["Selected_Events_pT_jet3"+leptonFlav]->Fill(selectedJets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       MSPlot["Selected_Events_pT_jet4"+leptonFlav]->Fill(selectedJets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
       MSPlot["Selected_Events_pT_lepton"+leptonFlav]->Fill(selectedLepton->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      
+
       for (unsigned int q=0; q<selectedJets.size(); q++) {
 	MSPlot["Selected_Events_pT_alljets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor);       
 	if(q<4)
@@ -904,6 +894,11 @@ int main (int argc, char *argv[]){
     } //loop on events
     cout << "\n -> " << nSelectedMu << " mu+jets and " << nSelectedEl << " e+jets events where selected" << endl;
 
+    //--------------------------------//
+    // Store the gen-level LHCO plots //
+    //--------------------------------//
+    lhcoOutput.WriteLHCOPlots(fout);
+
     //------ Store the LightAnomCoupAnalyzer tree ------//
     LightFile->cd();
     TTree* configTreeLightFile = new TTree("configTreeLightFile","configuration Tree in Light File");
@@ -951,7 +946,7 @@ int main (int argc, char *argv[]){
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name, 0, false, false, false, 1);     //string label, unsigned int RatioType, bool addRatioErrorBand, bool addErrorBand, bool ErrorBandAroundTotalInput, int scaleNPSSignal 
-    temp->Write(fout, name, true, "PlotsMacro/MSPlots/", "pdf");
+    temp->Write(fout, name, false, "PlotsMacro/MSPlots/", "pdf");
   }
 
   TDirectory* th1dir = fout->mkdir("1D_histograms");

@@ -17,9 +17,10 @@ using namespace TopTree;
 class LHCOOutput{
 
 public:
-  LHCOOutput(int, std::string, bool);
+  LHCOOutput(int, bool);
   ~LHCOOutput();
 
+  void Initialize(std::string);
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
   void StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge, vector<int> jetCombi); 
   void WriteLHCOPlots(TFile*);
