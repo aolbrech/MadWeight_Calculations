@@ -946,7 +946,7 @@ int main (int argc, char *argv[]){
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name, 0, false, false, false, 1);     //string label, unsigned int RatioType, bool addRatioErrorBand, bool addErrorBand, bool ErrorBandAroundTotalInput, int scaleNPSSignal 
-    temp->Write(fout, name, false, "PlotsMacro/MSPlots/", "pdf");
+    temp->Write(fout, name, saveAsPDF, (pathPNG+"/MSPlots/").c_str(), "pdf");
   }
 
   TDirectory* th1dir = fout->mkdir("1D_histograms");

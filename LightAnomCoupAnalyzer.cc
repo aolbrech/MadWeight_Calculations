@@ -52,15 +52,19 @@ int main (int argc, char *argv[])
   // Input & output information //
   //----------------------------//
   //ROOT file for storing plots
-  TFile* outputFile = new TFile("LightAnomCoup_Analysis.root","RECREATE");
+  string pathPNG = "PlotsMacro_Light";
+  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis.root").c_str(),"RECREATE");
+  std::cout << " Does MSPlot directory already exists at the start ?? --> " << outputFile->GetDirectory("MSPlots") << std::endl;
 
   //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
   inputFiles.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root");
+  inputFiles.push_back("LightTree/AnomalousCouplingsLight_Data_Mu.root");
 
   //Which parts of the analysis should be performed
   bool getLHCOOutput = true;
+  bool savePDF = false;
 
   //-------------------------//
   // Set analysis luminosity //
@@ -68,11 +72,6 @@ int main (int argc, char *argv[])
   float Luminosity = 19646.840; //IsoMu24_eta2p1 trigger for semiMu case!  
   std::cout << " Analysis luminosity is set to : " << Luminosity << std::endl;
 
-  //-----------------------//
-  // Load personal classes //
-  //-----------------------//
-  BTagStudy bTagStudy(verbosity);
-  LHCOOutput lhcoOutput(verbosity, "Reco", getLHCOOutput);
 
   //-----------------------//
   // Initialize histograms //
@@ -147,7 +146,14 @@ int main (int argc, char *argv[])
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
-    std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputFiles.size() << " with " << nEvent << " selected events! \n " << std::endl;
+    std::cout << " *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nEvent << " selected events! \n " << std::endl;
+
+    //-----------------------//
+    // Load personal classes //
+    //-----------------------//
+    BTagStudy bTagStudy(verbosity, datasets);
+    LHCOOutput lhcoOutput(verbosity, getLHCOOutput);
+    if(dataSetName.find("TTbarJets") == 0) lhcoOutput.Initialize("Reco");
 
     for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
       inLightTree->GetEvent(iEvt);	
@@ -174,7 +180,7 @@ int main (int argc, char *argv[])
       //ooOOooOOoo-----------------------------------------ooOOooOOoo
       //ooOOooOOoo      Start of actual analysis           ooOOooOOoo
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
-      bTagStudy.CalculateJets(selectedJets, bTagCSV, correctJetCombi, selectedLepton);
+      bTagStudy.CalculateJets(selectedJets, bTagCSV, correctJetCombi, selectedLepton, datasets[iDataSet], Luminosity*scaleFactor);
       float bTagLeptIndex = bTagStudy.getBLeptIndex(3);
 
       //---------------------------------//
@@ -196,34 +202,34 @@ int main (int argc, char *argv[])
       MSPlot["nLightJets_AfterBTag"+leptChannel]->Fill(    (bTagStudy.getLightJets(ChosenBTag)).size(),   datasets[iDataSet], true, Luminosity*scaleFactor);      
  
       //Write out the LHCO output!
-      if( getLHCOOutput == true)
+      if( getLHCOOutput == true && dataSetName.find("TTbarJets") == 0)
         lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, leptonCharge, correctJetCombi); 
     }//End of loop on events
 
     //--- Get output from bTagStudy class ---//
     bTagStudy.ReturnBTagTable(dataSetName);
-    bTagStudy.CreateHistograms(outputFile);
+    bTagStudy.CreateHistograms(outputFile, savePDF, pathPNG, iDataSet);
 
     //--- Get output from LHCOOutput class ---//
-    lhcoOutput.WriteLHCOPlots(outputFile);	
+    if(dataSetName.find("TTbarJets") == 0) lhcoOutput.WriteLHCOPlots(outputFile);
 
   }//End of loop on datasets
 
- /////////////////////////
- // Write out the plots //
- /////////////////////////
- string pathPNG = "PlotsMacro_Light";
-
+  std::cout << " Does MSPlots directory exist (in LightAnomCoupAnalyzer) --> " << outputFile->GetDirectory("MSPlots") << std::endl;
+  /////////////////////////
+  // Write out the plots //
+  /////////////////////////
   outputFile -> cd();
   mkdir((pathPNG+"/MSPlots").c_str(),0777);
 
+  std::cout << " Making the plots in the LightAnomCoupAnalyzer file " << std::endl;
   TDirectory* msdir = outputFile->mkdir("MSPlots");
   msdir->cd(); 
   for(map<string,MultiSamplePlot*>::const_iterator it = MSPlot.begin(); it != MSPlot.end(); it++){    
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name, 0, false, false, false, 1);     //string label, unsigned int RatioType, bool addRatioErrorBand, bool addErrorBand, bool ErrorBandAroundTotalInput, int scaleNPSSignal 
-    temp->Write(outputFile, name, true, (pathPNG+"/MSPlots/").c_str(), "pdf");
+    temp->Write(outputFile, name, savePDF, (pathPNG+"/MSPlots/").c_str(), "pdf");
   }
 
   TDirectory* th1dir = outputFile->mkdir("1D_histograms");
