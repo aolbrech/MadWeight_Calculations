@@ -1,11 +1,11 @@
 #ifndef LHCOOutput_h
 #define LHCOOutput_h
 
+#include <map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include "TopTreeProducer/interface/TRootMCParticle.h"
-#include "TopTreeProducer/interface/TRootJet.h"
 #include "TLorentzVector.h"
 #include "TH1.h"
 #include "TH2.h"
@@ -21,7 +21,7 @@ public:
   ~LHCOOutput();
 
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
-  void StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge, vector<int> jetCombi); 
+  void StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets,int bLept, int bHadr, int light1, int light2, int decayChannelEnum, float leptonCharge, vector<int> jetCombi); 
   void WriteLHCOPlots(TFile*);
 
   bool GenEventContentCorrect()    {return CorrectGenEvtContent;};

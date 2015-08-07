@@ -21,6 +21,7 @@
 
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
 #include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
+#include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
 
 using namespace std;
 
@@ -50,11 +51,16 @@ int main (int argc, char *argv[])
   //----------------------------//
   // Input & output information //
   //----------------------------//
+  //ROOT file for storing plots
   TFile* outputFile = new TFile("LightAnomCoup_Analysis.root","RECREATE");
 
+  //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
   inputFiles.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root");
+
+  //Which parts of the analysis should be performed
+  bool getLHCOOutput = true;
 
   //-------------------------//
   // Set analysis luminosity //
@@ -66,6 +72,7 @@ int main (int argc, char *argv[])
   // Load personal classes //
   //-----------------------//
   BTagStudy bTagStudy(verbosity);
+  LHCOOutput lhcoOutput(verbosity, "Reco", getLHCOOutput);
 
   //-----------------------//
   // Initialize histograms //
@@ -159,6 +166,7 @@ int main (int argc, char *argv[])
       std::string leptChannel;
       if(decayChannel == 0) leptChannel = "_mu";
       else if(decayChannel == 1) leptChannel = "_el";
+      float leptonCharge = light->leptonCharge();
       vector<int> correctJetCombi = light->correctJetCombi();    //0 = LeptB, 1 = HadrB, 2 = Quark1 & 3 = Quark2
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
@@ -188,8 +196,8 @@ int main (int argc, char *argv[])
       MSPlot["nLightJets_AfterBTag"+leptChannel]->Fill(    (bTagStudy.getLightJets(ChosenBTag)).size(),   datasets[iDataSet], true, Luminosity*scaleFactor);      
  
       //Write out the LHCO output!
-      //if( RecoLHCOOutput == true)
-      //  lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, LeptonRecoCharge, jetCombi); 
+      if( getLHCOOutput == true)
+        lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, leptonCharge, correctJetCombi); 
     }//End of loop on events
 
     //--- Get output from bTagStudy class ---//
@@ -197,14 +205,14 @@ int main (int argc, char *argv[])
     bTagStudy.CreateHistograms(outputFile);
 
     //--- Get output from LHCOOutput class ---//
-    //lhcoOutput.WriteLHCOPlots(outputFile);	
+    lhcoOutput.WriteLHCOPlots(outputFile);	
 
   }//End of loop on datasets
 
  /////////////////////////
  // Write out the plots //
  /////////////////////////
- string pathPNG = "PlotsMacro";
+ string pathPNG = "PlotsMacro_Light";
 
   outputFile -> cd();
   mkdir((pathPNG+"/MSPlots").c_str(),0777);
@@ -215,7 +223,7 @@ int main (int argc, char *argv[])
     MultiSamplePlot *temp = it->second;
     string name = it->first;
     temp->Draw(name, 0, false, false, false, 1);     //string label, unsigned int RatioType, bool addRatioErrorBand, bool addErrorBand, bool ErrorBandAroundTotalInput, int scaleNPSSignal 
-    temp->Write(outputFile, name, true, "PlotsMacro/MSPlots/", "pdf");
+    temp->Write(outputFile, name, true, (pathPNG+"/MSPlots/").c_str(), "pdf");
   }
 
   TDirectory* th1dir = outputFile->mkdir("1D_histograms");

@@ -262,14 +262,14 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
   }			    
 }//End of class StoreGenInfo
 
-void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptonCharge, vector<int> jetCombi){
+void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptonCharge, vector<int> jetCombi){
 
   //--- Reconstruct neutrino partially ---//
   //---   (Neutrino Pt and M needed)   ---//
-  //float NeutrinoPz=99.;                            //with this value it can be distinguished in plots!
+  if(verbose_ > 3) std::cout << " Inside StoreRecoInfo class " << std::endl;
   TLorentzVector Neutrino;
-  float NeutrinoPx = -(*lepton+*Jets[bLeptIndex]+*Jets[bHadrIndex]+*Jets[light1Index]+*Jets[light2Index]).Px();
-  float NeutrinoPy = -(*lepton+*Jets[bLeptIndex]+*Jets[bHadrIndex]+*Jets[light1Index]+*Jets[light2Index]).Py();
+  float NeutrinoPx = -(lepton+Jets[bLeptIndex]+Jets[bHadrIndex]+Jets[light1Index]+Jets[light2Index]).Px();
+  float NeutrinoPy = -(lepton+Jets[bLeptIndex]+Jets[bHadrIndex]+Jets[light1Index]+Jets[light2Index]).Py();
   Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
   Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, Neutrino.Pt());                        //Reset the Neutrino Energy to get the correct precision
   if(verbose_ > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
@@ -278,8 +278,7 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
   vector<TLorentzVector*> LHCORecoVector(6);
   vector<int> MadGraphRecoId(6,4);
   vector<float> MGRecoBtagId(6,0.0);
-  if(Jets[bLeptIndex]->btag_combinedSecondaryVertexBJetTags() > 0 && Jets[bHadrIndex]->btag_combinedSecondaryVertexBJetTags() > 0)
-    MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;
+  MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;   //Event selection is already performed and b-jets are always at the same position!!
 
   //--- Check whether the event is correctly reconstructed  ---// 
   //---  (jetCombi is initialized to 9999 for all dataSets) ---//
@@ -292,41 +291,41 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
        (light2Index == jetCombi[3] || light2Index == jetCombi[3]) )
       EventCorrectlyMatched = true;
   }
-    
+   
   //--- Plot the generator-level distributions for Pt, eta and dR ---//
   //---   --> Will be used for MG cuts comparison                 ---//
-  histo1D["Pt_Reco_LightJets"]->Fill(Jets[light1Index]->Pt()); histo1D["Pt_Reco_LightJets"]->Fill(Jets[light2Index]->Pt());
-  histo1D["Pt_Reco_BJets"]->Fill(Jets[bHadrIndex]->Pt());    histo1D["Pt_Reco_BJets"]->Fill(Jets[bLeptIndex]->Pt()); 
-  if(fabs(Lepton->type()) == 13) histo1D["Pt_Reco_Muon"]->Fill(lepton->Pt());
-  if(fabs(Lepton->type()) == 11) histo1D["Pt_Reco_Electron"]->Fill(lepton->Pt());
+  histo1D["Pt_Reco_LightJets"]->Fill(Jets[light1Index].Pt()); histo1D["Pt_Reco_LightJets"]->Fill(Jets[light2Index].Pt());
+  histo1D["Pt_Reco_BJets"]->Fill(Jets[bHadrIndex].Pt());      histo1D["Pt_Reco_BJets"]->Fill(Jets[bLeptIndex].Pt()); 
+  if(decayChannel == 0) histo1D["Pt_Reco_Muon"]->Fill(lepton.Pt());
+  if(decayChannel == 1) histo1D["Pt_Reco_Electron"]->Fill(lepton.Pt());
   histo1D["Pt_Reco_MET"]->Fill(Neutrino.Pt());
 
-  histo1D["Eta_Reco_LightJets"]->Fill(Jets[light1Index]->Eta()); histo1D["Eta_Reco_LightJets"]->Fill(Jets[light2Index]->Eta());
-  histo1D["Eta_Reco_BJets"]->Fill(Jets[bHadrIndex]->Eta());      histo1D["Eta_Reco_BJets"]->Fill(Jets[bLeptIndex]->Eta());
-  if(fabs(Lepton->type()) == 13) histo1D["Eta_Reco_Muon"]->Fill(lepton->Eta());
-  if(fabs(Lepton->type()) == 11) histo1D["Eta_Reco_Electron"]->Fill(lepton->Eta());
+  histo1D["Eta_Reco_LightJets"]->Fill(Jets[light1Index].Eta()); histo1D["Eta_Reco_LightJets"]->Fill(Jets[light2Index].Eta());
+  histo1D["Eta_Reco_BJets"]->Fill(Jets[bHadrIndex].Eta());      histo1D["Eta_Reco_BJets"]->Fill(Jets[bLeptIndex].Eta());
+  if(decayChannel == 0) histo1D["Eta_Reco_Muon"]->Fill(lepton.Eta());
+  if(decayChannel == 1) histo1D["Eta_Reco_Electron"]->Fill(lepton.Eta());
   histo1D["Eta_Reco_MET"]->Fill(Neutrino.Eta());
 
-  histo1D["deltaR_Reco_LightJets"]->Fill(Jets[light1Index]->DeltaR(*Jets[light2Index]));
-  histo1D["deltaR_Reco_BJets"]->Fill(Jets[bHadrIndex]->DeltaR(*Jets[bLeptIndex]));
-  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light1Index]->DeltaR(*Jets[bHadrIndex])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light1Index]->DeltaR(*Jets[bLeptIndex])); 
-  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light2Index]->DeltaR(*Jets[bHadrIndex])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light2Index]->DeltaR(*Jets[bLeptIndex]));
-  if(fabs(Lepton->type()) == 13){
-    histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton->DeltaR(*Jets[light1Index])); histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton->DeltaR(*Jets[light2Index]));
-    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton->DeltaR(*Jets[bHadrIndex])); histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton->DeltaR(*Jets[bLeptIndex]));
+  histo1D["deltaR_Reco_LightJets"]->Fill(Jets[light1Index].DeltaR(Jets[light2Index]));
+  histo1D["deltaR_Reco_BJets"]->Fill(Jets[bHadrIndex].DeltaR(Jets[bLeptIndex]));
+  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light1Index].DeltaR(Jets[bHadrIndex])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light1Index].DeltaR(Jets[bLeptIndex])); 
+  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light2Index].DeltaR(Jets[bHadrIndex])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light2Index].DeltaR(Jets[bLeptIndex]));
+  if(decayChannel == 0){
+    histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton.DeltaR(Jets[light1Index])); histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton.DeltaR(Jets[light2Index]));
+    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton.DeltaR(Jets[bHadrIndex]));    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton.DeltaR(Jets[bLeptIndex]));
   }
-  if(fabs(Lepton->type()) == 11){
-    histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton->DeltaR(*Jets[light1Index])); histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton->DeltaR(*Jets[light2Index]));
-    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton->DeltaR(*Jets[bHadrIndex])); histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton->DeltaR(*Jets[bLeptIndex]));
+  if(decayChannel == 1){
+    histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton.DeltaR(Jets[light1Index])); histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton.DeltaR(Jets[light2Index]));
+    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton.DeltaR(Jets[bHadrIndex]));    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton.DeltaR(Jets[bLeptIndex]));
   }
-	
+
   //---  Filling of LHCO files for reco events  ---//
   if(leptonCharge < 0.0 ){ //Negative lepton events
-    LHCORecoVector[0] = Jets[bHadrIndex]; 
-    LHCORecoVector[1] = Jets[light1Index];
-    LHCORecoVector[2] = Jets[light2Index];
-    LHCORecoVector[3] = Jets[bLeptIndex];
-    LHCORecoVector[4] = lepton;
+    LHCORecoVector[0] = &Jets[bHadrIndex]; 
+    LHCORecoVector[1] = &Jets[light1Index];
+    LHCORecoVector[2] = &Jets[light2Index];
+    LHCORecoVector[3] = &Jets[bLeptIndex];
+    LHCORecoVector[4] = &lepton;
     LHCORecoVector[5] = &Neutrino;
 
     MadGraphRecoId[5] = 6;
@@ -342,12 +341,12 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector* lepton, vector<TRootJet*> Jets, i
     }
   }//End of negative lepton
   else if(leptonCharge > 0.0 ){ //Positive lepton events
-    LHCORecoVector[0] = Jets[bLeptIndex];
-    LHCORecoVector[1] = lepton;
+    LHCORecoVector[0] = &Jets[bLeptIndex];
+    LHCORecoVector[1] = &lepton;
     LHCORecoVector[2] = &Neutrino;
-    LHCORecoVector[3] = Jets[bHadrIndex];
-    LHCORecoVector[4] = Jets[light1Index];
-    LHCORecoVector[5] = Jets[light2Index];
+    LHCORecoVector[3] = &Jets[bHadrIndex];
+    LHCORecoVector[4] = &Jets[light1Index];
+    LHCORecoVector[5] = &Jets[light2Index];
 
     MadGraphRecoId[2] = 6;
     if(decayChannel == 1){//Positive electron
