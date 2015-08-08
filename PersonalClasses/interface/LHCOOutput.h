@@ -48,7 +48,7 @@ private:
   bool writeOutput_;
   std::string GenOrReco_;
 
-  enum LeptonType_t {muPlus, muMinus, elPlus, elMinus};
+  enum LeptonType_t {muPlus, muMinus, elPlus, elMinus, notFound};
   LeptonType_t leptonType;
 
   map<string,TH1F*> histo1D;

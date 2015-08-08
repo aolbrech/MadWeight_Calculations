@@ -8,6 +8,8 @@ LHCOOutput::LHCOOutput(int verbosity, bool writeOutput){
   verbose_ = verbosity;
   writeOutput_ = writeOutput;
   GenOrReco_ = "";
+  CorrectGenEvtContent = false;
+  leptonType = notFound;
   if(verbose_ > 3) std::cout << " In constructor of LHCOOutput! " << std::endl;
 }
 
@@ -29,17 +31,16 @@ void LHCOOutput::Initialize(string GenOrReco){
   GenOrReco_ = GenOrReco; //Will be updated if the sample is TTbarJets and then the destructor will actually do something (for all other samples nothing will be executed in destructor)
   NumberNegativeElectrons = 0; NumberNegativeMuons = 0; NumberPositiveElectrons = 0; NumberPositiveMuons = 0;
   WrongEvtCounter = 0;
-  CorrectGenEvtContent = false;
   NumberNegRecoEl = 0;    NumberNegRecoMu = 0;  NumberPosRecoEl = 0;  NumberPosRecoMu = 0; 
   NrPosRecoMuCorrect = 0; NrPosRecoMuWrong = 0; NrPosRecoMuUnmatched = 0; 
 
-  if(GenOrReco == "Gen"){
+  if(GenOrReco == "Gen" && writeOutput_ == true){
     GenOutFile[0].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveMuon.lhco");
     GenOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeMuon.lhco");
     GenOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveElectron.lhco");
     GenOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeElectron.lhco");
   }
-  else if(GenOrReco == "Reco"){
+  else if(GenOrReco == "Reco" && writeOutput_ == true){
     RecoOutFile[0].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveMuon.lhco");
     RecoOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeMuon.lhco");
     RecoOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElec.lhco");
@@ -118,10 +119,10 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 
       else if((fabs(partType) == 13 || fabs(partType) == 11 ) && fabs(motherType) == 24 && fabs(grannyType) == 6){
 	EventContent[4]++;
-	string leptonType="";
-	if(fabs(partType) == 13){      if(verbose_>4) leptonType = "*Particle found: Muon";}
-	else if(fabs(partType) == 11){ if(verbose_>4) leptonType = "*Particle found: Electron";}
-	Lepton = (TRootMCParticle*) mcParticles[i]; if(verbose_ > 4) cout<<leptonType<<endl;
+	string LeptonType="";
+	if(fabs(partType) == 13){      if(verbose_>4) LeptonType = "*Particle found: Muon";}
+	else if(fabs(partType) == 11){ if(verbose_>4) LeptonType = "*Particle found: Electron";}
+	Lepton = (TRootMCParticle*) mcParticles[i]; if(verbose_ > 4) cout<<LeptonType<<endl;
       }//End of lepton identification
 	  
       else if((fabs(partType) == 14 || fabs(partType) == 12 ) && fabs(motherType) == 24 && fabs(grannyType) == 6){
