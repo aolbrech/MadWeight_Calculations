@@ -84,7 +84,7 @@ int main (int argc, char *argv[]){
   ///////////////////////////////
   //  Run specific parts only  //
   ///////////////////////////////
-  bool getLHCOOutput = true;
+  bool getLHCOOutput = false;
   bool getEventInfo = true;
   bool saveAsPDF = false;
 
@@ -220,7 +220,6 @@ int main (int argc, char *argv[]){
   histo1D["Quark1JetNumber"] = new TH1F("Quark1JetNumber","Quark1JetNumber",12,-1.5,10.5);
   histo1D["Quark2JetNumber"] = new TH1F("Quark2JetNumber","Quark2JetNumber",12,-1.5,10.5);
 
-  histo1D["lumiWeights"] = new TH1F("lumiWeights","lumiWeights", 200,-100,100);
 
   ////////////////////////////////////
   /// MultiSamplePlot
@@ -239,6 +238,8 @@ int main (int argc, char *argv[]){
   MSPlot["InitJets_METPt_METTypeOneCorrected"] = new MultiSamplePlot(datasets, "InitJets_METPt_METTypeOneCorrected", 60,0,300, "p_{T} (GeV)");
   MSPlot["InitJets_METPt_JerSmearingApplied"] = new MultiSamplePlot(datasets, "InitJets_METPt_JerSmearingApplied", 60,0,300, "p_{T} (GeV)");
 
+  MSPlot["nEventsAfterCutsSemiMu"] = new MultiSamplePlot(datasets, "nEventsAfterCutsSemiMu",15, -0.5, 14.5, "#events after each cut");
+
   //string leptFlavs[3]={"_other","_mu","_el"};
   string leptFlavs[2]={"_mu","_el"};
   for(int ii = 0; ii < 2; ii++){
@@ -251,6 +252,9 @@ int main (int argc, char *argv[]){
     MSPlot["Selected_Events_pT_alljets"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_alljets"+leptFlav, 60, 0, 600, "p_{T} (GeV)");
     MSPlot["Selected_Events_pT_lepton"+leptFlav] = new MultiSamplePlot(datasets, "Selected_Events_pT_lepton"+leptFlav,150,-100,350,"p_{t} (GeV)");
   }
+
+  MSPlot["lumiWeights"] = new MultiSamplePlot(datasets, "lumiWeights", 200,-1,2, "lumiWeight obtained from nTruePU");
+  MSPlot["nTruePU"] = new MultiSamplePlot(datasets, "nTruePU",100, 0, 75,"number of true PU interactions");
   
   ////////////////////////////////////
   /// Selection table
@@ -389,8 +393,8 @@ int main (int argc, char *argv[]){
     nEvents[d] = 0;
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -456,11 +460,29 @@ int main (int argc, char *argv[]){
 	else if( genEvt->isFullLeptonic() )
 	  scaleFactor *= (0.108*9.)*(0.108*9.);
       }
-      MSPlot["InitJets_METPt"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      if(init_jets.size() > 0) MSPlot["InitJets_Pt_jet1"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      if(init_jets.size() > 1) MSPlot["InitJets_Pt_jet2"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      if(init_jets.size() > 2) MSPlot["InitJets_Pt_jet3"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      if(init_jets.size() > 3) MSPlot["InitJets_Pt_jet4"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+
+      //------------------------//
+      // Start with corrections //
+      //------------------------//
+
+      ////////////////////////////////////////
+      //  Beam scraping and PU reweighting      --> Will be moved to nTuple analyzer!
+      ////////////////////////////////////////
+      double lumiWeight = 1;  
+      if(! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) ){   
+        if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
+        else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
+        else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
+      }
+      MSPlot["lumiWeights"]->Fill(lumiWeight, datasets[d], true, scaleFactor*Luminosity*lumiWeight);
+      MSPlot["nTruePU"]->Fill(event->nTruePU(), datasets[d], true, scaleFactor*Luminosity*lumiWeight);
+
+      //Plot some of the original kinematic information (but need this PUweight to be known ...)
+      MSPlot["InitJets_METPt"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      if(init_jets.size() > 0) MSPlot["InitJets_Pt_jet1"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      if(init_jets.size() > 1) MSPlot["InitJets_Pt_jet2"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      if(init_jets.size() > 2) MSPlot["InitJets_Pt_jet3"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      if(init_jets.size() > 3) MSPlot["InitJets_Pt_jet4"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
       
       //////////////////////////////////////
       // Apply Jet Corrections on-the-fly //   
@@ -475,18 +497,8 @@ int main (int argc, char *argv[]){
 	jetTools->correctJets(init_jets, event->kt6PFJets_rho(), false);
 	jetTools->correctMETTypeOne(init_jets, mets[0], false);
       }
-      MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 
-      ////////////////////////////////////////
-      //  Beam scraping and PU reweighting      --> Will be moved to nTuple analyzer!
-      ////////////////////////////////////////
-      double lumiWeight = 1;  
-      if(! (dataSetName == "Data" || dataSetName == "data" || dataSetName == "DATA") ){   
-        if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-        else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
-        else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
-      }
-      histo1D["lumiWeights"]->Fill(lumiWeight);	
       
       ///////////////////
       // TRIGGER SETUP //
@@ -569,7 +581,7 @@ int main (int argc, char *argv[]){
 	if (doJESShift != "nominal")
 	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //last integer (1) = nSigma
       }
-      MSPlot["InitJets_METPt_JerSmearingApplied"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["InitJets_METPt_JerSmearingApplied"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
       
       ////////////////////////////////////////////////////////
       // Access particle information before event selection //
@@ -579,7 +591,7 @@ int main (int argc, char *argv[]){
       if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosTheta"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
       
       //Accessing information and store in EventInfoFile    
-      std::string leptonTypeString[4] = {"muPlus","muMinus","elPlus","elMinus"};      //Not possible to define this in header file of LHCOOutput ...
+      std::string leptonTypeString[5] = {"muPlus","muMinus","elPlus","elMinus","notIdentified"};      //Not possible to define this in header file of LHCOOutput ...
       
       if( getEventInfo == true){
         EventInfoFile << "     " << ievt << "         ";
@@ -595,10 +607,10 @@ int main (int argc, char *argv[]){
       // EVENT SELECTION //
       /////////////////////
       if(init_jets.size() >=4){ // MSPlots before 'basic' event selection (no b-tag)
-	MSPlot["InitJets_pT_jet1_beforeEvtSel"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	MSPlot["InitJets_pT_jet2_beforeEvtSel"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	MSPlot["InitJets_pT_jet3_beforeEvtSel"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-	MSPlot["InitJets_pT_jet4_beforeEvtSel"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["InitJets_pT_jet1_beforeEvtSel"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+	MSPlot["InitJets_pT_jet2_beforeEvtSel"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+	MSPlot["InitJets_pT_jet3_beforeEvtSel"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+	MSPlot["InitJets_pT_jet4_beforeEvtSel"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
       }
       
       //Declare selection instance    
@@ -651,24 +663,34 @@ int main (int argc, char *argv[]){
       }
       
       // semi-mu selection
+      MSPlot["nEventsAfterCutsSemiMu"]->Fill(0, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
       selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);              
       if (triggedSemiMu) {
+        MSPlot["nEventsAfterCutsSemiMu"]->Fill(1, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	selecTableSemiMu.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV) {
+          MSPlot["nEventsAfterCutsSemiMu"]->Fill(2, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	  selecTableSemiMu.Fill(d,2,scaleFactor*lumiWeight);
 	  if (selectedMuons.size() == 1) {
+            MSPlot["nEventsAfterCutsSemiMu"]->Fill(3, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	    selecTableSemiMu.Fill(d,3,scaleFactor*lumiWeight);
 	    if( vetoMuons.size() == 1 ) {
+              MSPlot["nEventsAfterCutsSemiMu"]->Fill(4, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	      selecTableSemiMu.Fill(d,4,scaleFactor*lumiWeight);
 	      if (vetoElectronsSemiMu.size() == 0) {
+                MSPlot["nEventsAfterCutsSemiMu"]->Fill(5, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		selecTableSemiMu.Fill(d,5,scaleFactor*lumiWeight);
 		if (selectedJets.size() >= 1) {
+                  MSPlot["nEventsAfterCutsSemiMu"]->Fill(6, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		  selecTableSemiMu.Fill(d,6,scaleFactor*lumiWeight);
 		  if (selectedJets.size() >= 2) {
+                    MSPlot["nEventsAfterCutsSemiMu"]->Fill(7, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		    selecTableSemiMu.Fill(d,7,scaleFactor*lumiWeight);
 		    if (selectedJets.size() >= 3) {
+                      MSPlot["nEventsAfterCutsSemiMu"]->Fill(8, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		      selecTableSemiMu.Fill(d,8,scaleFactor*lumiWeight);
 		      if (selectedJets.size() >= 4) {
+                        MSPlot["nEventsAfterCutsSemiMu"]->Fill(9, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 			selecTableSemiMu.Fill(d,9,scaleFactor*lumiWeight);
 		 	eventselectedSemiMu = true;
 		      }
@@ -739,16 +761,15 @@ int main (int argc, char *argv[]){
       }
       
       // MSPlots after 'basic' event selection (no b-tag)
-      MSPlot["Selected_Events_pT_jet1"+leptonFlav]->Fill(selectedJets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["Selected_Events_pT_jet2"+leptonFlav]->Fill(selectedJets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["Selected_Events_pT_jet3"+leptonFlav]->Fill(selectedJets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["Selected_Events_pT_jet4"+leptonFlav]->Fill(selectedJets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor);
-      MSPlot["Selected_Events_pT_lepton"+leptonFlav]->Fill(selectedLepton->Pt(), datasets[d], true, Luminosity*scaleFactor);
+      MSPlot["Selected_Events_pT_jet1"+leptonFlav]->Fill(selectedJets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      MSPlot["Selected_Events_pT_jet2"+leptonFlav]->Fill(selectedJets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      MSPlot["Selected_Events_pT_jet3"+leptonFlav]->Fill(selectedJets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      MSPlot["Selected_Events_pT_jet4"+leptonFlav]->Fill(selectedJets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      MSPlot["Selected_Events_pT_lepton"+leptonFlav]->Fill(selectedLepton->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 
       for (unsigned int q=0; q<selectedJets.size(); q++) {
-	MSPlot["Selected_Events_pT_alljets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor);       
-	if(q<4)
-	  MSPlot["Selected_Events_pT_4leadingjets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor);
+	MSPlot["Selected_Events_pT_alljets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+	if(q<4) MSPlot["Selected_Events_pT_4leadingjets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
       }
       
       ////////////////////////////////////////////////////////////////////
@@ -879,6 +900,8 @@ int main (int argc, char *argv[]){
       anomCoupLight->setLeptonCharge(LeptonRecoCharge);
       anomCoupLight->setCorrectJetCombi(jetCombi);
       anomCoupLight->setMET(*mets[0]);
+      if(dataSetName.find("TTbarJets") == 0) anomCoupLight->setGenCosTheta(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
+      else anomCoupLight->setGenCosTheta(2.);
 	
       //Store the information needed for the TF (but only has value when dataset is ttbar)
       anomCoupLight->setGenVectorLight1( genLight1 );
