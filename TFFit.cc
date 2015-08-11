@@ -40,8 +40,8 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
-  bool CreateTFFromTree = true;
-  bool RunFitForTF = false;
+  bool CreateTFFromTree = false;
+  bool RunFitForTF = true;
   int nEtaBins = 4;
   //Used classes
   TFCreation tfCreation(nEtaBins);
@@ -123,12 +123,12 @@ int main (int argc, char **argv)
     //Set which TFFile should be used
     TFile *readFile, *writeFile;
     if(CreateTFFromTree == false){
-      readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_UpdatedElAndMu.root","READ");
-      writeFile = new TFile("TFInformation/CreatedTFFromDistributions_AllEvts_UpdatedElAndMu.root","RECREATE");
+      readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_LightTree.root","READ");
+      writeFile = new TFile("TFInformation/CreatedTFFromDistributions_AllEvts_LightTree.root","RECREATE");
     }
     else{
-      readFile = new TFile("TFInformation/PlotsForTransferFunctions_FromTree.root","READ");
-      writeFile = new TFile("TFInformation/CreatedTFFromDistributions_FromTree.root","RECREATE");
+      readFile = new TFile("TFInformation/PlotsForTransferFunctions_FromLightTree.root","READ");
+      writeFile = new TFile("TFInformation/CreatedTFFromDistributions_FromLightTree.root","RECREATE");
     }
     //Also draw the 2D histograms!	
 
@@ -137,18 +137,18 @@ int main (int argc, char **argv)
     int ConsHisto = 1;
     const int NrParamsDblGaus = 6;
     std::cout << " --> Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-    string HistoInfo[12][1+NrParamsDblGaus] = { "BJet_DiffPhiVsGenPt",    "0.0002", "0.022", "8000",  "0.0002",   "0.06", "3000",
-						"BJet_DiffPtVsGenPt",         "10",   "-12","20000",      "13",    "10", "-5000",
-						"BJet_DiffThetaVsGenPt",       "0",  "0.04", "2000",       "0",  "0.013", "6000",
-						"El_DiffPhiVsGenPt",           "0", "0.006",  "600",       "0", "0.0012", "1500",
-						"El_DiffPtVsGenPt",            "0",    "-2",  "600",       "0",    "0.9", "1500",
-						"El_DiffThetaVsGenPt",         "0", "0.007",  "700",       "0", "0.0013", "2500",
-						"Light_DiffPhiVsGenPt",        "0", "0.022", "8000",  "0.0004",  "0.002", "3000",
-						"Light_DiffPtVsGenPt",         "0",     "8", "4000",       "0",     "12", "4000",
-						"Light_DiffThetaVsGenPt",      "0", "-0.05", "2000",       "0", "-0.014", "6000",
-						"Mu_DiffPhiVsGenInvPt",        "0","0.0026",  "600",       "0", "0.0004",  "800",
-						"Mu_DiffInvPtVsGenInvPt",      "0", "0.0006", "500",       "0", "0.0003", "2000",
-						"Mu_DiffThetaVsGenInvPt",      "0", "0.002",  "500",       "0", "0.0004",  "500"};
+    string HistoInfo[12][1+NrParamsDblGaus] = { "BJet_DiffPhiVsGenE",   "0.0002",  "0.022", "8000", "0.0002",   "0.06",  "3000",
+						"BJet_DiffEVsGenE",         "10",    "-12","20000",     "13",     "10", "-5000",
+						"BJet_DiffThetaVsGenE",      "0",   "0.04", "2000",      "0",  "0.013",  "6000",
+						"El_DiffPhiVsGenE",          "0",  "0.006",  "600",      "0", "0.0012",  "1500",
+						"El_DiffEVsGenE",            "0",     "-2",  "600",      "0",    "0.9",  "1500",
+						"El_DiffThetaVsGenE",        "0",  "0.007",  "700",      "0", "0.0013",  "2500",
+						"Light_DiffPhiVsGenE",       "0",  "0.022", "8000", "0.0004",  "0.002",  "3000",
+						"Light_DiffEVsGenE",         "0",      "8", "4000",      "0",     "12",  "4000",
+						"Light_DiffThetaVsGenE",     "0", " -0.05", "2000",      "0", "-0.014",  "6000",
+						"Mu_DiffPhiVsGenInvE",       "0", "0.0026",  "600",      "0", "0.0004",   "800",
+						"Mu_DiffInvEVsGenInvE",      "0", "0.0006",  "500",      "0", "0.0003",  "2000",
+						"Mu_DiffThetaVsGenInvE",     "0",  "0.002",  "500",      "0", "0.0004",   "500"};
 
     //Set the booleans!
     bool useROOTClass = false;
@@ -176,8 +176,8 @@ int main (int argc, char **argv)
       myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
       myTransferCard[ii]<<"#|                                                                       |"<<endl;
       myTransferCard[ii]<<"#|    To change the transfer function run ./bin/change_tf.py             |"<<endl;
-      if(ii ==0 ) myTransferCard[ii]<<"#|    Current parametrization : DblGaus_PT                               |"<<endl;
-      if(ii ==1 ) myTransferCard[ii]<<"#|    Current parametrization : DblGausEtaBins_PT                        |"<<endl;
+      if(ii ==0 ) myTransferCard[ii]<<"#|    Current parametrization : DblGaus_E                               |"<<endl;
+      if(ii ==1 ) myTransferCard[ii]<<"#|    Current parametrization : DblGausEtaBins_E                        |"<<endl;
       myTransferCard[ii]<<"#|    Contains full double Gaussian for all kinematics and particles     |"<<endl;
       if(ii == 0) myTransferCard[ii]<<"#|    ** Information for all eta-bins **                                 |"<<endl;
       if(ii == 1) myTransferCard[ii]<<"#|    ** Information for the "<<nEtaBins<<" considered eta-bins separately **         |"<<endl;
@@ -258,7 +258,7 @@ int main (int argc, char **argv)
 
       //Set the correct startValues and fit the distribution
       for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = atof((HistoInfo[iHisto][1+jj]).c_str());
-    
+   
       for(int iEtaBin = 0; iEtaBin <= nEtaBins; iEtaBin++)
 	tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, writeFile, iEtaBin, readFile);
     
@@ -270,10 +270,10 @@ int main (int argc, char **argv)
       else if(HistoInfo[iHisto][0].find("Mu_") == 0)  {PartName = "muon";     BlockName = "TF_muon_";     particles = "mu";        widthType = "thin";}
       else if(HistoInfo[iHisto][0].find("El_") == 0)  {PartName = "electron"; BlockName = "TF_electron_"; particles = "el";        widthType = "thin";}
       // -- 2) which kinematic variable
-      if(HistoInfo[iHisto][0].find("DiffPt") <= HistoInfo[iHisto][0].size())         {CaptionName = PartName+" transverse momentum";            KinVarName = "PT";   }
+      if(HistoInfo[iHisto][0].find("DiffE") <= HistoInfo[iHisto][0].size())         {CaptionName = PartName+" transverse momentum";            KinVarName = "E";   }
       else if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" polar angle \\theta";            KinVarName = "THETA";}
       else if(HistoInfo[iHisto][0].find("DiffPhi") <= HistoInfo[iHisto][0].size())   {CaptionName = PartName+" azimuthal angle \\phi";          KinVarName = "PHI";  }
-      else if(HistoInfo[iHisto][0].find("DiffInvPt") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName = "PT";   } //MadWeight only knows 'PT'
+      else if(HistoInfo[iHisto][0].find("DiffInvE") <= HistoInfo[iHisto][0].size()) {CaptionName = PartName+" inverse of transverse momentum"; KinVarName = "E";   } //MadWeight only knows 'PT'
       BlockName = BlockName + KinVarName;
     
       //Write the TF's in a table and in a MadWeight card!:
@@ -284,8 +284,8 @@ int main (int argc, char **argv)
       myTFTable<<"\\centering" << endl;
       myTFTable<<"\\begin{tabular}{c|ccc}" << endl;
       myTFTable<<"\\hline" << endl;
-      if(PartName != "muon") myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{p_{T}}$) & $a_{i2}$ ($p_{T}$)" << "\\\\" << endl;
-      else                   myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{\\frac{1}{p_{T}}}$) & $a_{i2}$ ($\\frac{1}{p_{T}}$)" << "\\\\" << endl;
+      if(PartName != "muon") myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
+      else                   myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{\\frac{1}{E}}$) & $a_{i2}$ ($\\frac{1}{E}$)" << "\\\\" << endl;
       myTFTable<<"\\hline" << endl;
     
       for(int ii = 0; ii < 2; ii++){
@@ -294,18 +294,18 @@ int main (int argc, char **argv)
 	  myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
 	  myTransferCard[ii]<<"#|     Parameter for particles: "<<PartName << endl; 
 	  myTransferCard[ii]<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
-	  if(PartName != "muon") myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(pT) + C*pT  for width of gaussians "<< endl;
-	  else                   myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(1/pT) + C*1/pT  for width of gaussians "<< endl;
-	  if(PartName != "muon") myTransferCard[ii]<<"#|      -->                        A + B*pT + C*pT² + D*pT³ + F*pT^4"<< endl;
-	  else                   myTransferCard[ii]<<"#|      -->                        A + B*1/pT + C*1/pT² + D*1/pT³ + F*1/pT^4"<< endl;
+	  if(PartName != "muon") myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
+	  else                   myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(1/E) + C*1/E  for width of gaussians "<< endl;
+	  if(PartName != "muon") myTransferCard[ii]<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
+	  else                   myTransferCard[ii]<<"#|      -->                        A + B*1/E + C*1/E² + D*1/E³ + F*1/E^4"<< endl;
 	  myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
 
 	  myTF[ii]<<"\n##**********************************************************************##"<<endl;
 	  myTF[ii]<<"##             TF for "<<PartName<<"                                      "<<endl;
 	  myTF[ii]<<"##**********************************************************************##"<<endl;
 	  myTF[ii]<<"<block name='"<<PartName<<"'>   #name can be anything"<<endl;
-	  if(PartName != "muon") myTF[ii]<<"  <info> double gaussian with parameter depending on the transverse energy </info>"<<endl;
-	  else                   myTF[ii]<<"  <info> double gaussian with parameter depending on the inverse of transverse energy </info>"<<endl;
+	  if(PartName != "muon") myTF[ii]<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
+	  else                   myTF[ii]<<"  <info> double gaussian with parameter depending on the inverse of energy </info>"<<endl;
 	  myTF[ii]<<"  <particles> "<<particles<<" </particles>"<<endl;
 	  myTF[ii]<<"  <width_type> "<<widthType<<" </width_type>"<<endl;
 	  myTF[ii]<<"  #width type should be thin or large (thin is for energy accurate up to 5-10%)";
@@ -337,7 +337,8 @@ int main (int argc, char **argv)
     myTFTable.close();
     
     //Delete the used pointers:
-    delete readFile,writeFile;
+    delete readFile;
+    delete writeFile;
   }//End of TF calculation when ROOT file is used!
   
   cout << "It took us " << ((double)clock() - start) / CLOCKS_PER_SEC << " to run the program" << endl;
