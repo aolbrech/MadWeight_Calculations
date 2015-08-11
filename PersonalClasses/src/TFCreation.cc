@@ -338,7 +338,6 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   delete [] hlist;
 }
 
-
 void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], bool ChangeFitRange){
   //------------------------------------------------------------------------------------------//
   // Main difference with the Root class FitSlicesY() is the plotting of histograms !        

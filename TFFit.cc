@@ -77,7 +77,7 @@ int main (int argc, char **argv)
 
 	inputTFTree->GetEvent(iEvt);
         vector<TLorentzVector> selectedJets = light->selectedJets();
-        vector<int> correctJetCombi = light->jetCombi();
+        vector<int> correctJetCombi = light->correctJetCombi();
         int correctLeptBIndex = correctJetCombi[0];
         int correctHadrBIndex = correctJetCombi[1];
         int correctQuark1Index = correctJetCombi[2];
@@ -96,8 +96,6 @@ int main (int argc, char **argv)
 	  genPart[3] = light->genVectorLeptB();
 	  genPart[4] = light->genVectorLepton();
   
-          std::cout << " Pt of genVectorLeptB : " << genPart[3].Pt() << std::endl;
-
 	  if(genPart[4].M() <= 0.05) decayChannel = isSemiEl; //Electron channel --> decayChannel == 1
 	  else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
 
