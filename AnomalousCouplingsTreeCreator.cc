@@ -206,10 +206,10 @@ int main (int argc, char *argv[]){
   map<string,TH1F*> histo1D;     
   map<string,TH2F*> histo2D;  
   
-  histo1D["genPt_Muon"] = new TH1F("genPt_Muon","genPt_Muon",400,0,200);
-  histo1D["recoPt_Muon"] = new TH1F("recoPt_Muon","recoPt_Muon",400,0,200);
-  histo1D["genPt_Elec"] = new TH1F("genPt_Elec","genPt_Elec",400,0,200);
-  histo1D["recoPt_Elec"] = new TH1F("recoPt_Elec","recoPt_Elec",400,0,200);
+  histo1D["Pt_genEvtMuon"] = new TH1F("Pt_genEvtMuon","Pt distribution for genEvt muon",100,0,150);
+  histo1D["Mass_genEvtMuon"] = new TH1F("Mass_genEvtMuon","Mass distribution for genEvt muon",100,0,0.2);
+  histo1D["Pt_genEvtElec"] = new TH1F("Pt_genEvtElec","Pt distribution for genEvt electron",100,0,150);
+  histo1D["Mass_genEvtElec"] = new TH1F("Mass_genEvtElec","Mass distribution for genEvt electron",100,0,0.001);
 
   histo1D["StCosTheta"] = new TH1F("StCosTheta","StCosTheta",200,-1,1);
   histo1D["CorrectBLeptCSVDiscr"] = new TH1F("CorrectBLeptCSVDiscr","CorrectBLeptCSVDiscr",400,-2.5,1.5);
@@ -219,7 +219,6 @@ int main (int argc, char *argv[]){
 
   histo1D["Quark1JetNumber"] = new TH1F("Quark1JetNumber","Quark1JetNumber",12,-1.5,10.5);
   histo1D["Quark2JetNumber"] = new TH1F("Quark2JetNumber","Quark2JetNumber",12,-1.5,10.5);
-
 
   ////////////////////////////////////
   /// MultiSamplePlot
@@ -324,7 +323,8 @@ int main (int argc, char *argv[]){
     int iFile = -1;
     string dataSetName = datasets[d]->Name();
     
-    int nSelectedMu=0, nSelectedEl=0;
+    int nSelectedMuPos = 0, nSelectedMuNeg = 0;
+    int nSelectedElPos = 0, nSelectedElNeg = 0;
     
     if (verbose > 1){
       cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
@@ -386,15 +386,14 @@ int main (int argc, char *argv[]){
       EventInfoFile << " Event Number      Lepton Type       Event selection       selectedChannelNumber " << endl;
     }
     unsigned int NumberCorrectEvents = 0; //Counts the number of semi-leptonic events
-    
     ////////////////////////////////////
     //	loop on events
     ////////////////////////////////////
     nEvents[d] = 0;
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    for (unsigned int ievt = 0; ievt < 10000; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -409,7 +408,7 @@ int main (int argc, char *argv[]){
       nEvents[d]++;
       
       if(ievt%1000 == 0)
-	std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)datasets[d]->NofEvtsToRunOver())*100  << "%)" << " +> # selected: " << nSelectedMu << " (mu+jets) " << nSelectedEl << " (e+jets)" << flush<<"\r";
+	std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)datasets[d]->NofEvtsToRunOver())*100  << "%)" << " +> # selected: " << nSelectedMuPos+nSelectedMuNeg << " (mu+jets) " << nSelectedElPos+nSelectedElNeg << " (e+jets)" << flush<<"\r";
       
       ////////////////
       // LOAD EVENT //
@@ -427,21 +426,22 @@ int main (int argc, char *argv[]){
         treeLoader.LoadMCEvent(ievt, 0, 0, mcParticles,false);  
         sort(mcParticles.begin(),mcParticles.end(),HighestPt()); // HighestPt() is included from the Selection class
       }
-      
+
       // check with genEvent which ttbar channel it is
       if(dataSetName.find("TTbarJets") == 0)  {
 	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
 	if( genEvt->isSemiLeptonic(TRootGenEvent::kMuon) ) {
-	  isSemiMu=true;
-	  isSemiE=false;
+	  isSemiMu=true; isSemiE=false;
+          histo1D["Mass_genEvtMuon"]->Fill(genEvt->lepton().M());
+          histo1D["Pt_genEvtMuon"]->Fill(genEvt->lepton().Pt());
 	}
 	else if( genEvt->isSemiLeptonic(TRootGenEvent::kElec) ) {
-	  isSemiMu=false;
-	  isSemiE=true;
+	  isSemiMu=false; isSemiE=true;
+          histo1D["Mass_genEvtElec"]->Fill(genEvt->lepton().M());
+          histo1D["Pt_genEvtElec"]->Fill(genEvt->lepton().Pt());
 	}
 	else {
-	  isSemiMu=false;
-	  isSemiE=false;
+	  isSemiMu=false; isSemiE=false;
 	}
       }
       
@@ -499,7 +499,6 @@ int main (int argc, char *argv[]){
       }
       MSPlot["InitJets_METPt_METTypeOneCorrected"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 
-      
       ///////////////////
       // TRIGGER SETUP //
       ///////////////////
@@ -582,14 +581,15 @@ int main (int argc, char *argv[]){
 	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //last integer (1) = nSigma
       }
       MSPlot["InitJets_METPt_JerSmearingApplied"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-      
+
       ////////////////////////////////////////////////////////
       // Access particle information before event selection //
       // Write this information to LHCO Output for MW       //
       ////////////////////////////////////////////////////////
       lhcoOutput.StoreGenInfo(mcParticles);
-      if(lhcoOutput.GenEventContentCorrect()) histo1D["StCosTheta"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton())); 	
-      
+      if(lhcoOutput.GenEventContentCorrect())
+        histo1D["StCosTheta"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
+
       //Accessing information and store in EventInfoFile    
       std::string leptonTypeString[5] = {"muPlus","muMinus","elPlus","elMinus","notIdentified"};      //Not possible to define this in header file of LHCOOutput ...
       
@@ -620,7 +620,7 @@ int main (int argc, char *argv[]){
       selection.setElectronCuts(32,2.5,0.1,0.02,0.5,0.3,0); 
       selection.setLooseMuonCuts(10,2.5,0.2);
       selection.setLooseElectronCuts(20,2.5,0.15,0.);
-      
+
       bool triggedSemiMu = false;
       bool triggedSemiEl = false;
 
@@ -748,14 +748,18 @@ int main (int argc, char *argv[]){
       TLorentzVector* selectedLepton;
       float LeptonRecoCharge;
       if (eventselectedSemiMu){
-        nSelectedMu++; decayChannel = semiMu;
         selectedLepton = (TLorentzVector*)selectedMuons[0]; LeptonRecoCharge = selectedMuons[0]->charge();
+        decayChannel = semiMu;
+        if(LeptonRecoCharge > 0) nSelectedMuPos++;
+        else if(LeptonRecoCharge < 0) nSelectedMuNeg++;
 	datasetsPlot = datasetsMu; Luminosity = LuminosityMu;
         leptonFlav="_mu";
       }
       else if (eventselectedSemiEl){
-        nSelectedEl++; decayChannel = semiEl;
+        decayChannel = semiEl;
         selectedLepton = (TLorentzVector*)selectedElectrons[0]; LeptonRecoCharge = selectedElectrons[0]->charge();
+        if(LeptonRecoCharge > 0) nSelectedElPos++;
+        else if(LeptonRecoCharge < 0) nSelectedElNeg++;
 	datasetsPlot = datasetsEl; Luminosity = LuminosityEl;
         leptonFlav="_el";
       }
@@ -791,12 +795,20 @@ int main (int argc, char *argv[]){
 	  if(mcParticles[i]->status() != 3) continue;
 	  
 	  //Muon identification:
-	  if(mcParticles[i]->type() == 13 && mcParticles[i]->motherType() == -24 && mcParticles[i]->grannyType() == -6){if(muMinusFromTop) cerr<<"muMinusFromTop already true"<<endl; muMinusFromTop = true;}
-	  if(mcParticles[i]->type() == -13 && mcParticles[i]->motherType() == 24 && mcParticles[i]->grannyType() == 6){if(muPlusFromTop) cerr<<"muPlusFromTop already true"<<endl; muPlusFromTop = true;}
+	  if(mcParticles[i]->type() == 13 && mcParticles[i]->motherType() == -24 && mcParticles[i]->grannyType() == -6){
+            if(muMinusFromTop) cerr<<"muMinusFromTop already true"<<endl; muMinusFromTop = true;
+          }
+	  if(mcParticles[i]->type() == -13 && mcParticles[i]->motherType() == 24 && mcParticles[i]->grannyType() == 6){
+            if(muPlusFromTop) cerr<<"muPlusFromTop already true"<<endl; muPlusFromTop = true;
+          }
 	  
 	  //Electron identification:
-	  if(mcParticles[i]->type() == 11 && mcParticles[i]->motherType() == -24 && mcParticles[i]->grannyType() == -6){if(elMinusFromTop) cerr<<"elMinusFromTop already true"<<endl; elMinusFromTop = true;}
-	  if(mcParticles[i]->type() == -11 && mcParticles[i]->motherType() == 24 && mcParticles[i]->grannyType() == 6){if(elPlusFromTop) cerr<<"elPlusFromTop already true"<<endl; elPlusFromTop = true;}
+	  if(mcParticles[i]->type() == 11 && mcParticles[i]->motherType() == -24 && mcParticles[i]->grannyType() == -6){
+            if(elMinusFromTop) cerr<<"elMinusFromTop already true"<<endl; elMinusFromTop = true;
+          }
+	  if(mcParticles[i]->type() == -11 && mcParticles[i]->motherType() == 24 && mcParticles[i]->grannyType() == 6){
+            if(elPlusFromTop) cerr<<"elPlusFromTop already true"<<endl; elPlusFromTop = true;
+          }
 	  
 	  if( abs(mcParticles[i]->type()) < 6 || abs(mcParticles[i]->type()) == 21 ){
 	    mcParticlesTLV.push_back(*mcParticles[i]); mcParticlesMatching.push_back(*mcParticles[i]);
@@ -872,6 +884,7 @@ int main (int argc, char *argv[]){
           genHadrB = (TLorentzVector) mcParticlesMatching[hadronicBJet_.second];
           genLeptB = (TLorentzVector) mcParticlesMatching[leptonicBJet_.second];
           genLepton = (TLorentzVector) *lhcoOutput.getGenLepton();
+
 	}//End of matched particles reconstructed
       
       }//End of TTbarJets!
@@ -915,7 +928,7 @@ int main (int argc, char *argv[]){
       //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
     } //loop on events
-    cout << "\n -> " << nSelectedMu << " mu+jets and " << nSelectedEl << " e+jets events where selected" << endl;
+    cout << "\n -> " << nSelectedMuPos << " mu+ , " << nSelectedMuNeg << " mu-, " << nSelectedElPos << " el+ and " << nSelectedElNeg << " el- events where selected" << endl;
 
     //--------------------------------//
     // Store the gen-level LHCO plots //
