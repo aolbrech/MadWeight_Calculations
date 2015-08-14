@@ -325,6 +325,8 @@ int main (int argc, char *argv[]){
     
     int nSelectedMuPos = 0, nSelectedMuNeg = 0;
     int nSelectedElPos = 0, nSelectedElNeg = 0;
+    int nGenMu = 0;
+    int nGenEl = 0;
     
     if (verbose > 1){
       cout << "   Dataset " << d << ": " << datasets[d]->Name () << "/ title : " << datasets[d]->Title () << endl;
@@ -392,8 +394,8 @@ int main (int argc, char *argv[]){
     nEvents[d] = 0;
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
 
-    //for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    for (unsigned int ievt = 0; ievt < 10000; ievt++){
+    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
+    //for (unsigned int ievt = 0; ievt < 500; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -434,11 +436,13 @@ int main (int argc, char *argv[]){
 	  isSemiMu=true; isSemiE=false;
           histo1D["Mass_genEvtMuon"]->Fill(genEvt->lepton().M());
           histo1D["Pt_genEvtMuon"]->Fill(genEvt->lepton().Pt());
+          nGenMu++;
 	}
 	else if( genEvt->isSemiLeptonic(TRootGenEvent::kElec) ) {
 	  isSemiMu=false; isSemiE=true;
           histo1D["Mass_genEvtElec"]->Fill(genEvt->lepton().M());
           histo1D["Pt_genEvtElec"]->Fill(genEvt->lepton().Pt());
+          nGenEl++;
 	}
 	else {
 	  isSemiMu=false; isSemiE=false;
@@ -913,7 +917,7 @@ int main (int argc, char *argv[]){
       anomCoupLight->setLeptonCharge(LeptonRecoCharge);
       anomCoupLight->setCorrectJetCombi(jetCombi);
       anomCoupLight->setMET(*mets[0]);
-      if(dataSetName.find("TTbarJets") == 0) anomCoupLight->setGenCosTheta(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
+      if(dataSetName.find("TTbarJets") == 0 && lhcoOutput.GenEventContentCorrect()) anomCoupLight->setGenCosTheta(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
       else anomCoupLight->setGenCosTheta(2.);
 	
       //Store the information needed for the TF (but only has value when dataset is ttbar)
@@ -928,7 +932,8 @@ int main (int argc, char *argv[]){
       //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
     } //loop on events
-    cout << "\n -> " << nSelectedMuPos << " mu+ , " << nSelectedMuNeg << " mu-, " << nSelectedElPos << " el+ and " << nSelectedElNeg << " el- events where selected" << endl;
+    cout << "\n -> " << nSelectedMuPos << " mu+ " << " and " << nSelectedMuNeg << " mu- events are selected on " << nGenMu << " ==> " << (float)(nSelectedMuPos+nSelectedMuNeg)/(float)nGenMu << endl;
+    cout <<   " -> " << nSelectedElPos << " el+ " << " and " << nSelectedElNeg << " el- events are selected on " << nGenEl << " ==> " << (float)(nSelectedElPos+nSelectedElNeg)/(float)nGenEl << endl;
 
     //--------------------------------//
     // Store the gen-level LHCO plots //
