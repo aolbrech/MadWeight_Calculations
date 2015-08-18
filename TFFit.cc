@@ -40,16 +40,20 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
-  bool CreateTFFromTree = false;
+  bool CreateTFFromTree = true; 
   bool RunFitForTF = true;
-  int nEtaBins = 4;
+  int nEtaBins = 1;
+
+  std::string EtaConsidered = "";
+  if(nEtaBins == 4) EtaConsidered = "_etaBins";
+
   //Used classes
   TFCreation tfCreation(nEtaBins);
 
   if(CreateTFFromTree){
     //Load the TFTree information
     vector<string> inputTFRoot;
-    inputTFRoot.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root"); 
+    inputTFRoot.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept_AlmostAllTTbarEvents_9August2015.root"); 
 
     for(unsigned int iDataSet = 0; iDataSet <inputTFRoot.size(); iDataSet++){
       TFile* inputTFFile = new TFile(inputTFRoot[iDataSet].c_str(),"READ");
@@ -61,12 +65,11 @@ int main (int argc, char **argv)
 
       //Set the number of selected events (for loop on events):
       int nEvent = inputTFTree->GetEntries(); 
-      // int nEvent = 100000;
+      //int nEvent = 10000;
       std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
       //Initialize the TFCreation class (create all histograms):
-      tfCreation.InitializeVariables(nEtaBins); //Add option of nr eta bins here!
-
+      tfCreation.InitializeVariables(); 
       //Read in the TLorenztVectors:
       TLorentzVector genPart[5], recoPart[5];
       enum DecayChannel_t {isSemiMu, isSemiEl};
@@ -100,12 +103,12 @@ int main (int argc, char **argv)
 	  else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
 
 	  //Fill the histograms of the TFCreation class!
-	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, nEtaBins);
+	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
 
         }//Only for matched particles reconstructed!
       }//Loop on events
 
-      TFile* fillFile = new TFile("TFInformation/PlotsForTransferFunctions_FromLightTree.root","RECREATE");
+      TFile* fillFile = new TFile(("TFInformation/PlotsForTransferFunctions_FromLightTree"+EtaConsidered+".root").c_str(),"RECREATE");
       std::cout << "    ----> Information writen in file : " << fillFile->GetName() << std::endl << std::endl;
       tfCreation.WritePlots(fillFile);
       fillFile->Close();
@@ -123,32 +126,46 @@ int main (int argc, char **argv)
     //Set which TFFile should be used
     TFile *readFile, *writeFile;
     if(CreateTFFromTree == false){
-      readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_LightTree.root","READ");
-      writeFile = new TFile("TFInformation/CreatedTFFromDistributions_AllEvts_LightTree.root","RECREATE");
+      //readFile = new TFile("TFInformation/PlotsForTransferFunctions_AllEvts_LightTree.root","READ");
+      writeFile = new TFile(("TFInformation/CreatedTFFromDistributions_AllEvts_LightTree"+EtaConsidered+".root").c_str(),"RECREATE");
+      readFile = new TFile(("TFInformation/PlotsForTransferFunctions_FromLightTree"+EtaConsidered+".root").c_str(),"READ");
+      //writeFile = new TFile("TFInformation/CreatedTFFromDistributions_FromLightTree.root","RECREATE");
     }
     else{
-      readFile = new TFile("TFInformation/PlotsForTransferFunctions_FromLightTree.root","READ");
-      writeFile = new TFile("TFInformation/CreatedTFFromDistributions_FromLightTree.root","RECREATE");
+      readFile = new TFile(("TFInformation/PlotsForTransferFunctions_FromLightTree"+EtaConsidered+".root").c_str(),"READ");
+      writeFile = new TFile(("TFInformation/CreatedTFFromDistributions_FromLightTree"+EtaConsidered+".root").c_str(),"RECREATE");
     }
     //Also draw the 2D histograms!	
 
     //Define all histograms which need to be fitted!
     const int NrFitHistos = 12;
     int ConsHisto = 1;
-    const int NrParamsDblGaus = 6;
+    const int NrParamsDblGaus = 5;
     std::cout << " --> Will look at " << NrFitHistos << " different histograms to fit! " << std::endl;
-    string HistoInfo[12][1+NrParamsDblGaus] = { "BJet_DiffPhiVsGenE",   "0.0002",  "0.022", "8000", "0.0002",   "0.06",  "3000",
-						"BJet_DiffEVsGenE",         "10",    "-12","20000",     "13",     "10", "-5000",
-						"BJet_DiffThetaVsGenE",      "0",   "0.04", "2000",      "0",  "0.013",  "6000",
-						"El_DiffPhiVsGenE",          "0",  "0.006",  "600",      "0", "0.0012",  "1500",
-						"El_DiffEVsGenE",            "0",     "-2",  "600",      "0",    "0.9",  "1500",
-						"El_DiffThetaVsGenE",        "0",  "0.007",  "700",      "0", "0.0013",  "2500",
-						"Light_DiffPhiVsGenE",       "0",  "0.022", "8000", "0.0004",  "0.002",  "3000",
-						"Light_DiffEVsGenE",         "0",      "8", "4000",      "0",     "12",  "4000",
-						"Light_DiffThetaVsGenE",     "0", " -0.05", "2000",      "0", "-0.014",  "6000",
-						"Mu_DiffPhiVsGenInvE",       "0", "0.0026",  "600",      "0", "0.0004",   "800",
-						"Mu_DiffInvEVsGenInvE",      "0", "0.0006",  "500",      "0", "0.0003",  "2000",
-						"Mu_DiffThetaVsGenInvE",     "0",  "0.002",  "500",      "0", "0.0004",   "500"};
+    string HistoInfo[24][1+NrParamsDblGaus] = { "BJet_DiffPhiVsGenE",   "0.0002",  "0.022", "0.", "0.0002",   "0.06",
+						"BJet_DiffEVsGenE",         "10",    "-12", "0.",     "13",     "10",
+						"BJet_DiffThetaVsGenE",      "0",   "0.04", "0.",      "0",  "0.013",
+						"El_DiffPhiVsGenE",          "0",  "0.006", "0.",      "0", "0.0012",
+						"El_DiffEVsGenE",            "0",     "-2", "0.",      "0",    "0.9",
+						"El_DiffThetaVsGenE",        "0",  "0.007", "0.",      "0", "0.0013",
+						"Light_DiffPhiVsGenE",       "0",  "0.022", "0.", "0.0004",  "0.002",
+						"Light_DiffEVsGenE",         "0",      "8", "0.",      "0",     "12",
+						"Light_DiffThetaVsGenE",     "0", " -0.05", "0.",      "0", "-0.014",
+						"Mu_DiffPhiVsGenInvE",       "0", "0.0026", "0.",      "0", "0.0004",
+						"Mu_DiffInvEVsGenInvE",      "0", "0.0006", "0.",      "0", "0.0003",
+						"Mu_DiffThetaVsGenInvE",     "0",  "0.002", "0.",      "0", "0.0004",
+						"BJet_DiffPhiVsGenPt",  "0.0002",  "0.022", "0.", "0.0002",   "0.06",
+						"BJet_DiffPtVsGenPt",       "10",    "-12", "0.",     "13",     "10",
+						"BJet_DiffThetaVsGenPt",     "0",   "0.04", "0.",      "0",  "0.013",
+						"El_DiffPhiVsGenPt",         "0",  "0.006", "0.",      "0", "0.0012",
+						"El_DiffPtVsGenPt",          "0",     "-2", "0.",      "0",    "0.9",
+						"El_DiffThetaVsGenPt",       "0",  "0.007", "0.",      "0", "0.0013",
+						"Light_DiffPhiVsGenPt",      "0",  "0.022", "0.", "0.0004",  "0.002",
+						"Light_DiffPtVsGenPt",       "0",      "8", "0.",      "0",     "12",
+						"Light_DiffThetaVsGenPt",    "0", " -0.05", "0.",      "0", "-0.014",
+						"Mu_DiffPhiVsGenInvPt",      "0", "0.0026", "0.",      "0", "0.0004",
+						"Mu_DiffInvPtVsGenInvPt",    "0", "0.0006", "0.",      "0", "0.0003",
+						"Mu_DiffThetaVsGenInvPt",    "0",  "0.002", "0.",      "0", "0.0004"};
 
     //Set the booleans!
     bool useROOTClass = false;
@@ -156,101 +173,103 @@ int main (int argc, char **argv)
     int histoNrForStartValues = NrFitHistos; //Not needed if useStartValues = false
     bool useStartArray = true;
     bool changeFitRange = true;
+    //Use a enum to distinguish between EDep and PtDep!! 
  
-    ofstream myTFTable, myTransferCard[2], myTF[2];
+    ofstream myTFTable, myTransferCard, myTF;
     myTFTable.open("TFInformation/TransferFunctions_TABLE.tex");
-    myTF[0].open("TFInformation/TF_user.dat");
-    myTF[1].open("TFInformation/TF_user_etaBins.dat");
-    myTransferCard[0].open("TFInformation/transfer_card_user.dat");
-    myTransferCard[1].open("TFInformation/transfer_card_user_etaBins.dat");
-
-    for(int ii = 0; ii < 2; ii++){
-      myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
-      myTransferCard[ii]<<"#|                         TRANSFER_CARD.DAT                             |"<<endl;
-      myTransferCard[ii]<<"#|                                                                       |"<<endl;
-      myTransferCard[ii]<<"#|     Author: Annik Olbrechts (VUB)                                     |"<<endl;
-      myTransferCard[ii]<<"#|             27 November 2014                                          |"<<endl;
-      myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
-      myTransferCard[ii]<<"#|     This file is generated automaticly by MADWEIGHT                   |"<<endl;
-      myTransferCard[ii]<<"#|     card generation version: 1.0.0                                    |"<<endl;
-      myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;
-      myTransferCard[ii]<<"#|                                                                       |"<<endl;
-      myTransferCard[ii]<<"#|    To change the transfer function run ./bin/change_tf.py             |"<<endl;
-      if(ii ==0 ) myTransferCard[ii]<<"#|    Current parametrization : DblGaus_E                               |"<<endl;
-      if(ii ==1 ) myTransferCard[ii]<<"#|    Current parametrization : DblGausEtaBins_E                        |"<<endl;
-      myTransferCard[ii]<<"#|    Contains full double Gaussian for all kinematics and particles     |"<<endl;
-      if(ii == 0) myTransferCard[ii]<<"#|    ** Information for all eta-bins **                                 |"<<endl;
-      if(ii == 1) myTransferCard[ii]<<"#|    ** Information for the "<<nEtaBins<<" considered eta-bins separately **         |"<<endl;
-      myTransferCard[ii]<<"#+-----------------------------------------------------------------------+"<<endl;	
-
-      myTF[ii]<<"<file>## ##################################################################"<<endl;
-      myTF[ii]<<"##                                                                       ##"<<endl;
-      myTF[ii]<<"##                          Matrix Element                               ##"<<endl;
-      myTF[ii]<<"##                          ==============                               ##"<<endl;
-      myTF[ii]<<"##                                                                       ##"<<endl;
-      myTF[ii]<<"##		    Generate the transfer functions                     ##"<<endl;
-      myTF[ii]<<"##	             -------------------------------                    ##"<<endl;
-      myTF[ii]<<"## 	     			                                        ##"<<endl;
-      myTF[ii]<<"##				                                        ##"<<endl;
-      myTF[ii]<<"##    Author: Annik Olbrechts (VUB)                                      ##"<<endl;
-      myTF[ii]<<"##   			                                                ##"<<endl;
-      myTF[ii]<<"##    Version:     1.0.0                         		        ##"<<endl;
-      myTF[ii]<<"##    Last change: 27/11/14			                        ##"<<endl;
-      myTF[ii]<<"##					                                ##"<<endl;
-      myTF[ii]<<"###########################################################################"<<endl;
-      myTF[ii]<<"###########################################################################"<<endl;
-      myTF[ii]<<"##				                                        ##"<<endl;
-      myTF[ii]<<"##				                                        ##"<<endl;
-      myTF[ii]<<"##    Instructions:			                                ##"<<endl;
-      myTF[ii]<<"##								        ##"<<endl;
-      myTF[ii]<<"##	- This program  creates transfer functions in THETA/PHI/E       ##"<<endl;
-      myTF[ii]<<"##	- Those functions must be defined in f77 standard               ##"<<endl;
-      myTF[ii]<<"##	- In addition to each transfer function(START_TF), you MUST give##"<<endl;
-      myTF[ii]<<"##	   the typical width associated to your function (START_WIDTH)	##"<<endl;
-      myTF[ii]<<"##      - If a transfer functions is not defined here it will by default ##"<<endl;
-      myTF[ii]<<"##          - equals to one for neutrino/neutralino                      ##"<<endl;
-      myTF[ii]<<"##          - a delta functions for the rest                             ##"<<endl;
-      myTF[ii]<<"###########################################################################"<<endl;
-      myTF[ii]<<"##                                                                       ##"<<endl;
-      myTF[ii]<<"##   Syntax/variables:                                                   ## "<<endl;
-      myTF[ii]<<"##                                                                       ##"<<endl;
-      myTF[ii]<<"##  - a definition for transfer functions should define the variable tf  ##"<<endl;
-      myTF[ii]<<"##    while a definition for the width shoud define the variable width   ## "<<endl;                              
-      myTF[ii]<<"##	- You can use all standard f77 functions. (All variables are	##"<<endl;
-      myTF[ii]<<"##		in double precision format). 	                        ##"<<endl;
-      myTF[ii]<<"##	- The experimental event is  defined by the variable pexp(i)    ##"<<endl;
-      myTF[ii]<<"##		i=0->3 (0->E,1->Px,2->Py,3->Pz)	                        ##"<<endl;
-      myTF[ii]<<"##	- The partonic event is defined by the variable p(i)	        ##"<<endl;
-      myTF[ii]<<"##		i=0->3 (0->E,1->Px,2->Py,3->Pz)			        ##"<<endl;
-      myTF[ii]<<"##		sigma can not depend on those variables		        ##"<<endl;
-      myTF[ii]<<"##	- You can use 10 local variables			        ##"<<endl;
-      myTF[ii]<<"##		(double precision):  prov1,prov2,...,prov10	        ##"<<endl;
-      myTF[ii]<<"##	- You can call specific functions on p or pexp:	                ##"<<endl;
-      myTF[ii]<<"##		-pt(p)   : transverse momenta 			        ##"<<endl;
-      myTF[ii]<<"##		-eta(p)  : pseudo-rapidity			        ##"<<endl;
-      myTF[ii]<<"##		-rap(p)  : rapidity					##"<<endl;
-      myTF[ii]<<"##		-theta(p): polar angle				        ##"<<endl;
-      myTF[ii]<<"##		-phi(p)	 : azimuthal angle				##"<<endl;
-      myTF[ii]<<"##	- The whole LHCO information is available.                      ##"<<endl;
-      myTF[ii]<<"##              -run_number,trigger                       		##"<<endl;
-      myTF[ii]<<"##		-eta_init(N),phi_init(N),pt_init(N)                     ##"<<endl;
-      myTF[ii]<<"##              -j_mass(N),ntrk(N),btag(N),had_em(N)     	        ##"<<endl;
-      myTF[ii]<<"##		-dummy1(N),dummy2(N)		                        ##"<<endl;
-      myTF[ii]<<"##	    N is the LHCO tag(first column)	                        ##"<<endl;
-      myTF[ii]<<"##		- current tag is n_lhco  				##"<<endl;
-      myTF[ii]<<"##		- tag for missing ET is met_lhco			##"<<endl;
-      myTF[ii]<<"##				  					##"<<endl;
-      myTF[ii]<<"##	- You can incorporate parameters that will be passed through    ##"<<endl;
-      myTF[ii]<<"##	        the transfert_card.dat. Those ones must have the        ##"<<endl;
-      myTF[ii]<<"##		following syntax: #1,#2,#3,.. You can restart 		##"<<endl;
-      myTF[ii]<<"##		the assignement for each different transfer function	##"<<endl;
-      myTF[ii]<<"##	- In addition to each transfer function(tf_), you MUST give	##"<<endl;
-      myTF[ii]<<"##		the typical width associated to your function (sigma_)	##"<<endl;
-      myTF[ii]<<"##		This is needed for the phase space generator      	##"<<endl;
-      myTF[ii]<<"##									##"<<endl;
-      myTF[ii]<<"###########################################################################"<<endl;
-      myTF[ii]<<"###########################################################################"<<endl;
+    if(nEtaBins == 1){
+      myTF.open("TFInformation/TF_user.dat");
+      myTransferCard.open("TFInformation/transfer_card_user.dat");
     }
+    else{
+      myTF.open("TFInformation/TF_user_etaBins.dat");
+      myTransferCard.open("TFInformation/transfer_card_user_etaBins.dat");
+    }
+
+    myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;
+    myTransferCard<<"#|                         TRANSFER_CARD.DAT                             |"<<endl;
+    myTransferCard<<"#|                                                                       |"<<endl;
+    myTransferCard<<"#|     Author: Annik Olbrechts (VUB)                                     |"<<endl;
+    myTransferCard<<"#|             27 November 2014                                          |"<<endl;
+    myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;
+    myTransferCard<<"#|     This file is generated automaticly by MADWEIGHT                   |"<<endl;
+    myTransferCard<<"#|     card generation version: 1.0.0                                    |"<<endl;
+    myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;
+    myTransferCard<<"#|                                                                       |"<<endl;
+    myTransferCard<<"#|    To change the transfer function run ./bin/change_tf.py             |"<<endl;
+    if(nEtaBins == 1) myTransferCard<<"#|    Current parametrization : DblGaus_E                                |"<<endl;
+    else              myTransferCard<<"#|    Current parametrization : DblGausEtaBins_E                        |"<<endl;
+    myTransferCard<<"#|    Contains full double Gaussian for all kinematics and particles     |"<<endl;
+    if(nEtaBins == 1) myTransferCard<<"#|    ** Information for all eta-bins **                                 |"<<endl;
+    else              myTransferCard<<"#|    ** Information for the "<<nEtaBins<<" considered eta-bins separately **         |"<<endl;
+    myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;	
+
+    myTF<<"<file>## ##################################################################"<<endl;
+    myTF<<"##                                                                       ##"<<endl;
+    myTF<<"##                          Matrix Element                               ##"<<endl;
+    myTF<<"##                          ==============                               ##"<<endl;
+    myTF<<"##                                                                       ##"<<endl;
+    myTF<<"##		    Generate the transfer functions                       ##"<<endl;
+    myTF<<"##	             -------------------------------                      ##"<<endl;
+    myTF<<"## 	     			                                          ##"<<endl;
+    myTF<<"##				                                          ##"<<endl;
+    myTF<<"##    Author: Annik Olbrechts (VUB)                                      ##"<<endl;
+    myTF<<"##   			                                                  ##"<<endl;
+    myTF<<"##    Version:     1.0.0                         		          ##"<<endl;
+    myTF<<"##    Last change: 27/11/14			                          ##"<<endl;
+    myTF<<"##					                                  ##"<<endl;
+    myTF<<"###########################################################################"<<endl;
+    myTF<<"###########################################################################"<<endl;
+    myTF<<"##				                                          ##"<<endl;
+    myTF<<"##    Instructions:			                                  ##"<<endl;
+    myTF<<"##								          ##"<<endl;
+    myTF<<"##	- This program  creates transfer functions in THETA/PHI/E         ##"<<endl;
+    myTF<<"##	- Those functions must be defined in f77 standard                 ##"<<endl;
+    myTF<<"##	- In addition to each transfer function(START_TF), you MUST give  ##"<<endl;
+    myTF<<"##	   the typical width associated to your function (START_WIDTH)	  ##"<<endl;
+    myTF<<"##      - If a transfer functions is not defined here it will by default ##"<<endl;
+    myTF<<"##          - equals to one for neutrino/neutralino                      ##"<<endl;
+    myTF<<"##          - a delta functions for the rest                             ##"<<endl;
+    myTF<<"###########################################################################"<<endl;
+    myTF<<"##                                                                       ##"<<endl;
+    myTF<<"##   Syntax/variables:                                                   ## "<<endl;
+    myTF<<"##                                                                       ##"<<endl;
+    myTF<<"##  - a definition for transfer functions should define the variable tf  ##"<<endl;
+    myTF<<"##    while a definition for the width shoud define the variable width   ## "<<endl;                              
+    myTF<<"##	- You can use all standard f77 functions. (All variables are	  ##"<<endl;
+    myTF<<"##		in double precision format). 	                          ##"<<endl;
+    myTF<<"##	- The experimental event is  defined by the variable pexp(i)      ##"<<endl;
+    myTF<<"##		i=0->3 (0->E,1->Px,2->Py,3->Pz)	                          ##"<<endl;
+    myTF<<"##	- The partonic event is defined by the variable p(i)	          ##"<<endl;
+    myTF<<"##		i=0->3 (0->E,1->Px,2->Py,3->Pz)			          ##"<<endl;
+    myTF<<"##		sigma can not depend on those variables		          ##"<<endl;
+    myTF<<"##	- You can use 10 local variables			          ##"<<endl;
+    myTF<<"##		(double precision):  prov1,prov2,...,prov10	          ##"<<endl;
+    myTF<<"##	- You can call specific functions on p or pexp:	                  ##"<<endl;
+    myTF<<"##		-pt(p)   : transverse momenta 			          ##"<<endl;
+    myTF<<"##		-eta(p)  : pseudo-rapidity			          ##"<<endl;
+    myTF<<"##		-rap(p)  : rapidity					  ##"<<endl;
+    myTF<<"##		-theta(p): polar angle				          ##"<<endl;
+    myTF<<"##		-phi(p)	 : azimuthal angle				  ##"<<endl;
+    myTF<<"##	- The whole LHCO information is available.                        ##"<<endl;
+    myTF<<"##              -run_number,trigger                       		  ##"<<endl;
+    myTF<<"##		-eta_init(N),phi_init(N),pt_init(N)                       ##"<<endl;
+    myTF<<"##              -j_mass(N),ntrk(N),btag(N),had_em(N)     	          ##"<<endl;
+    myTF<<"##		-dummy1(N),dummy2(N)		                          ##"<<endl;
+    myTF<<"##	    N is the LHCO tag(first column)	                          ##"<<endl;
+    myTF<<"##		- current tag is n_lhco  				  ##"<<endl;
+    myTF<<"##		- tag for missing ET is met_lhco			  ##"<<endl;
+    myTF<<"##				  					  ##"<<endl;
+    myTF<<"##	- You can incorporate parameters that will be passed through      ##"<<endl;
+    myTF<<"##	        the transfert_card.dat. Those ones must have the          ##"<<endl;
+    myTF<<"##		following syntax: #1,#2,#3,.. You can restart 		  ##"<<endl;
+    myTF<<"##		the assignement for each different transfer function	  ##"<<endl;
+    myTF<<"##	- In addition to each transfer function(tf_), you MUST give	  ##"<<endl;
+    myTF<<"##		the typical width associated to your function (sigma_)	  ##"<<endl;
+    myTF<<"##		This is needed for the phase space generator      	  ##"<<endl;
+    myTF<<"##									  ##"<<endl;
+    myTF<<"###########################################################################"<<endl;
+    myTF<<"###########################################################################"<<endl;
 
     float startValues[NrParamsDblGaus];
     for(int iHisto = 0; iHisto < NrFitHistos; iHisto++){
@@ -258,8 +277,8 @@ int main (int argc, char **argv)
 
       //Set the correct startValues and fit the distribution
       for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = atof((HistoInfo[iHisto][1+jj]).c_str());
-   
-      for(int iEtaBin = 0; iEtaBin <= nEtaBins; iEtaBin++)
+ 
+      for(int iEtaBin = 1; iEtaBin <= nEtaBins; iEtaBin++)
 	tfCreation.CalculateTFFromFile(HistoInfo[iHisto][0], useStartValues, histoNrForStartValues, useROOTClass, useStartArray, startValues, changeFitRange, writeFile, iEtaBin, readFile);
     
       //Set the caption correct:
@@ -288,39 +307,38 @@ int main (int argc, char **argv)
       else                   myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{\\frac{1}{E}}$) & $a_{i2}$ ($\\frac{1}{E}$)" << "\\\\" << endl;
       myTFTable<<"\\hline" << endl;
     
-      for(int ii = 0; ii < 2; ii++){
-	if(HistoInfo[iHisto][0].find("DiffPhi") <= HistoInfo[iHisto][0].size() || HistoInfo[iHisto][0].find("DiffInvPhi") <= HistoInfo[iHisto][0].size() ){   //Only write this for the first variable! 
+      if(HistoInfo[iHisto][0].find("DiffPhi") <= HistoInfo[iHisto][0].size() || HistoInfo[iHisto][0].find("DiffInvPhi") <= HistoInfo[iHisto][0].size() ){   //Only write this for the first variable! 
 
-	  myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
-	  myTransferCard[ii]<<"#|     Parameter for particles: "<<PartName << endl; 
-	  myTransferCard[ii]<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
-	  if(PartName != "muon") myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
-	  else                   myTransferCard[ii]<<"#|      --> Dependency defined as: A + B*sqrt(1/E) + C*1/E  for width of gaussians "<< endl;
-	  if(PartName != "muon") myTransferCard[ii]<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
-	  else                   myTransferCard[ii]<<"#|      -->                        A + B*1/E + C*1/E² + D*1/E³ + F*1/E^4"<< endl;
-	  myTransferCard[ii]<<"#+--------------------------------------------------------------------------------------+" <<endl;
+	myTransferCard<<"#+--------------------------------------------------------------------------------------+" <<endl;
+	myTransferCard<<"#|     Parameter for particles: "<<PartName << endl; 
+	myTransferCard<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
+	if(PartName != "muon") myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
+	else                   myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(1/E) + C*1/E  for width of gaussians "<< endl;
+	if(PartName != "muon") myTransferCard<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
+	else                   myTransferCard<<"#|      -->                        A + B*1/E + C*1/E² + D*1/E³ + F*1/E^4"<< endl;
+	myTransferCard<<"#+--------------------------------------------------------------------------------------+" <<endl;
 
-	  myTF[ii]<<"\n##**********************************************************************##"<<endl;
-	  myTF[ii]<<"##             TF for "<<PartName<<"                                      "<<endl;
-	  myTF[ii]<<"##**********************************************************************##"<<endl;
-	  myTF[ii]<<"<block name='"<<PartName<<"'>   #name can be anything"<<endl;
-	  if(PartName != "muon") myTF[ii]<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
-	  else                   myTF[ii]<<"  <info> double gaussian with parameter depending on the inverse of energy </info>"<<endl;
-	  myTF[ii]<<"  <particles> "<<particles<<" </particles>"<<endl;
-	  myTF[ii]<<"  <width_type> "<<widthType<<" </width_type>"<<endl;
-	  myTF[ii]<<"  #width type should be thin or large (thin is for energy accurate up to 5-10%)";
-	}
-	//Output for all variables!
-	myTransferCard[ii]<<"BLOCK "<<BlockName << endl;
-                
-	myTF[ii]<<"\n  <variable name='"<<KinVarName<<"'>"<<endl;
-	myTF[ii]<<"    <tf>";
+	myTF<<"\n##**********************************************************************##"<<endl;
+	myTF<<"##             TF for "<<PartName<<"                                      "<<endl;
+	myTF<<"##**********************************************************************##"<<endl;
+	myTF<<"<block name='"<<PartName<<"'>   #name can be anything"<<endl;
+	if(PartName != "muon") myTF<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
+	else                   myTF<<"  <info> double gaussian with parameter depending on the inverse of energy </info>"<<endl;
+	myTF<<"  <particles> "<<particles<<" </particles>"<<endl;
+	myTF<<"  <width_type> "<<widthType<<" </width_type>"<<endl;
+	myTF<<"  #width type should be thin or large (thin is for energy accurate up to 5-10%)";
       }
+
+      //Output for all variables!
+      myTransferCard<<"BLOCK "<<BlockName << endl;
+                
+      myTF<<"\n  <variable name='"<<KinVarName<<"'>"<<endl;
+      myTF<<"    <tf>";
     
-      tfCreation.WriteTF(myTFTable, myTransferCard[0], myTransferCard[1], myTF[0], myTF[1], nEtaBins, KinVarName, PartName);  
+      tfCreation.WriteTF(myTFTable, myTransferCard, myTF, KinVarName, PartName);  
       if(HistoInfo[iHisto][0].find("DiffTheta") <= HistoInfo[iHisto][0].size() ){
-	if(HistoInfo[iHisto][0].find("Mu_") <= HistoInfo[iHisto][0].size() ){ myTF[0] << "\n</block>\n</file>"; myTF[1] << "\n</block>\n</file>";}
-	else{                                                                 myTF[0] << "\n</block>";          myTF[1] << "\n</block>";}
+	if(HistoInfo[iHisto][0].find("Mu_") <= HistoInfo[iHisto][0].size() ){ myTF << "\n</block>\n</file>";}
+	else{                                                                 myTF << "\n</block>";         }
       }
     
       myTFTable<<"\\hline" << endl;
@@ -330,10 +348,8 @@ int main (int argc, char **argv)
     //Close the root file where all histograms are saved together with the output files!
     readFile->Close();
     writeFile->Close();
-    myTF[0].close();
-    myTF[1].close();
-    myTransferCard[0].close();
-    myTransferCard[1].close();
+    myTF.close();
+    myTransferCard.close();
     myTFTable.close();
     
     //Delete the used pointers:
