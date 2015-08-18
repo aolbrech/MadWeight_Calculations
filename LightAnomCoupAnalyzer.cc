@@ -41,7 +41,6 @@ int main (int argc, char *argv[])
   //  -->Used in bTagStudy  //
   //------------------------//
   int verbosity                 = 1;
-  //0 muet
   //1 Main Info
   //2 mcParticlesMatchin Info
   //3 
@@ -54,24 +53,25 @@ int main (int argc, char *argv[])
   //ROOT file for storing plots
   string pathPNG = "PlotsMacro_Light";
   TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis.root").c_str(),"RECREATE");
-  std::cout << " Does MSPlot directory already exists at the start ?? --> " << outputFile->GetDirectory("MSPlots") << std::endl;
 
   //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
   inputFiles.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root");
-  inputFiles.push_back("LightTree/AnomalousCouplingsLight_Data_Mu.root");
-
+  //inputFiles.push_back("LightTree/AnomalousCouplingsLight_Data_Mu.root");
+  if(verbosity > 0) std::cout << " - All ROOT files loaded " << std::endl;
+	
   //Which parts of the analysis should be performed
   bool getLHCOOutput = true;
   bool savePDF = false;
+  bool splitLeptonCharge = false;
+  bool getCorrectWrong = false;
 
   //-------------------------//
   // Set analysis luminosity //
   //-------------------------//
   float Luminosity = 19646.840; //IsoMu24_eta2p1 trigger for semiMu case!  
-  std::cout << " Analysis luminosity is set to : " << Luminosity << std::endl;
-
+  if(verbosity > 0) std::cout << " - Analysis luminosity is set to : " << Luminosity << std::endl;
 
   //-----------------------//
   // Initialize histograms //
@@ -106,6 +106,7 @@ int main (int argc, char *argv[])
     tmpDS->SetEquivalentLuminosity( dataSet->EquivalentLumi() );
     datasets.push_back( tmpDS );
   }
+  if(verbosity > 0) std::cout << " - Datasets initialized " << std::endl;
 
   //--------------------------//
   //  Initialize MSPlots      //
@@ -116,12 +117,12 @@ int main (int argc, char *argv[])
   for(int ii = 0; ii < 2; ii++){
     string leptFlav = leptFlavs[ii];
  
-    MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,14, -3.5, 10.5, "# selected jets");
-    MSPlot["nBTaggedJets_BeforeBTag"+leptFlav]  = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav, 14, -3.5, 10.5, "# b-tagged jets");
-    MSPlot["nLightJets_BeforeBTag"+leptFlav]    = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,   14, -3.5, 10.5, "# light jets");
-    MSPlot["nSelectedJets_AfterBTag"+leptFlav]  = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav, 14, -3.5, 10.5, "# selected jets");
-    MSPlot["nBTaggedJets_AfterBTag"+leptFlav]   = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,  14, -3.5, 10.5, "# b-tagged jets");
-    MSPlot["nLightJets_AfterBTag"+leptFlav]     = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,    14, -3.5, 10.5, "# light jets");
+    MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
+    MSPlot["nBTaggedJets_BeforeBTag"+leptFlav]  = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav, 10, -0.5, 9.5, "# b-tagged jets");
+    MSPlot["nLightJets_BeforeBTag"+leptFlav]    = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,   10, -0.5, 9.5, "# light jets");
+    MSPlot["nSelectedJets_AfterBTag"+leptFlav]  = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav, 10, -0.5, 9.5, "# selected jets");
+    MSPlot["nBTaggedJets_AfterBTag"+leptFlav]   = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,  10, -0.5, 9.5, "# b-tagged jets");
+    MSPlot["nLightJets_AfterBTag"+leptFlav]     = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,    10, -0.5, 9.5, "# light jets");
   }
 
   //--------------------------------//
@@ -146,17 +147,21 @@ int main (int argc, char *argv[])
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
-    std::cout << " *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nEvent << " selected events! \n " << std::endl;
+    if(verbosity > 0) std::cout << "   *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nEvent << " selected events! " << std::endl;
 
     //-----------------------//
     // Load personal classes //
     //-----------------------//
     BTagStudy bTagStudy(verbosity, datasets);
-    LHCOOutput lhcoOutput(verbosity, getLHCOOutput);
+    LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonCharge, getCorrectWrong);
     if(dataSetName.find("TTbarJets") == 0) lhcoOutput.Initialize("Reco");
 
+    int nSelectedMu = 0, nSelectedEl = 0;
     for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
-      inLightTree->GetEvent(iEvt);	
+      inLightTree->GetEvent(iEvt);
+
+      if(iEvt%5000 == 0)
+	std::cout<<"    Processing the "<<iEvt<<"th event ("<< ((double)iEvt/(double)nEvent)*100<<"%)"<<" -> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
 
       int eventId = light->eventID();
       int runId = light->runID();
@@ -195,6 +200,8 @@ int main (int argc, char *argv[])
 
       //Apply the event selection
       if( (bTagStudy.getbTaggedJets(ChosenBTag)).size() < 2 || (bTagStudy.getLightJets(ChosenBTag)).size() < 2 ) continue;
+      if(decayChannel == 0) nSelectedMu += 1;
+      else if(decayChannel == 1) nSelectedEl += 1;
 
       //Identical MSPlots with number of jets information after requiring at least two b-jets and at least 2 light jets!
       MSPlot["nSelectedJets_AfterBTag"+leptChannel]->Fill( selectedJets.size(),                           datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -213,16 +220,17 @@ int main (int argc, char *argv[])
     //--- Get output from LHCOOutput class ---//
     if(dataSetName.find("TTbarJets") == 0) lhcoOutput.WriteLHCOPlots(outputFile);
 
+    inputFile->Close();
+    delete inputFile;
   }//End of loop on datasets
 
-  std::cout << " Does MSPlots directory exist (in LightAnomCoupAnalyzer) --> " << outputFile->GetDirectory("MSPlots") << std::endl;
   /////////////////////////
   // Write out the plots //
   /////////////////////////
   outputFile -> cd();
   mkdir((pathPNG+"/MSPlots").c_str(),0777);
 
-  std::cout << " Making the plots in the LightAnomCoupAnalyzer file " << std::endl;
+  if(verbosity > 0) std::cout << "\n - Making the plots in the LightAnomCoupAnalyzer file " << std::endl;
   TDirectory* msdir = outputFile->mkdir("MSPlots");
   msdir->cd(); 
   for(map<string,MultiSamplePlot*>::const_iterator it = MSPlot.begin(); it != MSPlot.end(); it++){    
