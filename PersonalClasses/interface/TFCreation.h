@@ -31,7 +31,7 @@ class TFCreation{
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel, int NrEtaBins);
 	void CalculateTF(bool, bool, bool, bool);
         void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, TFile*, int, TFile*);
-	void FitSliceClassCode(TH2F*, int, const char*[], bool);
+	void FitSliceClassCode(TH2F*, int, std::string [], bool);
         std::vector<double> SetFitRange(std::string, int);
 	void SetStartValuesDoubleGaussian(int, bool, std::string);
 	void WriteTF(ostream &output, ostream &card, ostream &cardEta, ostream &TF, ostream &TFEta, int, std::string, std::string);

@@ -6,7 +6,7 @@ TFCreation::TFCreation(int nEtaBins){
   ///////////////////////////////////////
   //
   // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
-  doubleGaussianFit = new TF1("doubleGaussianFit","[2]*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2))))+[5]*(TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");
+  doubleGaussianFit = new TF1("doubleGaussianFit","(1/(TMath::Sqrt(2*TMath::Pi())*([1]+[2]*[4])))*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[2]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");
   
   //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
   caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
@@ -351,9 +351,9 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   histoFitDir->cd();
 
   //Set parameter names
-  const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
+  std::string parnames[5]={"a1","a2","a3","a4","a5"};
   const int npar = doubleGaussianFit->GetNpar();
-  for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);    
+  for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii].c_str());    
 
   caloEnergyFit->SetRange( fitHisto->GetXaxis()->GetXmin(), fitHisto->GetXaxis()->GetXmax() );
 
@@ -377,11 +377,11 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   for( int ipar = 0; ipar < npar; ipar++ ){
     if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
       caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");    //Quartic function as fit!
-      for(int ii = 0; ii < 5; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
+      for(int ii = 0; ii < 5; ii++) caloEnergyFit->SetParName(ii, ( parnames[ipar]+tostr(ii)).c_str() );
     }
     else{
       caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
-      for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() );
+      for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames[ipar]+tostr(ii)).c_str() );
     }
 
     double FitMax = fitHisto->GetXaxis()->GetXmax();
@@ -392,7 +392,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
       }
     }
 		
-    for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( string(parnames[ipar])+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
+    for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames[ipar]+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
     caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
     hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
@@ -406,7 +406,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   delete [] hlist;
 }
 
-void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parnames[], bool ChangeFitRange){
+void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, std::string parNames [], bool ChangeFitRange){
   //------------------------------------------------------------------------------------------//
   // Main difference with the Root class FitSlicesY() is the plotting of histograms !        
   // In the Root class the distribution of each hlist histogram is not given!
@@ -418,7 +418,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
   for(int ipar=0 ; ipar < npar; ipar++){
 
     float hlistMax = histoFit->GetXaxis()->GetXmax() + ((histoFit->GetXaxis()->GetXmax()-histoFit->GetXaxis()->GetXmin())/histoFit->GetXaxis()->GetNbins());	
-    hlist[ipar] = new TH1D( (string(histoFit->GetName())+"_"+parnames[ipar]).c_str(), (string(histoFit->GetName())+" : Fitted value of "+parnames[ipar]).c_str(), histoFit->GetXaxis()->GetNbins()+1, histoFit->GetXaxis()->GetXmin(), hlistMax);
+    hlist[ipar] = new TH1D( (string(histoFit->GetName())+"_"+parNames[ipar]).c_str(), (string(histoFit->GetName())+" : Fitted value of "+parNames[ipar]).c_str(), histoFit->GetXaxis()->GetNbins()+1, histoFit->GetXaxis()->GetXmin(), hlistMax);
     hlist[ipar]->GetXaxis()->SetTitle(histoFit->GetXaxis()->GetTitle());
   }
   hlist[npar] = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
@@ -488,42 +488,43 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, int npar, const char* parname
 void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray, std::string histoName){
 
   if(useStartArray == true){
-    for(int ii = 0; ii < 6; ii++){
+    for(int ii = 0; ii < 5; ii++){
       doubleGaussianFit->SetParameter(ii, startValuesArray[ii]);
+      std::cout << " Start value set to : " << startValuesArray[ii] << std::endl;
       if(histoName.find("_Eta_") <= histoName.size() && (ii == 2 || ii == 5) ){ doubleGaussianFit->SetParameter(ii, startValuesArray[ii]/4.); }
     }
   }
   else{
     //if(whichHisto==1 || whichHisto==4 || whichHisto == 7){ // for E transfer function of JETS (and elec -- added as test ...)
-    //  float StartValues[] = {-8,18,63,0,8.6,4.1};          //First three values are for the first broad gaussian (central, sigma and constant value respectively)
+    //  float StartValues[] = {-8,18,0,0,8.6};          //First three values are for the first broad gaussian (central, sigma and constant value respectively)
     //                                                       //Second three values are the same for the second narrow gaussian
-    //  for(int ii = 0; ii < 6; ii++)
+    //  for(int ii = 0; ii < 5; ii++)
     //	doubleGaussianFit->SetParameter(ii,StartValues[ii]);
     //}
     if(whichHisto==1 || whichHisto==4 || whichHisto == 7){ // for Pt transfer function of JETS (and elec -- added as test ...)
-      float StartValues[] = {-8,18,63,0,8.6,4.1};          //First three values are for the first broad gaussian (central, sigma and constant value respectively)
+      float StartValues[] = {-8,18,0,0,8.6};          //First three values are for the first broad gaussian (central, sigma and constant value respectively)
                                                            //Second three values are the same for the second narrow gaussian
-      for(int ii = 0; ii < 6; ii++)
+      for(int ii = 0; ii < 5; ii++)
 	doubleGaussianFit->SetParameter(ii,StartValues[ii]);
     }
     else if (whichHisto==0 || whichHisto==2 || whichHisto==3 || whichHisto==5 || whichHisto == 6 || whichHisto == 8) { //for theta and phi transfer functions of JETS (and elec)
-      float StartValues[] = {0,0.038,77,0.004,0.011,6.5};
-      for(int ii = 0; ii < 6; ii++)
+      float StartValues[] = {0,0.038,0,0.004,0.011};
+      for(int ii = 0; ii < 5; ii++)
 	doubleGaussianFit->SetParameter(ii, StartValues[ii]);
     }
     //else if (whichHisto==10){ //for 1/E transfer function of muons
-    //  float StartValues[] = {-0.0008,0.001,24,-0.0001,0.0001,4};
-    //  for(int ii = 0; ii < 6; ii++)
+    //  float StartValues[] = {-0.0008,0.001,0,-0.0001,0.0001};
+    //  for(int ii = 0; ii < 5; ii++)
     //	doubleGaussianFit->SetParameter(ii, StartValues[ii]);
     //}
     else if (whichHisto==10){ //for 1/Pt transfer function of muons
-      float StartValues[] = {-0.0008,0.001,24,-0.0001,0.0001,4};
-      for(int ii = 0; ii < 6; ii++)
+      float StartValues[] = {-0.0008,0.001,0,-0.0001,0.0001};
+      for(int ii = 0; ii < 5; ii++)
 	doubleGaussianFit->SetParameter(ii, StartValues[ii]);
     }
     else if (whichHisto==9 || whichHisto==11) { //for theta, phi transfer function of muons
-      float StartValues[] = {0.0,0.01,24,0,0.001,4};
-      for(int ii = 0; ii < 6; ii++)
+      float StartValues[] = {0.0,0.01,0,0,0.001};
+      for(int ii = 0; ii < 5; ii++)
 	doubleGaussianFit->SetParameter(ii, StartValues[ii]);
     }
   }
@@ -531,14 +532,14 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
 
 void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTransferCardEta, ostream &myTF, ostream &myTFEta, int nEtaBins, std::string kinVar, std::string partName){ 
 
-  const int NrPars = 6;
+  const int NrPars = 5;
   std::string pVar[2] = {"p(0)","pt(p)"};
   std::string pexpVar[2] = {"pexp(0)","pt(pexp)"};
 
   //Is Pt or E dependent considered
   int whichDep = 0;
 
-  string ParamName[NrPars] = {"Mean broad gaussian", "Width broad gaussian","Constant broad gaussian","Mean narrow gaussian","Width narrow gaussian","Constant narrow gaussian"};
+  string ParamName[NrPars] = {"Mean broad gaussian", "Width broad gaussian","Relative Constant gaussians","Mean narrow gaussian","Width narrow gaussian"};
   string TFDependencyWidth[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
   string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4)"};
   string WidthDependency[3] = {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]+")"};
@@ -645,7 +646,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
 
 void TFCreation::PlotDlbGaus(TH2F* fitHisto, TFile* plotsFile){
 /*
-  const int NrParsDblGaus = 6;
+  const int NrParsDblGaus = 5;
   const int EPars = 15;
   float EGenValues[EPars] = {10,15,20,30,40,55,70,85,100,115,130,145,160,180,200};
 
@@ -1050,9 +1051,9 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
   if(doFits == true){
 
     //Set parameter names
-    const char* parnames[6]={"a1","a2","a3","a4","a5","a6"};
+    std::string parnames[5]={"a1","a2","a3","a4","a5"};
     const int npar = doubleGaussianFit->GetNpar();
-    for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii]);
+    for(int ii = 0; ii < npar; ii++) doubleGaussianFit->SetParName(ii,parnames[ii].c_str());
 
     ///////////////////////////////////////////
     //  Choose the correct histogram to fit  //
@@ -1135,7 +1136,7 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
       for( int ipar = 0; ipar < npar; ipar++ ){
 
 	//give names to the parameters		
-	for(int jj = 0; jj < 3; jj++) caloEnergyFit->SetParName(jj, ( string(parnames[ipar])+tostr(jj)).c_str() );
+	for(int jj = 0; jj < 3; jj++) caloEnergyFit->SetParName(jj, ( parnames[ipar]+tostr(jj)).c_str() );
 	caloEnergyFit->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_Fit").c_str() );
 	hlist[ipar]->SetName( (string(histoForFit->GetName())+"_"+parnames[ipar]+"_PointsAndFit").c_str() );
 
