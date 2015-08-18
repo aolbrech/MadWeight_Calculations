@@ -87,6 +87,8 @@ int main (int argc, char *argv[]){
   bool getLHCOOutput = false;
   bool getEventInfo = true;
   bool saveAsPDF = false;
+  bool splitLeptonCharge = false;
+  bool getCorrectWrong = false;
 
   //Values needed for bTag study (select which of the 6 b-tag options is optimal!)
   int ChosenBTag;
@@ -369,7 +371,7 @@ int main (int argc, char *argv[]){
     /////////////////////
     //  Used classes   //
     /////////////////////
-    LHCOOutput lhcoOutput(verbose, getLHCOOutput); 
+    LHCOOutput lhcoOutput(verbose, getLHCOOutput, splitLeptonCharge, getCorrectWrong); 
     if(dataSetName.find("TTbarJets") == 0) lhcoOutput.Initialize("Gen");
     KinematicFunctions kinFunctions;  //Variable accessible in KinematicFunctions using kinFunctions.CosTheta(TLorentzVector *Top, TLorentzVector *WLept, TLorentzVector *lepton)
     AnomCoupLight* anomCoupLight = 0;
@@ -783,7 +785,7 @@ int main (int argc, char *argv[]){
       ////////////////////////////////////////////////////////////////////
       //   Use genEvent information to get the correct event topology   //
       ////////////////////////////////////////////////////////////////////
-      TLorentzVector genLight1 = 0., genLight2 = 0., genHadrB = 0., genLeptB = 0., genLepton = 0.;
+      TLorentzVector genLight1, genLight2, genHadrB, genLeptB, genLepton;
       if(dataSetName.find("TTbarJets_SemiLept") == 0){
         vector<TRootMCParticle> mcParticlesMatching;      	
         vector< pair<unsigned int, unsigned int> > JetPartonPair, ISRJetPartonPair; // First one is jet number, second one is mcParticle number
