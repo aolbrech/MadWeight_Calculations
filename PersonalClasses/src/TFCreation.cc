@@ -362,7 +362,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   if(useStartValues) SetStartValuesDoubleGaussian(histoNr, useStartArray, string(fitHisto->GetName()));         //Can only be done after that doubleGaussianFit is initialized!
 
   //Choose the correct fit method:
-  hlist = new TH1D*[npar];
+  hlist = new TH1D*[npar+1];
   TObjArray aSlices;
   if(useROOTClass){
     fitHisto->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
