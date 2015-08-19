@@ -57,7 +57,7 @@ int main (int argc, char *argv[]){
   //xml file
   string xmlFileName ="PersonalClasses/config/myAnomCouplConfig.xml";
   if (argc >= 2)                            //--> Needed for the PBS script!!
-    xmlFileName = string(argv[2]);
+    xmlFileName = string(argv[1]);
   const char *xmlfile = xmlFileName.c_str();
   cout << "used config file: " << xmlfile << endl;
 
