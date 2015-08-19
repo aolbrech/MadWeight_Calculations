@@ -381,7 +381,7 @@ int main (int argc, char *argv[]){
     //Initialize LightTuple (AnomCoupTree) specific stuff:
     TTree* LightTree = new TTree("LightTree","Tree containing the AnomCoup information");
     LightTree->Branch("TheAnomCoupLight","AnomCoupLight",&anomCoupLight);
-    TFile* LightFile = new TFile(("LightTree/AnomalousCouplingsLight_"+dataSetName+".root").c_str(),"RECREATE");
+    TFile* LightFile = new TFile(("LightTree/AnomCoupLight_"+dataSetName+".root").c_str(),"RECREATE");
 
     /////////////////////////////////////////
     //  LHCO Output files + GeneratorInfo  //
@@ -1017,10 +1017,10 @@ int main (int argc, char *argv[]){
 
   //Selection tables
   selecTableSemiMu.TableCalculator(false,true,true,true,true);
-  string selectiontableMu = "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/SelectionTable_BTAG_SEMIMU.tex";
+  string selectiontableMu = "EventSelectionResults/AnalyzerOutput/SelectionTable_BTAG_SEMIMU.tex";
   selecTableSemiMu.Write(selectiontableMu.c_str());
   selecTableSemiEl.TableCalculator(false, true, true, true, true);
-  string selectiontableEl = "/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/SelectionTable_BTAG_SEMIEL.tex";
+  string selectiontableEl = "EventSelectionResults/AnalyzerOutput/SelectionTable_BTAG_SEMIEL.tex";
   selecTableSemiEl.Write(selectiontableEl.c_str());
   
   // Do some special things with certain plots (normalize, BayesDivide, ... )
