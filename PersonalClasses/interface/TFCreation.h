@@ -30,7 +30,6 @@ class TFCreation{
         ~TFCreation();
 	void InitializeVariables();
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel);
-	//void CalculateTF(bool, bool, bool, bool);
         void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, TFile*, int, TFile*);
 	void FitSliceClassCode(TH2F*, bool);
         std::vector<double> SetFitRange(std::string, int);
