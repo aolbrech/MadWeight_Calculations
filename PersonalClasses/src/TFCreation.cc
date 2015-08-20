@@ -77,26 +77,26 @@ void TFCreation::InitializeVariables(){
   histo2D["Light_DiffPhiVsGenPt"]      = new TH2F("Light_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for light quarks",      10,   30,  165, 100, -0.15,  0.15);
 
   histo2D["BJet_RecoEVsGenE"]         = new TH2F("BJet_RecoEVsGenE",         "Energy of b-jets (reco vs gen level)",                        150,    0,  300, 150,     0,  300);
-  histo2D["BJet_DiffEVsGenE"]         = new TH2F("BJet_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for b-jets",            10,   30,  150, 100,   -35,   50);
+  histo2D["BJet_DiffEVsGenE"]         = new TH2F("BJet_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for b-jets",            20,   20,  230, 150,   -30,   35);
   histo2D["BJet_RecoPtVsGenPt"]       = new TH2F("BJet_RecoPtVsGenPt",       "Transverse momentum of b-jets (reco vs gen level)",           150,    0,  300, 150,     0,  300);
   histo2D["BJet_DiffPtVsGenPt"]       = new TH2F("BJet_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for b-jets",         10,   30,  150, 100,   -35,   50);
   histo2D["BJet_RecoThetaVsGenTheta"] = new TH2F("BJet_RecoThetaVsGenTheta", "Polar angle distribution of b-jets (reco vs gen)",             60,    0, 3.15,  60,     0, 3.15);
   histo2D["BJet_DiffThetaVsGenTheta"] = new TH2F("BJet_DiffThetaVsGenTheta", "#theta difference (gen-reco) versus #theta_{gen} for b-jets",  10,  0.1,  3.1, 100, -0.15, 0.15);
   histo2D["BJet_RecoThetaVsGenE"]     = new TH2F("BJet_RecoThetaVsGenE",     "Polar angle #theta_{rec} versus energy E_{gen} for b-jets",   120,    0,  300,  60,     0, 3.15);
-  histo2D["BJet_DiffThetaVsGenE"]     = new TH2F("BJet_DiffThetaVsGenE",     "#theta difference (gen-reco) versus E_{gen} for b-jets",       10,   30,  160, 150,  -0.1,  0.1);
+  histo2D["BJet_DiffThetaVsGenE"]     = new TH2F("BJet_DiffThetaVsGenE",     "#theta difference (gen-reco) versus E_{gen} for b-jets",       17,   30,  240, 150,  -0.1,  0.1);
   histo2D["BJet_RecoThetaVsGenPt"]    = new TH2F("BJet_RecoThetaVsGenPt",    "Polar angle #theta_{rec} versus energy P_{T,gen} for b-jets", 120,    0,  300,  60,     0, 3.15);
   histo2D["BJet_DiffThetaVsGenPt"]    = new TH2F("BJet_DiffThetaVsGenPt",    "#theta difference (gen-reco) versus P_{T,gen} for b-jets",     10,   30,  160, 150,  -0.1,  0.1);
   histo2D["BJet_RecoPhiVsGenPhi"]     = new TH2F("BJet_RecoPhiVsGenPhi",     "Azimuthal angle distribution of b-jets (reco vs gen)",         60, -3.2,  3.2,  60,  -3.2,  3.2);
   histo2D["BJet_DiffPhiVsGenPhi"]     = new TH2F("BJet_DiffPhiVsGenPhi",     "#phi difference (gen-reco) versus #phi_{gen} for b-jets",      10, -3.2,  3.2, 100,  -0.2,  0.2);
   histo2D["BJet_RecoPhiVsGenE"]       = new TH2F("BJet_RecoPhiVsGenE",       "Azimuthal angle #phi_{rec} versus E_{gen} for b-jets",        150,    0,  300,  60,  -3.2,  3.2);
-  histo2D["BJet_DiffPhiVsGenE"]       = new TH2F("BJet_DiffPhiVsGenE",       "#phi difference (gen-reco) versus E_{gen} for b-jets",         10,   30,  160, 100,  0.15, 0.15);
+  histo2D["BJet_DiffPhiVsGenE"]       = new TH2F("BJet_DiffPhiVsGenE",       "#phi difference (gen-reco) versus E_{gen} for b-jets",         18,   20,  250, 100,  0.15, 0.15);
   histo2D["BJet_RecoPhiVsGenPt"]      = new TH2F("BJet_RecoPhiVsGenPt",      "Azimuthal angle #phi_{rec} versus P_{T,gen} for b-jets",      150,    0,  300,  60,  -3.2,  3.2);
   histo2D["BJet_DiffPhiVsGenPt"]      = new TH2F("BJet_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for b-jets",       10,   30,  160, 100, -0.15, 0.15);
 
   histo2D["El_RecoEVsGenE"]         = new TH2F("El_RecoEVsGenE",         "Energy of electron (reco vs gen)",                             100,    0,  200, 100,      0,   200);
   histo2D["El_DiffEVsGenE"]         = new TH2F("El_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for electron",           10,   30,  105, 100,     -6,     6);
-  histo2D["El_RecoPtVsGenPt"]       = new TH2F("El_RecoPtVsGenPt",        "Transverse momentum of electron (reco vs gen)",                100,    0,  200, 100,      0,   200);
-  histo2D["El_DiffPtVsGenPt"]       = new TH2F("El_DiffPtVsGenPt",        "Pt difference (gen-reco) versus P_{T,gen} for electron",        10,   30,  105, 100,     -6,     6);
+  histo2D["El_RecoPtVsGenPt"]       = new TH2F("El_RecoPtVsGenPt",       "Transverse momentum of electron (reco vs gen)",                100,    0,  200, 100,      0,   200);
+  histo2D["El_DiffPtVsGenPt"]       = new TH2F("El_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for electron",        10,   30,  105, 100,     -6,     6);
   histo2D["El_RecoThetaVsGenTheta"] = new TH2F("El_RecoThetaVsGenTheta", "Polar angle distribution of electron (reco vs gen)",            60,    0, 3.15,  60,      0,  3.15);
   histo2D["El_DiffThetaVsGenTheta"] = new TH2F("El_DiffThetaVsGenTheta", "#theta difference (gen-reco) versus #theta_{gen} for electron", 10,    0, 3.15, 100,  -0.15,  0.15);
   histo2D["El_RecoThetaVsGenE"]     = new TH2F("El_RecoThetaVsGenE",     "Polar angle #theta_{rec} versus E_{gen} for electron",         100,    0,  200,  60,      0,  3.15);
@@ -361,11 +361,9 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   if(useStartValues) SetStartValuesDoubleGaussian(histoNr, useStartArray, string(fitHisto->GetName()));         //Can only be done after that doubleGaussianFit is initialized!
 
   //Choose the correct fit method:
-  hlist = new TH1D*[nParsFit_+1];
   TObjArray aSlices;
   if(useROOTClass){
-    fitHisto->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
-    for(int ipar = 0; ipar <= nParsFit_; ipar++) hlist[ipar] = (TH1D*) aSlices[ipar];
+    std::cout << " ERROR : Not able to use ROOT Class any more (not adapted to the use of TGraphs ...)" << std::endl;
   }
   else
     FitSliceClassCode(fitHisto, changeFitRange);
@@ -373,7 +371,10 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   //////////////////////////////////////////////////////////////////////////////////////////////
   //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
   //////////////////////////////////////////////////////////////////////////////////////////////
+
   for( int ipar = 0; ipar < nParsFit_; ipar++ ){
+    
+    //Set the name and function formula of this parameter fit correctly!
     if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
       caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");    //Quartic function as fit!
       for(int ii = 0; ii < 5; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
@@ -385,47 +386,43 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 
     double FitMax = fitHisto->GetXaxis()->GetXmax();
     double FitMin = fitHisto->GetXaxis()->GetXmin();
-    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){
-      for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
-	if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
-      }
-    }
-		
+//    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){        //-->What was special for this histogram??
+//      for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
+//	if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
+//      }
+//    }
+
     for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
     caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames_[ipar]+"_Fit").c_str() );
-    hlist[ipar]->SetName( (string(fitHisto->GetName())+"_"+parnames_[ipar]+"_PointsAndFit").c_str() );
 
-    hlist[ipar]->Fit(caloEnergyFit, "Q","",FitMin, FitMax);
+    grE_ParamFit[ipar]->Fit(caloEnergyFit, "Q", "",FitMin, FitMax);
     AllCaloEnergyFits[nParsFit_*whichEtaBin+ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
-    hlist[ipar]->Write();                    
+    grE_ParamFit[ipar]->Write();
+    delete grE_ParamFit[ipar];
   }
-  hlist[nParsFit_]->Write();
   //PlotDlbGaus(fitHisto,file);
 							  
-  delete [] hlist;
 }
 
 void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
   //------------------------------------------------------------------------------------------//
   // Main difference with the Root class FitSlicesY() is the plotting of histograms !        
-  // In the Root class the distribution of each hlist histogram is not given!
+  // In the Root class the distribution of each histogram is not given!
   // --> Useful to use the own code when needing control histograms
   //
   // Other difference between the two codes have been removed!
   // Originally the treatment of the overflow bin was different, but is now made similar!
   // Create one histogram for each function parameter -> 5 histograms for each 2D plot
 
-  for(int ipar=0 ; ipar < nParsFit_; ipar++){
-
-    float hlistMax = histoFit->GetXaxis()->GetXmax() + ((histoFit->GetXaxis()->GetXmax()-histoFit->GetXaxis()->GetXmin())/histoFit->GetXaxis()->GetNbins());	
-    hlist[ipar] = new TH1D( (string(histoFit->GetName())+"_"+parnames_[ipar]).c_str(), (string(histoFit->GetName())+" : Fitted value of "+parnames_[ipar]).c_str(), histoFit->GetXaxis()->GetNbins()+1, histoFit->GetXaxis()->GetXmin(), hlistMax);
-    hlist[ipar]->GetXaxis()->SetTitle(histoFit->GetXaxis()->GetTitle());
-  }
-  hlist[nParsFit_] = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
+  TH1D* h_chi2 = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
 
   //Loop on all bins in X, generate a projection along Y and fit each bin separately!
   int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
   int nbins = histoFit->GetXaxis()->GetNbins();
+  int nActiveBins = 0;
+  vector<double> xValue, yValue, yError;
+  std::string histoName = string(histoFit->GetName());
+  std::cout << " Looking at histogram : " << histoName << std::endl;
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -445,7 +442,6 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
     //Histogram doesn't have any memory space ...
     if(hp == 0) continue;
     if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
-    std::string histoName = string(histoFit->GetName());
 
     doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
     double ActualFitRange[2];
@@ -458,21 +454,43 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
     if(npfits > nParsFit_ && npfits >= cut) {
 
-      //Fill the hlist histogram for each parameter with the obtained Fit parameter and its uncertainty
+      //Fill the TGraph for each parameter with the obtained Fit parameter and its uncertainty
       //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
       for(int ipar=0; ipar<nParsFit_; ipar++ ){
         if( !( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size() ) && bin == 2) &&
             !( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && ( bin == 11 || bin == 10) ) &&
             !( histoName == "Mu_DiffInvPtVsGenInvPt" && bin == 1 ) &&                            
             !( histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 7)   &&
-            !( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11) ){
+            !( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11) &&
+            !( histoName == "BJet_DiffEVsGenE" && bin == 1) ){
 
-	  hlist[ipar]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetParameter(ipar));
-	  hlist[ipar]->SetBinError( (int) (bin+1/2) ,doubleGaussianFit->GetParError(ipar)); //WHY +1/2 .... (Is bin size always equal to 1 .. )?
+          if(ipar == 0) nActiveBins += 1;
+          xValue.push_back(histoFit->GetXaxis()->GetBinCenter(bin+1/2));
+          yValue.push_back(doubleGaussianFit->GetParameter(ipar));
+          yError.push_back(doubleGaussianFit->GetParError(ipar));
 	}
+
+        //Store the TGraph once all the bins have been considered!
+        if(bin == nbins+1){
+
+          //Select the information for each parameter separately and store it in a new vector!
+          vector<double> xValue_, yValue_, yError_;
+          xValue_.clear(); yValue_.clear(); yError_.clear();
+          for(int iAct = 0; iAct < nActiveBins; iAct++){
+            xValue_.push_back(xValue[ipar+nParsFit_*iAct]);
+            yValue_.push_back(yValue[ipar+nParsFit_*iAct]);
+            yError_.push_back(yError[ipar+nParsFit_*iAct]);
+          }
+
+          grE_ParamFit[ipar] = new TGraphErrors(nActiveBins, &xValue_[0], &yValue_[0], 0, &yError_[0]);
+          grE_ParamFit[ipar]->SetName(("TGraphTest_"+string(histoName+"_"+parnames_[ipar])).c_str());
+          grE_ParamFit[ipar]->Draw("AP");
+          grE_ParamFit[ipar]->SetMarkerStyle(1);
+          grE_ParamFit[ipar]->SetTitle("TGraph testing");
+        }
       }
-      //Save hchi2 histogram as extra hlist!
-      hlist[nParsFit_]->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-nParsFit_));
+      //Save hchi2 histogram!
+      h_chi2->Fill(histoFit->GetXaxis()->GetBinCenter(bin+1/2),doubleGaussianFit->GetChisquare()/(npfits-nParsFit_));
     
 //      if( bin == nbins/2 ){
 //	if(abs(doubleGaussianFit->GetParameter(1)) < abs(doubleGaussianFit->GetParameter(4))){ NarrowGaus[0] = 0; NarrowGaus[1] = 1; NarrowGaus[2] = 2; WideGaus[0] = 3; WideGaus[1] = 4; WideGaus[2] = 5;}
@@ -483,6 +501,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
     hp->Write();
     delete hp;
   }//loop over bins!
+  h_chi2->Write();
+  delete h_chi2;
 }
 
 void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray, std::string histoName){
@@ -737,52 +757,52 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
 
   if(histoName.find("BJet_DiffPhiVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0") <= histoName.size() ){            //Same fit ranges for first three eta-bins and full distribution!
-      double FullFitRangeNeg[11] = {-0.1, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.1,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[19] = {-0.12, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[19] = { 0.12,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size()){
-      double FullFitRangeNeg[11] = {-0.15, -0.15, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.06, -0.06, -0.06}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.15,  0.15,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.06,  0.06,  0.06}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.15, -0.15, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.06, -0.06, -0.06}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.15,  0.15,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.06,  0.06,  0.06}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of BJet_DiffPhi GenE histo
 
   if(histoName.find("BJet_DiffPhiVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0") <= histoName.size() ){            //Same fit ranges for first three eta-bins and full distribution!
-      double FullFitRangeNeg[11] = {-0.12, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.12,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.12, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.12,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size()){
-      double FullFitRangeNeg[11] = {-0.15, -0.15, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.06, -0.06, -0.06}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.15,  0.15,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.06,  0.06,  0.06}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.15, -0.15, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.06, -0.06, -0.06}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.15,  0.15,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.06,  0.06,  0.06}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of BJet_DiffPhi GenPt histo
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-18, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[21] = {-18, -20, -20, -22, -22, -24, -26, -26, -26, -28, -28, -28, -32, -32, -32}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[21] = { -2,   7,  14,  20,  22,  22,  28,  30,  30,  30,  30,  30,  30,  30,  30}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];    //Difference for first bin!
-      double FullFitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];    //Difference for first bin!
+      double FitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-20, -20, -20, -25, -25, -25, -30, -30, -35, -35, -35}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 10,  20,  25,  25,  30,  20,  20,  20,  20,  20,  20}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-20, -20, -20, -25, -25, -25, -30, -30, -35, -35, -35}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 10,  20,  25,  25,  30,  20,  20,  20,  20,  20,  20}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of BJet_DiffE histo
   if(histoName.find("BJet_DiffPtVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-18, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-18, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];    //Difference for first bin!
-      double FullFitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];    //Difference for first bin!
+      double FitRangePos[11] = { 10,  20,  25,  30,  30,  30,  30,  30,  30,  30,  40}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-20, -20, -20, -25, -25, -25, -30, -30, -35, -35, -35}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 10,  20,  25,  25,  30,  20,  20,  20,  20,  20,  20}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-20, -20, -20, -25, -25, -25, -30, -30, -35, -35, -35}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 10,  20,  25,  25,  30,  20,  20,  20,  20,  20,  20}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of BJet_DiffPt GenPt histo
 
@@ -793,8 +813,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
   if(histoName.find("El_DiffPhiVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){ FitRangeBinNeg = -0.012; FitRangeBinPos =  0.012; }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.01, -0.01, -0.01}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.01,  0.01,  0.01}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.01, -0.01, -0.01}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.01,  0.01,  0.01}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){ FitRangeBinNeg = -0.015; FitRangeBinPos = 0.015; }
   } //End of El_DiffPhi GenE histo
@@ -802,8 +822,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
   if(histoName.find("El_DiffPhiVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){ FitRangeBinNeg = -0.012; FitRangeBinPos =  0.012; }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.01, -0.01, -0.01}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.01,  0.01,  0.01}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.012, -0.01, -0.01, -0.01}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.012,  0.01,  0.01,  0.01}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){ FitRangeBinNeg = -0.015; FitRangeBinPos = 0.015; }
   } //End of El_DiffPhi GenPt histo
@@ -811,100 +831,100 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
   if(histoName.find("El_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -4; FitRangeBinPos = 5; }
     else if( histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-6, -6, -6, -6, -6, -6, -6.5, -6.5, -6.5, -6.5, -6.5}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 4,  5,  5,  6,  6,  6,  6.5,  6.5,  6.5,  6.5,  6.5}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-6, -6, -6, -6, -6, -6, -6.5, -6.5, -6.5, -6.5, -6.5}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 4,  5,  5,  6,  6,  6,  6.5,  6.5,  6.5,  6.5,  6.5}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of El_DiffE GenE histo
 
   if(histoName.find("El_DiffPtVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -4; FitRangeBinPos = 5; }
     else if( histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-6, -6, -6, -6, -6, -6, -6.5, -6.5, -6.5, -6.5, -6.5}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 4,  5,  5,  6,  6,  6,  6.5,  6.5,  6.5,  6.5,  6.5}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-6, -6, -6, -6, -6, -6, -6.5, -6.5, -6.5, -6.5, -6.5}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 4,  5,  5,  6,  6,  6,  6.5,  6.5,  6.5,  6.5,  6.5}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of El_DiffE GenPt histo
 
   if(histoName.find("El_DiffThetaVsGenE") <= histoName.size() ){
     if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -0.018; FitRangeBinPos = 0.018; }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.01, -0.01, -0.007, -0.007, -0.007, -0.005, -0.005, -0.005}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.012,  0.012,  0.012,  0.01,  0.01,  0.007,  0.007,  0.007,  0.005,  0.005,  0.005}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.01, -0.01, -0.007, -0.007, -0.007, -0.005, -0.005, -0.005}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.012,  0.012,  0.012,  0.01,  0.01,  0.007,  0.007,  0.007,  0.005,  0.005,  0.005}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of El_DiffTheta GenE histo
 
   if(histoName.find("El_DiffThetaVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -0.018; FitRangeBinPos = 0.018; }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.01, -0.01, -0.007, -0.007, -0.007, -0.005, -0.005, -0.005}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.012,  0.012,  0.012,  0.01,  0.01,  0.007,  0.007,  0.007,  0.005,  0.005,  0.005}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.012, -0.012, -0.012, -0.01, -0.01, -0.007, -0.007, -0.007, -0.005, -0.005, -0.005}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.012,  0.012,  0.012,  0.01,  0.01,  0.007,  0.007,  0.007,  0.005,  0.005,  0.005}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of El_DiffTheta GenPt histo
 
   if(histoName.find("Light_DiffPhiVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){ 
-      double FullFitRangeNeg[11] = {-0.14, -0.14, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.14,  0.14,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08};  FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.14, -0.14, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.14,  0.14,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08};  FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.12, -0.12, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.12,  0.12,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.12, -0.12, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.12,  0.12,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.15, -0.15, -0.15, -0.12, -0.12, -0.1, -0.08, -0.08, -0.07, -0.07, -0.07}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.15,  0.15,  0.15,  0.12,  0.12,  0.1,  0.08,  0.08,  0.07,  0.07,  0.07}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.15, -0.15, -0.15, -0.12, -0.12, -0.1, -0.08, -0.08, -0.07, -0.07, -0.07}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.15,  0.15,  0.15,  0.12,  0.12,  0.1,  0.08,  0.08,  0.07,  0.07,  0.07}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Light_DiffPhi GenE histo
 
   if(histoName.find("Light_DiffPhiVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){ 
-      double FullFitRangeNeg[11] = {-0.14, -0.14, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.14,  0.14,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08};  FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.14, -0.14, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.14,  0.14,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08};  FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.12, -0.12, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.12,  0.12,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.12, -0.12, -0.1, -0.1, -0.1, -0.1, -0.08, -0.08, -0.08, -0.08, -0.08}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.12,  0.12,  0.1,  0.1,  0.1,  0.1,  0.08,  0.08,  0.08,  0.08,  0.08}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.15, -0.15, -0.15, -0.12, -0.12, -0.1, -0.08, -0.08, -0.07, -0.07, -0.07}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.15,  0.15,  0.15,  0.12,  0.12,  0.1,  0.08,  0.08,  0.07,  0.07,  0.07}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.15, -0.15, -0.15, -0.12, -0.12, -0.1, -0.08, -0.08, -0.07, -0.07, -0.07}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.15,  0.15,  0.15,  0.12,  0.12,  0.1,  0.08,  0.08,  0.07,  0.07,  0.07}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Light_DiffPhi GenPt histo
 
   if(histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -18, -20, -20, -22, -22, -25, -28, -28, -28, -28}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  12,  18,  22,  25,  25,  28,  35,  35,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -18, -20, -20, -22, -22, -25, -28, -28, -28, -28}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  12,  18,  22,  25,  25,  28,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  14,  18,  20,  24,  24,  25,  30,  30,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  14,  18,  20,  24,  24,  25,  30,  30,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-16, -18, -20, -20, -22, -22, -22, -30, -30, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  12,  18,  22,  27,  27,  27,  35,  35,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];      //Check influence of fit (-35 was used in previous code ...)
+      double FitRangeNeg[11] = {-16, -18, -20, -20, -22, -22, -22, -30, -30, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  12,  18,  22,  27,  27,  27,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];      //Check influence of fit (-35 was used in previous code ...)
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  14,  18,  20,  24,  24,  30,  30,  30,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  14,  18,  20,  24,  24,  30,  30,  30,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Light_DiffE GenE histo
 
   if(histoName.find("Light_DiffPtVsGenPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -18, -20, -20, -22, -22, -25, -28, -28, -28, -28}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  12,  18,  22,  25,  25,  28,  35,  35,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -18, -20, -20, -22, -22, -25, -28, -28, -28, -28}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  12,  18,  22,  25,  25,  28,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  14,  18,  20,  24,  24,  25,  30,  30,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  14,  18,  20,  24,  24,  25,  30,  30,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-16, -18, -20, -20, -22, -22, -22, -30, -30, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  12,  18,  22,  27,  27,  27,  35,  35,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];      //Check influence of fit (-35 was used in previous code ...)
+      double FitRangeNeg[11] = {-16, -18, -20, -20, -22, -22, -22, -30, -30, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  12,  18,  22,  27,  27,  27,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];      //Check influence of fit (-35 was used in previous code ...)
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = {  7,  14,  18,  20,  24,  24,  30,  30,  30,  35,  35}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-15, -20, -20, -20, -22, -22, -22, -25, -25, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  14,  18,  20,  24,  24,  30,  30,  30,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Light_DiffPt GenPt histo
 
@@ -914,109 +934,109 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
 
   if(histoName.find("Mu_DiffPhiVsGenInvE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.0025, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.0025,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0025, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.0025,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.003, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.003,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.003, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.003,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.375") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.002, -0.0025, -0.003, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.002,  0.0025,  0.003,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.002, -0.0025, -0.003, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.002,  0.0025,  0.003,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.005, -0.005, -0.006}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.005,  0.005,  0.006}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.005, -0.005, -0.006}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.005,  0.005,  0.006}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.0026, -0.003, -0.0039, -0.0039, -0.0039, -0.0039, -0.0039, -0.0045, -0.0045, -0.0045, -0.0045}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.0026,  0.003,  0.0039,  0.0039,  0.0039,  0.0039,  0.0039,  0.0045,  0.0045,  0.0045,  0.0045}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0026, -0.003, -0.0039, -0.0039, -0.0039, -0.0039, -0.0039, -0.0045, -0.0045, -0.0045, -0.0045}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.0026,  0.003,  0.0039,  0.0039,  0.0039,  0.0039,  0.0039,  0.0045,  0.0045,  0.0045,  0.0045}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Mu_DiffPhi GenInvE histo
 
   if(histoName.find("Mu_DiffPhiVsGenInvPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.0025, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.0025,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0025, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.0025,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.003, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.003,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.003, -0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.003,  0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.375") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.002, -0.0025, -0.003, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.002,  0.0025,  0.003,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.002, -0.0025, -0.003, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005, -0.005}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.002,  0.0025,  0.003,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005,  0.005}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.005, -0.005, -0.006}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.005,  0.005,  0.006}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.003, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.004, -0.005, -0.005, -0.006}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.003,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.004,  0.005,  0.005,  0.006}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.0026, -0.003, -0.0039, -0.0039, -0.0039, -0.0039, -0.0039, -0.0045, -0.0045, -0.0045, -0.0045}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.0026,  0.003,  0.0039,  0.0039,  0.0039,  0.0039,  0.0039,  0.0045,  0.0045,  0.0045,  0.0045}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0026, -0.003, -0.0039, -0.0039, -0.0039, -0.0039, -0.0039, -0.0045, -0.0045, -0.0045, -0.0045}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.0026,  0.003,  0.0039,  0.0039,  0.0039,  0.0039,  0.0039,  0.0045,  0.0045,  0.0045,  0.0045}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Mu_DiffPhi GenInvPt histo
 
   if(histoName.find("Mu_DiffInvEVsGenInvE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size()){ //0.00045 & 0.00025 working 
-      double FullFitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.75") <= histoName.size() ){ FitRangeBinNeg = -0.0018; FitRangeBinPos = 0.0018; }
     else if(histoName.find("Eta_0.375") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.001, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.005,  0.008,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.001, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.005,  0.008,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.0015, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017}; FitRangeBinNeg = -0.0022; //FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.001,   0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015}; FitRangeBinPos = 0.0022; //FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0015, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017}; FitRangeBinNeg = -0.0022; //FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.001,   0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015}; FitRangeBinPos = 0.0022; //FitRangePos[iBin-1];
     }        
   } //End of Mu_DiffInvE GenInvE histo
 
   if(histoName.find("Mu_DiffInvPtVsGenInvPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size()){ //0.00045 & 0.00025 working 
-      double FullFitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.75") <= histoName.size() ){ FitRangeBinNeg = -0.0018; FitRangeBinPos = 0.0018; }
     else if(histoName.find("Eta_0.375") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.001, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.005,  0.008,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.001, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.005,  0.008,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.0015, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017}; FitRangeBinNeg = -0.0022; //FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.001,   0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015}; FitRangeBinPos = 0.0022; //FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.0015, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017, -0.0017}; FitRangeBinNeg = -0.0022; //FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.001,   0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015}; FitRangeBinPos = 0.0022; //FitRangePos[iBin-1];
     }        
   } //End of Mu_DiffInvPt GenInvPt histo
 
   if(histoName.find("Mu_DiffThetaVsGenInvE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.002, -0.0025, -0.0025, -0.003, -0.003, -0.003, -0.0035, -0.0035, -0.0035, -0.0035, -0.0035}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.002,  0.0025,  0.0025,  0.003,  0.003,  0.003,  0.0035,  0.0035,  0.0035,  0.0035,  0.0035}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.002, -0.0025, -0.0025, -0.003, -0.003, -0.003, -0.0035, -0.0035, -0.0035, -0.0035, -0.0035}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.002,  0.0025,  0.0025,  0.003,  0.003,  0.003,  0.0035,  0.0035,  0.0035,  0.0035,  0.0035}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() || histoName.find("1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.012, -0.012, -0.012, -0.015, -0.015, -0.015, -0.015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.012,  0.012,  0.012,  0.015,  0.015,  0.015,  0.015}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.012, -0.012, -0.012, -0.015, -0.015, -0.015, -0.015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.012,  0.012,  0.012,  0.015,  0.015,  0.015,  0.015}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Mu_DiffTheta GenInvE histo
 
   if(histoName.find("Mu_DiffThetaVsGenInvPt") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.002, -0.0025, -0.0025, -0.003, -0.003, -0.003, -0.0035, -0.0035, -0.0035, -0.0035, -0.0035}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.002,  0.0025,  0.0025,  0.003,  0.003,  0.003,  0.0035,  0.0035,  0.0035,  0.0035,  0.0035}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.002, -0.0025, -0.0025, -0.003, -0.003, -0.003, -0.0035, -0.0035, -0.0035, -0.0035, -0.0035}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.002,  0.0025,  0.0025,  0.003,  0.003,  0.003,  0.0035,  0.0035,  0.0035,  0.0035,  0.0035}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() || histoName.find("Eta_0.375") <= histoName.size() || histoName.find("1.45") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01, -0.01}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01,  0.01}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0.75") <= histoName.size() ){
-      double FullFitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.012, -0.012, -0.012, -0.015, -0.015, -0.015, -0.015}; FitRangeBinNeg = FullFitRangeNeg[iBin-1];
-      double FullFitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.012,  0.012,  0.012,  0.015,  0.015,  0.015,  0.015}; FitRangeBinPos = FullFitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-0.008, -0.01, -0.01, -0.01, -0.012, -0.012, -0.012, -0.015, -0.015, -0.015, -0.015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 0.008,  0.01,  0.01,  0.01,  0.012,  0.012,  0.012,  0.015,  0.015,  0.015,  0.015}; FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Mu_DiffTheta GenInvPt histo
 
@@ -1025,7 +1045,7 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
   return  BinnedFitRange;
 }
 
-void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
+/*void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bool useStartValues){
   TFile* file = new TFile("TFInformation/PlotsForTransferFunctions.root","RECREATE");
   file->cd();
 
@@ -1092,16 +1112,13 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
       TDirectory* histoFitDir = file->mkdir(histoForFit->GetName());
       histoFitDir->cd();
  
-      hlist = new TH1D*[nParsFit_+1];
       if(useStartValues)
 	SetStartValuesDoubleGaussian(f, false, string(histoForFit->GetName()));   //false means that normal start values are being used!
 
       TObjArray aSlices;
       if(useROOTClass){
 	//Fit using the FitSliceY function of TF1!
-	histoForFit->FitSlicesY(doubleGaussianFit, 0, -1, 0, "", &aSlices);
-	for(int ipar = 0; ipar <= nParsFit_; ipar++)
-	  hlist[ipar] = (TH1D*) aSlices[ipar];
+        std::cout << " ERROR : Not able to use ROOT Class any more (not adapted to the use of TGraphs ...)" << std::endl;
       }
       else
 	FitSliceClassCode(histoForFit,false);
@@ -1115,17 +1132,16 @@ void TFCreation::CalculateTF(bool drawHistos, bool doFits, bool useROOTClass, bo
 	//give names to the parameters		
 	for(int jj = 0; jj < 3; jj++) caloEnergyFit->SetParName(jj, ( parnames_[ipar]+tostr(jj)).c_str() );
 	caloEnergyFit->SetName( (string(histoForFit->GetName())+"_"+parnames_[ipar]+"_Fit").c_str() );
-	hlist[ipar]->SetName( (string(histoForFit->GetName())+"_"+parnames_[ipar]+"_PointsAndFit").c_str() );
 
-	hlist[ipar]->Fit(caloEnergyFit);
-	hlist[ipar]->Write();            
+        grE_ParamFit[ipar]->Fit(caloEnergyFit);
+        AllCaloEnergyFits[nParsFit_*whichEtaBin+ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
+        grE_ParamFit[ipar]->Write();
+        delete grE_ParamFit[ipar];
       }
-      hlist[nParsFit_]->Write();
 						
     }//Loop over f						
     delete histoForFit;
-    delete [] hlist;
   }                               //Boolean doFits = true
   file->Close();
   delete file;
-}
+}*/
