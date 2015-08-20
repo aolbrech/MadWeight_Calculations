@@ -384,8 +384,9 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
       for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
     }
 
-    double FitMax = fitHisto->GetXaxis()->GetXmax();
-    double FitMin = fitHisto->GetXaxis()->GetXmin();
+    //double binSize = (grE_ParamFit[ipar]->GetX()[1] - grE_ParamFit[ipar]->GetX()[0])/2;           //--> Not a good idea, seems to make the outliers relevant!!
+    double FitMin = grE_ParamFit[ipar]->GetX()[0];                                   //-binSize;
+    double FitMax = grE_ParamFit[ipar]->GetX()[grE_ParamFit[ipar]->GetN()-1];        //+binSize;
 //    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){        //-->What was special for this histogram??
 //      for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
 //	if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
