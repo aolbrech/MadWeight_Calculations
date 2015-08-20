@@ -6,7 +6,7 @@ TFCreation::TFCreation(int nEtaBins){
   ///////////////////////////////////////
   //
   // 1) Double Gaussian --> its range depends on the jet/lepton energy range (hence, the Y-axis)
-  doubleGaussianFit = new TF1("doubleGaussianFit","(1/(TMath::Sqrt(2*TMath::Pi())*([1]+[2]*[4])))*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[2]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");
+  doubleGaussianFit = new TF1("doubleGaussianFit","(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power([1],2))+TMath::Sqrt(TMath::Power([2],2))*[4])))*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[2]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");
   nParsFit_ = doubleGaussianFit->GetNpar();
   std::string parnames[5]={"a1","a2","a3","a4","a5"};
   std::string ParName[5] = {"Mean broad gaussian", "Width broad gaussian","Relative Constant gaussians","Mean narrow gaussian","Width narrow gaussian"};
@@ -448,7 +448,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
     if(ChangeFitRange == false){                                    ActualFitRange[0] = (double) (histoFit->GetYaxis())->GetXmin(); ActualFitRange[1] = (double) (histoFit->GetYaxis())->GetXmax(); }
     else{ std::vector<double> fitBin = SetFitRange(histoName, bin); ActualFitRange[0] = fitBin[0] ;                                 ActualFitRange[1] = fitBin[1];                                  }
 
-    //Do the actual fit:
+    //Do the actual fit (on a normalized histogram)!:
+    hp->Scale(1./hp->Integral());
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
@@ -615,24 +616,24 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     if(kinVar == "PT"){
       if(partName != "muon"){
         *TF << "\n\n        tf=(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov1)**2/2d0/prov2**2))          !first gaussian\n";
-        *TF <<     "        tf=tf+prov3*(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian\n";
-        *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                                      !normalisation";
+        *TF <<     "        tf=tf+prov3*(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian";
+        //*TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                                      !normalisation";
       }
       else{
         *TF << "\n\n        tf=(exp(-(1d0/"+pVar[whichDep]+"-1d0/"+pexpVar[whichDep]+"-prov1)**2/2d0/prov2**2))          !first gaussian\n";
-        *TF <<     "        tf=tf+prov3*(exp(-(1d0/"+pVar[whichDep]+"-1d0/"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian\n";
-        *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                                              !normalisation";
+        *TF <<     "        tf=tf+prov3*(exp(-(1d0/"+pVar[whichDep]+"-1d0/"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian";
+        //*TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                                              !normalisation";
       }
     }
     else if(kinVar == "THETA"){
       *TF << "\n\n        tf=(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))          !first gaussian\n";
-      *TF <<     "        tf=tf+prov3*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian\n";
-      *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                  !normalisation";
+      *TF <<     "        tf=tf+prov3*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian";
+      //*TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                  !normalisation";
     }
     else if(kinVar == "PHI"){
       *TF << "\n\n        tf=(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))           !first gaussian\n";
-      *TF <<     "        tf=tf+prov3*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))  !second gaussian\n";
-      *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))               !normalisation";
+      *TF <<     "        tf=tf+prov3*(exp(-(phi(p)-phi(pexp)-prov4)**2/2d0/prov5**2))  !second gaussian";
+      //*TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))               !normalisation";
     }
     
     WidthText.push_back("\n \n        width = max(prov2, prov5) ");
