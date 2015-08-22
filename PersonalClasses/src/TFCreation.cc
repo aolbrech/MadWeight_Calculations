@@ -9,7 +9,7 @@ TFCreation::TFCreation(int nEtaBins){
   doubleGaussianFit = new TF1("doubleGaussianFit","(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power([1],2))+TMath::Sqrt(TMath::Power([2],2))*[4])))*(TMath::Exp(-TMath::Power((x-[0]),2)/(2*TMath::Power([1],2)))+[2]*TMath::Exp(-TMath::Power((x-[3]),2)/(2*TMath::Power([4],2))))");
   nParsFit_ = doubleGaussianFit->GetNpar();
   std::string parnames[5]={"a1","a2","a3","a4","a5"};
-  std::string ParName[5] = {"Mean broad gaussian", "Width broad gaussian","Relative Constant gaussians","Mean narrow gaussian","Width narrow gaussian"};
+  std::string ParName[5] = {"Mean first gaussian", "Width first gaussian","Relative constant gaussians","Mean second gaussian","Width second gaussian"};
 
   if(nParsFit_ != sizeof(parnames)/sizeof(parnames[0])) std::cout << " ERROR : Difference between number of parameters and defined array --> Also check the header file than !! " << std::endl;
 
@@ -77,7 +77,7 @@ void TFCreation::InitializeVariables(){
   histo2D["Light_DiffPhiVsGenPt"]      = new TH2F("Light_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for light quarks",      10,   30,  165, 100, -0.15,  0.15);
 
   histo2D["BJet_RecoEVsGenE"]         = new TH2F("BJet_RecoEVsGenE",         "Energy of b-jets (reco vs gen level)",                        150,    0,  300, 150,     0,  300);
-  histo2D["BJet_DiffEVsGenE"]         = new TH2F("BJet_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for b-jets",            20,   20,  230, 150,   -30,   35);
+  histo2D["BJet_DiffEVsGenE"]         = new TH2F("BJet_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for b-jets",            18,   30,  230, 150,   -35,   38);
   histo2D["BJet_RecoPtVsGenPt"]       = new TH2F("BJet_RecoPtVsGenPt",       "Transverse momentum of b-jets (reco vs gen level)",           150,    0,  300, 150,     0,  300);
   histo2D["BJet_DiffPtVsGenPt"]       = new TH2F("BJet_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for b-jets",         10,   30,  150, 100,   -35,   50);
   histo2D["BJet_RecoThetaVsGenTheta"] = new TH2F("BJet_RecoThetaVsGenTheta", "Polar angle distribution of b-jets (reco vs gen)",             60,    0, 3.15,  60,     0, 3.15);
@@ -421,27 +421,55 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
   int cut = 0; // require a minimum number of bins in the slice to be filled --> Should this ever be larger than 0 ??
   int nbins = histoFit->GetXaxis()->GetNbins();
   int nActiveBins = 0;
-  vector<double> xValue, yValue, yError;
+  vector<double> xValue, yValue, xError, yError;
   std::string histoName = string(histoFit->GetName());
   std::cout << " Looking at histogram : " << histoName << std::endl;
+
+  //Combine some bins!
+  int binStart[10] = {50};
+  int binEnd[10] = {50};
+  int nCombBins = 0;
+  if( histoName == "BJet_DiffEVsGenE"){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
+
+  //Skip some bins!
+  int binToSkip[10] = {50};
+  int nSkippedBins = 0;
+  if( histoName == "BJet_DiffEVsGenE") binToSkip[0] = 1;
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
 
-    TH1D *hp;
-    if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
-      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
-    else if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)    //Temporary fix ... Need to figure out how to enlarge 1 bin!
-      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
-    else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
-      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
-    else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)
-      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
-    else
+    TH1D *hp = 0;
+//    if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
+//      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
+//    else if(string(histoFit->GetName()).find("Mu_DiffInvPtVsGenInvPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)    //Temporary fix ... Need to figure out how to enlarge 1 bin!
+//      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
+//    else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 8)
+//      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");            
+//    else if(string(histoFit->GetName()).find("El_DiffPtVsGenPt_Eta_1.45") <= string(histoFit->GetName()).size() && bin == 9)
+//      hp = histoFit->ProjectionY(projection_title.c_str(),8,9,"e");
+//    else
+//      hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
+
+    if(bin == binStart[nCombBins]){
+      projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
+      for(int ii = 1; ii <= binEnd[nCombBins] - binStart[nCombBins]; ii ++) projection_title += "And"+tostr(bin+ii);
+      hp = histoFit->ProjectionY(projection_title.c_str(),bin,binEnd[nCombBins],"e");
+      std::cout << " Combined histogram for bin : " << bin << " to " << binEnd[nCombBins] << std::endl;
+    }
+    else if(bin > binStart[nCombBins-1] && bin <= binEnd[nCombBins-1]){
+      std::cout << " Excluded histogram for bin : " << bin << std::endl;
+    }
+    else if(bin == binToSkip[nSkippedBins]){
+      nSkippedBins++;
+      std::cout << " Skipping bin : " << bin  << std::endl;
+    }
+    else{
       hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
+    }
 
     //Histogram doesn't have any memory space ...
-    if(hp == 0) continue;
+    if(hp == 0){std::cout << " Exiting loop on bin : " << bin << std::endl; continue;}
     if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
 
     doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
@@ -463,32 +491,48 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
             !( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && ( bin == 11 || bin == 10) ) &&
             !( histoName == "Mu_DiffInvPtVsGenInvPt" && bin == 1 ) &&                            
             !( histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 7)   &&
-            !( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11) &&
-            !( histoName == "BJet_DiffEVsGenE" && bin == 1) ){
+            !( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11) ){ // &&
+            //!( histoName == "BJet_DiffEVsGenE" && bin == 1) ){
 
           if(ipar == 0) nActiveBins += 1;
-          xValue.push_back(histoFit->GetXaxis()->GetBinCenter(bin+1/2));
-          yValue.push_back(doubleGaussianFit->GetParameter(ipar));
-          yError.push_back(doubleGaussianFit->GetParError(ipar));
+ 
+          if( bin == binStart[nCombBins] ){
+            xValue.push_back( (histoFit->GetXaxis()->GetBinCenter(bin)+histoFit->GetXaxis()->GetBinCenter(bin+1))/2);
+            float binCenter = 0;
+            for(int ii = 0; ii <= binEnd[nCombBins] - binStart[nCombBins]; ii++) binCenter += histoFit->GetXaxis()->GetBinWidth(bin+ii);
+            binCenter = binCenter/(binEnd[nCombBins] - binStart[nCombBins]+1);         //Need this 1/n factor since the width is from bin low edge to bin high edge!
+            xError.push_back( binCenter); 
+            yValue.push_back(doubleGaussianFit->GetParameter(ipar));
+            yError.push_back(doubleGaussianFit->GetParError(ipar));
+            if(ipar == nParsFit_-1) nCombBins++;
+          }
+          else{
+            xValue.push_back(histoFit->GetXaxis()->GetBinCenter(bin+1/2));
+            xError.push_back(histoFit->GetXaxis()->GetBinWidth(bin)/2 );
+            yValue.push_back(doubleGaussianFit->GetParameter(ipar));
+            yError.push_back(doubleGaussianFit->GetParError(ipar));
+          }
 	}
 
         //Store the TGraph once all the bins have been considered!
         if(bin == nbins+1){
 
           //Select the information for each parameter separately and store it in a new vector!
-          vector<double> xValue_, yValue_, yError_;
+          vector<double> xValue_, yValue_, xError_, yError_;
           xValue_.clear(); yValue_.clear(); yError_.clear();
           for(int iAct = 0; iAct < nActiveBins; iAct++){
             xValue_.push_back(xValue[ipar+nParsFit_*iAct]);
+            //xError_.push_back(xError[ipar+nParsFit_*iAct]);    //Problem since fit really sees it as an error ...
             yValue_.push_back(yValue[ipar+nParsFit_*iAct]);
             yError_.push_back(yError[ipar+nParsFit_*iAct]);
           }
 
           grE_ParamFit[ipar] = new TGraphErrors(nActiveBins, &xValue_[0], &yValue_[0], 0, &yError_[0]);
-          grE_ParamFit[ipar]->SetName(("TGraphTest_"+string(histoName+"_"+parnames_[ipar])).c_str());
+          grE_ParamFit[ipar]->GetXaxis()->SetTitle(histoFit->GetXaxis()->GetTitle());
+          grE_ParamFit[ipar]->SetTitle((ParName_[ipar]+" for "+histoName).c_str());
+          grE_ParamFit[ipar]->SetName((string(histoName+"_"+parnames_[ipar])).c_str());
           grE_ParamFit[ipar]->Draw("AP");
           grE_ParamFit[ipar]->SetMarkerStyle(1);
-          grE_ParamFit[ipar]->SetTitle("TGraph testing");
         }
       }
       //Save hchi2 histogram!
@@ -781,8 +825,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[21] = {-18, -20, -20, -22, -22, -24, -26, -26, -26, -28, -28, -28, -32, -32, -32}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[21] = { -2,   7,  14,  20,  22,  22,  28,  30,  30,  30,  30,  30,  30,  30,  30}; FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[21] = {-20, -22, -28, -30, -32, -34}; FitRangeBinNeg = FitRangeNeg[iBin-1]; //, -30, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[21] = {  7,  14,  24,  30,  30,  34}; FitRangeBinPos = FitRangePos[iBin-1]; //,  27,  32,  34,  35,  35,  34,  35,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0") <= histoName.size() ){
       double FitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];    //Difference for first bin!
