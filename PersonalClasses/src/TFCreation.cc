@@ -375,7 +375,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   for( int ipar = 0; ipar < nParsFit_; ipar++ ){
     
     //Set the name and function formula of this parameter fit correctly!
-    if(ipar == 0 || ipar == 2 || ipar == 3 || ipar == 5){
+    if(ipar == 0 || ipar == 2 || ipar == 3){
       caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x");    //Quartic function as fit!
       for(int ii = 0; ii < 5; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
     }
@@ -385,8 +385,13 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     }
 
     //double binSize = (grE_ParamFit[ipar]->GetX()[1] - grE_ParamFit[ipar]->GetX()[0])/2;           //--> Not a good idea, seems to make the outliers relevant!!
-    double FitMin = grE_ParamFit[ipar]->GetX()[0];                                   //-binSize;
-    double FitMax = grE_ParamFit[ipar]->GetX()[grE_ParamFit[ipar]->GetN()-1];        //+binSize;
+    double FitMin = grE_ParamFit[ipar]->GetX()[0];                            
+    double FitMax = grE_ParamFit[ipar]->GetX()[grE_ParamFit[ipar]->GetN()-1];         //First -1 is because bins go from 0 to N (Exclude overflow for histograms specifically, keep it when it is well determined!!)
+
+    //Exclude starting bins for the second gaussian determination
+    // --> Have to make sure this is really the second gaussian describing the tails!!
+    if(string(fitHisto->GetName()) == "BJet_DiffEVsGenE" && (ipar == 3 || ipar == 4) ){ FitMin = grE_ParamFit[ipar]->GetX()[2]; std::cout << " Will only do fit on second gaussian from x-value : " << FitMin << std::endl;}
+
 //    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){        //-->What was special for this histogram??
 //      for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
 //	if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
@@ -803,8 +808,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
 
   if(histoName.find("BJet_DiffPhiVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() || histoName.find("Eta_0") <= histoName.size() ){            //Same fit ranges for first three eta-bins and full distribution!
-      double FitRangeNeg[19] = {-0.12, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[19] = { 0.12,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05}; FitRangeBinPos = FitRangePos[iBin-1];
+      //double FitRangeNeg[19] = {-0.12, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.08, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05, -0.05}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      //double FitRangePos[19] = { 0.12,  0.12,  0.12,  0.1,  0.1,  0.08,  0.08,  0.08,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05,  0.05}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1.45") <= histoName.size()){
       double FitRangeNeg[11] = {-0.15, -0.15, -0.12, -0.12, -0.1, -0.1, -0.08, -0.08, -0.06, -0.06, -0.06}; FitRangeBinNeg = FitRangeNeg[iBin-1];
@@ -825,8 +830,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[21] = {-20, -22, -28, -30, -32, -34}; FitRangeBinNeg = FitRangeNeg[iBin-1]; //, -30, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[21] = {  7,  14,  24,  30,  30,  34}; FitRangeBinPos = FitRangePos[iBin-1]; //,  27,  32,  34,  35,  35,  34,  35,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[21] = {-20, -20, -26, -32, -34}; FitRangeBinNeg = FitRangeNeg[iBin-1]; //, -30, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[21] = {  7,  15,  26,  32,  33}; FitRangeBinPos = FitRangePos[iBin-1]; //,  27,  32,  34,  35,  35,  34,  35,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0") <= histoName.size() ){
       double FitRangeNeg[11] = {-15, -18, -20, -22, -22, -25, -25, -28, -28, -28, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];    //Difference for first bin!
