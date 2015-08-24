@@ -32,10 +32,9 @@ class TFCreation{
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel);
         void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, TFile*, int, TFile*);
 	void FitSliceClassCode(TH2F*, bool);
-        std::vector<double> SetFitRange(std::string, int);
+        std::vector<double> SetFitRange(std::string, int, double[]);
 	void SetStartValuesDoubleGaussian(int, bool, std::string);
-	void WriteTF(ostream &output, ostream &card, ostream &TF, std::string, std::string);
-        void PlotDlbGaus(TH2F*, TFile*);
+	void WriteTF(ostream &output, ostream &card, ostream &TF, std::string, std::string, int);
 	void WritePlots(TFile*);
 
     private:

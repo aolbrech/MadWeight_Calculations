@@ -608,18 +608,18 @@ void TFCreation::SetStartValuesDoubleGaussian(int whichHisto, bool useStartArray
   }
 } 
 
-void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTF, std::string kinVar, std::string partName){ 
+void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &myTF, std::string kinVar, std::string partName, int TFDep){ 
 
   std::string pVar[2] = {"p(0)","pt(p)"};
   std::string pexpVar[2] = {"pexp(0)","pt(pexp)"};
 
   //Is Pt or E dependent considered
-  int whichDep = 0;
+  int whichDep = TFDep;
 
   string TFDependencyWidth[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
   string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4)"};
   string WidthDependency[3] = {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]+")"};
-  if(partName == "muon"){
+  if(partName == "muon" && whichDep == 1){
     TFDependencyWidth[1] = "*dsqrt(1d0/"+pVar[whichDep]+")"; TFDependencyWidth[2] = "*1d0/"+pVar[whichDep]+")";
     TFDependency[1] = "*1d0/"+pVar[whichDep]; TFDependency[2] = "*1d0/"+pVar[whichDep]+"**2"; TFDependency[3] = "*1d0/"+pVar[whichDep]+"**3"; TFDependency[4] = "*1d0/"+pVar[whichDep]+"**4)";
     WidthDependency[1] = "*dsqrt(1d0/"+pexpVar[whichDep]+")"; WidthDependency[2] = "*1d0/"+pexpVar[whichDep]+")";
@@ -649,7 +649,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
       for(int icalpar = 0; icalpar < NrConsideredCaloPars; icalpar++){
 	dummyCounter++;
 	if(icalpar == 0) myTFTable<<ParName_[ipar]<<" & $a_{" <<ipar <<icalpar <<"}$ = "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParError(icalpar);
-	else              myTFTable<<                 " & $a_{" <<ipar <<icalpar <<"}$ = "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParError(icalpar);
+	else              myTFTable<<               " & $a_{" <<ipar <<icalpar <<"}$ = "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<<"$\\pm$"<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParError(icalpar);
 
 	*TransferCard<< dummyCounter << "     " << AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<< "     # " << ParName_[ipar] << endl;
 
@@ -660,7 +660,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
           }
         }
 	if(icalpar != 0 && (ipar == 0||ipar == 2||ipar == 3)) *TF << "+#"<<dummyCounter<<TFDependency[icalpar];
-	if(icalpar != 0 && (ipar == 1||ipar == 4)){           *TF <<"+#"<<dummyCounter<<TFDependencyWidth[icalpar];
+	if(icalpar != 0 && (ipar == 1||ipar == 4)){           *TF << "+#"<<dummyCounter<<TFDependencyWidth[icalpar];
           WidthText.push_back("+#"+tostr(dummyCounter)+WidthDependency[icalpar]);
         }
 	if(icalpar==NrConsideredCaloPars-1 && ipar == 2) *TF << "\n        prov"<<ipar+1<<"=max(0,prov"<<ipar+1<<")";
@@ -672,7 +672,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
         
     if(kinVar == "PT"){
-      if(partName != "muon"){
+      if(whichDep == 0 || (whichDep == 1 && partName != "muon") ){
         *TF << "\n\n        tf=(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov1)**2/2d0/prov2**2))          !first gaussian\n";
         *TF <<     "        tf=tf+prov3*(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian";
         //*TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(prov2+prov3*prov5))                                      !normalisation";
