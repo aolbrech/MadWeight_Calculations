@@ -60,7 +60,7 @@ void TFCreation::InitializeVariables(){
   histo2D["Muon_E_vs_Eta"] = new TH2F("Muon_E_vs_Eta","E-value versus eta-value for muons",60,-4,4,200,0,200);
 
   histo2D["Light_RecoEVsGenE"]         = new TH2F("Light_RecoEVsGenE",         "Energy of light quarks (reco vs gen)",                             150,    0,  300, 150,     0,   300);
-  histo2D["Light_DiffEVsGenE"]         = new TH2F("Light_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for light quarks",           16,   25,  160, 100,   -30,    35);
+  histo2D["Light_DiffEVsGenE"]         = new TH2F("Light_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for light quarks",           16,   25,  160, 100,   -35,    38);
   histo2D["Light_RecoPtVsGenPt"]       = new TH2F("Light_RecoPtVsGenPt",       "Transverse momentum of light quarks (reco vs gen)",                150,    0,  300, 150,     0,   300);
   histo2D["Light_DiffPtVsGenPt"]       = new TH2F("Light_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for light quarks",        10,   30,  125, 100,   -30,    35);
   histo2D["Light_RecoThetaVsGenTheta"] = new TH2F("Light_RecoThetaVsGenTheta", "Polar angle distribution of light quarks (reco vs gen)",            60,    0, 3.15,  60,     0,  3.15);
@@ -93,7 +93,7 @@ void TFCreation::InitializeVariables(){
   histo2D["BJet_RecoPhiVsGenPt"]      = new TH2F("BJet_RecoPhiVsGenPt",      "Azimuthal angle #phi_{rec} versus P_{T,gen} for b-jets",      150,    0,  300,  60,  -3.2,  3.2);
   histo2D["BJet_DiffPhiVsGenPt"]      = new TH2F("BJet_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for b-jets",       10,   30,  160, 100, -0.15, 0.15);
 
-  histo2D["El_RecoEVsGenE"]         = new TH2F("El_RecoEVsGenE",         "Energy of electron (reco vs gen)",                             100,    0,  200, 100,      0,   200);
+  histo2D["El_RecoEVsGenE"]         = new TH2F("El_RecoEVsGenE",         "Energy of electron (reco vs gen)",                             150,    0,  200, 150,      0,   200);
   histo2D["El_DiffEVsGenE"]         = new TH2F("El_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for electron",           25,   30,  220, 100,     -6,     6);
   histo2D["El_RecoPtVsGenPt"]       = new TH2F("El_RecoPtVsGenPt",       "Transverse momentum of electron (reco vs gen)",                100,    0,  200, 100,      0,   200);
   histo2D["El_DiffPtVsGenPt"]       = new TH2F("El_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for electron",        10,   30,  105, 100,     -6,     6);
@@ -115,7 +115,7 @@ void TFCreation::InitializeVariables(){
   histo2D["Mu_RecoInvPtVsGenInvPt"]  = new TH2F("Mu_RecoInvPtVsGenInvPt", "Inverse of transverse momentum of muon (reco vs gen)",                     100,     0,  0.05, 100,      0,   0.05);
   histo2D["Mu_DiffInvPtVsGenInvPt"]  = new TH2F("Mu_DiffInvPtVsGenInvPt", "#frac{1}{P_{T}} difference (gen-reco) versus #frac{1}{P_{T,gen}} for muon", 10, 0.005, 0.035, 120,-0.0018, 0.0018);
   histo2D["Mu_RecoEVsGenE"]          = new TH2F("Mu_RecoEVsGenE",         "Energy of muon (reco vs gen)",                                             150,     0,   200, 150,      0,    200);
-  histo2D["Mu_DiffEVsGenE"]          = new TH2F("Mu_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for muon",                           10,    26,   150, 100,    -10,     10);
+  histo2D["Mu_DiffEVsGenE"]          = new TH2F("Mu_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for muon",                           14,    20,   160, 125,     -6,      6);
   histo2D["Mu_RecoPtVsGenPt"]        = new TH2F("Mu_RecoPtVsGenPt",       "Transverse momentum of muon (reco vs gen)",                                150,     0,   200, 150,      0,    200);
   histo2D["Mu_DiffPtVsGenPt"]        = new TH2F("Mu_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for muon",                        10,    26,   150, 100,    -10,     10);
   histo2D["Mu_RecoThetaVsGenTheta"]  = new TH2F("Mu_RecoThetaVsGenTheta", "Polar angle distribution of muon (reco vs gen)",                            60,     0,  3.15,  60,      0,   3.15);
@@ -390,7 +390,12 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
 
     //Exclude starting bins for the second gaussian determination
     // --> Have to make sure this is really the second gaussian describing the tails!!
-    if(string(fitHisto->GetName()) == "BJet_DiffEVsGenE" && (ipar == 3 || ipar == 4) ){ FitMin = grE_ParamFit[ipar]->GetX()[2]; std::cout << " Will only do fit on second gaussian from x-value : " << FitMin << std::endl;}
+    if(string(fitHisto->GetName()) == "BJet_DiffEVsGenE"  && (ipar == 3 || ipar == 4) ){ FitMin = grE_ParamFit[ipar]->GetX()[2]; std::cout << " 2nd gaussian fit from : " << FitMin << std::endl;}
+    if(string(fitHisto->GetName()) == "Light_DiffEVsGenE" && (ipar == 3 || ipar == 4) ){ FitMin = grE_ParamFit[ipar]->GetX()[1]; std::cout << " 2nd gaussian fit from : " << FitMin << std::endl;}
+    if(string(fitHisto->GetName()) == "El_DiffEVsGenE"    && (ipar == 0 || ipar == 1 || ipar == 2) ){ FitMin = grE_ParamFit[ipar]->GetX()[1]; std::cout << " 2nd gaussian fit from : " << FitMin << std::endl;}
+
+    //Exclude overflow bin if necessary
+    if(string(fitHisto->GetName()) == "Light_DiffEVsGenE" || string(fitHisto->GetName()) == "El_DiffEVsGenE") FitMax =  grE_ParamFit[ipar]->GetX()[grE_ParamFit[ipar]->GetN()-2];
 
 //    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){        //-->What was special for this histogram??
 //      for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
@@ -420,7 +425,6 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
   // Originally the treatment of the overflow bin was different, but is now made similar!
   // Create one histogram for each function parameter -> 5 histograms for each 2D plot
 
-  std::cout << " Inside FitSliceClassCode ! " << std::endl;
   TH1D* h_chi2 = new TH1D( (string(histoFit->GetName())+"_chi2").c_str(), (string(histoFit->GetName())+": #chi^{2} distribution for "+string(doubleGaussianFit->GetExpFormula())).c_str(), histoFit->GetXaxis()->GetNbins(), histoFit->GetXaxis()->GetXmin(), histoFit->GetXaxis()->GetXmax() );
 
   //Loop on all bins in X, generate a projection along Y and fit each bin separately!
@@ -436,12 +440,13 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
   int nCombBins = 0;
   if( histoName == "BJet_DiffEVsGenE"){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
   else if(histoName == "Light_DiffEVsGenE"){binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
+  else if(histoName == "El_DiffEVsGenE"){binStart[0] = 15; binEnd[0] = 16; binStart[1] = 17; binEnd[1] = 19; binStart[2] = 20; binEnd[2] = 25;}
+  else if(histoName == "Mu_DiffEVsGenE"){binStart[0] = 13; binEnd[0] = 14;}
 
   //Skip some bins!
   int binToSkip[10] = {50};
   int nSkippedBins = 0;
   if( histoName == "BJet_DiffEVsGenE") binToSkip[0] = 1;
-  //if( histoName == "BJet_DiffThetaVsGenE") binToSkip[0] = 1;
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -472,6 +477,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
     }
     else{
       hp = histoFit->ProjectionY(projection_title.c_str(),bin,bin,"e");
+      if(histoName == "Mu_DiffEVsGenE" && bin == 15) hp->SetAxisRange(-8,8,"X");
     }
 
     //Histogram doesn't have any memory space ...
@@ -479,15 +485,15 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange){
     if( float(hp->GetEntries()) <= 0){ delete hp; continue;} //|| float(hp->GetEntries()) < cut) {delete hp; continue;}
 
     doubleGaussianFit->SetName((projection_title+"Fitted").c_str());
-    double ActualFitRange[2];
-    if(ChangeFitRange == false){                                    ActualFitRange[0] = (double) (histoFit->GetYaxis())->GetXmin(); ActualFitRange[1] = (double) (histoFit->GetYaxis())->GetXmax(); }
-    else{ std::vector<double> fitBin = SetFitRange(histoName, bin); ActualFitRange[0] = fitBin[0] ;                                 ActualFitRange[1] = fitBin[1];                                  }
+    double ActualFitRange[2] = {(double) (histoFit->GetYaxis())->GetXmin(), (double) (histoFit->GetYaxis())->GetXmax()};
+    if(ChangeFitRange == true){
+      std::vector<double> fitBin = SetFitRange(histoName, bin, ActualFitRange);
+      ActualFitRange[0] = fitBin[0]; ActualFitRange[1] = fitBin[1];
+    }
 
-    std::cout << " Will be performing the fit between " << ActualFitRange[0] << " and " << ActualFitRange[1] << "! " << std::endl;
     //Do the actual fit (on a normalized histogram)!:
     hp->Scale(1./hp->Integral());
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
-    std::cout << " Fit done ! " << std::endl;
 
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
     if(npfits > nParsFit_ && npfits >= cut) {
@@ -722,40 +728,46 @@ void TFCreation::WritePlots(TFile* outfile){
   outfile->cd(); //Step out from 2D_histograms_graphs directory!
 }
 
-std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin){
-    
+std::vector<double> TFCreation::SetFitRange(std::string histoName, int iBin, double startRange[2]){
+   
   std::vector<double> BinnedFitRange;
   BinnedFitRange.clear();
-  double FitRangeBinNeg = 0., FitRangeBinPos = 0.;
+  double FitRangeBinNeg = startRange[0], FitRangeBinPos = startRange[1];
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[21] = {-20, -20, -26, -32, -34}; FitRangeBinNeg = FitRangeNeg[iBin-1]; //, -30, -30, -30}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[21] = {  7,  15,  26,  32,  33}; FitRangeBinPos = FitRangePos[iBin-1]; //,  27,  32,  34,  35,  35,  34,  35,  35,  35,  35,  35}; FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[5] = {-20, -20, -26, -32, -34}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[5] = {  7,  15,  26,  32,  33}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of BJet_DiffE histo
 
   if(histoName.find("El_DiffEVsGenE") <= histoName.size() ){
-    if(histoName.find("Eta_1") > histoName.size() ){ FitRangeBinNeg = -4; FitRangeBinPos = 5; }
-    else if( histoName.find("Eta_1.45") <= histoName.size() ){
-      //double FitRangeNeg[11] = {-6, -6, -6, -6, -6, -6, -6.5, -6.5, -6.5, -6.5, -6.5}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      //double FitRangePos[11] = { 4,  5,  5,  6,  6,  6,  6.5,  6.5,  6.5,  6.5,  6.5}; FitRangeBinPos = FitRangePos[iBin-1];
+    if( histoName.find("Eta") > histoName.size() ){
+      double FitRangeNeg[16] = { -3,  -4, -4,  -4,  -4, -4.5, -4.5,  -4, -4.5, -4.5,  -5, -5, -5.5, -6, -6, -6}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[16] = {2.5, 2.5,  3, 3.5, 3.5,    4,  4.5, 4.5,    5,  5.5, 5.5,  6,    6,  6,  6,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of El_DiffE GenE histo
 
   if(histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[7] = {-20, -20, -20, -25, -28, -28, -28}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[7] = {  8,   8,  15,  20,  26,  28,  30}; FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[8] = {-21, -21, -23, -28, -30, -30, -32, -33}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[8] = {  9,   9,  16,  22,  26,  28,  32,  38}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Light_DiffE GenE histo
 
   if(histoName.find("Mu_DiffInvEVsGenInvE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size()){ //0.00045 & 0.00025 working 
-      //double FitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; FitRangeBinNeg = FitRangeNeg[iBin-1];
-      //double FitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015,   0.0015 }; FitRangeBinPos = FitRangePos[iBin-1];
+      //double FitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      //double FitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of Mu_DiffInvE GenInvE histo
+
+  if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
+    if(histoName.find("Eta") > histoName.size()){
+      double FitRangeNeg[8] = {-1.5, -1.5, -2.5,  -3, -3.5, -4,   -5, -5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[8] = { 1.5,    2,  2.5, 3.5,  3.5,  5,  5.5,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    }
+  }
 
   BinnedFitRange.push_back(FitRangeBinNeg); BinnedFitRange.push_back(FitRangeBinPos);
 
