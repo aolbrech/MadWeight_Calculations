@@ -74,32 +74,6 @@ int main (int argc, char **argv)
       //int nEvent = 4;
       std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
-      //Load the ROOT file containing the calo-fits
-      TFile *caloFits, *tfComp;
-      TF1 *fit_bjet[5], *fit_light[5], *fit_elec[5], *fit_muon[5];
-      TH1F* h_bJet_DeltaE = new TH1F("BJet_DeltaE","BJet_DeltaE",250,-125,125);         TH1F* h_bJet_TF = new TH1F("BJet_TF","BJet_TF",250,-125,125);
-      TH1F* h_light_DeltaE = new TH1F("Light_DeltaE","Light_DeltaE",250,-125,125);      TH1F* h_light_TF = new TH1F("Light_TF","Light_TF",20,-1,5);
-      TH1F* h_elec_DeltaE = new TH1F("Electron_DeltaE","Electron_DeltaE",200,-100,100); TH1F* h_elec_TF = new TH1F("Electron_TF","Electron_TF",200,-100,100);
-      TH1F* h_muon_DeltaE = new TH1F("MUon_DeltaE","Muon_DeltaE",200,-100,100);         TH1F* h_muon_TF = new TH1F("Muon_TF","Muon_TF",200,-100,100);
-      if(RunFitForTF == false){
-        caloFits = new TFile(("TFInformation/CaloEnergyFitFunctions"+EtaConsidered+".root").c_str(),"READ");
-        tfComp = new TFile(("TFInformation/TFComparison"+EtaConsidered+".root").c_str(),"RECREATE");
-        tfComp->cd();
-  
-        for(int ipar = 0; ipar < 5; ipar++){
-          fit_bjet[ipar] = (TF1*) caloFits->Get(("BJet_DiffEVsGenE_a"+tostr(ipar+1)+"_Fit").c_str());
-          fit_light[ipar] = (TF1*) caloFits->Get(("Light_DiffEVsGenE_a"+tostr(ipar+1)+"_Fit").c_str());
-          fit_muon[ipar] = (TF1*) caloFits->Get(("Mu_DiffEVsGenE_a"+tostr(ipar+1)+"_Fit").c_str());
-          fit_elec[ipar] = (TF1*) caloFits->Get(("El_DiffEvSGenE_a"+tostr(ipar+1)+"_Fit").c_str());
-
-          TCanvas *canv = new TCanvas("canv","canv");
-          canv->cd();
-          fit_bjet[ipar]->Draw();
-          canv->SaveAs(("TFInformation/Plots/"+string(fit_bjet[ipar]->GetName())+".pdf").c_str());
-        }
-        std::cout << " First parameter of first fit for b-jet is : " << fit_bjet[0]->GetParameter(0) << std::endl;
-      }
-
       //Initialize the TFCreation class (create all histograms):
       tfCreation.InitializeVariables(); 
       //Read in the TLorenztVectors:
@@ -136,85 +110,9 @@ int main (int argc, char **argv)
 
 	  //Fill the histograms of the TFCreation class!
 	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
-          //std::cout << " Sending event to PlotTF with energies : " << genPart[2].E() << " and " <<  recoPart[2].E() << std::endl;
-
-          if(RunFitForTF == false){
-            tfComp->cd();
-            float pi = 3.14159;
-
-            for(int ipart = 0; ipart < 5; ipart++){
-
-              //Looking at light jets
-              if(ipart == 0 || ipart == 1){
-                h_light_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
-
-                //Now get the TF-value
-                float CaloFitPar[5] = {0};
-                for(int ifit = 0; ifit < 5; ifit++){
-                  if(ifit == 1 || ifit == 4) CaloFitPar[ifit] = fit_muon[ifit]->GetParameter(0) + fit_muon[ifit]->GetParameter(1)*sqrt(genPart[ipart].E())+fit_muon[ifit]->GetParameter(2)*genPart[ipart].E();
-                  else{
-                    for(int ii = 0; ii < 5; ii++) CaloFitPar[ifit] += fit_muon[ifit]->GetParameter(ii)*pow(genPart[ipart].E(), ii);
-                  }
-                }
-                float TF = (1/sqrt(2*pi))*(1/(sqrt(pow(CaloFitPar[1],2))+CaloFitPar[2]*sqrt(pow(CaloFitPar[4],2))))*(exp(-(1/2)*pow((genPart[ipart].E()-recoPart[ipart].E()-CaloFitPar[0])/CaloFitPar[1],2))+CaloFitPar[2]*exp(-(1/2)*pow((genPart[ipart].E()-recoPart[ipart].E()-CaloFitPar[3])/CaloFitPar[4],2)));
-                h_light_TF->Fill(TF);
-
-//                TCanvas *c1 = new TCanvas(("c1_"+tostr(iEvt)).c_str(),"A Simple Graph Example",200,10,700,500);
-//                Double_t x[100], xDiff[100], y[100];
-//                Int_t n = 100;
-//                for (Int_t i=0;i<n;i++) {
-//                  //Let the x-value be the Egen!
-//                  for(int ifit = 0; ifit < 5; ifit++){
-//                    if(ifit == 1 || ifit == 4) CaloFitPar[ifit] = fit_muon[ifit]->GetParameter(0) + fit_muon[ifit]->GetParameter(1)*sqrt(x[i])+fit_muon[ifit]->GetParameter(2)*x[i];
-//                    else{
-//                      for(int ii = 0; ii < 5; ii++) CaloFitPar[ifit] += fit_muon[ifit]->GetParameter(ii)*pow(x[i], ii);
-//                    }
-//                  }
-//                  x[i] = i*2;
-//                  xDiff[i] = x[i]-recoPart[ipart].E();
-//                  y[i] = (1/sqrt(2*pi))*(1/(sqrt(pow(CaloFitPar[1],2))+CaloFitPar[2]*sqrt(pow(CaloFitPar[4],2))))*(exp(-(1/2)*pow((x[i]-recoPart[ipart].E()-CaloFitPar[0])/CaloFitPar[1],2))+CaloFitPar[2]*exp(-(1/2)*pow((x[i]-recoPart[ipart].E()-CaloFitPar[3])/CaloFitPar[4],2)));
-//                }
-//                TGraph* gr_GenE = new TGraph(n,x,y);
-//                TGraph* gr_DiffE = new TGraph(n,xDiff,y);
-//                std::cout << " Filled TGraph ! " << std::endl;
- //               gr_GenE->Draw("AC*");
-  //              gr_DiffE->Draw("AC*");
-//                tfComp->cd(); gr_GenE->Write(); gr_DiffE->Write(); c1->Write();
-              }
-              //Looking at b-jets
-              else if(ipart == 2 || ipart == 3){
-                h_bJet_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
-              }
-              //Looking at muons
-              else if(ipart == 4 && decayChannel == 0){
-                h_muon_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
-              }
-              //Looking at electrons
-              else if(ipart == 4 && decayChannel == 1){
-                h_elec_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
-              }
-
-              //Calculate the TF-value!
- 
-            }
-
-          }
-            
-//          tfCreation.PlotTF(2, tfDependency, caloFits, decayChannel ,genPart[2].E(), recoPart[2].E());
 
         }//Only for matched particles reconstructed!
       }//Loop on events
-
-      if(RunFitForTF == false){
-        h_light_DeltaE->Write(); h_light_TF->Write();
-        h_bJet_DeltaE->Write();  h_bJet_TF->Write();
-        h_muon_DeltaE->Write();  h_muon_TF->Write();
-        h_elec_DeltaE->Write();  h_elec_TF->Write();
-        tfComp->Close();
-        caloFits->Close();
-        delete tfComp;
-        delete caloFits;
-      }
 
       TFile* fillFile = new TFile(("TFInformation/PlotsForTransferFunctions_FromLightTree"+EtaConsidered+".root").c_str(),"RECREATE");
       fillFile->cd();
