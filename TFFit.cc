@@ -26,6 +26,8 @@
 using namespace std;
 //using namespace TopTree;
 
+template <typename T> string tostr(const T& t) { ostringstream os; os<<t; return os.str(); }
+
 int main (int argc, char **argv)
 {
   TApplication theApp("App", &argc, argv); //Needed to run on local Linux!
@@ -40,19 +42,19 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
-  bool CreateTFFromTree = false;
+  bool CreateTFFromTree = true; 
   bool RunFitForTF = true; 
   int nEtaBins = 1;
   bool TFForPhi = false;
   bool TFForTheta = false;
-  enum TFDependency_t {PtDepTF, EDepTF};
+  enum TFDependency_t {EDepTF, PtDepTF};
   TFDependency_t tfDependency = EDepTF;
 
   std::string EtaConsidered = "";
   if(nEtaBins == 4) EtaConsidered = "_etaBins";
 
   //Used classes
-  TFCreation tfCreation(nEtaBins);
+  TFCreation tfCreation(nEtaBins, EtaConsidered, RunFitForTF);
 
   if(CreateTFFromTree){
     //Load the TFTree information
@@ -69,8 +71,34 @@ int main (int argc, char **argv)
 
       //Set the number of selected events (for loop on events):
       int nEvent = inputTFTree->GetEntries(); 
-      //int nEvent = 10000;
+      //int nEvent = 4;
       std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
+
+      //Load the ROOT file containing the calo-fits
+      TFile *caloFits, *tfComp;
+      TF1 *fit_bjet[5], *fit_light[5], *fit_elec[5], *fit_muon[5];
+      TH1F* h_bJet_DeltaE = new TH1F("BJet_DeltaE","BJet_DeltaE",250,-125,125);         TH1F* h_bJet_TF = new TH1F("BJet_TF","BJet_TF",250,-125,125);
+      TH1F* h_light_DeltaE = new TH1F("Light_DeltaE","Light_DeltaE",250,-125,125);      TH1F* h_light_TF = new TH1F("Light_TF","Light_TF",20,-1,5);
+      TH1F* h_elec_DeltaE = new TH1F("Electron_DeltaE","Electron_DeltaE",200,-100,100); TH1F* h_elec_TF = new TH1F("Electron_TF","Electron_TF",200,-100,100);
+      TH1F* h_muon_DeltaE = new TH1F("MUon_DeltaE","Muon_DeltaE",200,-100,100);         TH1F* h_muon_TF = new TH1F("Muon_TF","Muon_TF",200,-100,100);
+      if(RunFitForTF == false){
+        caloFits = new TFile(("TFInformation/CaloEnergyFitFunctions"+EtaConsidered+".root").c_str(),"READ");
+        tfComp = new TFile(("TFInformation/TFComparison"+EtaConsidered+".root").c_str(),"RECREATE");
+        tfComp->cd();
+  
+        for(int ipar = 0; ipar < 5; ipar++){
+          fit_bjet[ipar] = (TF1*) caloFits->Get(("BJet_DiffEVsGenE_a"+tostr(ipar+1)+"_Fit").c_str());
+          fit_light[ipar] = (TF1*) caloFits->Get(("Light_DiffEVsGenE_a"+tostr(ipar+1)+"_Fit").c_str());
+          fit_muon[ipar] = (TF1*) caloFits->Get(("Mu_DiffEVsGenE_a"+tostr(ipar+1)+"_Fit").c_str());
+          fit_elec[ipar] = (TF1*) caloFits->Get(("El_DiffEvSGenE_a"+tostr(ipar+1)+"_Fit").c_str());
+
+          TCanvas *canv = new TCanvas("canv","canv");
+          canv->cd();
+          fit_bjet[ipar]->Draw();
+          canv->SaveAs(("TFInformation/Plots/"+string(fit_bjet[ipar]->GetName())+".pdf").c_str());
+        }
+        std::cout << " First parameter of first fit for b-jet is : " << fit_bjet[0]->GetParameter(0) << std::endl;
+      }
 
       //Initialize the TFCreation class (create all histograms):
       tfCreation.InitializeVariables(); 
@@ -108,11 +136,88 @@ int main (int argc, char **argv)
 
 	  //Fill the histograms of the TFCreation class!
 	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
+          //std::cout << " Sending event to PlotTF with energies : " << genPart[2].E() << " and " <<  recoPart[2].E() << std::endl;
+
+          if(RunFitForTF == false){
+            tfComp->cd();
+            float pi = 3.14159;
+
+            for(int ipart = 0; ipart < 5; ipart++){
+
+              //Looking at light jets
+              if(ipart == 0 || ipart == 1){
+                h_light_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
+
+                //Now get the TF-value
+                float CaloFitPar[5] = {0};
+                for(int ifit = 0; ifit < 5; ifit++){
+                  if(ifit == 1 || ifit == 4) CaloFitPar[ifit] = fit_muon[ifit]->GetParameter(0) + fit_muon[ifit]->GetParameter(1)*sqrt(genPart[ipart].E())+fit_muon[ifit]->GetParameter(2)*genPart[ipart].E();
+                  else{
+                    for(int ii = 0; ii < 5; ii++) CaloFitPar[ifit] += fit_muon[ifit]->GetParameter(ii)*pow(genPart[ipart].E(), ii);
+                  }
+                }
+                float TF = (1/sqrt(2*pi))*(1/(sqrt(pow(CaloFitPar[1],2))+CaloFitPar[2]*sqrt(pow(CaloFitPar[4],2))))*(exp(-(1/2)*pow((genPart[ipart].E()-recoPart[ipart].E()-CaloFitPar[0])/CaloFitPar[1],2))+CaloFitPar[2]*exp(-(1/2)*pow((genPart[ipart].E()-recoPart[ipart].E()-CaloFitPar[3])/CaloFitPar[4],2)));
+                h_light_TF->Fill(TF);
+
+//                TCanvas *c1 = new TCanvas(("c1_"+tostr(iEvt)).c_str(),"A Simple Graph Example",200,10,700,500);
+//                Double_t x[100], xDiff[100], y[100];
+//                Int_t n = 100;
+//                for (Int_t i=0;i<n;i++) {
+//                  //Let the x-value be the Egen!
+//                  for(int ifit = 0; ifit < 5; ifit++){
+//                    if(ifit == 1 || ifit == 4) CaloFitPar[ifit] = fit_muon[ifit]->GetParameter(0) + fit_muon[ifit]->GetParameter(1)*sqrt(x[i])+fit_muon[ifit]->GetParameter(2)*x[i];
+//                    else{
+//                      for(int ii = 0; ii < 5; ii++) CaloFitPar[ifit] += fit_muon[ifit]->GetParameter(ii)*pow(x[i], ii);
+//                    }
+//                  }
+//                  x[i] = i*2;
+//                  xDiff[i] = x[i]-recoPart[ipart].E();
+//                  y[i] = (1/sqrt(2*pi))*(1/(sqrt(pow(CaloFitPar[1],2))+CaloFitPar[2]*sqrt(pow(CaloFitPar[4],2))))*(exp(-(1/2)*pow((x[i]-recoPart[ipart].E()-CaloFitPar[0])/CaloFitPar[1],2))+CaloFitPar[2]*exp(-(1/2)*pow((x[i]-recoPart[ipart].E()-CaloFitPar[3])/CaloFitPar[4],2)));
+//                }
+//                TGraph* gr_GenE = new TGraph(n,x,y);
+//                TGraph* gr_DiffE = new TGraph(n,xDiff,y);
+//                std::cout << " Filled TGraph ! " << std::endl;
+ //               gr_GenE->Draw("AC*");
+  //              gr_DiffE->Draw("AC*");
+//                tfComp->cd(); gr_GenE->Write(); gr_DiffE->Write(); c1->Write();
+              }
+              //Looking at b-jets
+              else if(ipart == 2 || ipart == 3){
+                h_bJet_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
+              }
+              //Looking at muons
+              else if(ipart == 4 && decayChannel == 0){
+                h_muon_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
+              }
+              //Looking at electrons
+              else if(ipart == 4 && decayChannel == 1){
+                h_elec_DeltaE->Fill(genPart[ipart].E() - recoPart[ipart].E());
+              }
+
+              //Calculate the TF-value!
+ 
+            }
+
+          }
+            
+//          tfCreation.PlotTF(2, tfDependency, caloFits, decayChannel ,genPart[2].E(), recoPart[2].E());
 
         }//Only for matched particles reconstructed!
       }//Loop on events
 
+      if(RunFitForTF == false){
+        h_light_DeltaE->Write(); h_light_TF->Write();
+        h_bJet_DeltaE->Write();  h_bJet_TF->Write();
+        h_muon_DeltaE->Write();  h_muon_TF->Write();
+        h_elec_DeltaE->Write();  h_elec_TF->Write();
+        tfComp->Close();
+        caloFits->Close();
+        delete tfComp;
+        delete caloFits;
+      }
+
       TFile* fillFile = new TFile(("TFInformation/PlotsForTransferFunctions_FromLightTree"+EtaConsidered+".root").c_str(),"RECREATE");
+      fillFile->cd();
       std::cout << "    ----> Information writen in file : " << fillFile->GetName() << std::endl << std::endl;
       tfCreation.WritePlots(fillFile);
       fillFile->Close();
@@ -180,7 +285,7 @@ int main (int argc, char **argv)
     bool changeFitRange = true;
     //Use a enum to distinguish between EDep and PtDep!! 
  
-    ofstream myTFTable, myTransferCard, myTF;
+    ofstream myTFTable, myTransferCard, myTF, myLaTeX;
     myTFTable.open("TFInformation/TransferFunctions_TABLE.tex");
     if(nEtaBins == 1){
       myTF.open("TFInformation/TF_user.dat");
@@ -190,6 +295,11 @@ int main (int argc, char **argv)
       myTF.open("TFInformation/TF_user_etaBins.dat");
       myTransferCard.open("TFInformation/transfer_card_user_etaBins.dat");
     }
+    myLaTeX.open("TFInformation/LatexFile.tex");
+    myLaTeX << "\\documentclass[a4paper,10pt]{article} " << endl;
+    myLaTeX << "\\usepackage[utf8]{inputenc} " << endl;
+    myLaTeX << "\\usepackage[margin=1in]{geometry} \n \\usepackage{graphicx} " << endl;
+    myLaTeX << "\\title{Transfer Functions} \n \\begin{document} \n \\maketitle " << endl;
 
     myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;
     myTransferCard<<"#|                         TRANSFER_CARD.DAT                             |"<<endl;
@@ -210,7 +320,7 @@ int main (int argc, char **argv)
     myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;	
 
     myTF<<"<file>## ##################################################################"<<endl;
-    myTF<<"##                                                                       ##"<<endl;
+    myTF<<"##                                          ##"<<endl;
     myTF<<"##                          Matrix Element                               ##"<<endl;
     myTF<<"##                          ==============                               ##"<<endl;
     myTF<<"##                                                                       ##"<<endl;
@@ -282,8 +392,8 @@ int main (int argc, char **argv)
       std::string histoTitle = HistoInfo[iHisto][0];
 
       //Select the histograms which need to be considered!!
-      if(!( ( (tfDependency == 0 && (histoTitle.find("VsGenPt") <= histoSize || histoTitle.find("VsGenInvPt") <= histoSize ) ) ||
-            (tfDependency == 1 && histoTitle.find("VsGenE") <= histoSize ) ) 
+      if(!( ( (tfDependency == 1 && (histoTitle.find("VsGenPt") <= histoSize || histoTitle.find("VsGenInvPt") <= histoSize ) ) ||
+            (tfDependency == 0 && histoTitle.find("VsGenE") <= histoSize ) ) 
           && ( ( TFForPhi && histoTitle.find("DiffPhi") <= histoSize ) || (TFForTheta && histoTitle.find("DiffTheta") <= histoSize ) || histoTitle.find("DiffE") <= histoSize || histoTitle.find("DiffInvE") <= histoSize ) ) )
         continue;
   
@@ -316,7 +426,7 @@ int main (int argc, char **argv)
       myTFTable<<"\\centering" << endl;
       myTFTable<<"\\begin{tabular}{c|ccc}" << endl;
       myTFTable<<"\\hline" << endl;
-      if(tfDependency == 1 || (tfDependency == 0 && PartName != "muon") ) myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
+      if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{E}$) & $a_{i2}$ ($E$)" << "\\\\" << endl;
       else                                                                myTFTable<< "Type      & $a_{i0}$ & $a_{i1}$ ($\\sqrt{\\frac{1}{E}}$) & $a_{i2}$ ($\\frac{1}{E}$)" << "\\\\" << endl;
       myTFTable<<"\\hline" << endl;
     
@@ -327,9 +437,9 @@ int main (int argc, char **argv)
 	myTransferCard<<"#+--------------------------------------------------------------------------------------+" <<endl;
 	myTransferCard<<"#|     Parameter for particles: "<<PartName << endl; 
 	myTransferCard<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
-	if(tfDependency == 1 || (tfDependency == 0 && PartName != "muon") ) myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
+	if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
 	else                                                                myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(1/E) + C*1/E  for width of gaussians "<< endl;
-	if(tfDependency == 1 || (tfDependency == 0 && PartName != "muon") ) myTransferCard<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
+	if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTransferCard<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
 	else                                                                myTransferCard<<"#|      -->                        A + B*1/E + C*1/E² + D*1/E³ + F*1/E^4"<< endl;
 	myTransferCard<<"#+--------------------------------------------------------------------------------------+" <<endl;
 
@@ -337,7 +447,7 @@ int main (int argc, char **argv)
 	myTF<<"##             TF for "<<PartName<<"                                      "<<endl;
 	myTF<<"##**********************************************************************##"<<endl;
 	myTF<<"<block name='"<<PartName<<"'>   #name can be anything"<<endl;
-	if(tfDependency == 1 || (tfDependency == 0 && PartName != "muon") ) myTF<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
+	if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTF<<"  <info> double gaussian with parameter depending on the energy </info>"<<endl;
 	else                                                                myTF<<"  <info> double gaussian with parameter depending on the inverse of energy </info>"<<endl;
 	myTF<<"  <particles> "<<particles<<" </particles>"<<endl;
 	myTF<<"  <width_type> "<<widthType<<" </width_type>"<<endl;
@@ -350,9 +460,9 @@ int main (int argc, char **argv)
       myTF<<"\n  <variable name='"<<KinVarName<<"'>"<<endl;
       myTF<<"    <tf>";
     
-      tfCreation.WriteTF(myTFTable, myTransferCard, myTF, KinVarName, PartName);  
+      tfCreation.WriteTF(myTFTable, myTransferCard, myTF, myLaTeX, KinVarName, PartName, tfDependency);
       if(TFForTheta == false || (TFForTheta == true && histoTitle.find("DiffTheta") <= histoSize) ){
-	if( (tfDependency == 1 && histoTitle.find("Mu_DiffE") <= histoSize) || (tfDependency == 0 && histoTitle.find("Mu_DiffInvE") <= histoSize) ){ myTF << "\n</block>\n</file>";}  //Muon is the last of the four particles!!
+	if( (tfDependency == 0 && histoTitle.find("Mu_DiffE") <= histoSize) || (tfDependency == 1 && histoTitle.find("Mu_DiffInvE") <= histoSize) ){ myTF << "\n</block>\n</file>";}  //Muon is the last of the four particles!!
 	else{                                                                                                                                        myTF << "\n</block>";         }
       }
     
@@ -366,12 +476,15 @@ int main (int argc, char **argv)
     myTF.close();
     myTransferCard.close();
     myTFTable.close();
+
+    myLaTeX << "\\end{document}"<<endl;
+    myLaTeX.close();
     
     //Delete the used pointers:
     delete readFile;
     delete writeFile;
   }//End of TF calculation when ROOT file is used!
-  
+
   cout << "It took us " << ((double)clock() - start) / CLOCKS_PER_SEC << " to run the program" << endl;
   cout << "********************************************" << endl;
   cout << "           End of the program !!            " << endl;
