@@ -26,7 +26,7 @@ using namespace std;
 class TFCreation{
 
     public:
-        TFCreation(int);
+        TFCreation(int, std::string, bool);
         ~TFCreation();
 	void InitializeVariables();
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel);
@@ -34,7 +34,7 @@ class TFCreation{
 	void FitSliceClassCode(TH2F*, bool);
         std::vector<double> SetFitRange(std::string, int, double[]);
 	void SetStartValuesDoubleGaussian(int, bool, std::string);
-	void WriteTF(ostream &output, ostream &card, ostream &TF, std::string, std::string, int);
+	void WriteTF(ostream &output, ostream &card, ostream &TF, ostream &latex, std::string, std::string, int);
 	void WritePlots(TFile*);
 
     private:
@@ -52,8 +52,10 @@ class TFCreation{
         int nParsFit_, nEtaBins_;
         std::string parnames_[5], ParName_[5];
         TGraphErrors *grE_ParamFit[5];
+        double FitMin_[5], FitMax_[5];
         //int NarrowGaus[3];
         //int WideGaus[3];
+        TFile* caloFitFile;
 };
 #endif
 //
