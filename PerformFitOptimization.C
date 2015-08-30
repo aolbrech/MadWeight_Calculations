@@ -17,17 +17,17 @@
 /////////////////////////////////////////////////////////////
 // Specify whether the stacked canvasses have to be stored //
 bool storeSplittedCanvas = false; 
-std::string SplittedDir = "Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/SplittedCanvasses"; 
+std::string SplittedDir = "Events_RecoTest/RecoFirstRun_50000Evts_DblGausTF/SplittedCanvasses"; 
 /////////////////////////////////////////////////////////////
 
-TFile *inFile = new TFile("Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/FitDistributions_RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts_25000Evts.root","READ"); 
-TFile *outputFile = new TFile("Events_RgRScan_CalibrationCurve/RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts/FitOptimizations_RgR_CalibrationCurve_AllDeltaTF_RgRMGSampleNeg015_25000Evts_NoCuts_25000Evts.root","RECREATE"); 
+TFile *inFile = new TFile("Events_RecoTest/RecoFirstRun_50000Evts_DblGausTF/FitDistributions_RecoFirstRun_50000Evts_DblGausTF_25000Evts.root","READ"); 
+TFile *outputFile = new TFile("Events_RecoTest/RecoFirstRun_50000Evts_DblGausTF/FitOptimizations_RecoFirstRun_50000Evts_DblGausTF_25000Evts.root","RECREATE"); 
 
 int NrEvts = 10; 
-const int xBin = 17; 
+const int xBin = 9; 
 const int xFitBin = xBin*75; 
-float xLow = -0.425; 
-float xHigh = 0.425; 
+float xLow = -0.225; 
+float xHigh = 0.225; 
 
 void PaintOverflow(TH1F *h, TFile *FileToWrite, std::string dirName){     // This function draws the histogram h with an extra bin for overflows
   Int_t nx    = h->GetNbinsX()+1;
@@ -82,8 +82,8 @@ void getIndividualDirObjects(TDirectory *dir){
     std::string dirName(dir->GetName(), 0, 100);
 
     //Specify which chi-sq cut values should be considered:
-    float ChiSqCutsFstPol[4] = {0.0005, 0.00008, 0.00005, 0.00001}; 
-    float ChiSqCutsScdPol[4] = {0.0002, 0.00005, 0.00001, 0.000005}; 
+    float ChiSqCutsFstPol[4] = {0.0002, 0.001, 0.0005, 0.005}; 
+    float ChiSqCutsScdPol[4] = {0.0002, 0.001, 0.0005, 0.005}; 
     const int NrChiSqCutsFstPol = sizeof(ChiSqCutsFstPol)/sizeof(float);
     const int NrChiSqCutsScdPol = sizeof(ChiSqCutsScdPol)/sizeof(float);
     const int NrChiSqCuts = NrChiSqCutsFstPol;
