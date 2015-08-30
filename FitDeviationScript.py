@@ -158,11 +158,11 @@ elif KinVariable == "RgR":
 #  MGXSCut = array('d',[0.462736, 0.807034,  1.14397,   1.37121,   1.6414,    1.96796,            2.35719,              2.80657,    3.34178,   3.96076,    4.67808,  6.42868,   11.61381  ])
 
   if VarWindowGiven == False:
-    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different options are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n  4) Wide narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  5) Calibration Curve range : [-0.4, -0.3, -0.2, -0.15, 0.1, 0.05, 0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4] \n --> Choose the correct number : ')
+    VarWindow = raw_input('** Choose the correct RgR-window corresponding to the studied file ** \n** Different options are: \n  1) Wide   : [-0.5, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.5] \n  2) Narrow : [-0.20, -0.15, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20] \n  3) Full   : [-0.5, -0.3, -0.2, -0.15, -0.1, -0.05, -0.025, 0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5] \n  4) Wide narrow : [-0.3, -0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2, 0.3] \n  5) Calibration Curve range : [-0.4, -0.3, -0.2, -0.15, 0.1, 0.05, 0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4] \n  6) Zoomed : [-0.2, -0.15, -0.1, -0.05, 0.0, 0.05, 0.05, 0.1, 0.15, 0.2] \n --> Choose the correct number : ')
 
-  xMinValue = [4, 4, 7, 4, 6]
+  xMinValue = [4, 4, 7, 4, 6, 4]
   KinVar = "Re(g_{R})"
-  NrPointsToRemove = [2, 2, 5, 2, 4]
+  NrPointsToRemove = [2, 2, 5, 2, 4, 2]
   FitType = "pol2"
  
   if VarWindow == "1":
@@ -180,6 +180,9 @@ elif KinVariable == "RgR":
   elif VarWindow == "5":
     ValuesToDelete = [-0.5, -0.025, 0.025, 0.5]
     xBin, xLow, xHigh = 17, -0.425, 0.425
+  elif VarWindow == "6":
+    ValuesToDelete = [-0.5, -0.4, -0.3, -0.025, 0.025, 0.3, 0.4, 0.5]
+    xBin, xLow, xHigh = 9, -0.225, 0.225
 
 #Now delete the values stored in array 'ValuesToDelete'
 for iVar in range(len(ValuesToDelete)):
