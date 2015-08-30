@@ -15,7 +15,7 @@
 import os
 import sys
 
-#Get the Events directory, the considered range and the correction from the input line
+# Get the Events directory, the considered range and the correction from the input line
 if len(sys.argv) < 10:
   print " Need to give the Events directory, the considered range and the correction in the input line"
   print " Correct input : python CreateAllRootFiles_Nohup.py Events_xx RVR/RgR/MTop #evts y/n y/n doublePolFitMacro.C ApplyAccNorm(y/n) ApplyCosTheta(y/n) Range dirString(opt)"
@@ -31,7 +31,7 @@ applyAccNorm = sys.argv[7]
 applyCosTheta = sys.argv[8]
 whichRange = sys.argv[9]
 
-#Can give an optional string which should be retrieved in the considered directories (such as NoCuts/AllCuts/...)
+# Can give an optional string which should be retrieved in the considered directories (such as NoCuts/AllCuts/...)
 dirString = ""
 if len(sys.argv) == 11:
   dirString = sys.argv[10]
@@ -40,12 +40,12 @@ list_dir = os.listdir(whichDir)
 for VarDir in list_dir:
   print "Can the given string ",dirString," be retrieved in the dirName ",VarDir," .... ? ",VarDir.find(dirString)
 
-  #First make sure whether the uncomplete and zero events are removed!
-  #--> Need to make sure that considered VarDir is definitely a directory!
-  if not VarDir.endswith(".pdf") and VarDir.find(dirString) > 0: 
+  # First make sure whether the uncomplete and zero events are removed!
+  # --> Need to make sure that considered VarDir is definitely a directory!
+  if not VarDir.endswith(".pdf") and VarDir.find(dirString) > 0:
     os.system('python RemoveEvents.py '+whichDir+''+VarDir+'/')
-  
-    #Get the correct weights.out file (_NoZero > _NoUncompleteEvts > weights.out)
+
+    # Get the correct weights.out file (_NoZero > _NoUncompleteEvts > weights.out)
     list_dir = os.listdir(whichDir+''+VarDir)
     WeightFileName = ""
     for file_dir in list_dir:
@@ -54,5 +54,10 @@ for VarDir in list_dir:
       elif os.path.exists(whichDir+''+VarDir+'/weights.out'): WeightFileName = "weights.out"
 
     if WeightFileName != "":
+      # In case the cosTheta reweighting should be applied, create the weights_xx file and change the WeightFileName
+      if applyCosTheta == "y" or applyCosTheta == "yes" or applyCosTheta == "Y":
+        os.system('python AddCosThetaReweighting.py '+whichDir+''+VarDir+'/ '+KinVariable+' '+VarDir[VarDir.find("MGSample")+8:VarDir.find("_",VarDir.find("MGSample"))]+' '+WeightFileName+' '+nEvts)
+        WeightFileName = WeightFileName[:-4]+'_PtCutsApplied_AlsoOnMET_ApplyCosThetaReweighting.out'
+
       os.system('python FitDeviationScript.py '+str(whichDir)+''+str(VarDir)+'/ '+str(KinVariable)+' '+str(nEvts)+' '+str(runFitMacro)+' '+str(makeSplitPlots)+' '+str(whichAnalysis)+' '+str(applyAccNorm)+' '+str(applyCosTheta)+' '+str(whichDir)+''+str(VarDir)+'/'+str(WeightFileName)+' '+str(whichRange) )
       print "Python command is : ",str('python FitDeviationScript.py '+str(whichDir)+''+str(VarDir)+'/ '+str(KinVariable)+' '+str(nEvts)+' '+str(runFitMacro)+' '+str(makeSplitPlots)+' '+str(whichAnalysis)+' '+str(applyAccNorm)+' '+str(applyCosTheta)+' '+str(whichDir)+''+str(VarDir)+'/'+str(WeightFileName)+' '+str(whichRange))
