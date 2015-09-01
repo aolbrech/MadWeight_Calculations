@@ -20,6 +20,7 @@
 #include "PersonalClasses/Style.C"                                                 //CHECK if this works!
 
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
+#include "AnomalousCouplings/PersonalClasses/interface/BTagStudy_OLD.h"
 #include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
 
@@ -47,26 +48,36 @@ int main (int argc, char *argv[])
   //4 Info for each event
   //5 Debug
 
+  //---------------------------//
+  //  Run specific parts only  //
+  //---------------------------//
+  bool getLHCOOutput = true;
+  bool splitLeptonChargeLHCO = false;
+  bool getCorrectAndWrongLHCO = true; 
+  bool savePDF = false;
+  bool bTagChoiceMade = true; 
+
+  //-- Specific b-tag stuff!
+  int ChosenBTag = 3;  //-->Corresponds to two T b-tags and no light veto!
+  int NrBTags = 6;
+  string bTitle[6] = {"LooseTags","MediumTags","MediumTagsLVeto","TightTags","TightTagsMVeto","TightTagsLVeto"};
+  string numberBTags = "AllBTags";
+  if(bTagChoiceMade){ NrBTags = 1; bTitle[0] = bTitle[ChosenBTag]; numberBTags = bTitle[ChosenBTag];}
+
   //----------------------------//
   // Input & output information //
   //----------------------------//
   //ROOT file for storing plots
   string pathPNG = "PlotsMacro_Light";
-  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis.root").c_str(),"RECREATE");
+  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis_"+numberBTags+".root").c_str(),"RECREATE");
 
   //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
-  inputFiles.push_back("LightTree/AnomalousCouplingsLight_TTbarJets_SemiLept.root");
+  inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
   //inputFiles.push_back("LightTree/AnomalousCouplingsLight_Data_Mu.root");
   if(verbosity > 0) std::cout << " - All ROOT files loaded " << std::endl;
 	
-  //Which parts of the analysis should be performed
-  bool getLHCOOutput = true;
-  bool savePDF = false;
-  bool splitLeptonCharge = false;
-  bool getCorrectWrong = false;
-
   //-------------------------//
   // Set analysis luminosity //
   //-------------------------//
@@ -114,15 +125,21 @@ int main (int argc, char *argv[])
   //--------------------------//
   map<string,MultiSamplePlot*> MSPlot;
   string leptFlavs[2]={"_mu","_el"};
+
+  //-- Histograms which should be made separately for the two possible decay channels
   for(int ii = 0; ii < 2; ii++){
     string leptFlav = leptFlavs[ii];
+
+    //-- Histograms which should contain the considered btag name!
+    for(int ibTag = 0; ibTag < NrBTags; ibTag++){
  
-    MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
-    MSPlot["nBTaggedJets_BeforeBTag"+leptFlav]  = new MultiSamplePlot(datasets, "nBTaggedJets_BeforeBTag"+leptFlav, 10, -0.5, 9.5, "# b-tagged jets");
-    MSPlot["nLightJets_BeforeBTag"+leptFlav]    = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav,   10, -0.5, 9.5, "# light jets");
-    MSPlot["nSelectedJets_AfterBTag"+leptFlav]  = new MultiSamplePlot(datasets, "nSelectedJets_AfterBTag"+leptFlav, 10, -0.5, 9.5, "# selected jets");
-    MSPlot["nBTaggedJets_AfterBTag"+leptFlav]   = new MultiSamplePlot(datasets, "nBTaggedJets_AfterBTag"+leptFlav,  10, -0.5, 9.5, "# b-tagged jets");
-    MSPlot["nLightJets_AfterBTag"+leptFlav]     = new MultiSamplePlot(datasets, "nLightJets_AfterBTag"+leptFlav,    10, -0.5, 9.5, "# light jets");
+      MSPlot["nSelectedJets_"+bTitle[ibTag]+"_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_"+bTitle[ibTag]+"_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
+      MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# b-tagged jets");
+      MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# light jets");
+      MSPlot["nSelectedJets_"+bTitle[ibTag]+"_AfterBTag"+ leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_"+bTitle[ibTag]+"_AfterBTag"+ leptFlav,10, -0.5, 9.5, "# selected jets");
+      MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_AfterBTag"+ leptFlav] = new MultiSamplePlot(datasets, "nBTaggedJets_"+ bTitle[ibTag]+"_AfterBTag"+ leptFlav,10, -0.5, 9.5, "# b-tagged jets");
+      MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+ leptFlav] = new MultiSamplePlot(datasets, "nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+ leptFlav,10, -0.5, 9.5, "# light jets");
+    }
   }
 
   //--------------------------------//
@@ -143,7 +160,7 @@ int main (int argc, char *argv[])
   
     //Number of events that will be used in the "loop on events"
     int nEvent = inLightTree->GetEntries();
-    //int nEvent = 10;
+    //int nEvent = 200;
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
@@ -152,9 +169,16 @@ int main (int argc, char *argv[])
     //-----------------------//
     // Load personal classes //
     //-----------------------//
-    BTagStudy bTagStudy(verbosity, datasets);
-    LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonCharge, getCorrectWrong);
+    //BTagStudy bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag);
+    BTagStudy_OLD bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag);
+    LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
     if(dataSetName.find("TTbarJets") == 0) lhcoOutput.Initialize("Reco");
+
+    int evtsWithSameIndices = 0, evtsWithSameBHadr = 0, evtsWithSameLight1 = 0, evtsWithSameLight2 = 0, correctEvtsWithSameIndices = 0;
+    ofstream correctEvtComp, oldMethodToRemove, newMethodToAdd;
+    correctEvtComp.open(("MadWeightInput/AnalyzerOutput/CorrectEventComparison_"+dataSetName+".txt").c_str());
+    oldMethodToRemove.open(("MadWeightInput/AnalyzerOutput/OldMethod_EventsToRemove_"+dataSetName+".txt").c_str());
+    newMethodToAdd.open(("MadWeightInput/AnalyzerOutput/NewMethod_EventsToAdd_"+dataSetName+".txt").c_str());
 
     int nSelectedMu = 0, nSelectedEl = 0;
     for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
@@ -186,35 +210,82 @@ int main (int argc, char *argv[])
       //ooOOooOOoo      Start of actual analysis           ooOOooOOoo
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
       bTagStudy.CalculateJets(selectedJets, bTagCSV, correctJetCombi, selectedLepton, datasets[iDataSet], Luminosity*scaleFactor);
-      float bTagLeptIndex = bTagStudy.getBLeptIndex(3);
+  
+      for(int ibTag = 0; ibTag < NrBTags; ibTag++){
+        float bTagLeptIndex = bTagStudy.getBLeptIndex(ibTag);
+        float bTagLeptIndexNEW = bTagStudy.getBLeptIndexNEW(ibTag);
 
-      //---------------------------------//
-      //  Decide on the event selection  //
-      //---------------------------------//
-      int ChosenBTag = 3;  //-->Corresponds to two T b-tags and no light veto!
-
-      //MSPlots with number of jets information before requiring at least two b-jets and at least 2 light jets!
-      MSPlot["nSelectedJets_BeforeBTag"+leptChannel]->Fill( selectedJets.size(),                           datasets[iDataSet], true, Luminosity*scaleFactor);
-      MSPlot["nBTaggedJets_BeforeBTag"+leptChannel]->Fill(  (bTagStudy.getbTaggedJets(ChosenBTag)).size(), datasets[iDataSet], true, Luminosity*scaleFactor);
-      MSPlot["nLightJets_BeforeBTag"+leptChannel]->Fill(    (bTagStudy.getLightJets(ChosenBTag)).size(),   datasets[iDataSet], true, Luminosity*scaleFactor);
-
-      //Apply the event selection
-      if( (bTagStudy.getbTaggedJets(ChosenBTag)).size() < 2 || (bTagStudy.getLightJets(ChosenBTag)).size() < 2 ) continue;
-      if(decayChannel == 0) nSelectedMu += 1;
-      else if(decayChannel == 1) nSelectedEl += 1;
-
-      //Identical MSPlots with number of jets information after requiring at least two b-jets and at least 2 light jets!
-      MSPlot["nSelectedJets_AfterBTag"+leptChannel]->Fill( selectedJets.size(),                           datasets[iDataSet], true, Luminosity*scaleFactor);
-      MSPlot["nBTaggedJets_AfterBTag"+leptChannel]->Fill(  (bTagStudy.getbTaggedJets(ChosenBTag)).size(), datasets[iDataSet], true, Luminosity*scaleFactor);
-      MSPlot["nLightJets_AfterBTag"+leptChannel]->Fill(    (bTagStudy.getLightJets(ChosenBTag)).size(),   datasets[iDataSet], true, Luminosity*scaleFactor);      
+        //std::cout << " For event " << iEvt << " the two leptonic b-jet indices are the same .... ( " << bTagLeptIndex << " vs " << bTagLeptIndexNEW << " ) " << endl;
+        //if(bTagLeptIndex != 999) std::cout << " BLept index is : " << bTagLeptIndex << std::endl;
  
-      //Write out the LHCO output!
-      if( getLHCOOutput == true && dataSetName.find("TTbarJets") == 0)
-        lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayChannel, leptonCharge, correctJetCombi); 
+        //MSPlots with number of jets information before requiring at least two b-jets and at least 2 light jets!
+        MSPlot["nSelectedJets_"+bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( selectedJets.size(),                      datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);
+
+        //Apply the event selection
+        if( bTagStudy.getNrBTaggedJets(ibTag) < 2 || bTagStudy.getNrLightJets(ibTag) < 2 ) continue;
+        if(decayChannel == 0) nSelectedMu += 1;
+        else if(decayChannel == 1) nSelectedEl += 1;
+
+        if(bTagLeptIndex == bTagLeptIndexNEW && bTagStudy.getBHadrIndexNEW(ibTag) == bTagStudy.getBHadrIndex(ibTag) &&
+           (bTagStudy.getLight1Index(ibTag) == bTagStudy.getLight1Index5Jets(ibTag) || bTagStudy.getLight1Index(ibTag) == bTagStudy.getLight2Index5Jets(ibTag) ) &&
+           (bTagStudy.getLight2Index(ibTag) == bTagStudy.getLight1Index5Jets(ibTag) || bTagStudy.getLight2Index(ibTag) == bTagStudy.getLight2Index5Jets(ibTag) ) ){
+          evtsWithSameIndices++;
+        }
+
+        bool oldMethodCorrect = false, newMethodCorrect = false;
+        //How many correct events remain the same:
+        if(correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999 && correctJetCombi[2] != 9999 && correctJetCombi[3] != 9999){
+          correctEvtComp << "   " << iEvt << "    ";
+          //-- First look at old method
+          if( decayChannel == 0 && bTagLeptIndex == correctJetCombi[0] && bTagStudy.getBHadrIndex(ibTag) == correctJetCombi[1]    &&
+              (bTagStudy.getLight1Index5Jets(ibTag) == correctJetCombi[2] || bTagStudy.getLight1Index5Jets(ibTag) == correctJetCombi[3]) &&
+              (bTagStudy.getLight2Index5Jets(ibTag) == correctJetCombi[3] || bTagStudy.getLight2Index5Jets(ibTag) == correctJetCombi[3]) ){
+            correctEvtComp << "  1     ";
+            oldMethodCorrect = true;
+          }
+          else
+            correctEvtComp << "  0     ";
+          //-- Then look at new method
+          if( decayChannel == 0 && bTagLeptIndexNEW == correctJetCombi[0] && bTagStudy.getBHadrIndexNEW(ibTag) == correctJetCombi[1]    &&
+              (bTagStudy.getLight1Index(ibTag) == correctJetCombi[2] || bTagStudy.getLight1Index(ibTag) == correctJetCombi[3]) &&
+              (bTagStudy.getLight2Index(ibTag) == correctJetCombi[3] || bTagStudy.getLight2Index(ibTag) == correctJetCombi[3]) ){
+            correctEvtComp << "  1     " << endl;
+            newMethodCorrect = true;
+          }
+          else
+            correctEvtComp << "  0     " << endl;
+        }
+
+        if(oldMethodCorrect == true && newMethodCorrect == false) oldMethodToRemove << "  " << iEvt << "    -- Should be removed!" << endl;
+        if(oldMethodCorrect == false && newMethodCorrect == true){ 
+          newMethodToAdd << "  " << iEvt << "    -- Should be added!" << endl;
+          lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndexNEW, bTagStudy.getBHadrIndexNEW(ibTag), bTagStudy.getLight1Index(ibTag), bTagStudy.getLight2Index(ibTag), decayChannel, leptonCharge, correctJetCombi);
+        }
+        
+        //Identical MSPlots with number of jets information after requiring at least two b-jets and at least 2 light jets!
+        MSPlot["nSelectedJets_"+bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( selectedJets.size(),                      datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);      
+ 
+        //Write out the LHCO output!
+        if( getLHCOOutput == true && dataSetName.find("TTbarJets") == 0){
+          //lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndexNEW, bTagStudy.getBHadrIndexNEW(ibTag), bTagStudy.getLight1Index(ibTag), bTagStudy.getLight2Index(ibTag), decayChannel, leptonCharge, correctJetCombi);
+          //lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndex, bTagStudy.getBHadrIndex(ibTag), bTagStudy.getLight1Index5Jets(ibTag), bTagStudy.getLight2Index5Jets(ibTag), decayChannel, leptonCharge, correctJetCombi);
+        }
+      }
+
     }//End of loop on events
+    std::cout<<"    Processed all "<<nEvent<<" events  --> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
+    std::cout << "\n ---> " << evtsWithSameIndices << " of them have the same indices for the two methods! " << endl;
+    correctEvtComp.close();
+    newMethodToAdd.close();
+    oldMethodToRemove.close();
 
     //--- Get output from bTagStudy class ---//
     bTagStudy.ReturnBTagTable(dataSetName);
+    bTagStudy.ReturnBTagTableNEW(dataSetName);
     bTagStudy.CreateHistograms(outputFile, savePDF, pathPNG, iDataSet);
 
     //--- Get output from LHCOOutput class ---//
