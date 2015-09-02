@@ -174,12 +174,6 @@ int main (int argc, char *argv[])
     LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
     if(dataSetName.find("TTbarJets") == 0) lhcoOutput.Initialize("Reco");
 
-    int evtsWithSameIndices = 0, evtsWithSameBHadr = 0, evtsWithSameLight1 = 0, evtsWithSameLight2 = 0, correctEvtsWithSameIndices = 0;
-    ofstream correctEvtComp, oldMethodToRemove, newMethodToAdd;
-    correctEvtComp.open(("MadWeightInput/AnalyzerOutput/CorrectEventComparison_"+dataSetName+".txt").c_str());
-    oldMethodToRemove.open(("MadWeightInput/AnalyzerOutput/OldMethod_EventsToRemove_"+dataSetName+".txt").c_str());
-    newMethodToAdd.open(("MadWeightInput/AnalyzerOutput/NewMethod_EventsToAdd_"+dataSetName+".txt").c_str());
-
     int nSelectedMu = 0, nSelectedEl = 0;
     for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
       inLightTree->GetEvent(iEvt);
@@ -215,9 +209,6 @@ int main (int argc, char *argv[])
         float bTagLeptIndex = bTagStudy.getBLeptIndex(ibTag);
         float bTagLeptIndexNEW = bTagStudy.getBLeptIndexNEW(ibTag);
 
-        //std::cout << " For event " << iEvt << " the two leptonic b-jet indices are the same .... ( " << bTagLeptIndex << " vs " << bTagLeptIndexNEW << " ) " << endl;
-        //if(bTagLeptIndex != 999) std::cout << " BLept index is : " << bTagLeptIndex << std::endl;
- 
         //MSPlots with number of jets information before requiring at least two b-jets and at least 2 light jets!
         MSPlot["nSelectedJets_"+bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( selectedJets.size(),                      datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -228,42 +219,6 @@ int main (int argc, char *argv[])
         if(decayChannel == 0) nSelectedMu += 1;
         else if(decayChannel == 1) nSelectedEl += 1;
 
-        if(bTagLeptIndex == bTagLeptIndexNEW && bTagStudy.getBHadrIndexNEW(ibTag) == bTagStudy.getBHadrIndex(ibTag) &&
-           (bTagStudy.getLight1Index(ibTag) == bTagStudy.getLight1Index5Jets(ibTag) || bTagStudy.getLight1Index(ibTag) == bTagStudy.getLight2Index5Jets(ibTag) ) &&
-           (bTagStudy.getLight2Index(ibTag) == bTagStudy.getLight1Index5Jets(ibTag) || bTagStudy.getLight2Index(ibTag) == bTagStudy.getLight2Index5Jets(ibTag) ) ){
-          evtsWithSameIndices++;
-        }
-
-        bool oldMethodCorrect = false, newMethodCorrect = false;
-        //How many correct events remain the same:
-        if(correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999 && correctJetCombi[2] != 9999 && correctJetCombi[3] != 9999){
-          correctEvtComp << "   " << iEvt << "    ";
-          //-- First look at old method
-          if( decayChannel == 0 && bTagLeptIndex == correctJetCombi[0] && bTagStudy.getBHadrIndex(ibTag) == correctJetCombi[1]    &&
-              (bTagStudy.getLight1Index5Jets(ibTag) == correctJetCombi[2] || bTagStudy.getLight1Index5Jets(ibTag) == correctJetCombi[3]) &&
-              (bTagStudy.getLight2Index5Jets(ibTag) == correctJetCombi[3] || bTagStudy.getLight2Index5Jets(ibTag) == correctJetCombi[3]) ){
-            correctEvtComp << "  1     ";
-            oldMethodCorrect = true;
-          }
-          else
-            correctEvtComp << "  0     ";
-          //-- Then look at new method
-          if( decayChannel == 0 && bTagLeptIndexNEW == correctJetCombi[0] && bTagStudy.getBHadrIndexNEW(ibTag) == correctJetCombi[1]    &&
-              (bTagStudy.getLight1Index(ibTag) == correctJetCombi[2] || bTagStudy.getLight1Index(ibTag) == correctJetCombi[3]) &&
-              (bTagStudy.getLight2Index(ibTag) == correctJetCombi[3] || bTagStudy.getLight2Index(ibTag) == correctJetCombi[3]) ){
-            correctEvtComp << "  1     " << endl;
-            newMethodCorrect = true;
-          }
-          else
-            correctEvtComp << "  0     " << endl;
-        }
-
-        if(oldMethodCorrect == true && newMethodCorrect == false) oldMethodToRemove << "  " << iEvt << "    -- Should be removed!" << endl;
-        if(oldMethodCorrect == false && newMethodCorrect == true){ 
-          newMethodToAdd << "  " << iEvt << "    -- Should be added!" << endl;
-          lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndexNEW, bTagStudy.getBHadrIndexNEW(ibTag), bTagStudy.getLight1Index(ibTag), bTagStudy.getLight2Index(ibTag), decayChannel, leptonCharge, correctJetCombi);
-        }
-        
         //Identical MSPlots with number of jets information after requiring at least two b-jets and at least 2 light jets!
         MSPlot["nSelectedJets_"+bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( selectedJets.size(),                      datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -271,17 +226,13 @@ int main (int argc, char *argv[])
  
         //Write out the LHCO output!
         if( getLHCOOutput == true && dataSetName.find("TTbarJets") == 0){
-          //lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndexNEW, bTagStudy.getBHadrIndexNEW(ibTag), bTagStudy.getLight1Index(ibTag), bTagStudy.getLight2Index(ibTag), decayChannel, leptonCharge, correctJetCombi);
+          lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndexNEW, bTagStudy.getBHadrIndexNEW(ibTag), bTagStudy.getLight1Index(ibTag), bTagStudy.getLight2Index(ibTag), decayChannel, leptonCharge, correctJetCombi);
           //lhcoOutput.StoreRecoInfo(selectedLepton, selectedJets, bTagLeptIndex, bTagStudy.getBHadrIndex(ibTag), bTagStudy.getLight1Index5Jets(ibTag), bTagStudy.getLight2Index5Jets(ibTag), decayChannel, leptonCharge, correctJetCombi);
         }
       }
 
     }//End of loop on events
-    std::cout<<"    Processed all "<<nEvent<<" events  --> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
-    std::cout << "\n ---> " << evtsWithSameIndices << " of them have the same indices for the two methods! " << endl;
-    correctEvtComp.close();
-    newMethodToAdd.close();
-    oldMethodToRemove.close();
+    std::cout<<"    Processed all "<<nEvent<<" events  --> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\n";
 
     //--- Get output from bTagStudy class ---//
     bTagStudy.ReturnBTagTable(dataSetName);
