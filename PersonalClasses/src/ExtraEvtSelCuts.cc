@@ -96,6 +96,7 @@ void ExtraEvtSelCuts::StoreCutInfluence(TFile* outfile){
 
   //Also store the plots!!
   outfile->cd();
+  if(histo1D.size() > 0){
     TDirectory* th1dir = outfile->GetDirectory("1D_histograms_ExtraEvtSelCuts");   //Check whether directory already exists ..
     if(!th1dir) th1dir = outfile->mkdir("1D_histograms_ExtraEvtSelCuts");          // .. and otherwise create it!
     th1dir->cd();
@@ -107,7 +108,9 @@ void ExtraEvtSelCuts::StoreCutInfluence(TFile* outfile){
       temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
       temp->Write();
     }
-    
+  }
+   
+  if(histo2D.size() > 0){ 
     TDirectory* th2dir = outfile->GetDirectory("2D_histograms_ExtraEvtSelCuts");
     if(!th2dir) th2dir = outfile->mkdir("2D_histograms_ExtraEvtSelCuts");
     th2dir->cd();
@@ -115,5 +118,6 @@ void ExtraEvtSelCuts::StoreCutInfluence(TFile* outfile){
       TH2F *temp = it->second;
       temp->Write();
     }
+  }
     outfile->cd(); 
 }

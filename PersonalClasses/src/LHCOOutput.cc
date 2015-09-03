@@ -474,24 +474,28 @@ void LHCOOutput::WriteLHCOPlots(TFile* outfile){
     outfile->cd();
     if(verbose_ > 3) std::cout << " Inside WriteLHCOPlots function of LHCOOutput class ! \n Histograms will be filled in file : " << outfile->GetName() << " ********************************" << std::endl;
 
-    TDirectory* th1dir = outfile->GetDirectory("1D_histograms_LHCOOutput");   //Check whether directory already exists ..
-    if(!th1dir) th1dir = outfile->mkdir("1D_histograms_LHCOOutput");          // .. and otherwise create it!
-    th1dir->cd();
-    for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
-      TH1F *temp = it->second;
-      int N = temp->GetNbinsX();
-      temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
-      temp->SetBinContent(N+1,0);
-      temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
-      temp->Write();
+    if(histo1D.size() > 0){
+      TDirectory* th1dir = outfile->GetDirectory("1D_histograms_LHCOOutput");   //Check whether directory already exists ..
+      if(!th1dir) th1dir = outfile->mkdir("1D_histograms_LHCOOutput");          // .. and otherwise create it!
+      th1dir->cd();
+      for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
+        TH1F *temp = it->second;
+        int N = temp->GetNbinsX();
+        temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+        temp->SetBinContent(N+1,0);
+        temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+        temp->Write();
+      }
     }
     
-    TDirectory* th2dir = outfile->GetDirectory("2D_histograms_LHCOOutput");
-    if(!th2dir) th2dir = outfile->mkdir("2D_histograms_LHCOOutput");
-    th2dir->cd();
-    for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){    
-      TH2F *temp = it->second;
-      temp->Write();
+    if(histo2D.size() > 0){
+      TDirectory* th2dir = outfile->GetDirectory("2D_histograms_LHCOOutput");
+      if(!th2dir) th2dir = outfile->mkdir("2D_histograms_LHCOOutput");
+      th2dir->cd();
+      for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){    
+        TH2F *temp = it->second;
+        temp->Write();
+      }
     }
     outfile->cd(); 
   }
