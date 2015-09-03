@@ -300,14 +300,14 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
   }			    
 }//End of class StoreGenInfo
 
-void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, int bLeptIndex, int bHadrIndex, int light1Index, int light2Index, int decayChannel, float leptCharge, vector<int> jetCombi, ofstream &EvtNrInfo){
+void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> selJetCombi, int decayChannel, float leptCharge, vector<int> jetCombi, ofstream &EvtNrInfo){
 
   //--- Reconstruct neutrino partially ---//
   //---   (Neutrino Pt and M needed)   ---//
   if(verbose_ > 3) std::cout << " Inside StoreRecoInfo class " << std::endl;
   TLorentzVector Neutrino;
-  float NeutrinoPx = -(lepton+Jets[bLeptIndex]+Jets[bHadrIndex]+Jets[light1Index]+Jets[light2Index]).Px();
-  float NeutrinoPy = -(lepton+Jets[bLeptIndex]+Jets[bHadrIndex]+Jets[light1Index]+Jets[light2Index]).Py();
+  float NeutrinoPx = -(lepton+Jets[selJetCombi[0]]+Jets[selJetCombi[1]]+Jets[selJetCombi[2]]+Jets[selJetCombi[3]]).Px();
+  float NeutrinoPy = -(lepton+Jets[selJetCombi[0]]+Jets[selJetCombi[1]]+Jets[selJetCombi[2]]+Jets[selJetCombi[3]]).Py();
   Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, sqrt(NeutrinoPx*NeutrinoPx + NeutrinoPy*NeutrinoPy));
   Neutrino.SetPxPyPzE(NeutrinoPx, NeutrinoPy, 0.0, Neutrino.Pt());                        //Reset the Neutrino Energy to get the correct precision
   if(verbose_ > 3) std::cout << " Mass value for the neutrino : " << Neutrino.M() << " \n" << std::endl;
@@ -324,9 +324,9 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
   bool EventCorrectlyMatched = false;
   if(jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999){
     jetCombiFound = true;
-    if( bLeptIndex == jetCombi[0] && bHadrIndex == jetCombi[1]    &&
-       (light1Index == jetCombi[2] || light1Index == jetCombi[3]) &&
-       (light2Index == jetCombi[3] || light2Index == jetCombi[3]) )
+    if( selJetCombi[0] == jetCombi[0] && selJetCombi[1] == jetCombi[1]    &&
+       (selJetCombi[2] == jetCombi[2] || selJetCombi[2] == jetCombi[3]) &&
+       (selJetCombi[3] == jetCombi[3] || selJetCombi[3] == jetCombi[3]) )
       EventCorrectlyMatched = true;
   }
 
@@ -337,29 +337,29 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
    
   //--- Plot the generator-level distributions for Pt, eta and dR ---//
   //---   --> Will be used for MG cuts comparison                 ---//
-  histo1D["Pt_Reco_LightJets"]->Fill(Jets[light1Index].Pt()); histo1D["Pt_Reco_LightJets"]->Fill(Jets[light2Index].Pt());
-  histo1D["Pt_Reco_BJets"]->Fill(Jets[bHadrIndex].Pt());      histo1D["Pt_Reco_BJets"]->Fill(Jets[bLeptIndex].Pt()); 
+  histo1D["Pt_Reco_LightJets"]->Fill(Jets[selJetCombi[2]].Pt()); histo1D["Pt_Reco_LightJets"]->Fill(Jets[selJetCombi[3]].Pt());
+  histo1D["Pt_Reco_BJets"]->Fill(Jets[selJetCombi[1]].Pt());      histo1D["Pt_Reco_BJets"]->Fill(Jets[selJetCombi[0]].Pt()); 
   if(decayChannel == 0) histo1D["Pt_Reco_Muon"]->Fill(lepton.Pt());
   if(decayChannel == 1) histo1D["Pt_Reco_Electron"]->Fill(lepton.Pt());
   histo1D["Pt_Reco_MET"]->Fill(Neutrino.Pt());
 
-  histo1D["Eta_Reco_LightJets"]->Fill(Jets[light1Index].Eta()); histo1D["Eta_Reco_LightJets"]->Fill(Jets[light2Index].Eta());
-  histo1D["Eta_Reco_BJets"]->Fill(Jets[bHadrIndex].Eta());      histo1D["Eta_Reco_BJets"]->Fill(Jets[bLeptIndex].Eta());
+  histo1D["Eta_Reco_LightJets"]->Fill(Jets[selJetCombi[2]].Eta()); histo1D["Eta_Reco_LightJets"]->Fill(Jets[selJetCombi[3]].Eta());
+  histo1D["Eta_Reco_BJets"]->Fill(Jets[selJetCombi[1]].Eta());      histo1D["Eta_Reco_BJets"]->Fill(Jets[selJetCombi[0]].Eta());
   if(decayChannel == 0) histo1D["Eta_Reco_Muon"]->Fill(lepton.Eta());
   if(decayChannel == 1) histo1D["Eta_Reco_Electron"]->Fill(lepton.Eta());
   histo1D["Eta_Reco_MET"]->Fill(Neutrino.Eta());
 
-  histo1D["deltaR_Reco_LightJets"]->Fill(Jets[light1Index].DeltaR(Jets[light2Index]));
-  histo1D["deltaR_Reco_BJets"]->Fill(Jets[bHadrIndex].DeltaR(Jets[bLeptIndex]));
-  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light1Index].DeltaR(Jets[bHadrIndex])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light1Index].DeltaR(Jets[bLeptIndex])); 
-  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light2Index].DeltaR(Jets[bHadrIndex])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[light2Index].DeltaR(Jets[bLeptIndex]));
+  histo1D["deltaR_Reco_LightJets"]->Fill(Jets[selJetCombi[2]].DeltaR(Jets[selJetCombi[3]]));
+  histo1D["deltaR_Reco_BJets"]->Fill(Jets[selJetCombi[1]].DeltaR(Jets[selJetCombi[0]]));
+  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[selJetCombi[2]].DeltaR(Jets[selJetCombi[1]])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[selJetCombi[2]].DeltaR(Jets[selJetCombi[0]])); 
+  histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[selJetCombi[3]].DeltaR(Jets[selJetCombi[1]])); histo1D["deltaR_Reco_LightWithB"]->Fill(Jets[selJetCombi[3]].DeltaR(Jets[selJetCombi[0]]));
   if(decayChannel == 0){
-    histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton.DeltaR(Jets[light1Index])); histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton.DeltaR(Jets[light2Index]));
-    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton.DeltaR(Jets[bHadrIndex]));    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton.DeltaR(Jets[bLeptIndex]));
+    histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton.DeltaR(Jets[selJetCombi[2]])); histo1D["deltaR_Reco_MuonWithJet"]->Fill(lepton.DeltaR(Jets[selJetCombi[3]]));
+    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton.DeltaR(Jets[selJetCombi[1]]));    histo1D["deltaR_Reco_MuonWithB"]->Fill(lepton.DeltaR(Jets[selJetCombi[0]]));
   }
   if(decayChannel == 1){
-    histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton.DeltaR(Jets[light1Index])); histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton.DeltaR(Jets[light2Index]));
-    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton.DeltaR(Jets[bHadrIndex]));    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton.DeltaR(Jets[bLeptIndex]));
+    histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton.DeltaR(Jets[selJetCombi[2]])); histo1D["deltaR_Reco_ElectronWithJet"]->Fill(lepton.DeltaR(Jets[selJetCombi[3]]));
+    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton.DeltaR(Jets[selJetCombi[1]]));    histo1D["deltaR_Reco_ElectronWithB"]->Fill(lepton.DeltaR(Jets[selJetCombi[0]]));
   }
 
   //---  Filling of LHCO files for reco events  ---//
@@ -369,10 +369,10 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
   if(leptCharge < 0.0 ){ //Negative lepton events
     leptonCharge = -1;
 
-    LHCORecoVector[0] = &Jets[bHadrIndex]; 
-    LHCORecoVector[1] = &Jets[light1Index];
-    LHCORecoVector[2] = &Jets[light2Index];
-    LHCORecoVector[3] = &Jets[bLeptIndex];
+    LHCORecoVector[0] = &Jets[selJetCombi[1]]; 
+    LHCORecoVector[1] = &Jets[selJetCombi[2]];
+    LHCORecoVector[2] = &Jets[selJetCombi[3]];
+    LHCORecoVector[3] = &Jets[selJetCombi[0]];
     LHCORecoVector[4] = &lepton;
     LHCORecoVector[5] = &Neutrino;
 
@@ -393,12 +393,12 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
   else if(leptCharge > 0.0 ){ //Positive lepton events
     leptonCharge = 1;
 
-    LHCORecoVector[0] = &Jets[bLeptIndex];
+    LHCORecoVector[0] = &Jets[selJetCombi[0]];
     LHCORecoVector[1] = &lepton;
     LHCORecoVector[2] = &Neutrino;
-    LHCORecoVector[3] = &Jets[bHadrIndex];
-    LHCORecoVector[4] = &Jets[light1Index];
-    LHCORecoVector[5] = &Jets[light2Index];
+    LHCORecoVector[3] = &Jets[selJetCombi[1]];
+    LHCORecoVector[4] = &Jets[selJetCombi[2]];
+    LHCORecoVector[5] = &Jets[selJetCombi[3]];
 
     MadGraphRecoId[2] = 6;
     if(decayChannel == 1){//Positive electron
