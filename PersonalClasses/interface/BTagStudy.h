@@ -30,11 +30,13 @@ class BTagStudy{
     BTagStudy(int, vector<Dataset*>, bool, int);
     ~BTagStudy();
 
+    void InitializeDataSet(std::string);
     void CalculateJets(vector<TLorentzVector>, vector<float> bTagValues, vector<int> jetCombi, TLorentzVector lepton, Dataset*, float);
-    void ReturnBTagTable(std::string);
-    void ReturnThirdJetTable();    //Still to fill
-    void CreateHistograms(TFile*, bool, std::string, int); 
- 
+    void ReturnBTagTable();
+    //void ReturnThirdJetTable();    //Still to fill
+    void CreateHistograms(TFile*, bool, std::string, int iDS); 
+
+    vector<int> getIndices(int bTagNr) {return jetIndices[bTagNr];}; 
     int getBHadrIndex(int bTagNr)  {return bHadrIndex[bTagNr];};
     int getBLeptIndex(int bTagNr)  {return bLeptIndex[bTagNr];};
     int getLight1Index(int bTagNr) {return light1Index[bTagNr];};
@@ -44,15 +46,15 @@ class BTagStudy{
     int getNrNonbTaggedJets(int OptionNr){return NonbTagJetNr[OptionNr].size();};
     int getNrLightJets(int OptionNr)     {return LightJetNr[OptionNr].size();};
 
-    int getMlbMqqbChiSquared(int bTagNr) {return LowestChiSq[bTagNr];};
+    int getMlbMqqbChiSq(int bTagNr) {return LowestChiSq[bTagNr];};
 
   private:
     void CompareJetCombi(vector<int> jetCombi, int bTagNr, bool jetCase, int lightJetOne, int lightJetTwo);
-    void InitializeBegin(vector<Dataset*>);
     void ResetEventArrays();
     int getLowestMlbMqqbChiSquared( int bTagNr, vector<TLorentzVector> Jets, TLorentzVector lepton);
 
     int bHadrIndex[6], bLeptIndex[6], light1Index[6], light2Index[6];
+    vector<int> jetIndices[6];
     int NotReconstructedEvent[2][6], CorrectlyMatched[2][3][6], atLeastOneWrongMatch[2][3][6];
     int LowestChiSq[6];
 
@@ -63,11 +65,13 @@ class BTagStudy{
     vector<int> bTagJetNr[6], NonbTagJetNr[6], LightJetNr[6];
 
     float Mlb, Mqqb, S_Mlb, S_Mqqb;
+    int chosenBTag_, nrBTags_, nrDatasets_;
+    bool singleWP_, use5Jets_;  
+    std::string dataSetName_;
+
     map<std::string,TH1F*> histo1D;
     map<string,TH2F*> histo2D;
     map<string,MultiSamplePlot*> MSPlot;
-    int nrDatasets_, chosenBTag_, nrBTags_;
-    bool singleWP_, use5Jets_;  
 
     //4- and 5-jet case comparison
     //int EventWithTwoLightJets[6];

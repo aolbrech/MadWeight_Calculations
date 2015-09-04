@@ -1,25 +1,14 @@
 #include "../interface/BTagStudy.h"
 
 BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, int whichCombi){
+
   verbose = outputVerbose;
-  nrDatasets_ = datasets.size();
   singleWP_ = oneWP;
   chosenBTag_ = whichCombi;
-  use5Jets_ = true; 
+  use5Jets_ = true;
+  nrDatasets_ = datasets.size();
 
-  BTagStudy::InitializeBegin(datasets);
-
-    //evtSelOutput[0].open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/eventSelectionChoiceTables4JetCase.tex");
-    //evtSelOutput[1].open("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/EventSelectionResults/AnalyzerOutput/eventSelectionChoiceTables5JetCase.tex");
-}
-
-BTagStudy::~BTagStudy(){
-    evtSelOutput[0].close();
-    evtSelOutput[1].close();
-}
-
-void BTagStudy::InitializeBegin(vector<Dataset*> datasets){
-
+  //Start to initialize all variables!!
   for(int ii = 0; ii < 6; ii++){
     for(int jj = 0; jj < 2; jj++){
       NotReconstructedEvent[ii][jj]=0;
@@ -45,20 +34,39 @@ void BTagStudy::InitializeBegin(vector<Dataset*> datasets){
     if(singleWP_){BJetWP[0] = bjetWP[chosenBTag_]; LightJetWP[0] = lightjetWP[chosenBTag_]; OptionName[0] = optionName[chosenBTag_]; BName[0] = bName[chosenBTag_]; BTitle[0] = bTitle[chosenBTag_];}
     else         {BJetWP[itBTag] = bjetWP[itBTag]; LightJetWP[itBTag] = lightjetWP[itBTag]; OptionName[itBTag] = optionName[itBTag]; BName[itBTag] = bName[itBTag]; BTitle[itBTag] = bTitle[itBTag];}
 
-    //---  Create the histograms  ---//
-    MSPlot["Mlb_MassDistribution_"+BTitle[itBTag]] = new MultiSamplePlot(datasets,("Mlb_MassDistribution_"+BTitle[itBTag]).c_str(),150,50,180, ("Mass of lepton and leptonic b-jet "+BName[itBTag]).c_str());
-    MSPlot["Mlb_ChiSqDistribution_"+BTitle[itBTag]] = new MultiSamplePlot(datasets,("Mlb_ChiSqDistribution_"+BTitle[itBTag]).c_str(),150, 0, 10, ("#chi^{2}_{mlb} for b-jet choice "+BName[itBTag]).c_str());
-    histo1D["Mlb_CorrectCombiChiSq_"+BTitle[itBTag]] = new TH1F(("Mlb_CorrectCombiChiSq_"+BTitle[itBTag]).c_str(),("#chi^{2}_{mlb} for correct b-jet choice "+BName[itBTag]).c_str(),150,0,10);
-    histo1D["Mlb_WrongCombiChiSq_"+BTitle[itBTag]]   = new TH1F(("Mlb_WrongCombiChiSq_"+BTitle[itBTag]).c_str(),("#chi^{2}_{mlb} for wrong b-jet choice "+BName[itBTag]).c_str(),150,0,10);
-
-    histo1D["LowestChiSq_"+BTitle[itBTag]] = new TH1F(("LowestChiSq_"+BTitle[itBTag]).c_str(), ("#chi^{2} distribution for chosen jet-combination "+BName[itBTag]).c_str(), 150,0,80);
-    histo1D["WrongChiSq_"+BTitle[itBTag]] = new TH1F(("WrongChiSq_"+BTitle[itBTag]).c_str(), ("#chi^{2} distribution for the non-chosen jet combination "+BName[itBTag]).c_str(), 150,0,80);
+    //---  Create the MSPlots (general for all datasets)  ---//
+    //MSPlot["Mlb_MassDistribution_"+BTitle[itBTag]] =new MultiSamplePlot(datasets,("Mlb_MassDistribution_"+BTitle[itBTag]).c_str(),150,50,180,("Mass of lepton and leptonic b-jet "+BName[itBTag]).c_str());
+    //MSPlot["Mlb_ChiSqDistribution_"+BTitle[itBTag]] = new MultiSamplePlot(datasets,("Mlb_ChiSqDistribution_"+BTitle[itBTag]).c_str(),150,0,10,("#chi^{2}_{mlb} for b-jet choice "+BName[itBTag]).c_str());
   }
 
   //---  ChiSq Mlb and Mqqb information ---//
+  //Mlb  = 108.1841; S_Mlb  = 31.4213;    --> NEW values!!
+  //Mqqb = 174.6736; S_Mqqb = 17.5757;    --> NEW values!!
   Mlb  = 103.286; S_Mlb  = 26.7764;
   Mqqb = 178.722; S_Mqqb = 18.1385;
 }
+
+BTagStudy::~BTagStudy(){
+    evtSelOutput[0].close();
+    evtSelOutput[1].close();
+}
+
+void BTagStudy::InitializeDataSet(std::string datasetName){
+
+  //In case a histogram specific for each dataset should be created it should be initialized here!!
+  dataSetName_ = datasetName;
+
+  for(int itBTag = 0; itBTag < nrBTags_; itBTag++){
+
+    //---  Create the histograms  ---//
+    std::string TitleInfo = BTitle[itBTag]+"_"+dataSetName_;
+    histo1D["Mlb_CorrectCombiChiSq_"+TitleInfo] = new TH1F(("Mlb_CorrectCombiChiSq_"+TitleInfo).c_str(),("#chi^{2}_{mlb} for correct b-jet choice -- "+TitleInfo).c_str(),150,0,10);
+    histo1D["Mlb_WrongCombiChiSq_"+TitleInfo]   = new TH1F(("Mlb_WrongCombiChiSq_"+TitleInfo).c_str(),("#chi^{2}_{mlb} for wrong b-jet choice -- "+TitleInfo).c_str(),150,0,10);
+
+    histo1D["LowestChiSq_"+TitleInfo] = new TH1F(("LowestChiSq_"+TitleInfo).c_str(), ("#chi^{2} distribution for chosen jet-combination -- "+TitleInfo).c_str(), 150,0,80);
+    histo1D["WrongChiSq_"+TitleInfo] = new TH1F(("WrongChiSq_"+TitleInfo).c_str(), ("#chi^{2} distribution for the non-chosen jet combination -- "+TitleInfo).c_str(), 150,0,80);
+  }
+}   
 
 void BTagStudy::ResetEventArrays(){
 
@@ -66,6 +74,7 @@ void BTagStudy::ResetEventArrays(){
     bTagJetNr[ii].clear();
     NonbTagJetNr[ii].clear();
     LightJetNr[ii].clear();
+    jetIndices[ii].clear();
   }
 }
 
@@ -126,6 +135,11 @@ void BTagStudy::CalculateJets(vector<TLorentzVector> Jets, vector<float> CSVbTag
       bHadrIndex[bTagOption] = 999;
       bLeptIndex[bTagOption] = 999;
     }
+
+    jetIndices[bTagOption].push_back(bLeptIndex[bTagOption]);
+    jetIndices[bTagOption].push_back(bHadrIndex[bTagOption]);
+    jetIndices[bTagOption].push_back(light1Index[bTagOption]);
+    jetIndices[bTagOption].push_back(light2Index[bTagOption]);
       
     //--- Additional output for debugging --//
     if(verbose > 3)
@@ -157,12 +171,12 @@ int BTagStudy::getLowestMlbMqqbChiSquared(int bTagNr, vector<TLorentzVector> Jet
   std::sort(ChiSq.begin(), ChiSq.end(), sort_pred());
 
   //Add some information in histograms
-  histo1D["LowestChiSq_"+BTitle[bTagNr]]->Fill(ChiSq[0].second);
+  histo1D["LowestChiSq_"+BTitle[bTagNr]+"_"+dataSetName_]->Fill(ChiSq[0].second);
   for(unsigned int ii = 1; ii < ChiSq.size(); ii++)
-    histo1D["WrongChiSq_"+BTitle[bTagNr]]->Fill(ChiSq[ii].second);  //--> Change the title of this histogram to specify how many others there are (5 or only 1)!! (not possible, since this is an event-by-event value ...)
+    histo1D["WrongChiSq_"+BTitle[bTagNr]+"_"+dataSetName_]->Fill(ChiSq[ii].second);
 
   //Store the lowest chi-sq value such that it can be passed on to main class and used for additional event selection
-  LowestChiSq[bTagNr] = ChiSq[0].first;
+  LowestChiSq[bTagNr] = ChiSq[0].second;
 
   return ChiSq[0].first;
 }
@@ -208,13 +222,12 @@ void BTagStudy::CompareJetCombi(vector<int> jetCombi, int OptionNr, bool fifthJe
   }//If 5-jet case is considered, this loop is done twice!!
 }
 
-void BTagStudy::CreateHistograms(TFile* outfile, bool savePDF, std::string pathPNG, int datasetNr){
+void BTagStudy::CreateHistograms(TFile* outfile, bool savePDF, std::string pathPNG, int dataSetNr){
   //--- Use this function to create ChiSq histograms ---//
   outfile->cd();
   if(verbose > 3) std::cout << " Inside CreateHistograms function of BTagStudy class ! \n  Histograms will be filled in file : " << outfile->GetName() << " ********************************" << std::endl;
 
-  //Only write out the MSPlots if the datasetNr == nrDatasets_-1!
-  if(datasetNr == nrDatasets_-1 && MSPlot.size() > 0){
+  if(dataSetNr == nrDatasets_-1 && MSPlot.size() > 0){
     TDirectory* msdir = outfile->GetDirectory("MSPlots_BTagStudy");
     if(!msdir) msdir = outfile->mkdir("MSPlots_BTagStudy");
     msdir->cd(); 
@@ -254,10 +267,10 @@ void BTagStudy::CreateHistograms(TFile* outfile, bool savePDF, std::string pathP
   outfile->cd(); 
 }
 
-void BTagStudy::ReturnBTagTable(std::string dataSetName){ 
+void BTagStudy::ReturnBTagTable(){ 
 
-  evtSelOutput[0].open(("EventSelectionResults/AnalyzerOutput/evtSelChoice_4JetCase_"+dataSetName+".tex").c_str());
-  evtSelOutput[1].open(("EventSelectionResults/AnalyzerOutput/evtSelChoice_5JetCase_"+dataSetName+".tex").c_str());
+  evtSelOutput[0].open("EventSelectionResults/AnalyzerOutput/evtSelChoice_4JetCase.tex");
+  evtSelOutput[1].open("EventSelectionResults/AnalyzerOutput/evtSelChoice_5JetCase.tex");
 
   string Title[3]= {"  \\textbf{Option} & all 4 correct & $\\geq$ 1 wrong       & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
 		    "  \\textbf{Option} & 2 b's correct & $\\geq$ 1 b wrong     & b's correct ($\\%$)   & $\\frac{s}{b}$ & non-matched \\\\", 
@@ -296,9 +309,9 @@ void BTagStudy::ReturnBTagTable(std::string dataSetName){
   }//itJetCase
 }
 
-void BTagStudy::ReturnThirdJetTable(){
+/*void BTagStudy::ReturnThirdJetTable(){
   //--- Create a separate output file for 3rd jet efficiencies! ---//
 	//ThirdJetPercentage[jj] = (float)(Correct3rdJet[jj]*100.0)/(float)(CorrectOnes5Jets[jj]);
         //" & " << Correct3rdJet[itWhichJets]          << 
         //" & " << ThirdJetPercentage[itWhichJets]     << 
-}
+}*/
