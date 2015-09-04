@@ -432,7 +432,7 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
       CWUEvtNr[CWUIndex]++; 
       LHCOEventOutput(leptonCharge, CWURecoFile[CWUIndex], CWUEvtNr[CWUIndex], LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
 
-      EvtNrInfo << "            " << CWUFile[CWUIndex] << "         " << CWUEvtNr[CWUIndex];
+      EvtNrInfo << "                " << CWUFile[CWUIndex] << "                     " << CWUEvtNr[CWUIndex];
     }
   } 
 
