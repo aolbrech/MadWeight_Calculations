@@ -22,10 +22,10 @@ using namespace TopTree;
 class ExtraEvtSelCuts{
 
   public:
-    ExtraEvtSelCuts();
+    ExtraEvtSelCuts(float TopMassHadr, float sTopMassHadr, float WMassHadr, float sWMassHadr, bool, int chiSqCut = -1, int massSigma = -1);
     ~ExtraEvtSelCuts();
 
-    void Initialize(float TopMassHadr, float sTopMassHadr, float WMassHadr, float sWMassHadr, bool, std::string bTagTitle, int chiSqCut = -1, int massSigma = -1);
+    void Initialize(std::string bTagTitle, std::string dataSetName);
     bool KeepEvent(vector<int>, TLorentzVector, vector<TLorentzVector>, vector<int>, float chiSqValue, int CWUIndex, int decayCh);
     void StoreCutInfluence(TFile*);
 
@@ -33,7 +33,7 @@ class ExtraEvtSelCuts{
     float MTopHadr_, MWHadr_, sig_MTopH_, sig_MWH_;
     float ChiSqCutVal_[5], MTop_Down_[5], MTop_Up_[5], MW_Down_[5], MW_Up_[5], MassWindow_Sigmas_[5];
     int nrCuts_, chosenChiSq_, chosenMassWindow_;
-    std::string bTitle_;
+    std::string histTitle_;
     bool oneBTag_;
 
     int OriginalEvts_[3], NrEvts_AllChosenCuts_[3];

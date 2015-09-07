@@ -1,21 +1,10 @@
 #include "../interface/ExtraEvtSelCuts.h"
 
-ExtraEvtSelCuts::ExtraEvtSelCuts(){
-
-  //Do not do anything here since this class should only be used in the case of the TTBarSemiLepton dataset!
-  //This because it uses the correctJetCombi information in order to decide on the optimal cut values!
-}
-
-ExtraEvtSelCuts::~ExtraEvtSelCuts(){
-
-}
-
-void ExtraEvtSelCuts::Initialize(float TopMassHadr, float sTopMassHadr, float WMassHadr, float sWMassHadr, bool oneBTag, std::string bTagTitle, int chiSqCut, int massWindow){
+ExtraEvtSelCuts::ExtraEvtSelCuts(float TopMassHadr, float sTopMassHadr, float WMassHadr, float sWMassHadr, bool oneBTag, int chiSqCut, int massWindow){
 
   //Initialize the counters for the chi-sq and mW/mTop cuts!
   float ChiSqCutValues[5] = {50, 30, 20, 10, 5};
   float MassWindowSigmas[5] = {5, 3, 2, 1.5, 1}; 
-  bTitle_ = bTagTitle;
   oneBTag_ = oneBTag;
 
   nrCuts_ = 5;
@@ -36,10 +25,27 @@ void ExtraEvtSelCuts::Initialize(float TopMassHadr, float sTopMassHadr, float WM
     }
   }
 
+}
+
+ExtraEvtSelCuts::~ExtraEvtSelCuts(){
+
+}
+
+void ExtraEvtSelCuts::Initialize(std::string bTagTitle, std::string dataSetName){
+
+  histTitle_ = bTagTitle+"_"+dataSetName;
   //Get the Mlb-Mqqb chiSq for correct and wrong events to decide on a cut-value
-  histo1D["LowestChiSq_CorrectEvents_"+bTitle_]   = new TH1F(("LowestChiSq_CorrectEvents_"+bTitle_).c_str(),   ("#chi^{2} distribution for chosen jet-combination (correct events -- "+bTitle_+")").c_str(),   50,0,80);
-  histo1D["LowestChiSq_WrongEvents_"+bTitle_]     = new TH1F(("LowestChiSq_WrongEvents_"+bTitle_).c_str(),     ("#chi^{2} distribution for chosen jet-combination (wrong events -- "+bTitle_+")").c_str(),     50,0,80);
-  histo1D["LowestChiSq_UnmatchedEvents_"+bTitle_] = new TH1F(("LowestChiSq_UnmatchedEvents_"+bTitle_).c_str(), ("#chi^{2} distribution for chosen jet-combination (unmatched events -- "+bTitle_+")").c_str(), 50,0,80);
+  histo1D["LowestChiSq_CorrectEvents_"+histTitle_]   = new TH1F(("LowestChiSq_CorrectEvents_"+histTitle_).c_str(),   ("#chi^{2} distribution for chosen jet-combination (correct events -- "+histTitle_+")").c_str(),   50,0,80);
+  histo1D["LowestChiSq_WrongEvents_"+histTitle_]     = new TH1F(("LowestChiSq_WrongEvents_"+histTitle_).c_str(),     ("#chi^{2} distribution for chosen jet-combination (wrong events -- "+histTitle_+")").c_str(),     50,0,80);
+  histo1D["LowestChiSq_UnmatchedEvents_"+histTitle_] = new TH1F(("LowestChiSq_UnmatchedEvents_"+histTitle_).c_str(), ("#chi^{2} distribution for chosen jet-combination (unmatched events -- "+histTitle_+")").c_str(), 50,0,80);
+
+  //Reset the counters!
+  for(int iCut = 0; iCut < nrCuts_; iCut++){
+    for(int iCWU = 0; iCWU < 3; iCWU++){
+      NrEvts_ChiSq_[iCWU][iCut] = 0;  NrEvts_MT_[iCWU][iCut] = 0; NrEvts_MW_[iCWU][iCut] = 0; NrEvts_MComb_[iCWU][iCut] = 0;
+      if(iCut == 0){ NrEvts_AllChosenCuts_[iCWU] = 0; OriginalEvts_[iCWU] = 0;}
+    }
+  }
 }
 
 bool ExtraEvtSelCuts::KeepEvent(vector<int> jetComb, TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> selJetComb, float chiSq, int CWUIndex, int decayCh){
@@ -59,10 +65,10 @@ bool ExtraEvtSelCuts::KeepEvent(vector<int> jetComb, TLorentzVector lepton, vect
     if(ChiSqSurv[chosenChiSq_] && MTSurv[chosenMassWindow_] && MWSurv[chosenMassWindow_]) keepEvt = true;
 
     //Now get the numbers for the correct/wrong/unmatched categories!
-    if(CWUIndex == 0)      histo1D["LowestChiSq_CorrectEvents_"+bTitle_]->Fill(chiSq);  
-    else if(CWUIndex == 1) histo1D["LowestChiSq_WrongEvents_"+bTitle_]->Fill(chiSq);    
-    else if(CWUIndex == 2) histo1D["LowestChiSq_UnmatchedEvents_"+bTitle_]->Fill(chiSq);
-  
+    if(CWUIndex == 0)      histo1D["LowestChiSq_CorrectEvents_"+histTitle_]->Fill(chiSq);  
+    else if(CWUIndex == 1) histo1D["LowestChiSq_WrongEvents_"+histTitle_]->Fill(chiSq);    
+    else if(CWUIndex == 2) histo1D["LowestChiSq_UnmatchedEvents_"+histTitle_]->Fill(chiSq);
+ 
     OriginalEvts_[CWUIndex]++;
 
     for(int iCut = 0; iCut < nrCuts_; iCut++){
