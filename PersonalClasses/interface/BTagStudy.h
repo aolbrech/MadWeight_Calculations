@@ -46,7 +46,7 @@ class BTagStudy{
     int getNrNonbTaggedJets(int OptionNr){return NonbTagJetNr[OptionNr].size();};
     int getNrLightJets(int OptionNr)     {return LightJetNr[OptionNr].size();};
 
-    int getMlbMqqbChiSq(int bTagNr) {return LowestChiSq[bTagNr];};
+    float getMlbMqqbChiSq(int bTagNr) {return LowestChiSq[bTagNr];};
 
   private:
     void CompareJetCombi(vector<int> jetCombi, int bTagNr, bool jetCase, int lightJetOne, int lightJetTwo);
@@ -56,7 +56,7 @@ class BTagStudy{
     int bHadrIndex[6], bLeptIndex[6], light1Index[6], light2Index[6];
     vector<int> jetIndices[6];
     int NotReconstructedEvent[2][6], CorrectlyMatched[2][3][6], atLeastOneWrongMatch[2][3][6];
-    int LowestChiSq[6];
+    float LowestChiSq[6];
 
     int verbose;
     float BJetWP[6], LightJetWP[6];  
