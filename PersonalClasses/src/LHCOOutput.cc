@@ -20,13 +20,12 @@ LHCOOutput::~LHCOOutput(){
 
   //Close the output files:
   for(int ii = 0; ii < 4; ii++){
-    if(GenOrReco_ == "Gen" && writeOutput_) GenOutFile[ii].close();
-    if(GenOrReco_ == "Reco" && writeOutput_) RecoOutFile[ii].close();
+    if(writeOutput_) MWOutFile[ii].close();
     if(GenOrReco_ == "Reco" && writeOutput_ && ii < 3) CWURecoFile[ii].close();
   }
 }
 
-void LHCOOutput::Initialize(string GenOrReco){
+void LHCOOutput::Initialize(string GenOrReco, std::string dataSetName){
   if(verbose_ > 3) std::cout << " In Initialize function of LHCOOutput ... " << std::endl;    
 
   GenOrReco_ = GenOrReco; //Will be updated if the sample is TTbarJets and then the destructor will actually do something (for all other samples nothing will be executed in destructor)
@@ -35,43 +34,21 @@ void LHCOOutput::Initialize(string GenOrReco){
   
   CWUEvtNr[0] = 0; CWUEvtNr[1] = 0; CWUEvtNr[2] = 0;
 
-  if(GenOrReco == "Gen" && writeOutput_ == true){
-    if(splitLeptCharge_){
-      GenOutFile[0].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveMuon.lhco");
-      GenOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeMuon.lhco");
-      GenOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_PositiveElectron.lhco");
-      GenOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_NegativeElectron.lhco");
-    }
-    else{
-      GenOutFile[0].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_Muon.lhco");
-      GenOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarLHCO_Electron.lhco");
+  int nrTypes = 4;
+  std::string whichType[4] = {"PositiveMuon","NegativeMuon","PositiveElectron","NegativeElectron"};
+  if(!splitLeptCharge_){ whichType[0] = "Muon"; whichType[1] = "Electron"; nrTypes = 2;}
+
+  if(writeOutput_){
+  
+    for(int iType = 0; iType < nrTypes; iType++)
+      MWOutFile[iType].open(("MadWeightInput/AnalyzerOutput/"+dataSetName+"_"+GenOrReco+"_"+whichType[iType]+".lhco").c_str());
+      
+    if(splitCorrectWrong_ && dataSetName.find("TTbarJets_SemiLept") == 0 && GenOrReco == "Reco"){
+      CWURecoFile[0].open(("MadWeightInput/AnalyzerOutput/"+dataSetName+"_Correct"+GenOrReco+"_"+whichType[0]+".lhco").c_str());
+      CWURecoFile[1].open(("MadWeightInput/AnalyzerOutput/"+dataSetName+"_Wrong"+GenOrReco+"_"+whichType[0]+".lhco").c_str());
+      CWURecoFile[2].open(("MadWeightInput/AnalyzerOutput/"+dataSetName+"_Unmatched"+GenOrReco+"_"+whichType[0]+".lhco").c_str());
     }
   }
-  else if(GenOrReco == "Reco" && writeOutput_ == true){
-    if(splitLeptCharge_){
-      RecoOutFile[0].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveMuon.lhco");
-      RecoOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeMuon.lhco");
-      RecoOutFile[2].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_PositiveElec.lhco");
-      RecoOutFile[3].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_NegativeElec.lhco");
-    }
-    else{
-      RecoOutFile[0].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_Muon.lhco");
-      RecoOutFile[1].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_Reco_Electron.lhco");
-    }
-
-    if(splitCorrectWrong_){
-      if(splitLeptCharge_){
-        CWURecoFile[0].open("MadWeightInput/AnalyzerOutput/CorrectRecoEvents_PositiveMuon.lhco");
-        CWURecoFile[1].open("MadWeightInput/AnalyzerOutput/WrongRecoEvents_PositiveMuon.lhco");
-        CWURecoFile[2].open("MadWeightInput/AnalyzerOutput/UnmatchedRecoEvents_PositiveMuon.lhco");
-      }
-      else{
-        CWURecoFile[0].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_CorrectReco_Muon.lhco");
-        CWURecoFile[1].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_WrongReco_Muon.lhco");
-        CWURecoFile[2].open("MadWeightInput/AnalyzerOutput/TTbarSemiLepton_UnmatchedReco_Muon.lhco");
-      }
-    }
-  }   
 
   histo1D[(GenOrReco+"_TopMassLept").c_str()] = new TH1F((GenOrReco+"_TopMassLept").c_str(),("Leptonic top-mass distribution for "+GenOrReco+" events").c_str(),250,130,210);
   histo1D[(GenOrReco+"_TopMassHadr").c_str()] = new TH1F((GenOrReco+"_TopMassHadr").c_str(),("Hadronic top-mass distribution for "+GenOrReco+" events").c_str(),250,130,210);
@@ -230,8 +207,8 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 	if(writeOutput_){
 	  NumberNegativeElectrons++;
           leptonType = elMinus;      //Enum information	  --> Used anywhere??
-	  if(splitLeptCharge_) LHCOEventOutput(3, GenOutFile[3], NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
-          else                 LHCOEventOutput(3, GenOutFile[1], NumberNegativeElectrons+NumberPositiveElectrons,LHCOVector,MadGraphId, MGBtag);
+	  if(splitLeptCharge_) LHCOEventOutput(3, MWOutFile[3], NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
+          else                 LHCOEventOutput(3, MWOutFile[1], NumberNegativeElectrons+NumberPositiveElectrons,LHCOVector,MadGraphId, MGBtag);
 	}
       }//Negative electron
       else if(Lepton->type() == 13){       //Looking at negative muon events (index 1 for LHCO file)
@@ -239,8 +216,8 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 	if(writeOutput_){
 	  NumberNegativeMuons++;
           leptonType = muMinus;      //Enum information
-	  if(splitLeptCharge_) LHCOEventOutput(1, GenOutFile[1], NumberNegativeMuons,LHCOVector,MadGraphId, MGBtag);
-          else                 LHCOEventOutput(1, GenOutFile[0], NumberNegativeMuons+NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
+	  if(splitLeptCharge_) LHCOEventOutput(1, MWOutFile[1], NumberNegativeMuons,LHCOVector,MadGraphId, MGBtag);
+          else                 LHCOEventOutput(1, MWOutFile[0], NumberNegativeMuons+NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
 	}
       }//Negative muon
 
@@ -264,8 +241,8 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 	if(writeOutput_){
 	  NumberPositiveElectrons++;
           leptonType = elPlus;      //Enum information
-	  if(splitLeptCharge_) LHCOEventOutput(2, GenOutFile[2], NumberPositiveElectrons,LHCOVector,MadGraphId, MGBtag);
-          else                 LHCOEventOutput(2, GenOutFile[1], NumberPositiveElectrons+NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
+	  if(splitLeptCharge_) LHCOEventOutput(2, MWOutFile[2], NumberPositiveElectrons,LHCOVector,MadGraphId, MGBtag);
+          else                 LHCOEventOutput(2, MWOutFile[1], NumberPositiveElectrons+NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
 	}
       }//Positive electron
       else if(Lepton->type() == -13){             //Looking at positive muon events (index 0 for LHCO file)
@@ -273,8 +250,8 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
 	if(writeOutput_){
 	  NumberPositiveMuons++;
           leptonType = muPlus;      //Enum information
-	  if(splitLeptCharge_) LHCOEventOutput(0, GenOutFile[0], NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
-          else                 LHCOEventOutput(0, GenOutFile[0], NumberPositiveMuons+NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
+	  if(splitLeptCharge_) LHCOEventOutput(0, MWOutFile[0], NumberPositiveMuons,LHCOVector,MadGraphId, MGBtag);
+          else                 LHCOEventOutput(0, MWOutFile[0], NumberPositiveMuons+NumberNegativeElectrons,LHCOVector,MadGraphId, MGBtag);
 	}
       }//Positive muon
 	  
@@ -403,7 +380,7 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
     }
   }//End of positive lepton
 
-  LHCOEventOutput(leptonCharge, RecoOutFile[fileIndex], MWEvtNr, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
+  LHCOEventOutput(leptonCharge, MWOutFile[fileIndex], MWEvtNr, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
   EvtNrInfo << "            " << MainFile[fileIndex] << "                " << MWEvtNr;
   if( MWEvtNr < 10) EvtNrInfo << " "; if( MWEvtNr < 100) EvtNrInfo << " "; if( MWEvtNr < 1000) EvtNrInfo << " "; if( MWEvtNr < 10000) EvtNrInfo << " "; if( MWEvtNr < 100000) EvtNrInfo << " ";
  

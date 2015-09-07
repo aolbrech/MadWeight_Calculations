@@ -20,7 +20,7 @@ public:
   LHCOOutput(int, bool, bool, bool);
   ~LHCOOutput();
 
-  void Initialize(std::string);
+  void Initialize(std::string, std::string dataSetName = "");
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
   void StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> selJetCombi, int decayChannelEnum, float leptonCharge, ofstream &EvtNrInfo, int CWUIndex); 
   void WriteLHCOPlots(TFile*);
@@ -44,7 +44,7 @@ private:
   unsigned int NumberNegRecoEl, NumberNegRecoMu, NumberPosRecoEl, NumberPosRecoMu;
   unsigned int CWUEvtNr[3];
   bool CorrectGenEvtContent;
-  ofstream GenOutFile[4], RecoOutFile[4], WrongGenFile, CWURecoFile[3];
+  ofstream MWOutFile[4], WrongGenFile, CWURecoFile[3];
   int verbose_;
   bool writeOutput_, splitLeptCharge_, splitCorrectWrong_;
   std::string GenOrReco_;
