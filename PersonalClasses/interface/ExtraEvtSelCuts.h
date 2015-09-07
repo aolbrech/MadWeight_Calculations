@@ -26,7 +26,7 @@ class ExtraEvtSelCuts{
     ~ExtraEvtSelCuts();
 
     void Initialize(float TopMassHadr, float sTopMassHadr, float WMassHadr, float sWMassHadr, bool, std::string bTagTitle, int chiSqCut = -1, int massSigma = -1);
-    bool KeepEvent(vector<int>, TLorentzVector, vector<TLorentzVector>, vector<int>, float chiSqValue);
+    bool KeepEvent(vector<int>, TLorentzVector, vector<TLorentzVector>, vector<int>, float chiSqValue, int CWUIndex, int decayCh);
     void StoreCutInfluence(TFile*);
 
   private:
@@ -36,12 +36,10 @@ class ExtraEvtSelCuts{
     std::string bTitle_;
     bool oneBTag_;
 
-    int CorrEvts_, WrongEvts_, UnmatchEvts_;
-    int CorrEvts_ChiSq_[5], WrongEvts_ChiSq_[5], UnmatchEvts_ChiSq_[5];
-    int CorrEvts_MT_[5], WrongEvts_MT_[5], UnmatchEvts_MT_[5];
-    int CorrEvts_MW_[5], WrongEvts_MW_[5], UnmatchEvts_MW_[5];
-    int CorrEvts_MComb_[5], WrongEvts_MComb_[5], UnmatchEvts_MComb_[5];
-    int CorrEvts_AllChosenCuts_, WrongEvts_AllChosenCuts_, UnmatchEvts_AllChosenCuts_;
+    int OriginalEvts_[3], NrEvts_AllChosenCuts_[3];
+    int NrEvts_ChiSq_[3][5], NrEvts_MT_[3][5], NrEvts_MW_[3][5], NrEvts_MComb_[3][5];
+
+    int WrongEvts_Mu, WrongEvts_El, CorrEvts_Mu, CorrEvts_El;
 
     map<string,TH1F*> histo1D;
     map<string,TH2F*> histo2D;

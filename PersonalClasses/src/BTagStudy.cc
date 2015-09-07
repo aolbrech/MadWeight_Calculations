@@ -1,6 +1,6 @@
 #include "../interface/BTagStudy.h"
 
-BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, int whichCombi){
+BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, int whichCombi, float Masslb, float sMasslb, float Massqqb, float sMassqqb){
 
   verbose = outputVerbose;
   singleWP_ = oneWP;
@@ -9,12 +9,12 @@ BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, i
   nrDatasets_ = datasets.size();
 
   //Start to initialize all variables!!
-  for(int ii = 0; ii < 6; ii++){
-    for(int jj = 0; jj < 2; jj++){
+  for(int ii = 0; ii < 2; ii++){
+    for(int jj = 0; jj < 6; jj++){
       NotReconstructedEvent[ii][jj]=0;
-      for(int kk = 0; kk < 2; kk++){
-        CorrectlyMatched[kk][ii][jj]=0;
-        atLeastOneWrongMatch[kk][ii][jj] = 0;
+      for(int kk = 0; kk < 3; kk++){
+        CorrectlyMatched[ii][kk][jj]=0;
+        atLeastOneWrongMatch[ii][kk][jj] = 0;
       }
     }
   }
@@ -40,10 +40,8 @@ BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, i
   }
 
   //---  ChiSq Mlb and Mqqb information ---//
-  //Mlb  = 108.1841; S_Mlb  = 31.4213;    --> NEW values!!
-  //Mqqb = 174.6736; S_Mqqb = 17.5757;    --> NEW values!!
-  Mlb  = 103.286; S_Mlb  = 26.7764;
-  Mqqb = 178.722; S_Mqqb = 18.1385;
+  Mlb  = Masslb; S_Mlb  = sMasslb;
+  Mqqb = Massqqb; S_Mqqb = sMassqqb;
 }
 
 BTagStudy::~BTagStudy(){
@@ -269,8 +267,10 @@ void BTagStudy::CreateHistograms(TFile* outfile, bool savePDF, std::string pathP
 
 void BTagStudy::ReturnBTagTable(){ 
 
-  evtSelOutput[0].open("EventSelectionResults/AnalyzerOutput/evtSelChoice_4JetCase.tex");
-  evtSelOutput[1].open("EventSelectionResults/AnalyzerOutput/evtSelChoice_5JetCase.tex");
+  std::string TexFileTitle = "AllBTags";
+  if(nrBTags_ == 1) TexFileTitle = BTitle[0];	
+  evtSelOutput[0].open(("EventSelectionResults/AnalyzerOutput/evtSelChoice_4JetCase_"+TexFileTitle+".tex").c_str());
+  evtSelOutput[1].open(("EventSelectionResults/AnalyzerOutput/evtSelChoice_5JetCase_"+TexFileTitle+".tex").c_str());
 
   string Title[3]= {"  \\textbf{Option} & all 4 correct & $\\geq$ 1 wrong       & correct ($\\%$)       & $\\frac{s}{b}$ & non-matched \\\\", 
 		    "  \\textbf{Option} & 2 b's correct & $\\geq$ 1 b wrong     & b's correct ($\\%$)   & $\\frac{s}{b}$ & non-matched \\\\", 

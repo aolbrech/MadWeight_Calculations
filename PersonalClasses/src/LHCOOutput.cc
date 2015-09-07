@@ -300,7 +300,7 @@ void LHCOOutput::StoreGenInfo(vector<TRootMCParticle*> mcParticles){
   }			    
 }//End of class StoreGenInfo
 
-void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> selJetCombi, int decayChannel, float leptCharge, vector<int> jetCombi, ofstream &EvtNrInfo){
+void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> selJetCombi, int decayChannel, float leptCharge, ofstream &EvtNrInfo, int CWUIndex){
 
   //--- Reconstruct neutrino partially ---//
   //---   (Neutrino Pt and M needed)   ---//
@@ -317,18 +317,6 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
   vector<int> MadGraphRecoId(6,4);
   vector<float> MGRecoBtagId(6,0.0);
   MGRecoBtagId[0] = 1; MGRecoBtagId[3] = 1;   //Event selection is already performed and b-jets are always at the same position!!
-
-  //--- Check whether the event is correctly reconstructed  ---// 
-  //---  (jetCombi is initialized to 9999 for all dataSets) ---//
-  bool jetCombiFound = false;
-  bool EventCorrectlyMatched = false;
-  if(jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999){
-    jetCombiFound = true;
-    if( selJetCombi[0] == jetCombi[0] && selJetCombi[1] == jetCombi[1]    &&
-       (selJetCombi[2] == jetCombi[2] || selJetCombi[2] == jetCombi[3]) &&
-       (selJetCombi[3] == jetCombi[3] || selJetCombi[3] == jetCombi[3]) )
-      EventCorrectlyMatched = true;
-  }
 
   //Naming file for storing in the EvtNrInfo output file
   std::string MainFile[4] = {"SemiMuPlus","SemiMuMinus","SemiElPlus","SemiElMinus"};
@@ -424,11 +412,7 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
   
     //fileIndices of interest are: (0 -- both in case lept charge is splitted or not since this corresponds to semiMuPlus or semiMu !!)  --> in order to add SemiEl (!splitLeptCharge_ && fileIndex == 1) should be asked!
     if(fileIndex == 0){
-      int CWUIndex = 999;
-      if(EventCorrectlyMatched)                         CWUIndex = 0; 
-      else if( !EventCorrectlyMatched && jetCombiFound) CWUIndex = 1;
-      else if( !jetCombiFound)                          CWUIndex = 2;
-     
+    
       CWUEvtNr[CWUIndex]++; 
       LHCOEventOutput(leptonCharge, CWURecoFile[CWUIndex], CWUEvtNr[CWUIndex], LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
 

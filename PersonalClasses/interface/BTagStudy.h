@@ -27,7 +27,7 @@ struct sort_pred {
 class BTagStudy{
 
   public:
-    BTagStudy(int, vector<Dataset*>, bool, int);
+    BTagStudy(int, vector<Dataset*>, bool, int, float, float, float, float);
     ~BTagStudy();
 
     void InitializeDataSet(std::string);

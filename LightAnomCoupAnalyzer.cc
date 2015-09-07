@@ -164,13 +164,11 @@ int main (int argc, char *argv[])
   //-----------------------//
   // Load personal classes //
   //-----------------------//
-  BTagStudy bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag);
   ExtraEvtSelCuts extraEvtSelCuts;
   float Mlb  = 108.1841, S_Mlb  = 31.4213;
   float Mqqb = 174.6736, S_Mqqb = 17.5757;
   float MW = 83.8037, S_MW = 10.2385;
-  //float Mlb  = 103.286, S_Mlb  = 26.7764;    --> OLD values (but used for CorrectReco file!!)
-  //float Mqqb = 178.722, S_Mqqb = 18.1385;
+  BTagStudy bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag, Mlb, S_Mlb, Mqqb, S_Mqqb);
 
   //--------------------------------------//
   // Loop on datasets for actual analysis //
@@ -186,7 +184,7 @@ int main (int argc, char *argv[])
   
     //Number of events that will be used in the "loop on events"
     int nEvent = inLightTree->GetEntries();
-    //int nEvent = 50000;
+    //int nEvent = 5000;
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
@@ -254,6 +252,20 @@ int main (int argc, char *argv[])
       for(int ibTag = 0; ibTag < NrBTags; ibTag++){
         vector<int> selJetCombi = bTagStudy.getIndices(ibTag);
 
+        //--- Check whether the event is correctly reconstructed  ---// 
+        //---  (jetCombi is initialized to 9999 for all dataSets) ---//
+        int CWUIndex = 999;
+        if(correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999 && correctJetCombi[2] != 9999 && correctJetCombi[3] != 9999){
+          if( selJetCombi[0] == correctJetCombi[0] && selJetCombi[1] == correctJetCombi[1]  &&
+             (selJetCombi[2] == correctJetCombi[2] || selJetCombi[2] == correctJetCombi[3]) &&
+             (selJetCombi[3] == correctJetCombi[2] || selJetCombi[3] == correctJetCombi[3]) )
+            CWUIndex = 0;
+          else
+            CWUIndex = 1; 
+        }
+        else
+          CWUIndex = 2;
+
         //MSPlots with number of jets information before requiring at least two b-jets and at least 2 light jets!
         MSPlot["nSelectedJets_"+bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( selJets.size(),                    datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -282,14 +294,16 @@ int main (int argc, char *argv[])
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);      
 
-        bool CutsSurvived = extraEvtSelCuts.KeepEvent(correctJetCombi, selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag));
+        bool CutsSurvived = extraEvtSelCuts.KeepEvent(correctJetCombi, selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag), CWUIndex, decayCh);
         EvtNrMatching << "              " << CutsSurvived << "      ";
  
         //Write out the LHCO output!
-        if( getLHCOOutput && bTagChoiceMade)
-          lhcoOutput.StoreRecoInfo(selLepton, selJets, selJetCombi, decayCh, leptCharge, correctJetCombi, EvtNrMatching);
-        else if(getLHCOOutput && !bTagChoiceMade)
-          cout << " ERROR : Not possible to write the lhco file when all b-tag options are still being considered!! " << endl;
+        if( getLHCOOutput && bTagChoiceMade && CutsSurvived)
+          lhcoOutput.StoreRecoInfo(selLepton, selJets, selJetCombi, decayCh, leptCharge, EvtNrMatching, CWUIndex);
+        else if(getLHCOOutput && !bTagChoiceMade){
+          cout << " ERROR : Not possible to write the lhco file when all b-tag options are still being considered!!  ==> Setting boolean to FALSE !" << endl;
+          getLHCOOutput = false;
+        }
       }
 
     }//End of loop on events
