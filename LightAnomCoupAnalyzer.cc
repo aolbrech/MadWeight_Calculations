@@ -60,11 +60,11 @@ int main (int argc, char *argv[])
   //---------------------------//
   //  Run specific parts only  //
   //---------------------------//
-  bool getLHCOOutput = true;
+  bool getLHCOOutput = true; 
   bool splitLeptonChargeLHCO = false;
   bool getCorrectAndWrongLHCO = true; 
   bool savePDF = false;
-  bool bTagChoiceMade = true; 
+  bool bTagChoiceMade = true;  
   bool getMassFits = false;
 
   //-- Specific b-tag stuff!
@@ -84,8 +84,8 @@ int main (int argc, char *argv[])
   //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
-  inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-  //inputFiles.push_back("LightTree/AnomalousCouplingsLight_Data_Mu.root");
+  //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
+  inputFiles.push_back("LightTree/AnomCoupLight_Data_Mu_2012B.root");
   if(verbosity > 0) std::cout << " - All ROOT files loaded " << std::endl;
 	
   //-------------------------//
@@ -172,10 +172,10 @@ int main (int argc, char *argv[])
   //-----------------------//
   // Load personal classes //
   //-----------------------//
-  ExtraEvtSelCuts extraEvtSelCuts;
   float Mlb  = 108.1841, S_Mlb  = 31.4213;
   float Mqqb = 174.6736, S_Mqqb = 17.5757;
   float MW = 83.8037, S_MW = 10.2385;
+  ExtraEvtSelCuts extraEvtSelCuts(Mqqb, S_Mqqb, MW, S_MW, bTagChoiceMade, 3, 2);
   BTagStudy bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag, Mlb, S_Mlb, Mqqb, S_Mqqb);
 
   //--------------------------------------//
@@ -202,10 +202,8 @@ int main (int argc, char *argv[])
     //-----------------------//
     bTagStudy.InitializeDataSet(dataSetName);
     LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
-    if(dataSetName.find("TTbarJets") == 0){
-      lhcoOutput.Initialize("Reco");
-      extraEvtSelCuts.Initialize(Mqqb, S_Mqqb, MW, S_MW, bTagChoiceMade, bTitle[0], 3, 2);
-    }
+    extraEvtSelCuts.Initialize(bTitle[0], dataSetName);
+    lhcoOutput.Initialize("Reco", dataSetName);
 
     ofstream EvtNrMatching;
     EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/EventNrMatching_"+dataSetName+".txt").c_str());
