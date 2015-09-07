@@ -38,6 +38,14 @@ int main (int argc, char *argv[])
   //setTDRStyle(); 
   setMyStyle();
 
+  //--------------------------------//
+  //  Get NrEvts from command line  //
+  //--------------------------------//
+  int nrEvts = -1;
+  if(argc >= 2 && string(argv[1]) != "-1")
+    nrEvts = atoi(argv[1]);
+  std::cout << " ---- Changed nrEvts to : " << nrEvts << endl;
+
   //------------------------//
   //  Verbosity for output  //
   //  -->Used in bTagStudy  //
@@ -183,12 +191,11 @@ int main (int argc, char *argv[])
     light_br->SetAddress(&light);
   
     //Number of events that will be used in the "loop on events"
-    int nEvent = inLightTree->GetEntries();
-    //int nEvent = 5000;
+    if(nrEvts == -1) nrEvts = inLightTree->GetEntries();
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
-    if(verbosity > 0) std::cout << "   *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nEvent << " selected events! " << std::endl;
+    if(verbosity > 0) std::cout << "   *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nrEvts << " selected events! " << std::endl;
 
     //-----------------------//
     // Load personal classes //
@@ -209,11 +216,11 @@ int main (int argc, char *argv[])
     //  Start looping over events  //
     // --------------------------- //    
     int nSelectedMu = 0, nSelectedEl = 0;
-    for(unsigned int iEvt = 0; iEvt < nEvent; iEvt++){
+    for(unsigned int iEvt = 0; iEvt < nrEvts; iEvt++){
       inLightTree->GetEvent(iEvt);
 
       if(iEvt%5000 == 0)
-	std::cout<<"    Processing the "<<iEvt<<"th event ("<< ((double)iEvt/(double)nEvent)*100<<"%)"<<" -> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
+	std::cout<<"    Processing the "<<iEvt<<"th event ("<< ((double)iEvt/(double)nrEvts)*100<<"%)"<<" -> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
 
       int eventId = light->eventID();
       int runId = light->runID();
@@ -307,7 +314,7 @@ int main (int argc, char *argv[])
       }
 
     }//End of loop on events
-    std::cout<<"    Processed all "<<nEvent<<" events  --> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\n";
+    std::cout<<"    Processed all "<<nrEvts<<" events  --> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\n";
 
     //------------------------------//
     //  Calculate the ChiSq values  //
