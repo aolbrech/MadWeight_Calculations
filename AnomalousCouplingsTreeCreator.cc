@@ -54,10 +54,17 @@ int main (int argc, char *argv[]){
   // Configuration
   /////////////////////
 
+  //Nr events
+  int NrEvtsToRunOver = -1;
+  if(argc >= 2 && string(argv[1]) != "-1"){
+    NrEvtsToRunOver = atoi(argv[1]);
+    cout << " ** Will only look at " << NrEvtsToRunOver << " events ! " << endl;
+  }
+
   //xml file
   string xmlFileName ="PersonalClasses/config/myAnomCouplConfig.xml";
-  if (argc >= 2)                            //--> Needed for the PBS script!!
-    xmlFileName = string(argv[1]);
+  if (argc >= 3)                            //--> Needed for the PBS script!!
+    xmlFileName = string(argv[2]);
   const char *xmlfile = xmlFileName.c_str();
   cout << "used config file: " << xmlfile << endl;
 
@@ -398,8 +405,8 @@ int main (int argc, char *argv[]){
     nEvents[d] = 0;
     int itriggerSemiMu = -1,itriggerSemiEl = -1, previousRun = -1;
 
-    for (unsigned int ievt = 0; ievt < datasets[d]->NofEvtsToRunOver(); ievt++){
-    //for (unsigned int ievt = 0; ievt < 5000; ievt++){
+    if(NrEvtsToRunOver == -1) NrEvtsToRunOver = datasets[d]->NofEvtsToRunOver();
+    for (unsigned int ievt = 0; ievt < NrEvtsToRunOver; ievt++){
       
       if(verbosity > 3) std::cout << " Looking at event : " << ievt << std::endl;    
       vector < TRootVertex* > vertex;
@@ -414,7 +421,7 @@ int main (int argc, char *argv[]){
       nEvents[d]++;
       
       if(ievt%1000 == 0)
-	std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)datasets[d]->NofEvtsToRunOver())*100  << "%)" << " +> # selected: " << nSelectedMuPos+nSelectedMuNeg << " (mu+jets) " << nSelectedElPos+nSelectedElNeg << " (e+jets)" << flush<<"\r";
+	std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)NrEvtsToRunOver)*100  << "%)" << " +> # selected: " << nSelectedMuPos+nSelectedMuNeg << " (mu+jets) " << nSelectedElPos+nSelectedElNeg << " (e+jets)" << flush<<"\r";
       
       ////////////////
       // LOAD EVENT //
@@ -940,8 +947,15 @@ int main (int argc, char *argv[]){
       //----  End of Tree file filling (LightAnomCoupAnalyzer)  ----//
 
     } //loop on events
-    cout << "\n -> " << nSelectedMuPos << " mu+ " << " and " << nSelectedMuNeg << " mu- events are selected on " << nGenMu << " ==> " << (float)(nSelectedMuPos+nSelectedMuNeg)/(float)nGenMu << endl;
-    cout <<   " -> " << nSelectedElPos << " el+ " << " and " << nSelectedElNeg << " el- events are selected on " << nGenEl << " ==> " << (float)(nSelectedElPos+nSelectedElNeg)/(float)nGenEl << endl;
+  
+    if(dataSetName.find("TTbarJets_SemiLept") == 0){
+      cout << "\n -> " << nSelectedMuPos << " mu+ " << " and " << nSelectedMuNeg << " mu- events are selected on " << nGenMu << " ==> " << (float)(nSelectedMuPos+nSelectedMuNeg)/(float)nGenMu << endl;
+      cout <<   " -> " << nSelectedElPos << " el+ " << " and " << nSelectedElNeg << " el- events are selected on " << nGenEl << " ==> " << (float)(nSelectedElPos+nSelectedElNeg)/(float)nGenEl << endl;
+    }
+    else{
+      cout << "\n -> " << nSelectedMuPos << " mu+ " << " and " << nSelectedMuNeg << " mu- events are selected on " << NrEvtsToRunOver << " ==> " << (float)(nSelectedMuPos+nSelectedMuNeg)/(float)NrEvtsToRunOver << endl;
+      cout <<   " -> " << nSelectedElPos << " el+ " << " and " << nSelectedElNeg << " el- events are selected on " << NrEvtsToRunOver << " ==> " << (float)(nSelectedElPos+nSelectedElNeg)/(float)NrEvtsToRunOver << endl;
+    }
 
     //--------------------------------//
     // Store the gen-level LHCO plots //
