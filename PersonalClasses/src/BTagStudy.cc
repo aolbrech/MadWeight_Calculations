@@ -250,6 +250,7 @@ void BTagStudy::CreateHistograms(TFile* outfile, bool savePDF, std::string pathP
       temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
       temp->Write();
     }
+    histo1D.clear();  //Clear the map such that it can be filled with only the histograms of the considered dataset!!
   }
 
   //Histo2D's
@@ -261,6 +262,7 @@ void BTagStudy::CreateHistograms(TFile* outfile, bool savePDF, std::string pathP
       TH2F *temp = it->second;
       temp->Write();
     }
+    histo2D.clear(); 
   }
   outfile->cd(); 
 }

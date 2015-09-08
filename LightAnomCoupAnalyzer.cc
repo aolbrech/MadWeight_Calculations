@@ -84,7 +84,7 @@ int main (int argc, char *argv[])
   //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
-  //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
+  inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
   inputFiles.push_back("LightTree/AnomCoupLight_Data_Mu_2012B.root");
   if(verbosity > 0) std::cout << " - All ROOT files loaded " << std::endl;
 	
@@ -206,9 +206,10 @@ int main (int argc, char *argv[])
     lhcoOutput.Initialize("Reco", dataSetName);
 
     ofstream EvtNrMatching;
-    EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/EventNrMatching_"+dataSetName+".txt").c_str());
-    EvtNrMatching << "  Event Nr     Extra cuts survived     Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)   " << endl;
-
+    if(bTagChoiceMade && getLHCOOutput){
+      EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/EventNrMatching_"+dataSetName+".txt").c_str());
+      EvtNrMatching << "  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)   " << endl;
+    }
 
     // --------------------------- //
     //  Start looping over events  //
@@ -236,6 +237,7 @@ int main (int argc, char *argv[])
       else if(decayCh == 1) leptChannel = "_el";
       float leptCharge = light->leptonCharge();
       vector<int> correctJetCombi = light->correctJetCombi();    //0 = LeptB, 1 = HadrB, 2 = Quark1 & 3 = Quark2
+      float genCosTheta = light->genCosTh();
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
       //ooOOooOOoo      Reading out nTuples done           ooOOooOOoo
@@ -291,8 +293,6 @@ int main (int argc, char *argv[])
           }
         }
 
-        EvtNrMatching << "\n    " << iEvt;
-        if( iEvt < 10) EvtNrMatching << " "; if( iEvt < 100) EvtNrMatching << " "; if( iEvt < 1000) EvtNrMatching << " "; if( iEvt < 10000) EvtNrMatching << " "; if( iEvt < 100000) EvtNrMatching << " ";
 
         //Identical MSPlots with number of jets information after requiring at least two b-jets and at least 2 light jets!
         MSPlot["nSelectedJets_"+bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( selJets.size(),                    datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -300,11 +300,19 @@ int main (int argc, char *argv[])
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);      
 
         bool CutsSurvived = extraEvtSelCuts.KeepEvent(correctJetCombi, selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag), CWUIndex, decayCh);
-        EvtNrMatching << "              " << CutsSurvived << "      ";
  
         //Write out the LHCO output!
-        if( getLHCOOutput && bTagChoiceMade && CutsSurvived)
+        if( getLHCOOutput && bTagChoiceMade && CutsSurvived){
+
+          //Keep track of the original event number and the madweight numbers:
+          EvtNrMatching << "\n    " << iEvt;
+          if( iEvt < 10) EvtNrMatching << " "; if( iEvt < 100) EvtNrMatching << " "; if( iEvt < 1000) EvtNrMatching << " "; if( iEvt < 10000) EvtNrMatching << " "; if( iEvt < 100000) EvtNrMatching << " ";
+          //std::cout.setf( std::ios::fixed, std:: ios::floatfield );
+          EvtNrMatching << "              " << CutsSurvived << "                " << fixed << setprecision(9)<< genCosTheta << "";
+          if(genCosTheta > 0) EvtNrMatching << " ";
+
           lhcoOutput.StoreRecoInfo(selLepton, selJets, selJetCombi, decayCh, leptCharge, EvtNrMatching, CWUIndex);
+        }
         else if(getLHCOOutput && !bTagChoiceMade){
           cout << " ERROR : Not possible to write the lhco file when all b-tag options are still being considered!!  ==> Setting boolean to FALSE !" << endl;
           getLHCOOutput = false;
@@ -331,7 +339,7 @@ int main (int argc, char *argv[])
                                                histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) - histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2),
                                                histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) + histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2));
       
-      //Write out the sigma values!
+      //Write out the mass values!
       std::cout << "   ** Mlb  = " << histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1)          << " +- " << histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2) << endl;
       std::cout << "   ** Mqqb = " << histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2) << endl;
       std::cout << "   ** MW   = " << histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2) << std::endl;
@@ -349,7 +357,7 @@ int main (int argc, char *argv[])
                                                histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) - histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
                                                histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) + histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
       
-        //Write out the sigma values!
+        //Write out the mass values!
         cout << "\n   ** Mlb  -- " << bTitle[ibTag] << " = " << histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)          << " +- " << histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
         cout << "   ** Mqqb -- " << bTitle[ibTag] << " = " << histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
         cout << "   ** MW   -- " << bTitle[ibTag] << " = " << histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << std::endl;
@@ -365,6 +373,9 @@ int main (int argc, char *argv[])
 
     //--- Get output form the ExtraEvtSel class ---//
     if(dataSetName.find("TTbarJets_SemiLept") == 0) extraEvtSelCuts.StoreCutInfluence(outputFile);
+
+    //---- Close the EventNrMatching output file for the considered dataset
+    if(bTagChoiceMade && getLHCOOutput) EvtNrMatching.close();
 
     inputFile->Close();
     delete inputFile;
