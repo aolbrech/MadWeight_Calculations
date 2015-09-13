@@ -31,8 +31,8 @@ class TFCreation{
 	void InitializeVariables();
 	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel);
         void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, TFile*, int, TFile*);
-	void FitSliceClassCode(TH2F*, bool);
-        std::vector<double> SetFitRange(std::string, int, double[]);
+	void FitSliceClassCode(TH2F*, bool, int);
+        std::vector<double> SetFitRange(std::string, unsigned int, double[]);
 	void SetStartValuesDoubleGaussian(int, bool, std::string);
 	void WriteTF(ostream &output, ostream &card, ostream &TF, ostream &latex, std::string, std::string, int);
 	void WritePlots(TFile*);
@@ -51,7 +51,7 @@ class TFCreation{
         double EtaValues[6];
         int nParsFit_, nEtaBins_;
         std::string parnames_[5], ParName_[5];
-        TGraphErrors *grE_ParamFit[5];
+        TGraphErrors *grE_ParamFit[30];
         double FitMin_[5], FitMax_[5];
         //int NarrowGaus[3];
         //int WideGaus[3];
