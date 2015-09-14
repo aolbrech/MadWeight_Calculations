@@ -632,6 +632,10 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangeNeg[16] = { -3,  -4, -4,  -4,  -4, -4.5, -4.5,  -4, -4.5, -4.5,  -5, -5, -5.5, -6, -6, -6}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[16] = {2.5, 2.5,  3, 3.5, 3.5,    4,  4.5, 4.5,    5,  5.5, 5.5,  6,    6,  6,  6,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
+    else{
+      double FitRangeNeg[12] = {-2, -2.5, -2.5, -2.5, -2.5,  -3,  -3, -3, -3, -3, -3, -3}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[12] = { 2,  2.5,    3,    3,    3, 3.5, 3.5,  4,  4,  4,  4,  4}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    }
   } //End of El_DiffE GenE histo
 
   if(histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
