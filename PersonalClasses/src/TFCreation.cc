@@ -27,13 +27,12 @@ TFCreation::TFCreation(int nEtaBins, std::string etaCons, bool doFits){
   nEtaBins_ = nEtaBins;
   EtaBin[0] = ""; EtaTitle[0] = "";
   //if(nEtaBins_ == 4){         
-  EtaValues [1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
+  EtaValues[1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
+  EtaValue[1] = "0"; EtaValue[2] = "0p375"; EtaValue[3] = "0p750"; EtaValue[4] = "1p450"; EtaValue[5] = "2p5";
   for(int ii = 1; ii <= 4; ii++){
-    EtaBin[ii] = "_Eta_"+tostr(EtaValues[ii])+"_"+tostr(EtaValues[ii+1]);
+    EtaBin[ii] = "_Eta_"+EtaValue[ii]+"_"+EtaValue[ii+1];
     EtaTitle[ii] = " -- "+tostr(EtaValues[ii])+" < |#eta| #leq "+tostr(EtaValues[ii+1]);
   }
-  //}
-  //else if (nEtaBins_ != 1) std::cout << " Wrong choice for NrEtaBins --> Can only be 1 or 4 !! " << std::endl;
 }
 
 TFCreation::~TFCreation(){
@@ -144,9 +143,6 @@ void TFCreation::InitializeVariables(){
   histo2D["Mu_RecoPhiVsGenPt"]       = new TH2F("Mu_RecoPhiVsGenPt",      "Azimuthal angle #phi_{rec} versus P_{T,gen} for muon",                     150,     0,   200,  60,   -3.2,    3.2);
   histo2D["Mu_DiffPhiVsGenPt"]       = new TH2F("Mu_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for muon",                      10,    26,   150, 100,   -0.2,    0.2);
 
-  //Initialize the different eta bins! 
-  //if(nEtaBins_ == 4){         
-
   //Store all the existing histo2D's in a new collection!
   map<string,TH2F*> histo2DCopy = histo2D;
   for(int iEta = 1; iEta <= 4; iEta++){
@@ -157,15 +153,19 @@ void TFCreation::InitializeVariables(){
       //Need different Ymax and Ymin for Mu_DiffThetaVsGenInvPt histogram!
       double YMax = temp->GetYaxis()->GetXmax();
       double YMin = temp->GetYaxis()->GetXmin();
+      int NYBins = (int)(temp->GetYaxis()->GetNbins());
       if( string(temp->GetName()) == "Mu_DiffThetaVsGenInvPt"){ YMax = 0.015; YMin = -0.015;}
-      if( string(temp->GetName()) == "Mu_DiffEVsGenE" && (iEta == 1 || iEta == 2)){ YMax = 4.5; YMin = -4;}
+      if( string(temp->GetName()) == "Mu_DiffEVsGenE" ){
+        if(iEta == 1 || iEta == 2){ YMax = 4.5; YMin = -4; NYBins = NYBins*1.1;}
+        else if(iEta == 3){ YMax = 5; YMin = -5; NYBins = NYBins*0.9;}
+      }
 
       if(iEta == 4)
-	histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins())*0.9, YMin*1.4, YMax*1.4 );
+	histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), NYBins*0.9, YMin*1.4, YMax*1.4 );
       else if(iEta == 3)
-	histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin*1.2, YMax*1.2);
+	histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), NYBins, YMin*1.2, YMax*1.2);
       else
-        histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin, YMax);      
+        histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), NYBins, YMin, YMax);      
     }
   }
 }
@@ -351,6 +351,7 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, int histoNr, bool useROOTClass, bool useStartArray, float startValues[], bool changeFitRange, TFile* file, int whichEtaBin, TFile* readFile){
  
   //Select the correct Eta-bin histogram!
+  if(nEtaBins_ == 1) EtaBin[1] = EtaBin[0];
   TH2F* fitHisto = (TH2F*) readFile->Get( ("2D_histograms_graphs/"+fitHistoName+""+EtaBin[whichEtaBin]).c_str() );
 
   TDirectory* th2dir;
@@ -392,37 +393,36 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
       for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
     }
 
-    //double binSize = (grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1] - grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[0])/2;           //--> Not a good idea, seems to make the outliers relevant!!
-    FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[0];                            
-    FitMax_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-1]; //-1 is because bins go from 0 to N (Keep overflow when it is well determined!!)
+    FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[0];                            
+    FitMax_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-1]; //-1 is because bins go from 0 to N (Keep overflow when it is well determined!!)
 
     //Exclude starting bins for the second gaussian determination
     // --> Have to make sure this is really the second gaussian describing the tails!!
     std::string fitHistName = string(fitHisto->GetName());
     if(fitHistName.find("Light_DiffEVsGenE") < fitHistName.size()){
-      if(fitHistName.find("Eta") > fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1]; std::cout << " 2nd gaussian fit from : " << FitMin_[ipar] << std::endl;}
+      if(fitHistName.find("Eta") > fitHistName.size() && (ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1]; 
       else if(fitHistName.find("Eta_0_") <= fitHistName.size()){
-        if( ipar == 2 || ipar == 3 || ipar == 4 ){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];}
+        if( ipar == 2 || ipar == 3 || ipar == 4 ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];}
+        else if(ipar == 0 || ipar == 1){           FitMax_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];}
+      }
+      else if(fitHistName.find("Eta_0p375_") <= fitHistName.size()){
+        if( ipar == 2 || ipar == 3 || ipar == 4 ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];}
         else if(ipar == 0 || ipar == 1){ FitMax_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];}
       }
-      else if(fitHistName.find("Eta_0.375_") <= fitHistName.size()){
-        if( ipar == 2 || ipar == 3 || ipar == 4 ){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];}
-        else if(ipar == 0 || ipar == 1){ FitMax_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];}
-      }
-      else if(fitHistName.find("Eta_0.75") <= fitHistName.size() && (ipar == 2||ipar==3||ipar==4) ){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];}
+      else if(fitHistName.find("Eta_0p75") <= fitHistName.size() && (ipar == 2||ipar==3||ipar==4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];}
     }
-    if(string(fitHisto->GetName()) == "El_DiffEVsGenE"    && (ipar == 0||ipar == 1 || ipar == 2) ){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1]; cout << " 2nd gauss fit from : " << FitMin_[ipar] << endl;}
+    if(string(fitHisto->GetName()) == "El_DiffEVsGenE"    && (ipar == 0||ipar == 1 || ipar == 2) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];}
     if(fitHistName.find("BJet_DiffEVsGenE") < fitHistName.size()){
-      if(fitHistName.find("Eta") > fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; cout << " 2nd gauss fit from : " << FitMin_[ipar] << endl;}
-      else if(fitHistName.find("Eta_0_") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; cout << " 2nd gauss fit from : " << FitMin_[ipar] << endl;}
-      else if(fitHistName.find("Eta_0.375") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; cout << " 2nd gauss from : " << FitMin_[ipar] << endl;}
-      else if(fitHistName.find("Eta_0.75") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar == 4)){ FitMin_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3];}
+      if(fitHistName.find("Eta") > fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
+      else if(fitHistName.find("Eta_0_") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; }
+      else if(fitHistName.find("Eta_0p375") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; }
+      else if(fitHistName.find("Eta_0p75") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar == 4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3];}
     }
 
     //Exclude overflow bin if necessary
-    if(string(fitHisto->GetName()) == "Light_DiffEVsGenE" || string(fitHisto->GetName()) == "El_DiffEVsGenE") FitMax_[ipar] =  grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];
+    if(string(fitHisto->GetName()) == "Light_DiffEVsGenE" || string(fitHisto->GetName()) == "El_DiffEVsGenE") FitMax_[nParsFit_*whichEtaBin+ipar] =  grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];
 
-//    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5"){        //-->What was special for this histogram??
+//    if( string(fitHisto->GetName()) == "Mu_DiffInvPtVsGenInvPt_Eta_1p45_2p5"){        //-->What was special for this histogram??
 //      for(int ii = 1; ii < 11; ii++){  //Only go until bin 10 since overflow bin is always excluded from fit (and otherwise edge of this bin is taken as max!)
 //	if( hlist[ipar]->GetBinContent(ii) == 0.) FitMax = hlist[ipar]->GetXaxis()->GetBinLowEdge(ii);
 //      }
@@ -432,7 +432,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames_[ipar]+"_Fit").c_str() );
     caloEnergyFit->SetTitle((ParName_[ipar]+" for "+string(fitHisto->GetName())).c_str());
 
-    grE_ParamFit[nParsFit_*whichEtaBin+ipar]->Fit(caloEnergyFit, "Q", "",FitMin_[ipar], FitMax_[ipar]);
+    grE_ParamFit[nParsFit_*whichEtaBin+ipar]->Fit(caloEnergyFit, "Q", "",FitMin_[nParsFit_*whichEtaBin+ipar], FitMax_[nParsFit_*whichEtaBin+ipar]);
     caloEnergyFit->SetRange(0,250);
     AllCaloEnergyFits[nParsFit_*whichEtaBin+ipar] = *caloEnergyFit;       //caloEnergyFit is a pointer, but each member of the array should point to the corresponding value of the TF1!
     grE_ParamFit[nParsFit_*whichEtaBin+ipar]->Write();
@@ -470,15 +470,15 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   if(     histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){ 
     if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
     else if(histoName.find("Eta_0_") <= histoName.size()){    binStart[0] = 12; binEnd[0] = 14;}
-    else if(histoName.find("Eta_0.375") <= histoName.size()){ binStart[0] = 15; binEnd[0] = 18;}
-    else if(histoName.find("Eta_0.75") <= histoName.size()){  binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
+    else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 15; binEnd[0] = 18;}
+    else if(histoName.find("Eta_0p75") <= histoName.size()){  binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
   }
   else if(histoName.find("Light_DiffEVsGenE") <= histoName.size()){
     if(histoName.find("Eta") > histoName.size() ){ binStart[0] = 1;  binEnd[0] = 2;  binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
     else if(histoName.find("Eta_0_") <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
-    else if(histoName.find("Eta_0.375") <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 15; binEnd[1] = 16;}
-    else if(histoName.find("Eta_0.75") <= histoName.size()){ binStart[0] = 2; binEnd[0] = 3;}
-    else if(histoName.find("Eta_1.45") <= histoName.size()){binStart[0] = 5; binEnd[0] = 6;}
+    else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 15; binEnd[1] = 16;}
+    else if(histoName.find("Eta_0p75") <= histoName.size()){ binStart[0] = 2; binEnd[0] = 3;}
+    else if(histoName.find("Eta_1p45") <= histoName.size()){binStart[0] = 5; binEnd[0] = 6;}
   }
   else if(histoName.find("El_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){ binStart[0] = 15; binEnd[0] = 16; binStart[1] = 17; binEnd[1] = 19; binStart[2] = 20; binEnd[2] = 25;}
@@ -486,21 +486,23 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   }
   else if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){   binStart[0] = 13; binEnd[0] = 14;}
-    else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 11; binEnd[0] = 12;}
+    else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 9; binEnd[0] = 10;}
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){binStart[0] = 5; binEnd[0] = 6; binStart[1] = 13; binEnd[1] = 14;}
   }
 
   //Skip some bins!
   int binToSkip[10] = {50};
   int nSkippedBins = 0;
   if( histoName == "BJet_DiffEVsGenE") binToSkip[0] = 1;
-  else if(histoName == "BJet_DiffEVsGenE_Eta_0_0.375"){binToSkip[0] = 15; binToSkip[1] = 16; binToSkip[2] = 17; binToSkip[3] = 18; binToSkip[4] = 19; lastBin = 12;}
-  else if(histoName == "BJet_DiffEVsGenE_Eta_0.375_0.75"){binToSkip[0] = 19; lastBin = 15;}
-  else if(histoName == "BJet_DiffEVsGenE_Eta_0.75_1.45"){binToSkip[0] = 1;}
-  else if(histoName == "BJet_DiffEVsGenE_Eta_1.45_2.5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
-  else if(histoName == "Light_DiffEVsGenE_Eta_0.75_1.45"){ binToSkip[0] = 1;}
-  else if(histoName == "Light_DiffEVsGenE_Eta_1.45_2.5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
-  else if(histoName == "El_DiffEVsGenE_Eta_0_0.375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
-  else if(histoName == "Mu_DiffEVsGenE_Eta_0_0.375"){binToSkip[0] = 13; binToSkip[1] = 14; binToSkip[2] = 15; lastBin = 12;}
+  else if(histoName == "BJet_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 15; binToSkip[1] = 16; binToSkip[2] = 17; binToSkip[3] = 18; binToSkip[4] = 19; lastBin = 12;}
+  else if(histoName == "BJet_DiffEVsGenE_Eta_0p375_0p75"){binToSkip[0] = 19; lastBin = 15;}
+  else if(histoName == "BJet_DiffEVsGenE_Eta_0p75_1p45"){binToSkip[0] = 1;}
+  else if(histoName == "BJet_DiffEVsGenE_Eta_1p45_2p5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
+  else if(histoName == "Light_DiffEVsGenE_Eta_0p75_1p45"){ binToSkip[0] = 1;}
+  else if(histoName == "Light_DiffEVsGenE_Eta_1p45_2p5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
+  else if(histoName == "El_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
+  else if(histoName == "Mu_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 11; binToSkip[1] = 12; binToSkip[2] = 13; binToSkip[3] = 14; binToSkip[4] = 15; lastBin = 9;}
+  else if(histoName == "Mu_DiffEVsGenE_Eta_1p45_2p5"){ binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -536,6 +538,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     //Do the actual fit (on a normalized histogram)!:
     hp->Scale(1./hp->Integral());
     doubleGaussianFit->SetParLimits(2, 0, 1);
+    //doubleGaussianFit->SetParLimits(0,-10,10);
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
@@ -545,10 +548,10 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
       //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
       for(int ipar=0; ipar<nParsFit_; ipar++ ){
         if( !( (histoName == "Light_DiffPtVsGenPt" || histoName.find("Light_DiffPtVsGenPt_Eta_0") <= histoName.size() ) && bin == 2) &&
-            !( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1.45_2.5" && ( bin == 11 || bin == 10) ) &&
+            !( histoName == "Mu_DiffInvPtVsGenInvPt_Eta_1p45_2p5" && ( bin == 11 || bin == 10) ) &&
             !( histoName == "Mu_DiffInvPtVsGenInvPt" && bin == 1 ) &&                            
-            !( histoName.find("Light_DiffPtVsGenPt_Eta_1.45") <= histoName.size() && bin == 7)   &&
-            !( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0.75") <= histoName.size() && bin == 11) ){ // &&
+            !( histoName.find("Light_DiffPtVsGenPt_Eta_1p45") <= histoName.size() && bin == 7)   &&
+            !( histoName.find("Mu_DiffInvPtVsGenInvPt_Eta_0p75") <= histoName.size() && bin == 11) ){ // &&
 
           if(ipar == 0) nActiveBins += 1;
  
@@ -622,15 +625,15 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangeNeg[11] = {-10, -20, -34, -30, -30, -30, -30, -34, -35, -34, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[11] = {  7,  15,  16,  30,  36,  36,  36,  36,  35,  35,  35}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_0.375") <= histoName.size()){
+    else if(histoName.find("Eta_0p375") <= histoName.size()){
       double FitRangeNeg[7] = {-14, -18, -30, -32, -34, -35, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[7] = {  5,  10,  18,  20,  22,  28,  32}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_0.75") <= histoName.size()){
+    else if(histoName.find("Eta_0p75") <= histoName.size()){
       double FitRangeNeg[8] = {-10, -15, -18, -36, -40, -38, -40, -40}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[8] = { 10,   8,  16,  25,  36,  38,  43,  44}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_1.45") <= histoName.size()){
+    else if(histoName.find("Eta_1p45") <= histoName.size()){
       double FitRangeNeg[18] = {-10, -10, -10, -10, -10, -32, -35, -40, -43, -45, -45, -45, -43, -43, -45, -45, -45, -45}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[18] = { 10,  10,  10,  10,  10,  18,  25,  35,  45,  47,  50,  50,  50,  50,  50,  50,  50,  50}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
@@ -656,15 +659,15 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangeNeg[8] = {-15, -10, -25, -28, -30, -35, -35, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[8] = {  5,   6,  12,  22,  28,  32,  34,  35}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_0.375") <= histoName.size()){
+    else if(histoName.find("Eta_0p375") <= histoName.size()){
       double FitRangeNeg[8] = {-13, -13, -13, -25, -27, -30, -30, -32}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[8] = {  4,   5,  10,  18,  22,  27,  30,  33}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_0.75") <= histoName.size()){
+    else if(histoName.find("Eta_0p75") <= histoName.size()){
       double FitRangeNeg[14] = {-13, -25, -20, -27, -30, -32, -35, -38, -38, -39, -41, -41, -41, -41}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[14] = {  4,   6,   5,  10,  17,  25,  34,  40,  43,  42,  42,  41,  41,  44}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_1.45") <= histoName.size() ){
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){
       double FitRangeNeg[11] = {-10, -10, -10, -10, -40, -35, -35, -40, -40, -40, -45}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[11] = {  4,   4,   4,   4,   2,   3,  12,  15,  23,  30,  35}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
@@ -682,9 +685,13 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangeNeg[8] = {-1.5, -1.5, -2.5,  -3, -3.5, -4,   -5, -5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[8] = { 1.5,    2,  2.5, 3.5,  3.5,  5,  5.5,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else{
-      double FitRangeNeg[7] = {-1.0, -1.5, -2.0, -3.0, -3.0, -3.5, -4.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[7] = { 1.0,  1.2,  2.5,  3.2,  3.5,  3.5,  4.2}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    else if(histoName.find("Eta_0_") <= histoName.size() ){
+      double FitRangeNeg[7] = {-0.9, -1.5, -2.0, -2.6, -3.0, -3.5, -4.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[7] = { 0.9,  1.5,  2.0,  2.5,  3.0,  3.2,  3.5}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    }
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){
+      double FitRangeNeg[12] = {-0.5, -0.5, -0.5, -0.5, -4.0, -3.5, -4.5, -4.5, -6.0, -6.5, -6.5, -7.5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[12] = { 0.5,  0.5,  0.5,  0.5,  4.0,  3.0,  5.0,  6.0,  7.0,  7.0,  8.0,  8.0}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   }
 
@@ -761,8 +768,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   ostream *TF = &myTF;
   ostream *LaTeX = &myLaTeX;
 
-  *LaTeX << "\n \\newpage \\section{"<< partName << " for " << kinVar <<"}" << endl;
-  *LaTeX << "\\begin{figure}[h!b] " << endl;
+  *LaTeX << "\n\\section{"<< partName << " for " << kinVar <<"}" << endl;
 
   int dummyCounter = 0;
   vector<std::string> WidthText;
@@ -774,9 +780,13 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
       else if(iEta == 2){ WidthText.push_back("\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN "); *TF << WidthText[WidthText.size()-1];}
       else if(iEta == 3){ WidthText.push_back("\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN ");  *TF << WidthText[WidthText.size()-1];}
       else if(iEta == 4){ WidthText.push_back("\n      ENDIF \n \n      IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN ");   *TF << WidthText[WidthText.size()-1];}
+      
+      if(iEta != 1) *LaTeX << " \\caption{Fit distributions for " << EtaValues[iEta-1] << " $<$ $\\vert \\eta \\vert$ $<$ " << EtaValues[iEta] << "}\n \\end{figure}\n \\newpage \n";
+      *LaTeX << " \\subsection{Eta between "<< EtaValues[iEta] << " and " << EtaValues[iEta+1] << "}\n";
     }
     else WidthText.push_back("\n    </tf> \n    <width>");
         
+    *LaTeX << " \\begin{figure}[h!b] " << endl;
     for(int ipar = 0; ipar < nParsFit_; ipar++){
       int NrConsideredCaloPars;
       if(ipar == 0 || ipar == 2 || ipar == 3) NrConsideredCaloPars = 5;
@@ -784,7 +794,8 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
 
       TCanvas *canv = new TCanvas(("canv_"+partName+""+EtaBin[iEta]).c_str(),"canvas");
       canv->cd();
-      AllCaloEnergyFits[iEta*nParsFit_+ipar].GetXaxis()->SetTitle(("Generator parton energy (GeV) -- Fit between "+tostr(FitMin_[ipar])+" and "+tostr(FitMax_[ipar])).c_str());
+      AllCaloEnergyFits[iEta*nParsFit_+ipar].SetRange(FitMin_[iEta*nParsFit_+ipar]*0.9, FitMax_[iEta*nParsFit_+ipar]*1.01);
+      AllCaloEnergyFits[iEta*nParsFit_+ipar].GetXaxis()->SetTitle(("Generator parton energy (GeV) -- Fit between "+tostr(FitMin_[iEta*nParsFit_+ipar])+" and "+tostr(FitMax_[iEta*nParsFit_+ipar])).c_str());
       AllCaloEnergyFits[iEta*nParsFit_+ipar].Draw();
       grE_ParamFit[iEta*nParsFit_+ipar]->Draw("P");
       canv->SaveAs(("TFInformation/Plots/"+string(AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName())+".pdf").c_str());
@@ -880,7 +891,8 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   }
 
   //Will need to decide what to do when eta-bins are considered --> Probably best to make a subsection structure then and show each eta-bins separately!
-  *LaTeX << "\\caption{Fit distributions} " << endl;
+  if(nEtaBins_ == 1) *LaTeX << " \\caption{Fit distributions} " << endl;
+  else               *LaTeX << " \\caption{Fit distributions for " << EtaValues[nEtaBins_] << " $<$ $\\vert \\eta \\vert$ $<$ " << EtaValues[nEtaBins_+1] << "}\n";
   *LaTeX << "\\end{figure} " << endl;
 
 }

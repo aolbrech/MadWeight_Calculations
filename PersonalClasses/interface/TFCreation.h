@@ -46,13 +46,14 @@ class TFCreation{
 	TF1 *doubleGaussianFit, *caloEnergyFit;
         float* startValuesArray;
         TF1 AllCaloEnergyFits[30];
-        std::string EtaBin[5];    //4 eta bins and one extra for all events!
-        std::string EtaTitle[5];
-        double EtaValues[6];
+
+        double EtaValues[6], ;
+        std::string EtaValue[6], EtaBin[5], EtaTitle[5];
+
         int nParsFit_, nEtaBins_;
         std::string parnames_[5], ParName_[5];
         TGraphErrors *grE_ParamFit[30];
-        double FitMin_[5], FitMax_[5];
+        double FitMin_[30], FitMax_[30];
         //int NarrowGaus[3];
         //int WideGaus[3];
         TFile* caloFitFile;
