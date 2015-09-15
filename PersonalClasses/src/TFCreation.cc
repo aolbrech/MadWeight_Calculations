@@ -26,14 +26,14 @@ TFCreation::TFCreation(int nEtaBins, std::string etaCons, bool doFits){
   //Store the EtaBin Title and Name for the histograms!
   nEtaBins_ = nEtaBins;
   EtaBin[0] = ""; EtaTitle[0] = "";
-  if(nEtaBins_ == 4){         
-    EtaValues [1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
-    for(int ii = 1; ii <= nEtaBins_; ii++){
-      EtaBin[ii] = "_Eta_"+tostr(EtaValues[ii])+"_"+tostr(EtaValues[ii+1]);
-      EtaTitle[ii] = " -- "+tostr(EtaValues[ii])+" < |#eta| #leq "+tostr(EtaValues[ii+1]);
-    }
+  //if(nEtaBins_ == 4){         
+  EtaValues [1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
+  for(int ii = 1; ii <= 4; ii++){
+    EtaBin[ii] = "_Eta_"+tostr(EtaValues[ii])+"_"+tostr(EtaValues[ii+1]);
+    EtaTitle[ii] = " -- "+tostr(EtaValues[ii])+" < |#eta| #leq "+tostr(EtaValues[ii+1]);
   }
-  else if (nEtaBins_ != 1) std::cout << " Wrong choice for NrEtaBins --> Can only be 1 or 4 !! " << std::endl;
+  //}
+  //else if (nEtaBins_ != 1) std::cout << " Wrong choice for NrEtaBins --> Can only be 1 or 4 !! " << std::endl;
 }
 
 TFCreation::~TFCreation(){
@@ -145,26 +145,27 @@ void TFCreation::InitializeVariables(){
   histo2D["Mu_DiffPhiVsGenPt"]       = new TH2F("Mu_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for muon",                      10,    26,   150, 100,   -0.2,    0.2);
 
   //Initialize the different eta bins! 
-  if(nEtaBins_ == 4){         
-    //Store all the existing histo2D's in a new collection!
-    map<string,TH2F*> histo2DCopy = histo2D;
-    for(int iEta = 1; iEta <= nEtaBins_; iEta++){
+  //if(nEtaBins_ == 4){         
 
-      for(std::map<std::string,TH2F*>::const_iterator it = histo2DCopy.begin(); it != histo2DCopy.end(); it++){
-	TH2F *temp = it->second;
+  //Store all the existing histo2D's in a new collection!
+  map<string,TH2F*> histo2DCopy = histo2D;
+  for(int iEta = 1; iEta <= 4; iEta++){
+
+    for(std::map<std::string,TH2F*>::const_iterator it = histo2DCopy.begin(); it != histo2DCopy.end(); it++){
+      TH2F *temp = it->second;
 	
-	//Need different Ymax and Ymin for Mu_DiffThetaVsGenInvPt histogram!
-	double YMax = temp->GetYaxis()->GetXmax();
-	double YMin = temp->GetYaxis()->GetXmin();
-	if( string(temp->GetName()) == "Mu_DiffThetaVsGenInvPt"){ YMax = 0.015; YMin = -0.015;}
+      //Need different Ymax and Ymin for Mu_DiffThetaVsGenInvPt histogram!
+      double YMax = temp->GetYaxis()->GetXmax();
+      double YMin = temp->GetYaxis()->GetXmin();
+      if( string(temp->GetName()) == "Mu_DiffThetaVsGenInvPt"){ YMax = 0.015; YMin = -0.015;}
+      if( string(temp->GetName()) == "Mu_DiffEVsGenE" && (iEta == 1 || iEta == 2)){ YMax = 4.5; YMin = -4;}
 
-	if(iEta == nEtaBins_)
-	  histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins())*0.9, YMin*1.4, YMax*1.4 );
-	else if(iEta == nEtaBins_-1)
-	  histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin*1.2, YMax*1.2);
-        else
-          histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin, YMax);      
-      }
+      if(iEta == 4)
+	histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins())*0.9, YMin*1.4, YMax*1.4 );
+      else if(iEta == 3)
+	histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin*1.2, YMax*1.2);
+      else
+        histo2D[temp->GetName()+EtaBin[iEta]] = new TH2F( (temp->GetName()+EtaBin[iEta]).c_str(), (temp->GetTitle()+EtaTitle[iEta]).c_str(), temp->GetXaxis()->GetNbins(), temp->GetXaxis()->GetXmin(), temp->GetXaxis()->GetXmax(), (int)(temp->GetYaxis()->GetNbins()), YMin, YMax);      
     }
   }
 }
@@ -195,155 +196,155 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
 
   if(isSemiMu){histo2D["Muon_Pt_vs_Eta"]->Fill(selLepton->Eta(), selLepton->Pt()); histo2D["Muon_E_vs_Eta"]->Fill(selLepton->Eta(), selLepton->E());}
 
-
-  // Select the correct eta-bin which should be used!
-  int whichEtaBin = 0; 
-  int useEtaBinWJet1 = 99, useEtaBinWJet2 = 99, useEtaBinHadrB = 99, useEtaBinLeptB = 99, useEtaBinLepton = 99;
-  if(nEtaBins_ != 1){
-    for(int iEta = 1; iEta <= nEtaBins_; iEta++){
-      if(abs(selHadrWJet1->Eta()) <= EtaValues[iEta+1] && abs(selHadrWJet1->Eta()) > EtaValues[iEta]) useEtaBinWJet1 = iEta;
-      if(abs(selHadrWJet2->Eta()) <= EtaValues[iEta+1] && abs(selHadrWJet2->Eta()) > EtaValues[iEta]) useEtaBinWJet2 = iEta;
-      if(abs(selHadrBJet->Eta())  <= EtaValues[iEta+1] && abs(selHadrBJet->Eta()) > EtaValues[iEta])  useEtaBinHadrB = iEta;
-      if(abs(selLeptBJet->Eta())  <= EtaValues[iEta+1] && abs(selLeptBJet->Eta()) > EtaValues[iEta])  useEtaBinLeptB = iEta;
-      if(abs(selLepton->Eta())    <= EtaValues[iEta+1] && abs(selLepton->Eta()) > EtaValues[iEta])    useEtaBinLepton = iEta;
+  for(int iEtaCase = 0; iEtaCase < 2; iEtaCase++){
+    // Select the correct eta-bin which should be used!
+    int whichEtaBin = 0; 
+    int useEtaBinWJet1 = 99, useEtaBinWJet2 = 99, useEtaBinHadrB = 99, useEtaBinLeptB = 99, useEtaBinLepton = 99;
+    if(iEtaCase == 1){
+      for(int iEta = 1; iEta <= 4; iEta++){
+        if(abs(selHadrWJet1->Eta()) <= EtaValues[iEta+1] && abs(selHadrWJet1->Eta()) > EtaValues[iEta]) useEtaBinWJet1 = iEta;
+        if(abs(selHadrWJet2->Eta()) <= EtaValues[iEta+1] && abs(selHadrWJet2->Eta()) > EtaValues[iEta]) useEtaBinWJet2 = iEta;
+        if(abs(selHadrBJet->Eta())  <= EtaValues[iEta+1] && abs(selHadrBJet->Eta()) > EtaValues[iEta])  useEtaBinHadrB = iEta;
+        if(abs(selLeptBJet->Eta())  <= EtaValues[iEta+1] && abs(selLeptBJet->Eta()) > EtaValues[iEta])  useEtaBinLeptB = iEta;
+        if(abs(selLepton->Eta())    <= EtaValues[iEta+1] && abs(selLepton->Eta()) > EtaValues[iEta])    useEtaBinLepton = iEta;
+      }
     }
-  }
+    //Fill histograms for first light jet in case eta-splitting is desired!
+    if(iEtaCase == 1) whichEtaBin = useEtaBinWJet1;
+    histo2D["Light_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet1->E(),    selHadrWJet1->E()     );
+    histo2D["Light_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->Pt(),   selHadrWJet1->Pt()     );
+    histo2D["Light_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet1->Theta(),selHadrWJet1->Theta() );
+    histo2D["Light_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->E(),    selHadrWJet1->Theta() );
+    histo2D["Light_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet1->Pt(),    selHadrWJet1->Theta() );
+    histo2D["Light_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->Phi(),  selHadrWJet1->Phi()   );
+    histo2D["Light_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->E(),    selHadrWJet1->Phi()   );
+    histo2D["Light_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet1->Pt(),    selHadrWJet1->Phi()   );   
 
-  //Fill histograms for first light jet in case eta-splitting is desired!
-  if(nEtaBins_ != 1) whichEtaBin = useEtaBinWJet1;
-  histo2D["Light_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet1->E(),    selHadrWJet1->E()     );
-  histo2D["Light_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->Pt(),   selHadrWJet1->Pt()     );
-  histo2D["Light_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet1->Theta(),selHadrWJet1->Theta() );
-  histo2D["Light_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->E(),    selHadrWJet1->Theta() );
-  histo2D["Light_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet1->Pt(),    selHadrWJet1->Theta() );
-  histo2D["Light_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->Phi(),  selHadrWJet1->Phi()   );
-  histo2D["Light_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->E(),    selHadrWJet1->Phi()   );
-  histo2D["Light_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet1->Pt(),    selHadrWJet1->Phi()   );   
+    histo2D["Light_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet1->E(),    hadrWJet1->E()     - selHadrWJet1->E()     );
+    histo2D["Light_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->Pt(),   hadrWJet1->Pt()    - selHadrWJet1->Pt()     );
+    histo2D["Light_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet1->Theta(),hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->E(),    hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet1->Pt(),    hadrWJet1->Theta() - selHadrWJet1->Theta() );
+    histo2D["Light_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    histo2D["Light_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->E(),    hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    histo2D["Light_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet1->Pt(),    hadrWJet1->DeltaPhi(*selHadrWJet1)   );
 
-  histo2D["Light_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet1->E(),    hadrWJet1->E()     - selHadrWJet1->E()     );
-  histo2D["Light_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->Pt(),   hadrWJet1->Pt()    - selHadrWJet1->Pt()     );
-  histo2D["Light_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet1->Theta(),hadrWJet1->Theta() - selHadrWJet1->Theta() );
-  histo2D["Light_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->E(),    hadrWJet1->Theta() - selHadrWJet1->Theta() );
-  histo2D["Light_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet1->Pt(),    hadrWJet1->Theta() - selHadrWJet1->Theta() );
-  histo2D["Light_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet1->Phi(),  hadrWJet1->DeltaPhi(*selHadrWJet1)   );
-  histo2D["Light_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet1->E(),    hadrWJet1->DeltaPhi(*selHadrWJet1)   );
-  histo2D["Light_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet1->Pt(),    hadrWJet1->DeltaPhi(*selHadrWJet1)   );
+    //Fill histograms for second light jet!
+    if(iEtaCase == 1) whichEtaBin = useEtaBinWJet2;
+    histo2D["Light_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet2->E(),    selHadrWJet2->E()     );
+    histo2D["Light_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->Pt(),   selHadrWJet2->Pt()     );
+    histo2D["Light_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet2->Theta(),selHadrWJet2->Theta() );
+    histo2D["Light_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->E(),    selHadrWJet2->Theta() );
+    histo2D["Light_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet2->Pt(),    selHadrWJet2->Theta() );
+    histo2D["Light_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->Phi(),  selHadrWJet2->Phi()   );
+    histo2D["Light_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->E(),    selHadrWJet2->Phi()   );
+    histo2D["Light_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet2->Pt(),    selHadrWJet2->Phi()   );
 
-  //Fill histograms for second light jet!
-  if(nEtaBins_ != 1) whichEtaBin = useEtaBinWJet2;
-  histo2D["Light_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet2->E(),    selHadrWJet2->E()     );
-  histo2D["Light_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->Pt(),   selHadrWJet2->Pt()     );
-  histo2D["Light_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet2->Theta(),selHadrWJet2->Theta() );
-  histo2D["Light_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->E(),    selHadrWJet2->Theta() );
-  histo2D["Light_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet2->Pt(),    selHadrWJet2->Theta() );
-  histo2D["Light_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->Phi(),  selHadrWJet2->Phi()   );
-  histo2D["Light_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->E(),    selHadrWJet2->Phi()   );
-  histo2D["Light_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet2->Pt(),    selHadrWJet2->Phi()   );
+    histo2D["Light_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet2->E(),    hadrWJet2->E()     - selHadrWJet2->E()     );
+    histo2D["Light_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->Pt(),   hadrWJet2->Pt()    - selHadrWJet2->Pt()    );
+    histo2D["Light_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet2->Theta(),hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->E(),    hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet2->Pt(),   hadrWJet2->Theta() - selHadrWJet2->Theta() );
+    histo2D["Light_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->E(),    hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    histo2D["Light_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
 
-  histo2D["Light_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrWJet2->E(),    hadrWJet2->E()     - selHadrWJet2->E()     );
-  histo2D["Light_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->Pt(),   hadrWJet2->Pt()    - selHadrWJet2->Pt()    );
-  histo2D["Light_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrWJet2->Theta(),hadrWJet2->Theta() - selHadrWJet2->Theta() );
-  histo2D["Light_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->E(),    hadrWJet2->Theta() - selHadrWJet2->Theta() );
-  histo2D["Light_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrWJet2->Pt(),   hadrWJet2->Theta() - selHadrWJet2->Theta() );
-  histo2D["Light_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrWJet2->Phi(),  hadrWJet2->DeltaPhi(*selHadrWJet2)   );
-  histo2D["Light_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrWJet2->E(),    hadrWJet2->DeltaPhi(*selHadrWJet2)   );
-  histo2D["Light_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrWJet2->Pt(),   hadrWJet2->DeltaPhi(*selHadrWJet2)   );
+    //Fill histograms for hadronic b-jet
+    if(iEtaCase == 1) whichEtaBin = useEtaBinHadrB;
+    histo2D["BJet_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrBJet->E(),    selHadrBJet->E()     );
+    histo2D["BJet_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->Pt(),   selHadrBJet->Pt()    );
+    histo2D["BJet_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrBJet->Theta(),selHadrBJet->Theta() );
+    histo2D["BJet_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->E(),    selHadrBJet->Theta() );
+    histo2D["BJet_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrBJet->Pt(),   selHadrBJet->Theta() );
+    histo2D["BJet_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->Phi(),  selHadrBJet->Phi());
+    histo2D["BJet_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->E(),    selHadrBJet->Phi());
+    histo2D["BJet_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrBJet->Pt(),   selHadrBJet->Phi());
 
-  //Fill histograms for hadronic b-jet
-  if(nEtaBins_ != 1) whichEtaBin = useEtaBinHadrB;
-  histo2D["BJet_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrBJet->E(),    selHadrBJet->E()     );
-  histo2D["BJet_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->Pt(),   selHadrBJet->Pt()    );
-  histo2D["BJet_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrBJet->Theta(),selHadrBJet->Theta() );
-  histo2D["BJet_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->E(),    selHadrBJet->Theta() );
-  histo2D["BJet_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrBJet->Pt(),   selHadrBJet->Theta() );
-  histo2D["BJet_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->Phi(),  selHadrBJet->Phi());
-  histo2D["BJet_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->E(),    selHadrBJet->Phi());
-  histo2D["BJet_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrBJet->Pt(),   selHadrBJet->Phi());
+    histo2D["BJet_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrBJet->E(),    hadrBJet->E()     - selHadrBJet->E()     );
+    histo2D["BJet_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->Pt(),   hadrBJet->Pt()    - selHadrBJet->Pt()    );
+    histo2D["BJet_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrBJet->Theta(),hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->E(),    hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrBJet->Pt(),   hadrBJet->Theta() - selHadrBJet->Theta() );
+    histo2D["BJet_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->E(),    hadrBJet->DeltaPhi(*selHadrBJet)   );
+    histo2D["BJet_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
 
-  histo2D["BJet_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        hadrBJet->E(),    hadrBJet->E()     - selHadrBJet->E()     );
-  histo2D["BJet_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->Pt(),   hadrBJet->Pt()    - selHadrBJet->Pt()    );
-  histo2D["BJet_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(hadrBJet->Theta(),hadrBJet->Theta() - selHadrBJet->Theta() );
-  histo2D["BJet_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->E(),    hadrBJet->Theta() - selHadrBJet->Theta() );
-  histo2D["BJet_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   hadrBJet->Pt(),   hadrBJet->Theta() - selHadrBJet->Theta() );
-  histo2D["BJet_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    hadrBJet->Phi(),  hadrBJet->DeltaPhi(*selHadrBJet)   );
-  histo2D["BJet_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      hadrBJet->E(),    hadrBJet->DeltaPhi(*selHadrBJet)   );
-  histo2D["BJet_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     hadrBJet->Pt(),   hadrBJet->DeltaPhi(*selHadrBJet)   );
+    //Fill histograms for leptonic b-jet
+    if(iEtaCase == 1) whichEtaBin = useEtaBinLeptB;
+    histo2D["BJet_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        leptBJet->E(),    selLeptBJet->E()     );
+    histo2D["BJet_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      leptBJet->Pt(),   selLeptBJet->Pt()    );
+    histo2D["BJet_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(leptBJet->Theta(),selLeptBJet->Theta() );
+    histo2D["BJet_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    leptBJet->E(),    selLeptBJet->Theta() );
+    histo2D["BJet_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   leptBJet->Pt(),   selLeptBJet->Theta() );
+    histo2D["BJet_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    leptBJet->Phi(),  selLeptBJet->Phi()   );
+    histo2D["BJet_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      leptBJet->E(),    selLeptBJet->Phi()   );
+    histo2D["BJet_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     leptBJet->Pt(),   selLeptBJet->Phi()   );
 
-  //Fill histograms for leptonic b-jet
-  if(nEtaBins_ != 1) whichEtaBin = useEtaBinLeptB;
-  histo2D["BJet_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        leptBJet->E(),    selLeptBJet->E()     );
-  histo2D["BJet_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      leptBJet->Pt(),   selLeptBJet->Pt()    );
-  histo2D["BJet_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(leptBJet->Theta(),selLeptBJet->Theta() );
-  histo2D["BJet_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    leptBJet->E(),    selLeptBJet->Theta() );
-  histo2D["BJet_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   leptBJet->Pt(),   selLeptBJet->Theta() );
-  histo2D["BJet_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    leptBJet->Phi(),  selLeptBJet->Phi()   );
-  histo2D["BJet_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      leptBJet->E(),    selLeptBJet->Phi()   );
-  histo2D["BJet_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     leptBJet->Pt(),   selLeptBJet->Phi()   );
+    histo2D["BJet_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        leptBJet->E(),    leptBJet->E()     - selLeptBJet->E()     );
+    histo2D["BJet_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      leptBJet->Pt(),   leptBJet->Pt()    - selLeptBJet->Pt()     );
+    histo2D["BJet_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(leptBJet->Theta(),leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    leptBJet->E(),    leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   leptBJet->Pt(),   leptBJet->Theta() - selLeptBJet->Theta() );
+    histo2D["BJet_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    leptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      leptBJet->E(),    leptBJet->DeltaPhi(*selLeptBJet)   );
+    histo2D["BJet_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     leptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
 
-  histo2D["BJet_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        leptBJet->E(),    leptBJet->E()     - selLeptBJet->E()     );
-  histo2D["BJet_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      leptBJet->Pt(),   leptBJet->Pt()    - selLeptBJet->Pt()     );
-  histo2D["BJet_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(leptBJet->Theta(),leptBJet->Theta() - selLeptBJet->Theta() );
-  histo2D["BJet_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    leptBJet->E(),    leptBJet->Theta() - selLeptBJet->Theta() );
-  histo2D["BJet_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   leptBJet->Pt(),   leptBJet->Theta() - selLeptBJet->Theta() );
-  histo2D["BJet_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    leptBJet->Phi(),  leptBJet->DeltaPhi(*selLeptBJet)   );
-  histo2D["BJet_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      leptBJet->E(),    leptBJet->DeltaPhi(*selLeptBJet)   );
-  histo2D["BJet_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     leptBJet->Pt(),   leptBJet->DeltaPhi(*selLeptBJet)   );
-
-  //Fill histograms for lepton!
-  if(nEtaBins_ != 1) whichEtaBin = useEtaBinLepton;
-  if(isSemiEl){
-    histo2D["El_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    selLepton->E()     );
-    histo2D["El_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   selLepton->Pt()    );
-    histo2D["El_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),selLepton->Theta() );
-    histo2D["El_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    selLepton->Theta() );
-    histo2D["El_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   selLepton->Theta() );
-    histo2D["El_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    selLepton->Phi()   );
-    histo2D["El_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   selLepton->Phi()   );
-    histo2D["El_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  selLepton->Phi()   );
+    //Fill histograms for lepton!
+    if(iEtaCase == 1) whichEtaBin = useEtaBinLepton;
+    if(isSemiEl){
+      histo2D["El_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    selLepton->E()     );
+      histo2D["El_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   selLepton->Pt()    );
+      histo2D["El_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),selLepton->Theta() );
+      histo2D["El_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    selLepton->Theta() );
+      histo2D["El_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   selLepton->Theta() );
+      histo2D["El_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    selLepton->Phi()   );
+      histo2D["El_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   selLepton->Phi()   );
+      histo2D["El_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  selLepton->Phi()   );
       
-    histo2D["El_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    lepton->E()     - selLepton->E()     );
-    histo2D["El_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
-    histo2D["El_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),lepton->Theta() - selLepton->Theta() );
-    histo2D["El_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    lepton->Theta() - selLepton->Theta() );
-    histo2D["El_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
-    histo2D["El_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
-    histo2D["El_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    lepton->DeltaPhi(*selLepton)   );
-    histo2D["El_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
-  }
-  else if(isSemiMu){
-    float InvEgenMu = 1./lepton->E();
-    float InvErecMu = 1./selLepton->E();
-    float InvPtgenMu = 1./lepton->Pt();
-    float InvPtrecMu = 1./selLepton->Pt();
-    histo2D["Mu_RecoInvEVsGenInvE"+EtaBin[whichEtaBin]]->Fill(  InvEgenMu,      InvErecMu         );
-    histo2D["Mu_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    selLepton->E()    );
-    histo2D["Mu_RecoInvPtVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     InvPtrecMu        );
-    histo2D["Mu_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   selLepton->Pt()   );
-    histo2D["Mu_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),selLepton->Theta());
-    histo2D["Mu_RecoThetaVsGenInvE"+EtaBin[whichEtaBin]]->Fill( InvEgenMu,      selLepton->Theta());
-    histo2D["Mu_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    selLepton->Theta());
-    histo2D["Mu_RecoThetaVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     selLepton->Theta());
-    histo2D["Mu_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   selLepton->Theta());
-    histo2D["Mu_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  selLepton->Phi()  );
-    histo2D["Mu_RecoPhiVsGenInvE"+EtaBin[whichEtaBin]]->Fill(   InvEgenMu,      selLepton->Phi()  );
-    histo2D["Mu_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    selLepton->Phi()  );
-    histo2D["Mu_RecoPhiVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(  InvPtgenMu,     selLepton->Phi()  );
-    histo2D["Mu_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   selLepton->Phi()  );
+      histo2D["El_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    lepton->E()     - selLepton->E()     );
+      histo2D["El_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
+      histo2D["El_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),lepton->Theta() - selLepton->Theta() );
+      histo2D["El_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    lepton->Theta() - selLepton->Theta() );
+      histo2D["El_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+      histo2D["El_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)   );
+      histo2D["El_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    lepton->DeltaPhi(*selLepton)   );
+      histo2D["El_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)   );
+    }
+    else if(isSemiMu){
+      float InvEgenMu = 1./lepton->E();
+      float InvErecMu = 1./selLepton->E();
+      float InvPtgenMu = 1./lepton->Pt();
+      float InvPtrecMu = 1./selLepton->Pt();
+      histo2D["Mu_RecoInvEVsGenInvE"+EtaBin[whichEtaBin]]->Fill(  InvEgenMu,      InvErecMu         );
+      histo2D["Mu_RecoEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    selLepton->E()    );
+      histo2D["Mu_RecoInvPtVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     InvPtrecMu        );
+      histo2D["Mu_RecoPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   selLepton->Pt()   );
+      histo2D["Mu_RecoThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),selLepton->Theta());
+      histo2D["Mu_RecoThetaVsGenInvE"+EtaBin[whichEtaBin]]->Fill( InvEgenMu,      selLepton->Theta());
+      histo2D["Mu_RecoThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    selLepton->Theta());
+      histo2D["Mu_RecoThetaVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     selLepton->Theta());
+      histo2D["Mu_RecoThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   selLepton->Theta());
+      histo2D["Mu_RecoPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  selLepton->Phi()  );
+      histo2D["Mu_RecoPhiVsGenInvE"+EtaBin[whichEtaBin]]->Fill(   InvEgenMu,      selLepton->Phi()  );
+      histo2D["Mu_RecoPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    selLepton->Phi()  );
+      histo2D["Mu_RecoPhiVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(  InvPtgenMu,     selLepton->Phi()  );
+      histo2D["Mu_RecoPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   selLepton->Phi()  );
 
-    histo2D["Mu_DiffInvEVsGenInvE"+EtaBin[whichEtaBin]]->Fill(  InvEgenMu,      InvEgenMu       - InvErecMu          );
-    histo2D["Mu_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    lepton->E()     - selLepton->E()     );
-    histo2D["Mu_DiffInvPtVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
-    histo2D["Mu_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
-    histo2D["Mu_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),lepton->Theta() - selLepton->Theta() );
-    histo2D["Mu_DiffThetaVsGenInvE"+EtaBin[whichEtaBin]]->Fill( InvEgenMu,      lepton->Theta() - selLepton->Theta() );
-    histo2D["Mu_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    lepton->Theta() - selLepton->Theta() );
-    histo2D["Mu_DiffThetaVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
-    histo2D["Mu_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
-    histo2D["Mu_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)         );
-    histo2D["Mu_DiffPhiVsGenInvE"+EtaBin[whichEtaBin]]->Fill(   InvEgenMu,      lepton->DeltaPhi(*selLepton)         );
-    histo2D["Mu_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    lepton->DeltaPhi(*selLepton)         );
-    histo2D["Mu_DiffPhiVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(  InvPtgenMu,     lepton->DeltaPhi(*selLepton)         );
-    histo2D["Mu_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)         );
+      histo2D["Mu_DiffInvEVsGenInvE"+EtaBin[whichEtaBin]]->Fill(  InvEgenMu,      InvEgenMu       - InvErecMu          );
+      histo2D["Mu_DiffEVsGenE"+EtaBin[whichEtaBin]]->Fill(        lepton->E(),    lepton->E()     - selLepton->E()     );
+      histo2D["Mu_DiffInvPtVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     InvPtgenMu      - InvPtrecMu         );
+      histo2D["Mu_DiffPtVsGenPt"+EtaBin[whichEtaBin]]->Fill(      lepton->Pt(),   lepton->Pt()    - selLepton->Pt()    );
+      histo2D["Mu_DiffThetaVsGenTheta"+EtaBin[whichEtaBin]]->Fill(lepton->Theta(),lepton->Theta() - selLepton->Theta() );
+      histo2D["Mu_DiffThetaVsGenInvE"+EtaBin[whichEtaBin]]->Fill( InvEgenMu,      lepton->Theta() - selLepton->Theta() );
+      histo2D["Mu_DiffThetaVsGenE"+EtaBin[whichEtaBin]]->Fill(    lepton->E(),    lepton->Theta() - selLepton->Theta() );
+      histo2D["Mu_DiffThetaVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(InvPtgenMu,     lepton->Theta() - selLepton->Theta() );
+      histo2D["Mu_DiffThetaVsGenPt"+EtaBin[whichEtaBin]]->Fill(   lepton->Pt(),   lepton->Theta() - selLepton->Theta() );
+      histo2D["Mu_DiffPhiVsGenPhi"+EtaBin[whichEtaBin]]->Fill(    lepton->Phi(),  lepton->DeltaPhi(*selLepton)         );
+      histo2D["Mu_DiffPhiVsGenInvE"+EtaBin[whichEtaBin]]->Fill(   InvEgenMu,      lepton->DeltaPhi(*selLepton)         );
+      histo2D["Mu_DiffPhiVsGenE"+EtaBin[whichEtaBin]]->Fill(      lepton->E(),    lepton->DeltaPhi(*selLepton)         );
+      histo2D["Mu_DiffPhiVsGenInvPt"+EtaBin[whichEtaBin]]->Fill(  InvPtgenMu,     lepton->DeltaPhi(*selLepton)         );
+      histo2D["Mu_DiffPhiVsGenPt"+EtaBin[whichEtaBin]]->Fill(     lepton->Pt(),   lepton->DeltaPhi(*selLepton)         );
+    }
   }
 }
 
@@ -483,7 +484,10 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     if(histoName.find("Eta") > histoName.size() ){ binStart[0] = 15; binEnd[0] = 16; binStart[1] = 17; binEnd[1] = 19; binStart[2] = 20; binEnd[2] = 25;}
     else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 17;}
   }
-  else if(histoName == "Mu_DiffEVsGenE"){   binStart[0] = 13; binEnd[0] = 14;}
+  else if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
+    if(histoName.find("Eta") > histoName.size() ){   binStart[0] = 13; binEnd[0] = 14;}
+    else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 11; binEnd[0] = 12;}
+  }
 
   //Skip some bins!
   int binToSkip[10] = {50};
@@ -496,6 +500,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   else if(histoName == "Light_DiffEVsGenE_Eta_0.75_1.45"){ binToSkip[0] = 1;}
   else if(histoName == "Light_DiffEVsGenE_Eta_1.45_2.5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
   else if(histoName == "El_DiffEVsGenE_Eta_0_0.375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
+  else if(histoName == "Mu_DiffEVsGenE_Eta_0_0.375"){binToSkip[0] = 13; binToSkip[1] = 14; binToSkip[2] = 15; lastBin = 12;}
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -676,6 +681,10 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
     if(histoName.find("Eta") > histoName.size()){
       double FitRangeNeg[8] = {-1.5, -1.5, -2.5,  -3, -3.5, -4,   -5, -5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[8] = { 1.5,    2,  2.5, 3.5,  3.5,  5,  5.5,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    }
+    else{
+      double FitRangeNeg[7] = {-1.0, -1.5, -2.0, -3.0, -3.0, -3.5, -4.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[7] = { 1.0,  1.2,  2.5,  3.2,  3.5,  3.5,  4.2}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   }
 
