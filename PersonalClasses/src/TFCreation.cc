@@ -479,7 +479,10 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     else if(histoName.find("Eta_0.75") <= histoName.size()){ binStart[0] = 2; binEnd[0] = 3;}
     else if(histoName.find("Eta_1.45") <= histoName.size()){binStart[0] = 5; binEnd[0] = 6;}
   }
-  else if(histoName == "El_DiffEVsGenE"){   binStart[0] = 15; binEnd[0] = 16; binStart[1] = 17; binEnd[1] = 19; binStart[2] = 20; binEnd[2] = 25;}
+  else if(histoName.find("El_DiffEVsGenE") <= histoName.size() ){
+    if(histoName.find("Eta") > histoName.size() ){ binStart[0] = 15; binEnd[0] = 16; binStart[1] = 17; binEnd[1] = 19; binStart[2] = 20; binEnd[2] = 25;}
+    else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 17;}
+  }
   else if(histoName == "Mu_DiffEVsGenE"){   binStart[0] = 13; binEnd[0] = 14;}
 
   //Skip some bins!
@@ -492,6 +495,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   else if(histoName == "BJet_DiffEVsGenE_Eta_1.45_2.5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
   else if(histoName == "Light_DiffEVsGenE_Eta_0.75_1.45"){ binToSkip[0] = 1;}
   else if(histoName == "Light_DiffEVsGenE_Eta_1.45_2.5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
+  else if(histoName == "El_DiffEVsGenE_Eta_0_0.375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -633,8 +637,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangePos[16] = {2.5, 2.5,  3, 3.5, 3.5,    4,  4.5, 4.5,    5,  5.5, 5.5,  6,    6,  6,  6,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else{
-      double FitRangeNeg[12] = {-2, -2.5, -2.5, -2.5, -2.5,  -3,  -3, -3, -3, -3, -3, -3}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[12] = { 2,  2.5,    3,    3,    3, 3.5, 3.5,  4,  4,  4,  4,  4}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[15] = {-1.3, -1.5, -2.4, -2.5, -2.5, -2.7, -2.7, -2.7, -3.0, -2.5, -2.5, -2.5, -3.0, -3.0, -3.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[15] = { 0.9,  1.7,  1.5,  1.6,  1.8,  2.3,  2.7,  2.5,  2.5,  3.0,  3.0,  3.0,  3.5,  3.5,  3.7}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   } //End of El_DiffE GenE histo
 
