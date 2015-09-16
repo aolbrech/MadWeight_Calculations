@@ -413,10 +413,10 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     }
     if(string(fitHisto->GetName()) == "El_DiffEVsGenE"    && (ipar == 0||ipar == 1 || ipar == 2) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];}
     if(fitHistName.find("BJet_DiffEVsGenE") < fitHistName.size()){
-      if(fitHistName.find("Eta") > fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
-      else if(fitHistName.find("Eta_0_") <= fitHistName.size() && (ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
-      else if(fitHistName.find("Eta_0p375") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; }
-      else if(fitHistName.find("Eta_0p75") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar == 4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3];}
+      if(fitHistName.find("Eta") > fitHistName.size()             && (ipar == 3||ipar == 4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
+      else if(fitHistName.find("Eta_0_")    <= fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
+      else if(fitHistName.find("Eta_0p375") <= fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
+      else if(fitHistName.find("Eta_0p75")  <= fitHistName.size() && (ipar == 2||ipar == 3||ipar == 4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3];}
     }
 
     //Exclude overflow bin if necessary
@@ -469,16 +469,16 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   int nCombBins = 0;
   if(     histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){ 
     if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
-    else if(histoName.find("Eta_0_") <= histoName.size()){    binStart[0] = 12; binEnd[0] = 14;}
+    else if(histoName.find("Eta_0_")    <= histoName.size()){ binStart[0] = 12; binEnd[0] = 14;}
     else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 15; binEnd[0] = 18;}
-    else if(histoName.find("Eta_0p75") <= histoName.size()){  binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
+    else if(histoName.find("Eta_0p75")  <= histoName.size()){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
   }
   else if(histoName.find("Light_DiffEVsGenE") <= histoName.size()){
-    if(histoName.find("Eta") > histoName.size() ){ binStart[0] = 1;  binEnd[0] = 2;  binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
-    else if(histoName.find("Eta_0_") <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
+    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
+    else if(histoName.find("Eta_0_")    <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 16;}
     else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 15; binEnd[1] = 16;}
-    else if(histoName.find("Eta_0p75") <= histoName.size()){ binStart[0] = 2; binEnd[0] = 3;}
-    else if(histoName.find("Eta_1p45") <= histoName.size()){binStart[0] = 5; binEnd[0] = 6;}
+    else if(histoName.find("Eta_0p75")  <= histoName.size()){ binStart[0] = 2; binEnd[0] = 3;}
+    else if(histoName.find("Eta_1p45")  <= histoName.size()){ binStart[0] = 5; binEnd[0] = 6;}
   }
   else if(histoName.find("El_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){ binStart[0] = 15; binEnd[0] = 16; binStart[1] = 17; binEnd[1] = 19; binStart[2] = 20; binEnd[2] = 25;}
@@ -493,11 +493,12 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   //Skip some bins!
   int binToSkip[10] = {50};
   int nSkippedBins = 0;
-  if( histoName == "BJet_DiffEVsGenE") binToSkip[0] = 1;
-  else if(histoName == "BJet_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 15; binToSkip[1] = 16; binToSkip[2] = 17; binToSkip[3] = 18; binToSkip[4] = 19; lastBin = 12;}
-  else if(histoName == "BJet_DiffEVsGenE_Eta_0p375_0p75"){binToSkip[0] = 19; lastBin = 15;}
-  else if(histoName == "BJet_DiffEVsGenE_Eta_0p75_1p45"){binToSkip[0] = 1;}
-  else if(histoName == "BJet_DiffEVsGenE_Eta_1p45_2p5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
+  if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
+    if(histoName.find("Eta") > histoName.size() ) binToSkip[0] = 1;
+    else if(histoName.find("Eta_0_")    <= histoName.size() ){ binToSkip[0] = 15; binToSkip[1] = 16; binToSkip[2] = 17; binToSkip[3] = 18; binToSkip[4] = 19; lastBin = 12;}
+    else if(histoName.find("Eta_0p75")  <= histoName.size() )  binToSkip[0] = 1;
+    else if(histoName.find("Eta_1p45")  <= histoName.size() ){ binToSkip[0] = 1;  binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
+  }
   else if(histoName == "Light_DiffEVsGenE_Eta_0p75_1p45"){ binToSkip[0] = 1;}
   else if(histoName == "Light_DiffEVsGenE_Eta_1p45_2p5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
   else if(histoName == "El_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
@@ -626,12 +627,12 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangePos[11] = {  7,  15,  15,  20,  23,  25,  25,  28,  30,  32,  32}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0p375") <= histoName.size()){
-      double FitRangeNeg[7] = {-16, -20, -30, -30, -33, -35, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[7] = {  5,  12,  20,  25,  28,  32,  35}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[7] = {-14, -18, -30, -32, -33, -35, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[7] = {  4,  11,  20,  22,  24,  27,  30}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0p75") <= histoName.size()){
-      double FitRangeNeg[8] = {-10, -15, -18, -36, -40, -38, -40, -40}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[8] = { 10,   8,  16,  25,  36,  38,  43,  44}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[6] = {-10, -22, -24, -30, -40, -38}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[6] = { 10,   6,  14,  22,  36,  38}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1p45") <= histoName.size()){
       double FitRangeNeg[18] = {-10, -10, -10, -10, -10, -32, -35, -40, -43, -45, -45, -45, -43, -43, -45, -45, -45, -45}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
