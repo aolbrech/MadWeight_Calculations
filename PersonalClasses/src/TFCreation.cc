@@ -414,7 +414,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     if(string(fitHisto->GetName()) == "El_DiffEVsGenE"    && (ipar == 0||ipar == 1 || ipar == 2) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];}
     if(fitHistName.find("BJet_DiffEVsGenE") < fitHistName.size()){
       if(fitHistName.find("Eta") > fitHistName.size() && (ipar == 3||ipar == 4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
-      else if(fitHistName.find("Eta_0_") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; }
+      else if(fitHistName.find("Eta_0_") <= fitHistName.size() && (ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2]; }
       else if(fitHistName.find("Eta_0p375") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar ==4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3]; }
       else if(fitHistName.find("Eta_0p75") <= fitHistName.size() && (ipar == 2||ipar == 3||ipar == 4)){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[3];}
     }
@@ -622,12 +622,12 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangePos[5] = {  7,  15,  26,  32,  33}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size()){
-      double FitRangeNeg[11] = {-10, -20, -34, -30, -30, -30, -30, -34, -35, -34, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[11] = {  7,  15,  16,  30,  36,  36,  36,  36,  35,  35,  35}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-13, -20, -26, -30, -30, -30, -30, -32, -34, -34, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = {  7,  15,  15,  20,  23,  25,  25,  28,  30,  32,  32}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0p375") <= histoName.size()){
-      double FitRangeNeg[7] = {-14, -18, -30, -32, -34, -35, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[7] = {  5,  10,  18,  20,  22,  28,  32}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[7] = {-16, -20, -30, -30, -33, -35, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[7] = {  5,  12,  20,  25,  28,  32,  35}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0p75") <= histoName.size()){
       double FitRangeNeg[8] = {-10, -15, -18, -36, -40, -38, -40, -40}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
