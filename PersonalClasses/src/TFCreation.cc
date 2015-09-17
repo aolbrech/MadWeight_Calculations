@@ -492,8 +492,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     if(histoName.find("Eta") > histoName.size() ){   binStart[0] = 13; binEnd[0] = 14;}
     else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 8; binEnd[0] = 10;}
     else if(histoName.find("Eta_0p375") <= histoName.size() ){binStart[0] = 9; binEnd[0] = 10; binStart[1] = 11; binEnd[1] = 12;}
-    else if(histoName.find("Eta_0p75") <= histoName.size() ){ binStart[0] = 2; binEnd[0] = 3;  binStart[1] = 10; binEnd[1] = 11;  binStart[2] = 12; binEnd[2] = 14;}
-    else if(histoName.find("Eta_1p45") <= histoName.size() ){binStart[0] = 5;  binEnd[0] = 6;  binStart[1] = 13; binEnd[1] = 14;}
+    else if(histoName.find("Eta_0p75") <= histoName.size() ){ binStart[0] = 2; binEnd[0] = 3;  binStart[1] = 10; binEnd[1] = 11; binStart[2] = 12; binEnd[2] = 14;}
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){binStart[0] = 5;  binEnd[0] = 6;  binStart[1] = 11; binEnd[1] = 12; binStart[2] = 13; binEnd[2] = 15;}
   }
 
   //Skip some bins!
@@ -512,7 +512,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     if(histoName.find("Eta_0_") <= histoName.size() ){        binToSkip[0] = 11; binToSkip[1] = 12; binToSkip[2] = 13; binToSkip[3] = 14; binToSkip[4] = 15; lastBin = 8;}
     else if(histoName.find("Eta_0p375") <= histoName.size() ){binToSkip[0] = 1; binToSkip[1] = 13; binToSkip[2] = 14; binToSkip[3] = 15; lastBin = 11;}
     else if(histoName.find("Eta_0p75") <= histoName.size() ){ binToSkip[0] = 1; }
-    else if(histoName.find("Eta_1p45") <= histoName.size() ){ binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){ binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; lastBin = 13;}
   }
 
   for(int bin=1;bin <= nbins+1;bin ++) {
@@ -702,7 +702,7 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
       double FitRangePos[6] = { 1.0,  2.5,  1.6,  3.2,  3.6,  4.0}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1p45") <= histoName.size() ){
-      double FitRangeNeg[12] = {-0.5, -0.5, -0.5, -0.5, -4.0, -3.5, -4.5, -4.5, -6.0, -6.5, -6.5, -7.5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangeNeg[12] = {-0.5, -0.5, -0.5, -0.5, -3.5, -3.5, -4.5, -4.5, -6.0, -6.5, -6.5, -7.5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[12] = { 0.5,  0.5,  0.5,  0.5,  4.0,  3.0,  5.0,  6.0,  7.0,  7.0,  8.0,  8.0}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
   }
