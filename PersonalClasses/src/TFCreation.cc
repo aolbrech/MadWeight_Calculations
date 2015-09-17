@@ -154,10 +154,12 @@ void TFCreation::InitializeVariables(){
       double YMax = temp->GetYaxis()->GetXmax();
       double YMin = temp->GetYaxis()->GetXmin();
       int NYBins = (int)(temp->GetYaxis()->GetNbins());
-      if( string(temp->GetName()) == "Mu_DiffThetaVsGenInvPt"){ YMax = 0.015; YMin = -0.015;}
+
+      //if( string(temp->GetName()) == "Mu_DiffThetaVsGenInvPt"){ YMax = 0.015; YMin = -0.015;}
       if( string(temp->GetName()) == "Mu_DiffEVsGenE" ){
-        if(iEta == 1 || iEta == 2){ YMax = 4.5; YMin = -4; NYBins = NYBins*1.1;}
-        else if(iEta == 3){ YMax = 5; YMin = -5; NYBins = NYBins*0.9;}
+        YMax = 4.0; YMin = -3.5;
+        if(iEta == 1 || iEta == 2) NYBins = NYBins*1.1;
+        else if(iEta == 4){ NYBins = NYBins*0.9; }
       }
 
       if(iEta == 4)
@@ -413,9 +415,13 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
       else if(fitHistName.find("Eta_0p75") <= fitHistSize && (ipar == 2||ipar==3||ipar==4) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];}
     }
     if(string(fitHisto->GetName()) == "El_DiffEVsGenE"    && (ipar == 0||ipar == 1 || ipar == 2) ){ FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];}
+
     if(fitHistName.find("BJet_DiffEVsGenE") < fitHistSize){
       if( (fitHistName.find("Eta") > fitHistSize || fitHistName.find("Eta_0") <= fitHistSize) && (ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];
     }
+
+    //In case of muons the last parameters correspond to the narrow gaussian!!
+    if(fitHistName.find("Mu_DiffEVsGenE") < fitHistSize && fitHistName.find("Eta_0p75") < fitHistSize && (ipar == 3 || ipar == 4) ) FitMax_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];
 
     //Exclude overflow bin if necessary
     if(fitHistName == "Light_DiffEVsGenE" || fitHistName == "El_DiffEVsGenE") FitMax_[nParsFit_*whichEtaBin+ipar] =  grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];
@@ -484,8 +490,10 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   }
   else if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){   binStart[0] = 13; binEnd[0] = 14;}
-    else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 9; binEnd[0] = 10;}
-    else if(histoName.find("Eta_1p45") <= histoName.size() ){binStart[0] = 5; binEnd[0] = 6; binStart[1] = 13; binEnd[1] = 14;}
+    else if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 8; binEnd[0] = 10;}
+    else if(histoName.find("Eta_0p375") <= histoName.size() ){binStart[0] = 9; binEnd[0] = 10; binStart[1] = 11; binEnd[1] = 12;}
+    else if(histoName.find("Eta_0p75") <= histoName.size() ){ binStart[0] = 2; binEnd[0] = 3;  binStart[1] = 10; binEnd[1] = 11;  binStart[2] = 12; binEnd[2] = 14;}
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){binStart[0] = 5;  binEnd[0] = 6;  binStart[1] = 13; binEnd[1] = 14;}
   }
 
   //Skip some bins!
@@ -500,8 +508,12 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   else if(histoName == "Light_DiffEVsGenE_Eta_0p75_1p45"){ binToSkip[0] = 1;}
   else if(histoName == "Light_DiffEVsGenE_Eta_1p45_2p5"){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
   else if(histoName == "El_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
-  else if(histoName == "Mu_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 11; binToSkip[1] = 12; binToSkip[2] = 13; binToSkip[3] = 14; binToSkip[4] = 15; lastBin = 9;}
-  else if(histoName == "Mu_DiffEVsGenE_Eta_1p45_2p5"){ binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
+  else if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
+    if(histoName.find("Eta_0_") <= histoName.size() ){        binToSkip[0] = 11; binToSkip[1] = 12; binToSkip[2] = 13; binToSkip[3] = 14; binToSkip[4] = 15; lastBin = 8;}
+    else if(histoName.find("Eta_0p375") <= histoName.size() ){binToSkip[0] = 1; binToSkip[1] = 13; binToSkip[2] = 14; binToSkip[3] = 15; lastBin = 11;}
+    else if(histoName.find("Eta_0p75") <= histoName.size() ){ binToSkip[0] = 1; }
+    else if(histoName.find("Eta_1p45") <= histoName.size() ){ binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4;}
+  }
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
@@ -536,13 +548,13 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
 
     //Do the actual fit (on a normalized histogram)!:
     hp->Scale(1./hp->Integral());
-    doubleGaussianFit->SetParLimits(2, 0, 1);
-    //doubleGaussianFit->SetParLimits(0,-10,10);
+    doubleGaussianFit->SetParLimits(2, 0.0, 1.0);
+    doubleGaussianFit->SetParLimits(0, -500, 500);
+    doubleGaussianFit->SetParLimits(3, -500, 500);
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
     if(npfits > nParsFit_ && npfits >= cut) {
-
       //Fill the TGraph for each parameter with the obtained Fit parameter and its uncertainty
       //--> Each bin in this histogram represents a bin range in x-axis of considered 2D histogram!
       for(int ipar=0; ipar<nParsFit_; ipar++ ){
@@ -672,21 +684,22 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
     }
   } //End of Light_DiffE GenE histo
 
-  if(histoName.find("Mu_DiffInvEVsGenInvE") <= histoName.size() ){
-    if(histoName.find("Eta") > histoName.size()){ //0.00045 & 0.00025 working 
-      //double FitRangeNeg[11] = {-0.0005, -0.0012, -0.0012, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015, -0.0015}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      //double FitRangePos[11] = { 0.0004,  0.001,   0.001,   0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015,  0.0015}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
-    }
-  } //End of Mu_DiffInvE GenInvE histo
-
   if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size()){
       double FitRangeNeg[8] = {-1.5, -1.5, -2.5,  -3, -3.5, -4,   -5, -5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[8] = { 1.5,    2,  2.5, 3.5,  3.5,  5,  5.5,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() ){
-      double FitRangeNeg[7] = {-0.9, -1.5, -2.0, -2.6, -3.0, -3.5, -4.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[7] = { 0.9,  1.5,  2.0,  2.5,  3.0,  3.2,  3.5}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[5] = {-1.0, -1.5, -2.0, -2.4, -3.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[5] = { 1.0,  1.3,  2.2,  3.0,  3.3}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    }
+    else if(histoName.find("Eta_0p375") <= histoName.size() ){
+      double FitRangeNeg[5] = {-1.0, -1.3, -1.6, -2.2, -3.4}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[5] = { 1.0,  1.4,  2.0,  2.7,  3.2}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+    }
+    else if(histoName.find("Eta_0p75") <= histoName.size() ){
+      double FitRangeNeg[6] = {-1.0, -2.5, -1.6, -3.0, -3.6, -4.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[6] = { 1.0,  2.5,  1.6,  3.2,  3.6,  4.0}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_1p45") <= histoName.size() ){
       double FitRangeNeg[12] = {-0.5, -0.5, -0.5, -0.5, -4.0, -3.5, -4.5, -4.5, -6.0, -6.5, -6.5, -7.5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
@@ -793,16 +806,12 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
 
       TCanvas *canv = new TCanvas(("canv_"+partName+""+EtaBin[iEta]).c_str(),"canvas");
       canv->cd();
-      //AllCaloEnergyFits[iEta*nParsFit_+ipar].SetRange(FitMin_[iEta*nParsFit_+ipar]*0.9, FitMax_[iEta*nParsFit_+ipar]*1.01);
-      //AllCaloEnergyFits[iEta*nParsFit_+ipar].GetXaxis()->SetTitle(("Generator parton energy (GeV) -- Fit between "+tostr(FitMin_[iEta*nParsFit_+ipar])+" and "+tostr(FitMax_[iEta*nParsFit_+ipar])).c_str());
       grE_ParamFit[iEta*nParsFit_+ipar]->Draw("AP");
       grE_ParamFit[iEta*nParsFit_+ipar]->GetXaxis()->SetTitle(("Generator parton energy (GeV) -- Fit between "+tostr(FitMin_[iEta*nParsFit_+ipar])+" and "+tostr(FitMax_[iEta*nParsFit_+ipar])).c_str());
-      grE_ParamFit[iEta*nParsFit_+ipar]->GetXaxis()->SetRangeUser(FitMin_[iEta*nParsFit_+ipar]*0.9, FitMax_[iEta*nParsFit_+ipar]*1.01);
+      AllCaloEnergyFits[iEta*nParsFit_+ipar].SetRange(FitMin_[iEta*nParsFit_+ipar], FitMax_[iEta*nParsFit_+ipar]);
       AllCaloEnergyFits[iEta*nParsFit_+ipar].Draw("same");
       canv->SaveAs(("TFInformation/Plots/"+string(AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName())+".pdf").c_str());
       delete canv;
-//      AllCaloEnergyFits[iEta*nParsFit_+ipar].SaveAs(("TFInformation/Plots/"+string(AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName())+".pdf").c_str());
-//      std::cout << " Looking at caloFit with name : " << AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName() << std::endl;
       *LaTeX << "  \\includegraphics[width = 0.45 \\textwidth]{Plots/" << AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName() << ".pdf}";
       if(ipar == 1 || ipar == 3) *LaTeX << " \\\\ " << endl;
       else                       *LaTeX << " " << endl;
