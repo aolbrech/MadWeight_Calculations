@@ -489,8 +489,8 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     if(histoName.find("Eta_0_") <= histoName.size() ){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 17;}
   }
   else if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
-    //if(histoName.find("Eta") > histoName.size() ){   binStart[0] = 13; binEnd[0] = 14;}
-    if(histoName.find("Eta_0_") <= histoName.size() ){   binStart[0] = 8; binEnd[0] = 10;}
+    if(histoName.find("Eta") > histoName.size() ){   binStart[0] = 13; binEnd[0] = 14;}
+    else if(histoName.find("Eta_0_") <= histoName.size() ){   binStart[0] = 8; binEnd[0] = 10;}
     else if(histoName.find("Eta_0p375") <= histoName.size() ){binStart[0] = 9; binEnd[0] = 10; binStart[1] = 11; binEnd[1] = 12;}
     else if(histoName.find("Eta_0p75") <= histoName.size() ){ binStart[0] = 2; binEnd[0] = 3;  binStart[1] = 10; binEnd[1] = 11; binStart[2] = 12; binEnd[2] = 14;}
     else if(histoName.find("Eta_1p45") <= histoName.size() ){ binStart[0] = 5; binEnd[0] = 6;  binStart[1] = 11; binEnd[1] = 12; binStart[2] = 13; binEnd[2] = 15;}
@@ -688,8 +688,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
 
   if(histoName.find("Mu_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size()){
-      double FitRangeNeg[8] = {-1.5, -1.5, -2.5,  -3, -3.5, -4,   -5, -5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[8] = { 1.5,    2,  2.5, 3.5,  3.5,  5,  5.5,  6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[8] = {-0.5, -1.2, -2.0, -2.2, -3.2, -3.8, -4.4,-5}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[8] = { 0.7,  1.4,  2.0,  3.0,  3.7,  4.3,    5, 6}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size() ){
       double FitRangeNeg[5] = {-1.0, -1.5, -2.0, -2.4, -3.0}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
