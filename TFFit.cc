@@ -42,7 +42,7 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
-  bool CreateTFFromTree = true; 
+  bool CreateTFFromTree = false;
   bool RunFitForTF = true; 
   int nEtaBins = 1;
   bool TFForPhi = false;
@@ -71,7 +71,7 @@ int main (int argc, char **argv)
 
       //Set the number of selected events (for loop on events):
       int nEvent = inputTFTree->GetEntries(); 
-      //int nEvent = 4;
+      //int nEvent = 5000;
       std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
       //Initialize the TFCreation class (create all histograms):
@@ -193,11 +193,14 @@ int main (int argc, char **argv)
       myTF.open("TFInformation/TF_user_etaBins.dat");
       myTransferCard.open("TFInformation/transfer_card_user_etaBins.dat");
     }
-    myLaTeX.open("TFInformation/LatexFile.tex");
+    myLaTeX.open(("TFInformation/TFSummary"+EtaConsidered+".tex").c_str());
     myLaTeX << "\\documentclass[a4paper,10pt]{article} " << endl;
     myLaTeX << "\\usepackage[utf8]{inputenc} " << endl;
     myLaTeX << "\\usepackage[margin=1in]{geometry} \n \\usepackage{graphicx} " << endl;
-    myLaTeX << "\\title{Transfer Functions} \n \\begin{document} \n \\maketitle " << endl;
+    myLaTeX << "\\title{Transfer Functions} \n\\begin{document} \n\\maketitle " << endl;
+    myLaTeX << "\\begin{abstract} " << endl;
+    myLaTeX << " Summary of the obtained Transfer Functions which will be implemented in Madweight as 'Double Gaussian TF' \\\\" << endl;
+    myLaTeX << "\\end{abstract} " << endl;
 
     myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;
     myTransferCard<<"#|                         TRANSFER_CARD.DAT                             |"<<endl;
@@ -290,8 +293,7 @@ int main (int argc, char **argv)
       std::string histoTitle = HistoInfo[iHisto][0];
 
       //Select the histograms which need to be considered!!
-      if(!( ( (tfDependency == 1 && (histoTitle.find("VsGenPt") <= histoSize || histoTitle.find("VsGenInvPt") <= histoSize ) ) ||
-            (tfDependency == 0 && histoTitle.find("VsGenE") <= histoSize ) ) 
+      if(!( ( (tfDependency == 1 && (histoTitle.find("VsGenPt") <= histoSize || histoTitle.find("VsGenInvPt") <= histoSize ) ) || (tfDependency == 0 && histoTitle.find("VsGenE") <= histoSize ) ) 
           && ( ( TFForPhi && histoTitle.find("DiffPhi") <= histoSize ) || (TFForTheta && histoTitle.find("DiffTheta") <= histoSize ) || histoTitle.find("DiffE") <= histoSize || histoTitle.find("DiffInvE") <= histoSize ) ) )
         continue;
   
@@ -357,16 +359,17 @@ int main (int argc, char **argv)
                 
       myTF<<"\n  <variable name='"<<KinVarName<<"'>"<<endl;
       myTF<<"    <tf>";
-    
+  
       tfCreation.WriteTF(myTFTable, myTransferCard, myTF, myLaTeX, KinVarName, PartName, tfDependency);
       if(TFForTheta == false || (TFForTheta == true && histoTitle.find("DiffTheta") <= histoSize) ){
-	if( (tfDependency == 0 && histoTitle.find("Mu_DiffE") <= histoSize) || (tfDependency == 1 && histoTitle.find("Mu_DiffInvE") <= histoSize) ){ myTF << "\n</block>\n</file>";}  //Muon is the last of the four particles!!
+	if( (tfDependency == 0 && histoTitle.find("Mu_DiffE") <= histoSize) || (tfDependency == 1 && histoTitle.find("Mu_DiffInvE") <= histoSize) ){ myTF << "\n</block>\n</file>";}  //Muon is the last of the 4 particles!!
 	else{                                                                                                                                        myTF << "\n</block>";         }
       }
     
       myTFTable<<"\\hline" << endl;
       myTFTable<<"\\end{tabular}"<<endl;
       myTFTable<<"\\end{table} \n"<<endl;
+
     }             
     //Close the root file where all histograms are saved together with the output files!
     readFile->Close();
