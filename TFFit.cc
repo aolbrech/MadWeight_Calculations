@@ -44,7 +44,7 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   bool CreateTFFromTree = false;
   bool RunFitForTF = true; 
-  int nEtaBins = 1;
+  int nEtaBins = 4;
   bool TFForPhi = false;
   bool TFForTheta = false;
   enum TFDependency_t {EDepTF, PtDepTF};
@@ -206,7 +206,7 @@ int main (int argc, char **argv)
     myTransferCard<<"#|                         TRANSFER_CARD.DAT                             |"<<endl;
     myTransferCard<<"#|                                                                       |"<<endl;
     myTransferCard<<"#|     Author: Annik Olbrechts (VUB)                                     |"<<endl;
-    myTransferCard<<"#|             27 November 2014                                          |"<<endl;
+    myTransferCard<<"#|             02 October 2015                                           |"<<endl;
     myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;
     myTransferCard<<"#|     This file is generated automaticly by MADWEIGHT                   |"<<endl;
     myTransferCard<<"#|     card generation version: 1.0.0                                    |"<<endl;
@@ -232,7 +232,7 @@ int main (int argc, char **argv)
     myTF<<"##    Author: Annik Olbrechts (VUB)                                      ##"<<endl;
     myTF<<"##   			                                            ##"<<endl;
     myTF<<"##    Version:     1.0.0                         		            ##"<<endl;
-    myTF<<"##    Last change: 27/11/14			                            ##"<<endl;
+    myTF<<"##    Last change: 02/02/15			                            ##"<<endl;
     myTF<<"##					                                    ##"<<endl;
     myTF<<"###########################################################################"<<endl;
     myTF<<"###########################################################################"<<endl;
@@ -339,7 +339,7 @@ int main (int argc, char **argv)
 	myTransferCard<<"#|      --> Used formula: Double Gaussian fit with parameters depending on momentum" << endl;
 	if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(E) + C*E  for width of gaussians "<< endl;
 	else                                                                myTransferCard<<"#|      --> Dependency defined as: A + B*sqrt(1/E) + C*1/E  for width of gaussians "<< endl;
-	if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTransferCard<<"#|      -->                        A + B*E + C*E² + D*E³ + F*E^4"<< endl;
+	if(tfDependency == 0 || (tfDependency == 1 && PartName != "muon") ) myTransferCard<<"#|      -->                        A + B*E + C*E² + D*E³ + F*sqrt(E)"<< endl;
 	else                                                                myTransferCard<<"#|      -->                        A + B*1/E + C*1/E² + D*1/E³ + F*1/E^4"<< endl;
 	myTransferCard<<"#+--------------------------------------------------------------------------------------+" <<endl;
 
