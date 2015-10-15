@@ -20,6 +20,7 @@ TFCreation::TFCreation(int nEtaBins, std::string etaCons, bool doFits){
   }
  
   //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
+  //caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
   caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
   if(doFits){ caloFitFile = new TFile(("TFInformation/CaloEnergyFitFunctions"+etaCons+".root").c_str(),"RECREATE");}
 
@@ -81,7 +82,7 @@ void TFCreation::InitializeVariables(){
   histo2D["Light_DiffPhiVsGenPt"]      = new TH2F("Light_DiffPhiVsGenPt",      "#phi difference (gen-reco) versus P_{T,gen} for light quarks",      10,   30,  165, 100, -0.15,  0.15);
 
   histo2D["BJet_RecoEVsGenE"]         = new TH2F("BJet_RecoEVsGenE",         "Energy of b-jets (reco vs gen level)",                        150,    0,  300, 150,     0,  300);
-  histo2D["BJet_DiffEVsGenE"]         = new TH2F("BJet_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for b-jets",            18,   30,  230, 150,   -35,   38);
+  histo2D["BJet_DiffEVsGenE"]         = new TH2F("BJet_DiffEVsGenE",         "E difference (gen-reco) versus E_{gen} for b-jets",            18,   30,  230, 350,  -100,  100);
   histo2D["BJet_RecoPtVsGenPt"]       = new TH2F("BJet_RecoPtVsGenPt",       "Transverse momentum of b-jets (reco vs gen level)",           150,    0,  300, 150,     0,  300);
   histo2D["BJet_DiffPtVsGenPt"]       = new TH2F("BJet_DiffPtVsGenPt",       "Pt difference (gen-reco) versus P_{T,gen} for b-jets",         10,   30,  150, 100,   -35,   50);
   histo2D["BJet_RecoThetaVsGenTheta"] = new TH2F("BJet_RecoThetaVsGenTheta", "Polar angle distribution of b-jets (reco vs gen)",             60,    0, 3.15,  60,     0, 3.15);
@@ -389,8 +390,9 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
     
     //Set the name and function formula of this parameter fit correctly!
     if(ipar == 0 || ipar == 2 || ipar == 3){
-      caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*sqrt(x)");    //Quartic function as fit!
-      for(int ii = 0; ii < 5; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
+      //caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*sqrt(x)");    //Quartic function as fit!
+      caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");    //Quartic function as fit!
+      for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
     }
     else{
       caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
@@ -414,8 +416,8 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
       else if(fitHistName.find("Eta_0p75") <= fitHistSize && (ipar == 3||ipar == 4) )   FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];
     }
     if(fitHistName.find("BJet_DiffEVsGenE") < fitHistSize){
-      if( fitHistName.find("Eta") > fitHistSize && (ipar == 2||ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];
-      else if( fitHistName.find("Eta_0") <= fitHistSize && (ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];
+      //if( fitHistName.find("Eta") > fitHistSize && (ipar == 2||ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];
+      if( fitHistName.find("Eta_0") <= fitHistSize && (ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];
     }
 
     //In case of muons the last parameters correspond to the narrow gaussian (not for the non-binned hist)!!
@@ -464,7 +466,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   int binEnd[10] = {50};
   int nCombBins = 0;
   if(     histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){ 
-    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 12; binEnd[0] = 13; binStart[1] = 14; binEnd[1] = 15; binStart[2] = 16; binEnd[2] = 18;}
+    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 1;  binEnd[0] = 2;} // binStart[1] = 14; binEnd[1] = 15; binStart[2] = 16; binEnd[2] = 18;}
     else if(histoName.find("Eta_0_")    <= histoName.size()){ binStart[0] = 12; binEnd[0] = 14;}
     else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 14; binEnd[0] = 15; binStart[1] = 16; binEnd[1] = 18;}
     else if(histoName.find("1p45") <= histoName.size()     ){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
@@ -542,9 +544,18 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
 
     //Do the actual fit (on a normalized histogram)!:
     hp->Scale(1./hp->Integral());
-    doubleGaussianFit->SetParLimits(2, 0.0, 1.0);
-    doubleGaussianFit->SetParLimits(0, -500, 500);
+    doubleGaussianFit->SetParLimits(0,  -10,  10);
+    doubleGaussianFit->SetParLimits(1,  0.0,  50);
+    doubleGaussianFit->SetParLimits(2,  0.0, 0.9);
     doubleGaussianFit->SetParLimits(3, -500, 500);
+    doubleGaussianFit->SetParLimits(4,   20, 100);
+    if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
+      if(histoName.find("Eta") > histoName.size() && (bin == 1 || bin == 3 || bin == 4)){
+        doubleGaussianFit->SetParLimits(3, -60, 30);
+        doubleGaussianFit->SetParLimits(4,   0, 100);
+      }
+    }
+
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
@@ -608,7 +619,39 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
 //      }
         
     }
-    hp->Write();
+    TCanvas* canv = new TCanvas("canv","canv");
+    canv->SetName(hp->GetName()); canv->SetTitle(hp->GetTitle());
+    canv->cd();
+    hp->Draw();
+    int n = 200;
+    double x[200], yDbl[200], ySngl[200];
+    for(int ii = 0; ii < n; ii ++){
+      x[ii] = -100+ii;
+      yDbl[ii] = (1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2))+TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(4),2))*doubleGaussianFit->GetParameter(2))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2)))+doubleGaussianFit->GetParameter(2)*TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(3)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(4),2))));
+      ySngl[ii] = (1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2))+TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(4),2))*doubleGaussianFit->GetParameter(2))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2)))+0*TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(3)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(4),2))));;
+    }
+    if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
+      std::cout << " ****  Looking at bin : " << bin << " **** " << endl;
+      if(histoName.find("Eta") > histoName.size() ){
+        std::cout << " Parameters of the double Gaussian fit are : " << endl;
+        std::cout << "  * Narrow (mean & width)  : " << doubleGaussianFit->GetParameter(0) << " , " << doubleGaussianFit->GetParameter(1) << endl;
+        std::cout << "  * Relative constant      : " << doubleGaussianFit->GetParameter(2) << endl;
+        std::cout << "  * Wide (mean & width)    : " << doubleGaussianFit->GetParameter(3) << " , " << doubleGaussianFit->GetParameter(4) << endl;
+      }
+    }
+    TGraph* gr_TFDistDblG = new TGraph(n,x,yDbl);
+    gr_TFDistDblG->Draw("C");
+    gr_TFDistDblG->SetLineColor(6); gr_TFDistDblG->SetLineStyle(2);
+    TGraph* gr_TFDistSnglG = new TGraph(n,x,ySngl);
+    gr_TFDistSnglG->Draw("C");
+    gr_TFDistSnglG->SetLineColor(3); gr_TFDistSnglG->SetLineStyle(10);
+    TLegend* leg_Canv = new TLegend(0.1, 0.6, 0.45, 0.9);
+    leg_Canv->AddEntry(hp,"Actual ttbar entries fitted with Dbl gaus","lpe");
+    leg_Canv->AddEntry(gr_TFDistDblG,"Overal Dbl gauss function","l");
+    leg_Canv->AddEntry(gr_TFDistSnglG,"Narrow gaus of Dbl gaus","l");
+    leg_Canv->Draw();
+    canv->Write();
+    //hp->Write();
     delete hp;
   }//loop over bins!
   h_chi2->Write();
@@ -623,10 +666,10 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[8] = {-9, -20, -22, -24, -25, -28, -30, -33}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[8] = { 4,  13,  22,  24,  25,  28,  32,  34}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[5] = {-35, -35, -33, -31, -57}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[5] = { 18,  16,  25,  32,  47}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
-    else if(histoName.find("Eta_0_") <= histoName.size()){
+    if(histoName.find("Eta_0_") <= histoName.size()){
       double FitRangeNeg[11] = {-13, -20, -26, -30, -30, -30, -30, -32, -34, -34, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
       double FitRangePos[11] = {  7,  15,  15,  20,  23,  25,  25,  28,  30,  32,  32}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
@@ -762,7 +805,8 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   int whichDep = TFDep;
 
   string TFDependencyWidth[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
-  string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*dsqrt("+pVar[whichDep]+"))"};
+  //string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*dsqrt("+pVar[whichDep]+"))"};
+  string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4))"};
   string WidthDependency[3] = {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]+")"};
   if(partName == "muon" && whichDep == 1){
     TFDependencyWidth[1] = "*dsqrt(1d0/"+pVar[whichDep]+")"; TFDependencyWidth[2] = "*1d0/"+pVar[whichDep]+")";
@@ -795,7 +839,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     *LaTeX << " \\begin{figure}[h!b] " << endl;
     for(int ipar = 0; ipar < nParsFit_; ipar++){
       int NrConsideredCaloPars;
-      if(ipar == 0 || ipar == 2 || ipar == 3) NrConsideredCaloPars = 5;
+      if(ipar == 0 || ipar == 2 || ipar == 3) NrConsideredCaloPars = 3;
       else NrConsideredCaloPars = 3;
 
       TCanvas *canv = new TCanvas(("canv_"+partName+""+EtaBin[iEta]).c_str(),"canvas");
@@ -839,6 +883,11 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
           FitMinValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*FitMin_[iEta*nParsFit_+ipar];
           FitMaxValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*FitMax_[iEta*nParsFit_+ipar];
         }
+        //else if(NrConsideredCaloPars == 5 && icalpar == 4){
+        //  FitMinValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*sqrt(FitMin_[iEta*nParsFit_+ipar]);
+        //  FitMaxValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*sqrt(FitMax_[iEta*nParsFit_+ipar]);
+        //  std::cout << " Now using sqrt(x) for parameter : " << icalpar << std::endl;
+        //}
         else{
           FitMinValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*pow(FitMin_[iEta*nParsFit_+ipar],icalpar);
           FitMaxValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*pow(FitMax_[iEta*nParsFit_+ipar],icalpar);
