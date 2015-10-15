@@ -549,12 +549,12 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     doubleGaussianFit->SetParLimits(2,  0.0, 0.9);
     doubleGaussianFit->SetParLimits(3, -500, 500);
     doubleGaussianFit->SetParLimits(4,   20, 500);
-    if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
-      if(histoName.find("Eta") > histoName.size() && (bin == 1 || bin == 3 || bin == 4)){
-        doubleGaussianFit->SetParLimits(3, -60, 30);
-        doubleGaussianFit->SetParLimits(4,   0, 100);
-      }
-    }
+    //if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
+    //  if(histoName.find("Eta") > histoName.size() && (bin == 1 || bin == 3 || bin == 4)){
+    //    doubleGaussianFit->SetParLimits(3, -60, 30);
+    //    doubleGaussianFit->SetParLimits(4,   0, 100);
+    //  }
+    //}
 
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
@@ -666,8 +666,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[11] = {-35, -35, -33, -31, -52, -55, -60, -65, -75, -80, -84}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[11] = { 18,  16,  25,  32,  46,  54,  59,  68,  75,  83,  86}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-39, -35, -33, -35, -49, -55, -60, -65, -75, -80, -84}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 18,  16,  25,  37,  44,  54,  59,  68,  75,  83,  86}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     if(histoName.find("Eta_0_") <= histoName.size()){
       double FitRangeNeg[11] = {-13, -20, -26, -30, -30, -30, -30, -32, -34, -34, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
@@ -806,7 +806,8 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
 
   string TFDependencyWidth[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
   //string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*dsqrt("+pVar[whichDep]+"))"};
-  string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4))"};
+  //string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4))"};
+  string TFDependency[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
   string WidthDependency[3] = {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]+")"};
   if(partName == "muon" && whichDep == 1){
     TFDependencyWidth[1] = "*dsqrt(1d0/"+pVar[whichDep]+")"; TFDependencyWidth[2] = "*1d0/"+pVar[whichDep]+")";
