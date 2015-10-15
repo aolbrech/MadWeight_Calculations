@@ -512,7 +512,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   }
 
   for(int bin=1;bin <= nbins+1;bin ++) {
-    string projection_title = string(histoFit->GetName())+"_sliceYbin"+tostr(bin);
+    string projection_title = "sliceYbin"+tostr(bin)+"_"+string(histoFit->GetName());
 
     TH1D *hp = 0;
     if(bin == binStart[nCombBins]){
@@ -548,7 +548,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     doubleGaussianFit->SetParLimits(1,  0.0,  50);
     doubleGaussianFit->SetParLimits(2,  0.0, 0.9);
     doubleGaussianFit->SetParLimits(3, -500, 500);
-    doubleGaussianFit->SetParLimits(4,   20, 100);
+    doubleGaussianFit->SetParLimits(4,   20, 500);
     if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
       if(histoName.find("Eta") > histoName.size() && (bin == 1 || bin == 3 || bin == 4)){
         doubleGaussianFit->SetParLimits(3, -60, 30);
@@ -666,8 +666,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
 
   if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[5] = {-35, -35, -33, -31, -57}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[5] = { 18,  16,  25,  32,  47}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[11] = {-35, -35, -33, -31, -52, -55, -60, -65, -75, -80, -84}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[11] = { 18,  16,  25,  32,  46,  54,  59,  68,  75,  83,  86}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     if(histoName.find("Eta_0_") <= histoName.size()){
       double FitRangeNeg[11] = {-13, -20, -26, -30, -30, -30, -30, -32, -34, -34, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
