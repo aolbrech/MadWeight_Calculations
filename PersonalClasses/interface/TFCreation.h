@@ -51,9 +51,9 @@ class TFCreation{
         std::string EtaValue[6], EtaBin[5], EtaTitle[5];
 
         int nParsFit_, nEtaBins_;
-        std::string parnames_[5], ParName_[5];
-        TGraphErrors *grE_ParamFit[30];
-        double FitMin_[30], FitMax_[30];
+        std::string parnames_[6], ParName_[6];
+        TGraphErrors *grE_ParamFit[36];
+        double FitMin_[36], FitMax_[36];
         //int NarrowGaus[3];
         //int WideGaus[3];
         TFile* caloFitFile;
