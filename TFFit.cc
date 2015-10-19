@@ -44,9 +44,10 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   bool CreateTFFromTree = false;
   bool RunFitForTF = true; 
-  int nEtaBins = 4;
+  int nEtaBins = 1;
   bool TFForPhi = false;
   bool TFForTheta = false;
+  bool TFForLepton = false;
   enum TFDependency_t {EDepTF, PtDepTF};
   TFDependency_t tfDependency = EDepTF;
 
@@ -186,8 +187,14 @@ int main (int argc, char **argv)
     ofstream myTFTable, myTransferCard, myTF, myLaTeX;
     myTFTable.open("TFInformation/TransferFunctions_TABLE.tex");
     if(nEtaBins == 1){
-      myTF.open("TFInformation/TF_user.dat");
-      myTransferCard.open("TFInformation/transfer_card_user.dat");
+      if(!TFForLepton){
+        myTF.open("TFInformation/TF_user_DeltaLepton.dat");
+        myTransferCard.open("TFInformation/transfer_card_user_DeltaLepton.dat");
+      }
+      else{
+        myTF.open("TFInformation/TF_user.dat");
+        myTransferCard.open("TFInformation/transfer_card_user.dat");
+      }
     }
     else{
       myTF.open("TFInformation/TF_user_etaBins.dat");
@@ -221,7 +228,7 @@ int main (int argc, char **argv)
     myTransferCard<<"#+-----------------------------------------------------------------------+"<<endl;	
 
     myTF<<"<file>## ##################################################################"<<endl;
-    myTF<<"##                                          ##"<<endl;
+    myTF<<"##                                                                       ##"<<endl;
     myTF<<"##                          Matrix Element                               ##"<<endl;
     myTF<<"##                          ==============                               ##"<<endl;
     myTF<<"##                                                                       ##"<<endl;
@@ -293,10 +300,13 @@ int main (int argc, char **argv)
       std::string histoTitle = HistoInfo[iHisto][0];
 
       //Select the histograms which need to be considered!!
-      if(!( ( (tfDependency == 1 && (histoTitle.find("VsGenPt") <= histoSize || histoTitle.find("VsGenInvPt") <= histoSize ) ) || (tfDependency == 0 && histoTitle.find("VsGenE") <= histoSize ) ) 
-          && ( ( TFForPhi && histoTitle.find("DiffPhi") <= histoSize ) || (TFForTheta && histoTitle.find("DiffTheta") <= histoSize ) || histoTitle.find("DiffE") <= histoSize || histoTitle.find("DiffInvE") <= histoSize ) ) )
+      if( !( (tfDependency == 1 && (histoTitle.find("VsGenPt") <= histoSize || histoTitle.find("VsGenInvPt") <= histoSize)) || (tfDependency == 0 && histoTitle.find("VsGenE") <= histoSize) ) ) 
         continue;
   
+      if( TFForPhi == false && histoTitle.find("DiffPhi") <= histoSize || TFForTheta == false && histoTitle.find("DiffTheta") <= histoSize 
+          || TFForLepton == false && (histoTitle.find("Mu_") <= histoSize || histoTitle.find("El_") <= histoSize))
+          continue;
+
       //Set the correct startValues and fit the distribution
       for(int jj = 0; jj < NrParamsDblGaus; jj++) startValues[jj] = atof((HistoInfo[iHisto][1+jj]).c_str());
 
@@ -362,15 +372,15 @@ int main (int argc, char **argv)
   
       tfCreation.WriteTF(myTFTable, myTransferCard, myTF, myLaTeX, KinVarName, PartName, tfDependency);
       if(TFForTheta == false || (TFForTheta == true && histoTitle.find("DiffTheta") <= histoSize) ){
-	if( (tfDependency == 0 && histoTitle.find("Mu_DiffE") <= histoSize) || (tfDependency == 1 && histoTitle.find("Mu_DiffInvE") <= histoSize) ){ myTF << "\n</block>\n</file>";}  //Muon is the last of the 4 particles!!
-	else{                                                                                                                                        myTF << "\n</block>";         }
+        myTF << "\n</block>";
       }
     
       myTFTable<<"\\hline" << endl;
       myTFTable<<"\\end{tabular}"<<endl;
       myTFTable<<"\\end{table} \n"<<endl;
 
-    }             
+    }
+    myTF << "\n</file>";             
     //Close the root file where all histograms are saved together with the output files!
     readFile->Close();
     writeFile->Close();
