@@ -76,13 +76,13 @@
   <variable name='E'>
     <tf>
       IF( ABS(eta(pexp)) .LE. 0.375) THEN 
-        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*dsqrt(p(0)))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4))
         IF( p(0) .LE. 35.5556) THEN 
-          prov1=-0.658269
+          prov1=-0.551799
         ENDIF 
 
         IF( p(0) .GE. 163.333) THEN 
-          prov1 = -0.885147
+          prov1 = -0.951727
         ENDIF 
 
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
@@ -94,22 +94,22 @@
           prov2 = 13.1006
         ENDIF 
 
-        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*dsqrt(p(0)))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4))
         IF( p(0) .LE. 35.5556) THEN 
-          prov3=0.263997
+          prov3=0.195233
         ENDIF 
 
         IF( p(0) .GE. 163.333) THEN 
-          prov3 = 0.409588
+          prov3 = 0.408945
         ENDIF 
 
-        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*dsqrt(p(0)))
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4))
         IF( p(0) .LE. 57.7778) THEN 
-          prov4=74.9003
+          prov4=72.6264
         ENDIF 
 
         IF( p(0) .GE. 163.333) THEN 
-          prov4 = 88.7403
+          prov4 = 88.5818
         ENDIF 
 
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
@@ -128,13 +128,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN 
-        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*dsqrt(p(0)))
+        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4))
         IF( p(0) .LE. 35.5556) THEN 
-          prov1=-2.57683
+          prov1=-2.20294
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov1 = -3.1616
+          prov1 = -3.74853
         ENDIF 
 
         prov2=(#27+#28*dsqrt(p(0))+#29*p(0))
@@ -146,22 +146,22 @@
           prov2 = 15.9495
         ENDIF 
 
-        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*dsqrt(p(0)))
+        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*p(0)**4))
         IF( p(0) .LE. 35.5556) THEN 
-          prov3=0.167133
+          prov3=0.143551
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov3 = 0.419932
+          prov3 = 0.394883
         ENDIF 
 
-        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*dsqrt(p(0)))
+        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*p(0)**4))
         IF( p(0) .LE. 57.7778) THEN 
-          prov4=87.2978
+          prov4=81.2952
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov4 = 111.423
+          prov4 = 108.129
         ENDIF 
 
         prov5=(#40+#41*dsqrt(p(0))+#42*p(0))
@@ -180,13 +180,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN 
-        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*dsqrt(p(0)))
+        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*p(0)**4))
         IF( p(0) .LE. 46.6667) THEN 
-          prov1=-2.95533
+          prov1=-2.99569
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov1 = 1.49496
+          prov1 = 0.620611
         ENDIF 
 
         prov2=(#48+#49*dsqrt(p(0))+#50*p(0))
@@ -198,22 +198,22 @@
           prov2 = 19.7043
         ENDIF 
 
-        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*dsqrt(p(0)))
+        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*p(0)**4))
         IF( p(0) .LE. 46.6667) THEN 
-          prov3=0.435588
+          prov3=0.32368
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov3 = 0.488682
+          prov3 = 0.54669
         ENDIF 
 
-        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*dsqrt(p(0)))
+        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*p(0)**4))
         IF( p(0) .LE. 68.8889) THEN 
-          prov4=-156.763
+          prov4=-146.857
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov4 = 36.1486
+          prov4 = 24.8055
         ENDIF 
 
         prov5=(#61+#62*dsqrt(p(0))+#63*p(0))
@@ -232,13 +232,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN 
-        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*dsqrt(p(0)))
+        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*p(0)**4))
         IF( p(0) .LE. 91.1111) THEN 
-          prov1=-1.27788
+          prov1=-1.24438
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov1 = 6.31925
+          prov1 = 5.94624
         ENDIF 
 
         prov2=(#69+#70*dsqrt(p(0))+#71*p(0))
@@ -250,22 +250,22 @@
           prov2 = 34.8513
         ENDIF 
 
-        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*dsqrt(p(0)))
+        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*p(0)**4))
         IF( p(0) .LE. 91.1111) THEN 
-          prov3=0.252372
+          prov3=0.255872
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov3 = 0.181651
+          prov3 = 0.18053
         ENDIF 
 
-        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*dsqrt(p(0)))
+        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*p(0)**4))
         IF( p(0) .LE. 91.1111) THEN 
-          prov4=-31.3788
+          prov4=-30.8875
         ENDIF 
 
         IF( p(0) .GE. 235.556) THEN 
-          prov4 = 69.0022
+          prov4 = 70.1361
         ENDIF 
 
         prov5=(#82+#83*dsqrt(p(0))+#84*p(0))
@@ -325,13 +325,13 @@
   <variable name='E'>
     <tf>
       IF( ABS(eta(pexp)) .LE. 0.375) THEN 
-        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*dsqrt(p(0)))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov1=15.6745
+          prov1=14.6578
         ENDIF 
 
         IF( p(0) .GE. 144) THEN 
-          prov1 = 16.4318
+          prov1 = 16.0204
         ENDIF 
 
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
@@ -343,22 +343,22 @@
           prov2 = 1.16975
         ENDIF 
 
-        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*dsqrt(p(0)))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov3=0.741054
+          prov3=0.800049
         ENDIF 
 
         IF( p(0) .GE. 144) THEN 
-          prov3 = 0.314815
+          prov3 = 0.306425
         ENDIF 
 
-        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*dsqrt(p(0)))
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov4=-0.230104
+          prov4=-0.226321
         ENDIF 
 
         IF( p(0) .GE. 144) THEN 
-          prov4 = 0.385264
+          prov4 = 0.448388
         ENDIF 
 
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
@@ -377,13 +377,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN 
-        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*dsqrt(p(0)))
+        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov1=-2.04323
+          prov1=-2.03347
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov1 = 1.2112
+          prov1 = 11.4761
         ENDIF 
 
         prov2=(#27+#28*dsqrt(p(0))+#29*p(0))
@@ -395,22 +395,22 @@
           prov2 = -0.00931496
         ENDIF 
 
-        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*dsqrt(p(0)))
+        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov3=0.00102931
+          prov3=0.000989531
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov3 = 0.000437312
+          prov3 = 0.000439884
         ENDIF 
 
-        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*dsqrt(p(0)))
+        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov4=-0.143238
+          prov4=-0.173536
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov4 = 1.60648
+          prov4 = 1.67588
         ENDIF 
 
         prov5=(#40+#41*dsqrt(p(0))+#42*p(0))
@@ -429,13 +429,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN 
-        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*dsqrt(p(0)))
+        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov1=14.2929
+          prov1=16.6462
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov1 = 44.5651
+          prov1 = 44.1449
         ENDIF 
 
         prov2=(#48+#49*dsqrt(p(0))+#50*p(0))
@@ -447,22 +447,22 @@
           prov2 = -33.8654
         ENDIF 
 
-        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*dsqrt(p(0)))
+        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov3=3.09808e-08
+          prov3=9.92968e-08
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov3 = 0.562237
+          prov3 = 0.430065
         ENDIF 
 
-        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*dsqrt(p(0)))
+        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*p(0)**4))
         IF( p(0) .LE. 33.8) THEN 
-          prov4=-0.323144
+          prov4=-0.310079
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov4 = -0.108246
+          prov4 = -0.165906
         ENDIF 
 
         prov5=(#61+#62*dsqrt(p(0))+#63*p(0))
@@ -481,13 +481,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN 
-        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*dsqrt(p(0)))
+        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*p(0)**4))
         IF( p(0) .LE. 79.4) THEN 
-          prov1=-9.5125
+          prov1=-8.9937
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov1 = -58.668
+          prov1 = -86.3575
         ENDIF 
 
         prov2=(#69+#70*dsqrt(p(0))+#71*p(0))
@@ -499,22 +499,22 @@
           prov2 = -0.126769
         ENDIF 
 
-        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*dsqrt(p(0)))
+        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*p(0)**4))
         IF( p(0) .LE. 79.4) THEN 
-          prov3=0.019103
+          prov3=0.037612
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov3 = 0.00593443
+          prov3 = 0.00596849
         ENDIF 
 
-        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*dsqrt(p(0)))
+        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*p(0)**4))
         IF( p(0) .LE. 79.4) THEN 
-          prov4=-0.0010332
+          prov4=0.120086
         ENDIF 
 
         IF( p(0) .GE. 223.8) THEN 
-          prov4 = -3.35214
+          prov4 = -2.98361
         ENDIF 
 
         prov5=(#82+#83*dsqrt(p(0))+#84*p(0))
@@ -574,13 +574,13 @@
   <variable name='E'>
     <tf>
       IF( ABS(eta(pexp)) .LE. 0.375) THEN 
-        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*dsqrt(p(0)))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4))
         IF( p(0) .LE. 33.4375) THEN 
-          prov1=-2.673
+          prov1=-2.64089
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov1 = -4.36697
+          prov1 = -4.43842
         ENDIF 
 
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
@@ -592,22 +592,22 @@
           prov2 = -14.8163
         ENDIF 
 
-        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*dsqrt(p(0)))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4))
         IF( p(0) .LE. 33.4375) THEN 
-          prov3=0.182876
+          prov3=0.18224
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov3 = 0.0713764
+          prov3 = 0.0669026
         ENDIF 
 
-        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*dsqrt(p(0)))
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4))
         IF( p(0) .LE. 46.0938) THEN 
-          prov4=-53.5167
+          prov4=-53.2765
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov4 = -48.0189
+          prov4 = -47.9617
         ENDIF 
 
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
@@ -626,13 +626,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN 
-        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*dsqrt(p(0)))
+        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4))
         IF( p(0) .LE. 33.4375) THEN 
-          prov1=-4.15707
+          prov1=-4.01172
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov1 = -3.79181
+          prov1 = -4.05598
         ENDIF 
 
         prov2=(#27+#28*dsqrt(p(0))+#29*p(0))
@@ -644,22 +644,22 @@
           prov2 = 15.4889
         ENDIF 
 
-        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*dsqrt(p(0)))
+        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*p(0)**4))
         IF( p(0) .LE. 33.4375) THEN 
-          prov3=0.326782
+          prov3=0.325932
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov3 = 0.0737233
+          prov3 = 0.0860535
         ENDIF 
 
-        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*dsqrt(p(0)))
+        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*p(0)**4))
         IF( p(0) .LE. 54.5312) THEN 
-          prov4=-60.818
+          prov4=-60.6358
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov4 = -9.16242
+          prov4 = -10.4453
         ENDIF 
 
         prov5=(#40+#41*dsqrt(p(0))+#42*p(0))
@@ -678,13 +678,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN 
-        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*dsqrt(p(0)))
+        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*p(0)**4))
         IF( p(0) .LE. 41.875) THEN 
-          prov1=-6.08276
+          prov1=-6.06872
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov1 = -3.31744
+          prov1 = -3.32314
         ENDIF 
 
         prov2=(#48+#49*dsqrt(p(0))+#50*p(0))
@@ -696,22 +696,22 @@
           prov2 = 19.9292
         ENDIF 
 
-        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*dsqrt(p(0)))
+        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*p(0)**4))
         IF( p(0) .LE. 41.875) THEN 
-          prov3=0.381643
+          prov3=0.37013
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov3 = 0.384105
+          prov3 = 0.445743
         ENDIF 
 
-        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*dsqrt(p(0)))
+        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*p(0)**4))
         IF( p(0) .LE. 54.5312) THEN 
-          prov4=-22.2928
+          prov4=-20.4859
         ENDIF 
 
         IF( p(0) .GE. 151.562) THEN 
-          prov4 = -0.232166
+          prov4 = -0.236524
         ENDIF 
 
         prov5=(#61+#62*dsqrt(p(0))+#63*p(0))
@@ -730,13 +730,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN 
-        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*dsqrt(p(0)))
+        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*p(0)**4))
         IF( p(0) .LE. 75.625) THEN 
-          prov1=-8.67378
+          prov1=-8.67956
         ENDIF 
 
         IF( p(0) .GE. 164.219) THEN 
-          prov1 = 12.3371
+          prov1 = 12.2855
         ENDIF 
 
         prov2=(#69+#70*dsqrt(p(0))+#71*p(0))
@@ -748,22 +748,22 @@
           prov2 = 18.446
         ENDIF 
 
-        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*dsqrt(p(0)))
+        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*p(0)**4))
         IF( p(0) .LE. 75.625) THEN 
-          prov3=0.309125
+          prov3=0.308896
         ENDIF 
 
         IF( p(0) .GE. 164.219) THEN 
-          prov3 = 0.829803
+          prov3 = 0.834997
         ENDIF 
 
-        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*dsqrt(p(0)))
+        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*p(0)**4))
         IF( p(0) .LE. 75.625) THEN 
-          prov4=-22.7976
+          prov4=-22.8029
         ENDIF 
 
         IF( p(0) .GE. 164.219) THEN 
-          prov4 = -14.1474
+          prov4 = -14.2039
         ENDIF 
 
         prov5=(#82+#83*dsqrt(p(0))+#84*p(0))
@@ -823,13 +823,13 @@
   <variable name='E'>
     <tf>
       IF( ABS(eta(pexp)) .LE. 0.375) THEN 
-        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*dsqrt(p(0)))
+        prov1=(#1+#2*p(0)+#3*p(0)**2+#4*p(0)**3+#5*p(0)**4))
         IF( p(0) .LE. 25) THEN 
-          prov1=15.6054
+          prov1=15.5902
         ENDIF 
 
         IF( p(0) .GE. 100) THEN 
-          prov1 = 35.752
+          prov1 = 35.9388
         ENDIF 
 
         prov2=(#6+#7*dsqrt(p(0))+#8*p(0))
@@ -841,22 +841,22 @@
           prov2 = 14.4353
         ENDIF 
 
-        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*dsqrt(p(0)))
+        prov3=(#9+#10*p(0)+#11*p(0)**2+#12*p(0)**3+#13*p(0)**4))
         IF( p(0) .LE. 25) THEN 
-          prov3=0.998072
+          prov3=0.995497
         ENDIF 
 
         IF( p(0) .GE. 100) THEN 
-          prov3 = 0.407171
+          prov3 = 0.407316
         ENDIF 
 
-        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*dsqrt(p(0)))
+        prov4=(#14+#15*p(0)+#16*p(0)**2+#17*p(0)**3+#18*p(0)**4))
         IF( p(0) .LE. 25) THEN 
-          prov4=0.0102601
+          prov4=0.0102392
         ENDIF 
 
         IF( p(0) .GE. 100) THEN 
-          prov4 = 0.727868
+          prov4 = 0.731954
         ENDIF 
 
         prov5=(#19+#20*dsqrt(p(0))+#21*p(0))
@@ -875,13 +875,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.375 .AND. ABS(eta(pexp)) .LE. 0.75) THEN 
-        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*dsqrt(p(0)))
+        prov1=(#22+#23*p(0)+#24*p(0)**2+#25*p(0)**3+#26*p(0)**4))
         IF( p(0) .LE. 35) THEN 
-          prov1=22.4325
+          prov1=22.4363
         ENDIF 
 
         IF( p(0) .GE. 130) THEN 
-          prov1 = 81.9244
+          prov1 = 84.2208
         ENDIF 
 
         prov2=(#27+#28*dsqrt(p(0))+#29*p(0))
@@ -893,22 +893,22 @@
           prov2 = 27.9422
         ENDIF 
 
-        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*dsqrt(p(0)))
+        prov3=(#30+#31*p(0)+#32*p(0)**2+#33*p(0)**3+#34*p(0)**4))
         IF( p(0) .LE. 35) THEN 
-          prov3=1.04271
+          prov3=1.04272
         ENDIF 
 
         IF( p(0) .GE. 130) THEN 
-          prov3 = 0.699314
+          prov3 = 0.99513
         ENDIF 
 
-        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*dsqrt(p(0)))
+        prov4=(#35+#36*p(0)+#37*p(0)**2+#38*p(0)**3+#39*p(0)**4))
         IF( p(0) .LE. 35) THEN 
-          prov4=0.064835
+          prov4=0.0649379
         ENDIF 
 
         IF( p(0) .GE. 130) THEN 
-          prov4 = 1.19231
+          prov4 = 1.19894
         ENDIF 
 
         prov5=(#40+#41*dsqrt(p(0))+#42*p(0))
@@ -927,13 +927,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 0.75 .AND. ABS(eta(pexp)) .LE. 1.45) THEN 
-        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*dsqrt(p(0)))
+        prov1=(#43+#44*p(0)+#45*p(0)**2+#46*p(0)**3+#47*p(0)**4))
         IF( p(0) .LE. 40) THEN 
-          prov1=27.0246
+          prov1=27.0265
         ENDIF 
 
         IF( p(0) .GE. 165) THEN 
-          prov1 = 41.3068
+          prov1 = 42.4596
         ENDIF 
 
         prov2=(#48+#49*dsqrt(p(0))+#50*p(0))
@@ -945,22 +945,22 @@
           prov2 = 18.2282
         ENDIF 
 
-        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*dsqrt(p(0)))
+        prov3=(#51+#52*p(0)+#53*p(0)**2+#54*p(0)**3+#55*p(0)**4))
         IF( p(0) .LE. 40) THEN 
-          prov3=1.00003
+          prov3=1.00027
         ENDIF 
 
         IF( p(0) .GE. 165) THEN 
-          prov3 = 0.351485
+          prov3 = 0.35905
         ENDIF 
 
-        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*dsqrt(p(0)))
+        prov4=(#56+#57*p(0)+#58*p(0)**2+#59*p(0)**3+#60*p(0)**4))
         IF( p(0) .LE. 40) THEN 
-          prov4=0.0914085
+          prov4=0.0913607
         ENDIF 
 
         IF( p(0) .GE. 165) THEN 
-          prov4 = 1.42694
+          prov4 = 1.72209
         ENDIF 
 
         prov5=(#61+#62*dsqrt(p(0))+#63*p(0))
@@ -979,13 +979,13 @@
       ENDIF 
  
       IF( ABS(eta(pexp)) .GT. 1.45 .AND. ABS(eta(pexp)) .LE. 2.5) THEN 
-        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*dsqrt(p(0)))
+        prov1=(#64+#65*p(0)+#66*p(0)**2+#67*p(0)**3+#68*p(0)**4))
         IF( p(0) .LE. 70) THEN 
-          prov1=41.035
+          prov1=40.9534
         ENDIF 
 
         IF( p(0) .GE. 150) THEN 
-          prov1 = 35.8232
+          prov1 = 35.9563
         ENDIF 
 
         prov2=(#69+#70*dsqrt(p(0))+#71*p(0))
@@ -997,22 +997,22 @@
           prov2 = 12.7506
         ENDIF 
 
-        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*dsqrt(p(0)))
+        prov3=(#72+#73*p(0)+#74*p(0)**2+#75*p(0)**3+#76*p(0)**4))
         IF( p(0) .LE. 70) THEN 
-          prov3=0.950619
+          prov3=0.958415
         ENDIF 
 
         IF( p(0) .GE. 150) THEN 
-          prov3 = 0.414074
+          prov3 = 0.414055
         ENDIF 
 
-        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*dsqrt(p(0)))
+        prov4=(#77+#78*p(0)+#79*p(0)**2+#80*p(0)**3+#81*p(0)**4))
         IF( p(0) .LE. 70) THEN 
-          prov4=0.303543
+          prov4=0.303763
         ENDIF 
 
         IF( p(0) .GE. 150) THEN 
-          prov4 = 1.38704
+          prov4 = 1.4056
         ENDIF 
 
         prov5=(#82+#83*dsqrt(p(0))+#84*p(0))
