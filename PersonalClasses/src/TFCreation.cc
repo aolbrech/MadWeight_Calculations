@@ -2,8 +2,6 @@
 
 TFCreation::TFCreation(int nEtaBins, std::string etaCons, bool doFits){
 
-  //TStyle *gStyle;
-  //gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0);
   gStyle->SetFillColor(0);
 
@@ -26,14 +24,12 @@ TFCreation::TFCreation(int nEtaBins, std::string etaCons, bool doFits){
   }
  
   //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
-  //caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
   caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
   if(doFits){ caloFitFile = new TFile(("TFInformation/CaloEnergyFitFunctions"+etaCons+".root").c_str(),"RECREATE");}
 
   //Store the EtaBin Title and Name for the histograms!
   nEtaBins_ = nEtaBins;
   EtaBin[0] = ""; EtaTitle[0] = "";
-  //if(nEtaBins_ == 4){         
   EtaValues[1] = 0.; EtaValues[2] = 0.375; EtaValues[3] = 0.750; EtaValues[4] = 1.450; EtaValues[5] = 2.5;
   EtaValue[1] = "0"; EtaValue[2] = "0p375"; EtaValue[3] = "0p750"; EtaValue[4] = "1p450"; EtaValue[5] = "2p5";
   for(int ii = 1; ii <= 4; ii++){
@@ -390,27 +386,24 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   //////////////////////////////////////////////////////////////////////////////////////////////
   //   Now histogram with all parameters needs to be fitted with Calorimeter Energy formula   //
   //////////////////////////////////////////////////////////////////////////////////////////////
+  std::string fitHistName = string(fitHisto->GetName());
+  unsigned int fitHistSize = fitHistName.size();
 
   for( int ipar = 0; ipar < nParsFit_; ipar++ ){
     
     //Set the name and function formula of this parameter fit correctly!
-    if(ipar == 0 || ipar == 2 || ipar == 3){
-      //caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*sqrt(x)");    //Quartic function as fit!
-      caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");    //Quartic function as fit!
-      for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
+    caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
+    if(ipar == 2){
+      if(fitHistName.find("Light") < fitHistSize) caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x"); 
+      if(fitHistName.find("BJet") < fitHistSize)  caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x+[5]*x*x*x*x*x");
     }
-    else{
-      caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
-      for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
-    }
+    for(int ii = 0; ii < caloEnergyFit->GetNpar(); ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
 
     FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[0];                            
     FitMax_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-1]; //-1 is because bins go from 0 to N (Keep overflow when it is well determined!!)
 
     //Exclude starting bins for the second gaussian determination
     // --> Have to make sure this is really the second gaussian describing the tails!!
-    std::string fitHistName = string(fitHisto->GetName());
-    unsigned int fitHistSize = fitHistName.size();
     if(fitHistName.find("Light_DiffEVsGenE") < fitHistSize){
       if(fitHistName.find("Eta_0_") <= fitHistSize && (ipar == 3||ipar == 4) )     FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[1];
       else if(fitHistName.find("Eta_0p375_") <= fitHistSize && (ipar == 3||ipar == 4) ) FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[2];
@@ -426,7 +419,7 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
       else if(fitHistName.find("Eta_0p75") < fitHistSize && (ipar == 3 || ipar == 4) ) FitMax_[ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-2];
     } 
 
-    for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
+    //for(int ii = 0; ii < 3; ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() ); //Name here since different for each doubleGaussian parameter!
     caloEnergyFit->SetName( (string(fitHisto->GetName())+"_"+parnames_[ipar]+"_Fit").c_str() );
     caloEnergyFit->SetTitle((ParName_[ipar]+" for "+string(fitHisto->GetName())).c_str());
 
@@ -562,7 +555,6 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
         doubleGaussianFit->SetParLimits(4,   0,  80);
       }
     }
-
     hp->Fit(doubleGaussianFit,"Q","",ActualFitRange[0],ActualFitRange[1]);
 
     int npfits = doubleGaussianFit->GetNumberFitPoints();              //WHAT IS THIS .... ???
@@ -637,7 +629,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
       yDbl[ii] = doubleGaussianFit->GetParameter(5)*(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2))+TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(4),2))*doubleGaussianFit->GetParameter(2))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2)))+doubleGaussianFit->GetParameter(2)*TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(3)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(4),2))));
       ySngl[ii] = doubleGaussianFit->GetParameter(5)*(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2)))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2)))+0*TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(3)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(4),2))));;
     }
-    if( histoName.find("Light_DiffEVsGenE") <= histoName.size() ){ // || histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
+/*    if( histoName.find("Light_DiffEVsGenE") <= histoName.size() ){ // || histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
       std::cout << " ****  Looking at bin : " << bin << " **** " << endl;
       if(histoName.find("Eta") > histoName.size() ){
         std::cout << " Parameters of the double Gaussian fit are : " << endl;
@@ -646,7 +638,7 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
         std::cout << "  * Wide (mean & width)    : " << doubleGaussianFit->GetParameter(3) << " , " << doubleGaussianFit->GetParameter(4) << endl;
         std::cout << "  * Amplitude              : " << doubleGaussianFit->GetParameter(5) << endl;
       }
-    }
+    }*/
     TGraph* gr_TFDistDblG = new TGraph(n,x,yDbl);
     gr_TFDistDblG->Draw("C");
     gr_TFDistDblG->SetLineColor(6); gr_TFDistDblG->SetLineStyle(2);
@@ -813,16 +805,14 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   //Is Pt or E dependent considered
   int whichDep = TFDep;
 
-  string TFDependencyWidth[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
-  //string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*dsqrt("+pVar[whichDep]+"))"};
-  //string TFDependency[5] = {"","*"+pVar[whichDep],"*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4))"};
-  string TFDependency[3]  = {"","*dsqrt("+pVar[whichDep]+")","*"+pVar[whichDep]+")"};
-  string WidthDependency[3] = {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]+")"};
-  if(partName == "muon" && whichDep == 1){
-    TFDependencyWidth[1] = "*dsqrt(1d0/"+pVar[whichDep]+")"; TFDependencyWidth[2] = "*1d0/"+pVar[whichDep]+")";
-    TFDependency[1] = "*1d0/"+pVar[whichDep]; TFDependency[2] = "*1d0/"+pVar[whichDep]+"**2"; TFDependency[3] = "*1d0/"+pVar[whichDep]+"**3"; TFDependency[4] = "*1d0/"+pVar[whichDep]+"**4)";
-    WidthDependency[1] = "*dsqrt(1d0/"+pexpVar[whichDep]+")"; WidthDependency[2] = "*1d0/"+pexpVar[whichDep]+")";
-  }
+  string TFDependency[3]  =     {"","*dsqrt("+pVar[whichDep]+")",   "*"+pVar[whichDep]   };
+  string TFDependencyConst[6] = {"","*"+pVar[whichDep],             "*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4","*"+pVar[whichDep]+"**5"};
+  string WidthDependency[3] =   {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]};
+  //if(partName == "muon" && whichDep == 1){
+  //  TFDependencyWidth[1] = "*dsqrt(1d0/"+pVar[whichDep]+")"; TFDependencyWidth[2] = "*1d0/"+pVar[whichDep]+")";
+  //  TFDependency[1] = "*1d0/"+pVar[whichDep]; TFDependency[2] = "*1d0/"+pVar[whichDep]+"**2"; TFDependency[3] = "*1d0/"+pVar[whichDep]+"**3"; TFDependency[4] = "*1d0/"+pVar[whichDep]+"**4)";
+  //  WidthDependency[1] = "*dsqrt(1d0/"+pexpVar[whichDep]+")"; WidthDependency[2] = "*1d0/"+pexpVar[whichDep]+")";
+  //}
 
   ostream *TransferCard = &myTransferCard;
   ostream *TF = &myTF;
@@ -847,10 +837,9 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
     else WidthText.push_back("\n    </tf> \n    <width>");
         
     *LaTeX << " \\begin{figure}[h!b] " << endl;
-    for(int ipar = 0; ipar < nParsFit_; ipar++){
-      int NrConsideredCaloPars;
-      if(ipar == 0 || ipar == 2 || ipar == 3) NrConsideredCaloPars = 3;
-      else NrConsideredCaloPars = 3;
+    std::string provFormula = "", provMin = "", provMax = "";
+    for(int ipar = 0; ipar < nParsFit_-1; ipar++){
+      int NrConsideredCaloPars = AllCaloEnergyFits[iEta*nParsFit_+ipar].GetNpar();
 
       TCanvas *canv = new TCanvas(("canv_"+partName+""+EtaBin[iEta]).c_str(),"canvas");
       canv->cd();
@@ -868,21 +857,23 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
       for(int icalpar = 0; icalpar < NrConsideredCaloPars; icalpar++){
 	dummyCounter++;
 	if(icalpar == 0) myTFTable<<ParName_[ipar]<<" & $a_{" <<ipar <<icalpar <<"}$ = "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<<" $\\pm$ "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParError(icalpar);
-	else              myTFTable<<               " & $a_{" <<ipar <<icalpar <<"}$ = "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<<" $\\pm$ "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParError(icalpar);
+	else             myTFTable<<                " & $a_{" <<ipar <<icalpar <<"}$ = "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<<" $\\pm$ "<<AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParError(icalpar);
 
 	*TransferCard<< dummyCounter << "     " << AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)<< "     # " << ParName_[ipar] << endl;
 
 	if(icalpar==0){
-          *TF << "\n        prov"<<ipar+1<<"=(#"<<dummyCounter; 
+//          *TF << "\n        prov"<<ipar+1<<"=(#"<<dummyCounter;
+          provFormula += "\n          prov"+tostr(ipar+1)+"=(#"+tostr(dummyCounter);
           if(ipar == 1 || ipar == 4){
             WidthText.push_back("\n        prov"+tostr(ipar+1)+"=(#"+tostr(dummyCounter));
           }
         }
 
-	if(icalpar != 0 && (ipar == 0||ipar == 2||ipar == 3)) *TF << "+#"<<dummyCounter<<TFDependency[icalpar];
-	if(icalpar != 0 && (ipar == 1||ipar == 4)){           *TF << "+#"<<dummyCounter<<TFDependencyWidth[icalpar];
-          WidthText.push_back("+#"+tostr(dummyCounter)+WidthDependency[icalpar]);
+	if(icalpar != 0 && ipar == 2){ provFormula += "+#"+tostr(dummyCounter)+TFDependencyConst[icalpar];}
+	else if(icalpar != 0){         provFormula += "+#"+tostr(dummyCounter)+TFDependency[icalpar];     
+          if(ipar == 1 || ipar == 4) WidthText.push_back("+#"+tostr(dummyCounter)+WidthDependency[icalpar]);
         }
+        if( icalpar == NrConsideredCaloPars-1){ provFormula += " )"; if(ipar == 1 || ipar == 4) WidthText.push_back(" )");}
 
         //Now add the cut-off!
         if(     NrConsideredCaloPars == 3 && icalpar == 1){
@@ -893,48 +884,49 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
           FitMinValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*FitMin_[iEta*nParsFit_+ipar];
           FitMaxValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*FitMax_[iEta*nParsFit_+ipar];
         }
-        //else if(NrConsideredCaloPars == 5 && icalpar == 4){
-        //  FitMinValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*sqrt(FitMin_[iEta*nParsFit_+ipar]);
-        //  FitMaxValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*sqrt(FitMax_[iEta*nParsFit_+ipar]);
-        //  std::cout << " Now using sqrt(x) for parameter : " << icalpar << std::endl;
-        //}
         else{
           FitMinValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*pow(FitMin_[iEta*nParsFit_+ipar],icalpar);
           FitMaxValue += AllCaloEnergyFits[iEta*nParsFit_+ipar].GetParameter(icalpar)*pow(FitMax_[iEta*nParsFit_+ipar],icalpar);
         }
 
-        if(icalpar == NrConsideredCaloPars-1){ 
-          *TF << "\n        IF( p(0) .LE. " << tostr(FitMin_[iEta*nParsFit_+ipar]) << ") THEN " << endl;
-          *TF << "          prov"<< ipar+1 << "=" << tostr(AllCaloEnergyFits[iEta*nParsFit_+ipar].Eval(FitMin_[iEta*nParsFit_+ipar])) << "\n        ENDIF " << endl;
-          *TF << "\n        IF( p(0) .GE. " << tostr(FitMax_[iEta*nParsFit_+ipar]) << ") THEN " << endl;
-          *TF << "          prov"<<ipar+1 << " = " << tostr(AllCaloEnergyFits[iEta*nParsFit_+ipar].Eval(FitMax_[iEta*nParsFit_+ipar],icalpar)) << "\n        ENDIF " << endl;
+        if(icalpar == NrConsideredCaloPars-1){
+          provMin += "\n          prov"+tostr(ipar+1)+" = "+tostr(AllCaloEnergyFits[iEta*nParsFit_+ipar].Eval(FitMin_[iEta*nParsFit_+ipar]));
+          provMax += "\n          prov"+tostr(ipar+1)+" = "+tostr(AllCaloEnergyFits[iEta*nParsFit_+ipar].Eval(FitMax_[iEta*nParsFit_+ipar],icalpar));
+//          *TF << "\n        IF( p(0) .LE. " << tostr(FitMin_[iEta*nParsFit_+ipar]) << ") THEN " << endl;
+//          *TF << "          prov"<< ipar+1 << "=" << tostr(AllCaloEnergyFits[iEta*nParsFit_+ipar].Eval(FitMin_[iEta*nParsFit_+ipar])) << "\n        ENDIF " << endl;
+//          *TF << "\n        IF( p(0) .GE. " << tostr(FitMax_[iEta*nParsFit_+ipar]) << ") THEN " << endl;
+//          *TF << "          prov"<<ipar+1 << " = " << tostr(AllCaloEnergyFits[iEta*nParsFit_+ipar].Eval(FitMax_[iEta*nParsFit_+ipar],icalpar)) << "\n        ENDIF " << endl;
         }
-      
-	//if(icalpar==NrConsideredCaloPars-1 && ipar == 2) *TF << "\n        prov"<<ipar+1<<"=max(0,prov"<<ipar+1<<")";
       }
       myTFTable << "\\\\" << endl;
       //delete grE_ParamFit[ipar];   //--> Will probably not work for more eta-bins ... !!
     }
+    *TF << "\n        IF( p(0) .LE. " << tostr(FitMin_[iEta*nParsFit_]) << ") THEN ";
+    *TF << provMin;
+    *TF << "\n        ELSE IF( p(0) .GE. " << tostr(FitMax_[iEta*nParsFit_]) << ") THEN ";
+    *TF << provMax;
+    *TF << "\n        ELSE";
+    *TF << "  " << provFormula << "\n        END IF " << endl;
 
     myTFTable << " \\hline" << endl;
     *TransferCard << " " << endl;  //Need a white line between the different eta-blocks!
         
     if(kinVar == "PT" || kinVar == "E"){
       if(whichDep == 0 || (whichDep == 1 && partName != "muon") ){
-        *TF << "\n\n        tf=(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov1)**2/2d0/prov2**2))          !first gaussian\n";
-        *TF <<     "        tf=tf+prov3*(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian\n";
-        *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(dsqrt(prov2*prov2)+prov3*dsqrt(prov5*prov5)))            !normalisation";
+        *TF << "\n        tf=(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov1)**2/2d0/prov2**2))                  !first gaussian\n";
+        *TF <<   "        tf=tf+prov3*(exp(-("+pVar[whichDep]+"-"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2))         !second gaussian\n";
+        *TF <<   "        tf=tf*((1d0/dsqrt(2d0*pi))/(dsqrt(prov2*prov2)+prov3*dsqrt(prov5*prov5)))   !normalisation";
       }
       else{
         *TF << "\n\n        tf=(exp(-(1d0/"+pVar[whichDep]+"-1d0/"+pexpVar[whichDep]+"-prov1)**2/2d0/prov2**2))          !first gaussian\n";
         *TF <<     "        tf=tf+prov3*(exp(-(1d0/"+pVar[whichDep]+"-1d0/"+pexpVar[whichDep]+"-prov4)**2/2d0/prov5**2)) !second gaussian\n";
-        *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(dsqrt(prov2*prov2)+prov3*dsqrt(prov5*prov5)))                    !normalisation";
+        *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(dsqrt(prov2*prov2)+prov3*dsqrt(prov5*prov5)))   !normalisation";
       }
     }
     else if(kinVar == "THETA"){
       *TF << "\n\n        tf=(exp(-(theta(p)-theta(pexp)-prov1)**2/2d0/prov2**2))          !first gaussian\n";
       *TF <<     "        tf=tf+prov3*(exp(-(theta(p)-theta(pexp)-prov4)**2/2d0/prov5**2)) !second gaussian\n";
-      *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(dsqrt(prov2*prov2)+prov3*dsqrt(prov5*prov5)))                  !normalisation";
+      *TF <<     "        tf=tf*((1d0/dsqrt(2d0*pi))/(dsqrt(prov2*prov2)+prov3*dsqrt(prov5*prov5)))   !normalisation";
     }
     else if(kinVar == "PHI"){
       *TF << "\n\n        tf=(exp(-(phi(p)-phi(pexp)-prov1)**2/2d0/prov2**2))           !first gaussian\n";
