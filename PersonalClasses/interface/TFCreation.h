@@ -57,6 +57,7 @@ class TFCreation{
         //int NarrowGaus[3];
         //int WideGaus[3];
         TFile* caloFitFile;
+        vector<std::string> indivFitHistos;
 };
 #endif
 //

@@ -503,6 +503,10 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     else if(histoName.find("Eta_0p75") <= histoName.size() ){ binToSkip[0] = 1; }
     else if(histoName.find("Eta_1p45") <= histoName.size() ){ binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; lastBin = 13;}
   }
+  
+  //Vector that will contain the string information to add in the LaTeX file containing all individual fitted histograms!
+  indivFitHistos.clear();
+  indivFitHistos.push_back("\\newpage \n\\subsection{Individual fit histograms} \n");
 
   for(int bin=1;bin <= nbins+1;bin ++) {
     string projection_title = "sliceYbin"+tostr(bin)+"_"+string(histoFit->GetName());
@@ -618,16 +622,16 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
 //      }
         
     }
-    TCanvas* canv = new TCanvas("canv","canv");
-    canv->SetName(hp->GetName()); canv->SetTitle(hp->GetTitle());
-    canv->cd();
+    TCanvas* canv_IndivFit = new TCanvas("canv_IndivFit","canv_IndivFit");
+    canv_IndivFit->SetName(hp->GetName()); canv_IndivFit->SetTitle(hp->GetTitle());
+    canv_IndivFit->cd();
     hp->Draw();
     int n = 200;
     double x[200], yDbl[200], ySngl[200];
     for(int ii = 0; ii < n; ii ++){
       x[ii] = -100+ii;
       yDbl[ii] = doubleGaussianFit->GetParameter(5)*(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2))+TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(4),2))*doubleGaussianFit->GetParameter(2))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2)))+doubleGaussianFit->GetParameter(2)*TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(3)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(4),2))));
-      ySngl[ii] = doubleGaussianFit->GetParameter(5)*(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2)))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2)))+0*TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(3)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(4),2))));;
+      ySngl[ii] = doubleGaussianFit->GetParameter(5)*(1/(TMath::Sqrt(2*TMath::Pi())*(TMath::Sqrt(TMath::Power(doubleGaussianFit->GetParameter(1),2)))))*(TMath::Exp(-TMath::Power((x[ii]-doubleGaussianFit->GetParameter(0)),2)/(2*TMath::Power(doubleGaussianFit->GetParameter(1),2))));;
     }
 /*    if( histoName.find("Light_DiffEVsGenE") <= histoName.size() ){ // || histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
       std::cout << " ****  Looking at bin : " << bin << " **** " << endl;
@@ -650,8 +654,11 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
     leg_Canv->AddEntry(gr_TFDistDblG,"Overal Dbl gauss function","l");
     leg_Canv->AddEntry(gr_TFDistSnglG,"Narrow gaus of Dbl gaus","l");
     leg_Canv->Draw();
-    canv->Write();
-    if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() || histoName.find("Light_DiffEVsGenE") <= histoName.size() )canv->SaveAs(("TFInformation/Plots/"+string(canv->GetName())+".pdf").c_str());
+    canv_IndivFit->Write();
+    if(histoName.find("BJet_DiffEVsGenE") <= histoName.size() || histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
+      canv_IndivFit->SaveAs(("TFInformation/Plots/"+string(canv_IndivFit->GetName())+".pdf").c_str());
+      indivFitHistos.push_back(("\\includegraphics[width = 0.50 \\textwidth]{Plots/"+string(canv_IndivFit->GetName())+"} \n").c_str());
+    }
     //hp->Write();
     delete hp;
   }//loop over bins!
@@ -949,6 +956,10 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   if(nEtaBins_ == 1) *LaTeX << " \\caption{Fit distributions} " << endl;
   else               *LaTeX << " \\caption{Fit distributions for " << EtaValues[nEtaBins_] << " $<$ $\\vert \\eta \\vert$ $<$ " << EtaValues[nEtaBins_+1] << "}\n";
   *LaTeX << "\\end{figure} " << endl;
+
+  for(int ii = 0; ii < indivFitHistos.size(); ii++)
+    *LaTeX << indivFitHistos[ii];
+  *LaTeX << " " << endl;
 
 }
 
