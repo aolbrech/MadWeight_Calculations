@@ -98,10 +98,15 @@ int main (int argc, char *argv[]){
   /////////////////////////////
   //   Which systematics ?   //
   /////////////////////////////
-  std::string doJESShift = "nominal"; // Other options are "minus" and "plus"
-  std::string doJERShift = "nominal";
-  std::string doLeptonSFShift = "Nominal";  //Other options are "Minus" and "Plus" (Capital letters are needed!
-  std::string doLumiWeightShift = "Nominal";  //Other options are "Minus" and "Plus"
+  std::string systematic = "Nominal";
+  if(argc >= 4)
+    systematic = string(argv[3]);
+  std::cout << " ** Will be using systematic : " << systematic << std::endl;
+  if(systematic != "Nominal" && systematic != "JESPlus" && systematic != "JESMinus" && systematic != "JERPlus" && systematic != "JERMinis" && systematic != "bTagPlus" && systematic != "bTagMinus"){
+    std::cout << " *****  Given systematic is not allowed! " << std::endl;
+    std::cout << " *****  Possibilities are : Nominal, JESPlus, JESMinus, JERPlus, JERMinus, bTagPlus, bTagMinus " << std::endl;
+    exit(-1);
+  }
  
   ////////////////////////////////////
   /// AnalysisEnvironment  
@@ -283,19 +288,11 @@ int main (int argc, char *argv[]){
   if (verbose > 0) cout << " - SelectionTable instantiated ..." << endl;
 
   ////////////////////////
-  // PileUp Reweighting //
+  // PileUp Reweighting //   --> Need this for the event selection table!
   ////////////////////////
-  LumiReWeighting LumiWeights, LumiWeightsUp, LumiWeightsDown;
-
-  LumiWeights = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/nominal.root", "pileup", "pileup");
-  LumiWeightsUp = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_up.root", "pileup", "pileup");
-  LumiWeightsDown = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208357/sys_down.root", "pileup", "pileup");
+  LumiReWeighting LumiWeights;
+  LumiWeights = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root", "PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208686_Mu/nominal.root", "pileup", "pileup");
   cout << " - LumiReWeighting instantiated ... " << endl;
-
-  // initialize lepton SF
-  LeptonTools* leptonTools = new LeptonTools(false);
-  leptonTools->readMuonSF("PersonalClasses/Calibrations/LeptonSF/Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.root", "PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run_2012A_2012B_53X.root", "PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run_2012C_53X.root", "PersonalClasses/Calibrations/LeptonSF/TriggerMuonEfficiencies_Run_2012D_53X.root");
-  leptonTools->readElectronSF();
 
   ////////////////////////////////////
   //	Loop on datasets
@@ -314,13 +311,16 @@ int main (int argc, char *argv[]){
     
     //open files and load
     treeLoader.LoadDataset (datasets[d], anaEnv);
+    bool isData = false;
+    if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 )
+      isData = true;
     
     /////////////////////////////////////
     /// Initialize JEC factors            --> Updated on 3/11/2015 (Recommendations from: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC)
     /////////////////////////////////////
     vector<JetCorrectorParameters> vCorrParam;
     
-    if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){// Data!
+    if( isData ){// Data!
       JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13__V4_DATA_L1FastJet_AK5PFchs.txt");
       vCorrParam.push_back(*L1JetCorPar);
       JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_DATA_L2Relative_AK5PFchs.txt");
@@ -354,7 +354,7 @@ int main (int argc, char *argv[]){
     //Initialize LightTuple (AnomCoupTree) specific stuff:
     TTree* LightTree = new TTree("LightTree","Tree containing the AnomCoup information");
     LightTree->Branch("TheAnomCoupLight","AnomCoupLight",&anomCoupLight);
-    TFile* LightFile = new TFile(("LightTree/AnomCoupLight_"+dataSetName+".root").c_str(),"RECREATE");
+    TFile* LightFile = new TFile(("LightTree/AnomCoupLight_"+dataSetName+"_"+systematic+".root").c_str(),"RECREATE");  
 
     /////////////////////////////////////////
     //  LHCO Output files + GeneratorInfo  //
@@ -385,7 +385,7 @@ int main (int argc, char *argv[]){
       vector<int> jetCombi(4,9999);;   //Define this here and just initialize to 9999 such that it also can be used for other datasets!
       
       if(ievt%1000 == 0)
-	std::cout<<"Processing the "<<ievt<<"th event (" << ((double)ievt/(double)NrEvtsToRunOver)*100  << "%)" << " +> # selected: " << nSelectedMuPos+nSelectedMuNeg << " (mu+jets) " << nSelectedElPos+nSelectedElNeg << " (e+jets)" << flush<<"\r";
+	std::cout<<"    - Processing the "<<ievt<<"th event (" << ((double)ievt/(double)NrEvtsToRunOver)*100  << "%)" << " +> # selected: " << nSelectedMuPos+nSelectedMuNeg << " (mu+jets) " << nSelectedElPos+nSelectedElNeg << " (e+jets)" << flush<<"\r";
       
       ////////////////
       // LOAD EVENT //
@@ -393,7 +393,7 @@ int main (int argc, char *argv[]){
       //TRootEvent* event = treeLoader.LoadEvent (ievt, vertex, init_muons, init_electrons, init_jets_corrected, mets);  //Use uncorrected jets ...
       TRootEvent* event = treeLoader.LoadEvent(ievt, vertex, init_muons, init_electrons, init_jets, mets);
       
-      if(! (dataSetName.find("Data")==0 || dataSetName.find("DATA")==0  || dataSetName.find("data")==0 ) ) {
+      if( !isData ) {
         genjets = treeLoader.LoadGenJet(ievt,false);
         sort(genjets.begin(),genjets.end(),HighestPt()); // HighestPt() is included from the Selection class
       }
@@ -442,27 +442,12 @@ int main (int argc, char *argv[]){
       //  Beam scraping and PU reweighting     --> Will be moved to nTuple analyzer!
       ////////////////////////////////////////
       double lumiWeight = 1;  
-      if(! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) ){   
-        if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
-        else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)event->nTruePU() );
-        else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)event->nTruePU() );
-      }
-//      MSPlot["lumiWeights"]->Fill(lumiWeight, datasets[d], true, scaleFactor*Luminosity*lumiWeight);
-//      MSPlot["nTruePU"]->Fill(event->nTruePU(), datasets[d], true, scaleFactor*Luminosity*lumiWeight);
-//
-//      //Plot some of the original kinematic information (but need this PUweight to be known ...)
-//      MSPlot["InitJets_METPt"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      if(init_jets.size() > 0) MSPlot["InitJets_Pt_jet1"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      if(init_jets.size() > 1) MSPlot["InitJets_Pt_jet2"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      if(init_jets.size() > 2) MSPlot["InitJets_Pt_jet3"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      if(init_jets.size() > 3) MSPlot["InitJets_Pt_jet4"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
+      if(!isData)   
+        lumiWeight = LumiWeights.ITweight( (int)event->nTruePU() );
       
       //////////////////////////////////////
       // Apply Jet Corrections on-the-fly //   
       //////////////////////////////////////
-      bool isData = false;
-      if( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 )
-        isData = true;
       jetTools->unCorrectMETTypeOne(init_jets, mets[0], isData);
       jetTools->correctJets(init_jets, event->kt6PFJets_rho(), isData);      //Why is this kt6PFJets rho information needed?
       jetTools->correctMETTypeOne(init_jets, mets[0], isData);
@@ -475,7 +460,7 @@ int main (int argc, char *argv[]){
       if(previousFilename != currentFilename){
 	previousFilename = currentFilename;
 	iFile++;
-	cout<<"File changed!!! => iFile = "<<iFile<<endl;
+	cout<<"    - File changed!!! => iFile = "<<iFile<<endl;
       }
       
       int currentRun = event->runId();
@@ -543,12 +528,13 @@ int main (int argc, char *argv[]){
       //       so these tools should only be used for studies of the effect of systematics //
       ///////////////////////////////////////////////////////////////////////////////////////
       //JER Smearing:
-      if( ! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ) ) {
-	jetTools->correctJetJER(init_jets, genjets, mets[0], doJERShift, false); //false means don't use old numbers but newer ones (~ 8TeV recommendation of 2014!) 
-	if (doJESShift != "nominal")
-	  jetTools->correctJetJESUnc(init_jets, mets[0], doJESShift, 1);  //last integer (1) = nSigma
+      if(!isData) {
+        if( systematic == "JERPlus")  jetTools->correctJetJER(init_jets, genjets, mets[0], "plus", false); //false means don't use old numbers but newer ones (~ 8TeV recommendation of 2014!) 
+        if( systematic == "JERMinus") jetTools->correctJetJER(init_jets, genjets, mets[0], "minus", false);
+        if( systematic == "Nominal")  jetTools->correctJetJER(init_jets, genjets, mets[0], "nominal", false);
+	if( systematic == "JESPlus")  jetTools->correctJetJESUnc(init_jets, mets[0], "plus", 1);  //last integer (1) = nSigma
+	if( systematic == "JESMinus") jetTools->correctJetJESUnc(init_jets, mets[0], "minus", 1);
       }
-//      MSPlot["InitJets_METPt_JerSmearingApplied"]->Fill(mets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 
       ////////////////////////////////////////////////////////
       // Access particle information before event selection //
@@ -574,12 +560,6 @@ int main (int argc, char *argv[]){
       /////////////////////
       // EVENT SELECTION //
       /////////////////////
-//      if(init_jets.size() >=4){ // MSPlots before 'basic' event selection (no b-tag)
-//	MSPlot["InitJets_pT_jet1_beforeEvtSel"]->Fill(init_jets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//	MSPlot["InitJets_pT_jet2_beforeEvtSel"]->Fill(init_jets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//	MSPlot["InitJets_pT_jet3_beforeEvtSel"]->Fill(init_jets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//	MSPlot["InitJets_pT_jet4_beforeEvtSel"]->Fill(init_jets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      }
       
       //Declare selection instance    
       Selection selection(init_jets, init_muons, init_electrons, mets, event->kt6PFJets_rho());
@@ -617,40 +597,25 @@ int main (int argc, char *argv[]){
       enum DecayChannel_t {semiMu, semiEl};
       DecayChannel_t decayChannel;
 
-      if( !( dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0)  &&  selectedElectrons.size() == 1 ) {
-	scaleFactor = scaleFactor*leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift );
-	//histo1D["leptonScales"]->Fill(leptonTools->getElectronSF(selectedElectrons[0]->Eta(), selectedElectrons[0]->Pt(), doLeptonSFShift));
-      }
-     
       // semi-mu selection
-//      MSPlot["nEventsAfterCutsSemiMu"]->Fill(0, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
       selecTableSemiMu.Fill(d,0,scaleFactor*lumiWeight);              
       if (triggedSemiMu) {
-//        MSPlot["nEventsAfterCutsSemiMu"]->Fill(1, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	selecTableSemiMu.Fill(d,1,scaleFactor*lumiWeight);
 	if (isGoodPV) {
-//          MSPlot["nEventsAfterCutsSemiMu"]->Fill(2, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	  selecTableSemiMu.Fill(d,2,scaleFactor*lumiWeight);
 	  if (selectedMuons.size() == 1) {
-//            MSPlot["nEventsAfterCutsSemiMu"]->Fill(3, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	    selecTableSemiMu.Fill(d,3,scaleFactor*lumiWeight);
 	    if( vetoMuons.size() == 1 ) {
-//              MSPlot["nEventsAfterCutsSemiMu"]->Fill(4, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 	      selecTableSemiMu.Fill(d,4,scaleFactor*lumiWeight);
 	      if (vetoElectronsSemiMu.size() == 0) {
-//                MSPlot["nEventsAfterCutsSemiMu"]->Fill(5, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		selecTableSemiMu.Fill(d,5,scaleFactor*lumiWeight);
 		if (selectedJets.size() >= 1) {
-//                  MSPlot["nEventsAfterCutsSemiMu"]->Fill(6, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		  selecTableSemiMu.Fill(d,6,scaleFactor*lumiWeight);
 		  if (selectedJets.size() >= 2) {
-//                    MSPlot["nEventsAfterCutsSemiMu"]->Fill(7, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		    selecTableSemiMu.Fill(d,7,scaleFactor*lumiWeight);
 		    if (selectedJets.size() >= 3) {
-//                      MSPlot["nEventsAfterCutsSemiMu"]->Fill(8, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 		      selecTableSemiMu.Fill(d,8,scaleFactor*lumiWeight);
 		      if (selectedJets.size() >= 4) {
-//                        MSPlot["nEventsAfterCutsSemiMu"]->Fill(9, datasets[d], true, Luminosity*scaleFactor*lumiWeight);
 			selecTableSemiMu.Fill(d,9,scaleFactor*lumiWeight);
 		 	eventselectedSemiMu = true;
 		      }
@@ -725,18 +690,6 @@ int main (int argc, char *argv[]){
 	datasetsPlot = datasetsEl; Luminosity = LuminosityEl;
         leptonFlav="_el";
       }
-      
-//      // MSPlots after 'basic' event selection (no b-tag)
-//      MSPlot["Selected_Events_pT_jet1"+leptonFlav]->Fill(selectedJets[0]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      MSPlot["Selected_Events_pT_jet2"+leptonFlav]->Fill(selectedJets[1]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      MSPlot["Selected_Events_pT_jet3"+leptonFlav]->Fill(selectedJets[2]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      MSPlot["Selected_Events_pT_jet4"+leptonFlav]->Fill(selectedJets[3]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      MSPlot["Selected_Events_pT_lepton"+leptonFlav]->Fill(selectedLepton->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//
-//      for (unsigned int q=0; q<selectedJets.size(); q++) {
-//	MSPlot["Selected_Events_pT_alljets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//	if(q<4) MSPlot["Selected_Events_pT_4leadingjets"+leptonFlav]->Fill(selectedJets[q]->Pt(), datasets[d], true, Luminosity*scaleFactor*lumiWeight);
-//      }
       
       ////////////////////////////////////////////////////////////////////
       //   Use genEvent information to get the correct event topology   //
@@ -935,7 +888,7 @@ int main (int argc, char *argv[]){
   }  //loop on datasets
   
   //Once everything is filled ...
-  if(verbose > 0) cout << " We ran over all the data ;-)" << endl;
+  if(verbose > 0) cout << "We ran over all the data ;-)" << endl;
   
   /////////////////////////
   // Write out the plots //
@@ -983,9 +936,9 @@ int main (int argc, char *argv[]){
   fout->Close(); 
    
   delete fout;
-  delete tcdatasets;
-  delete tcAnaEnv;
-  delete configTree;
+  //delete tcdatasets;
+  //delete tcAnaEnv;
+  //delete configTree;
   
   cout << "It took us " << ((double)clock() - start) / CLOCKS_PER_SEC << " to run the program" << endl;
   cout << "********************************************" << endl;
