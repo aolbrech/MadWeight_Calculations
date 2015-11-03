@@ -316,29 +316,29 @@ int main (int argc, char *argv[]){
     treeLoader.LoadDataset (datasets[d], anaEnv);
     
     /////////////////////////////////////
-    /// Initialize JEC factors            --> Updated on 5/08/2014
+    /// Initialize JEC factors            --> Updated on 3/11/2015 (Recommendations from: https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC)
     /////////////////////////////////////
     vector<JetCorrectorParameters> vCorrParam;
     
     if(dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0 ){// Data!
-      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L1FastJet_AK5PFchs.txt");
+      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13__V4_DATA_L1FastJet_AK5PFchs.txt");
       vCorrParam.push_back(*L1JetCorPar);
-      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2Relative_AK5PFchs.txt");
+      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_DATA_L2Relative_AK5PFchs.txt");
       vCorrParam.push_back(*L2JetCorPar);
-      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L3Absolute_AK5PFchs.txt");
+      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt");
       vCorrParam.push_back(*L3JetCorPar);
-      JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/FT_53_V21_AN4_Summer13_Data_L2L3Residual_AK5PFchs.txt");
+      JetCorrectorParameters *L2L3ResJetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt");
       vCorrParam.push_back(*L2L3ResJetCorPar);
     }
     else{
-      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L1FastJet_AK5PFchs.txt");
+      JetCorrectorParameters *L1JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_MC_L1FastJet_AK5PFchs.txt");
       vCorrParam.push_back(*L1JetCorPar);
-      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L2Relative_AK5PFchs.txt");
+      JetCorrectorParameters *L2JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_MC_L2Relative_AK5PFchs.txt");
       vCorrParam.push_back(*L2JetCorPar);
-      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_L3Absolute_AK5PFchs.txt");
+      JetCorrectorParameters *L3JetCorPar = new JetCorrectorParameters("PersonalClasses/Calibrations/JECFiles/Summer13_V4_MC_L3Absolute_AK5PFchs.txt");
       vCorrParam.push_back(*L3JetCorPar);
     }
-    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("PersonalClasses/Calibrations/JECFiles/START53_V23_Summer13_Uncertainty_AK5PFchs.txt");
+    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty("PersonalClasses/Calibrations/JECFiles/Summer13_V4_MC_Uncertainty_AK5PFchs.txt");
 
     //True means also redo L1        
     JetTools *jetTools = new JetTools(vCorrParam, jecUnc, true);
