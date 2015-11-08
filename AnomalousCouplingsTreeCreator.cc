@@ -40,7 +40,6 @@ using namespace TopTree;
 
 int main (int argc, char *argv[]){
 
-  TFile *fout = new TFile ("PlotsMacro/AnomCouplings.root", "RECREATE");  
   clock_t start = clock();
   
   cout << "*************************************************************" << endl;
@@ -303,6 +302,9 @@ int main (int argc, char *argv[]){
   for (unsigned int d = 0; d < datasets.size (); d++) {
     if (verbose > 1) cout << "   * Dataset " << d << ": " << datasets[d]->Name () << " with " << datasets[d]->NofEvtsToRunOver() << " events." << endl;
     
+    //Create a separate ROOT file for each dataset (possible since no MSPlots can be created!)
+    TFile *fout = new TFile(("PlotsMacro/AnomCouplings_"+dataSetName+"_"+systematic+".root").c_str(), "RECREATE");  
+
     int iFile = -1;
     string previousFilename = "", dataSetName = datasets[d]->Name();
     
@@ -408,7 +410,6 @@ int main (int argc, char *argv[]){
 
       // check with genEvent which ttbar channel it is
       if(dataSetName.find("TTbarJets") == 0)  {
-        std::cout << " In this if loop for WJets ? --> " << dataSetName << std::endl;
 	TRootGenEvent* genEvt = treeLoader.LoadGenEvent(ievt,false);
 	if( genEvt->isSemiLeptonic(TRootGenEvent::kMuon) ) {
           histo1D["Mass_genEvtMuon"]->Fill(genEvt->lepton().M());
