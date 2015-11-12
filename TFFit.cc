@@ -22,8 +22,13 @@
 //Specific code for anomalous couplings analysis:
 #include "AnomalousCouplings/PersonalClasses/interface/TFCreation.h"
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
+#include "AnomalousCouplings/PersonalClasses/interface/TFLight.h"
+//Reweighting!
+#include "TopTreeAnalysisBase/MCInformation/interface/LumiReWeighting.h"
+#include "TopTreeAnalysisBase/Tools/interface/LeptonTools.h"
 
 using namespace std;
+using namespace reweight;   //Need this in order to use LumiReWeighting!
 //using namespace TopTree;
 
 template <typename T> string tostr(const T& t) { ostringstream os; os<<t; return os.str(); }
@@ -42,8 +47,10 @@ int main (int argc, char **argv)
   ////////////////////////////////////////////////////////////////////
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
-  bool CreateTFFromTree = false;
-  bool RunFitForTF = true; 
+  bool useTFTree = true;
+
+  bool CreateTFFromTree = true; 
+  bool RunFitForTF = false;
   int nEtaBins = 1;
   bool TFForPhi = false;
   bool TFForTheta = false;
@@ -60,23 +67,52 @@ int main (int argc, char **argv)
   if(CreateTFFromTree){
     //Load the TFTree information
     vector<string> inputTFRoot;
-    inputTFRoot.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root"); 
+    if(useTFTree)
+      inputTFRoot.push_back("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/TFTree/TFLight_TTbarJets_SemiLept_Nominal.root");         //All corrections applied!
+    else
+      inputTFRoot.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_08112015_200540/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
+  
+    //--------------------------------//
+    // Lumi reweighting and lepton SF //
+    //--------------------------------//
+    LumiReWeighting LumiWeights;
+    LumiReWeighting LumiWeightsUp;
+    LumiReWeighting LumiWeightsDown;
+    LumiWeights = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root","PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208686_Mu/nominal.root","pileup","pileup");
+    LumiWeightsUp = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root","PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208686_Mu/sys_up.root","pileup","pileup");
+    LumiWeightsDown = LumiReWeighting("PersonalClasses/Calibrations/PUReweighting/pileup_MC_Summer12_S10.root","PersonalClasses/Calibrations/PUReweighting/pileup_2012Data53X_UpToRun208686_Mu/sys_down.root","pileup","pileup");
+    cout << " - LumiReWeighting instantiated ... " << endl;
+  
+    // initialize lepton SF (ROOT files taken from: IsoMu24_eta2p1)
+    LeptonTools* leptonTools = new LeptonTools(false);
+    leptonTools->readMuonSF("PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_ISO_Run_2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/SingleMuonTriggerEfficiencies_eta2p1_Run2012ABCD_v5trees.root");
+    leptonTools->readElectronSF();
 
     for(unsigned int iDataSet = 0; iDataSet <inputTFRoot.size(); iDataSet++){
       TFile* inputTFFile = new TFile(inputTFRoot[iDataSet].c_str(),"READ");
 
-      TTree* inputTFTree = (TTree*) inputTFFile->Get("LightTree");
-      TBranch* m_br = (TBranch*) inputTFTree->GetBranch("TheAnomCoupLight");
-      AnomCoupLight* light = 0;
-      m_br->SetAddress(&light);
+      TTree* inputTFTree = 0;
+      TBranch* m_br = 0;
+      TFLight* tfLight = 0;
+      AnomCoupLight* anomCoupLight = 0;
+      if(useTFTree){
+        inputTFTree = (TTree*) inputTFFile->Get("TFLightTree");
+        m_br = (TBranch*) inputTFTree->GetBranch("TheTFLight_muCh");
+        m_br->SetAddress(&tfLight);     //Maybe possible to use GetAddress!
+      }
+      else{
+        inputTFTree = (TTree*) inputTFFile->Get("LightTree");
+        m_br = (TBranch*) inputTFTree->GetBranch("TheAnomCoupLight");
+        m_br->SetAddress(&anomCoupLight);
+      }
 
       //Set the number of selected events (for loop on events):
       int nEvent = inputTFTree->GetEntries(); 
-      //int nEvent = 5000;
       std::cout << " *** Looking at dataset " << iDataSet+1 << "/" << inputTFRoot.size() << " with " << nEvent << " selected events! \n " << std::endl;
 
       //Initialize the TFCreation class (create all histograms):
       tfCreation.InitializeVariables(); 
+
       //Read in the TLorenztVectors:
       TLorentzVector genPart[5], recoPart[5];
       enum DecayChannel_t {isSemiMu, isSemiEl};
@@ -86,8 +122,46 @@ int main (int argc, char **argv)
 	  std::cout<<"Processing the "<<iEvt<<"th event (" << ((double)iEvt/(double)inputTFTree->GetEntries())*100  << "%)" << flush<<"\r";
 
 	inputTFTree->GetEvent(iEvt);
-        vector<TLorentzVector> selectedJets = light->selectedJets();
-        vector<int> correctJetCombi = light->correctJetCombi();
+
+        //Not directly possible to use 'light' since it has different types, but can extract the necessary objects in each loop separately
+        // (Not optimal, but since it are only a few parameters acceptable)
+        vector<TLorentzVector> selectedJets;
+        vector<int> correctJetCombi;
+        float scaleFactor;   
+ 
+        if(useTFTree){
+          selectedJets = tfLight->selectedJets();
+          correctJetCombi = tfLight->correctJetCombi();
+
+	  recoPart[4] = tfLight->selectedLepton();
+	  genPart[0] = tfLight->genVectorLight1();
+	  genPart[1] = tfLight->genVectorLight2();
+	  genPart[2] = tfLight->genVectorHadrB();
+	  genPart[3] = tfLight->genVectorLeptB();
+	  genPart[4] = tfLight->genVectorLepton();
+
+          scaleFactor = tfLight->fullScaleFactor();
+        }
+        else{
+          selectedJets = anomCoupLight->selectedJets();
+          correctJetCombi = anomCoupLight->correctJetCombi();
+
+	  recoPart[4] = anomCoupLight->selectedLepton();
+	  genPart[0] = anomCoupLight->genVectorLight1();
+	  genPart[1] = anomCoupLight->genVectorLight2();
+	  genPart[2] = anomCoupLight->genVectorHadrB();
+	  genPart[3] = anomCoupLight->genVectorLeptB();
+	  genPart[4] = anomCoupLight->genVectorLepton();
+
+          scaleFactor = anomCoupLight->scaleFactor();
+
+          //*** Start with corrections ***//
+          // Beam scraping and PU reweighting
+          //double lumiWeight = 1;  
+          //if(! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) )   
+          //  lumiWeight = LumiWeights.ITweight( (int)anomCoupLight->nTruePU() );
+        }
+
         int correctLeptBIndex = correctJetCombi[0];
         int correctHadrBIndex = correctJetCombi[1];
         int correctQuark1Index = correctJetCombi[2];
@@ -98,13 +172,6 @@ int main (int argc, char **argv)
 	  recoPart[1] = selectedJets[correctQuark2Index];
 	  recoPart[2] = selectedJets[correctHadrBIndex];
 	  recoPart[3] = selectedJets[correctLeptBIndex];
-	  recoPart[4] = light->selectedLepton();
-
-	  genPart[0] = light->genVectorLight1();
-	  genPart[1] = light->genVectorLight2();
-	  genPart[2] = light->genVectorHadrB();
-	  genPart[3] = light->genVectorLeptB();
-	  genPart[4] = light->genVectorLepton();
   
 	  if(genPart[4].M() <= 0.05) decayChannel = isSemiEl; //Electron channel --> decayChannel == 1
 	  else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
