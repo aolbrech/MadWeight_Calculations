@@ -22,10 +22,12 @@
 #include "PersonalClasses/Style.C"                                                 //CHECK if this works!
 
 #include "AnomalousCouplings/PersonalClasses/interface/AnomCoupLight.h"
+#include "AnomalousCouplings/PersonalClasses/interface/TFLight.h"
 #include "AnomalousCouplings/PersonalClasses/interface/BTagStudy_OLD.h"
 #include "AnomalousCouplings/PersonalClasses/interface/BTagStudy.h"
 #include "AnomalousCouplings/PersonalClasses/interface/LHCOOutput.h"
 #include "AnomalousCouplings/PersonalClasses/interface/ExtraEvtSelCuts.h"
+#include "TopTreeAnalysisBase/Tools/interface/BTagWeightTools.h"
 
 using namespace std;
 using namespace reweight;   //Need this in order to use LumiReWeighting!
@@ -48,6 +50,12 @@ std::string timestamp(){
 
     std::string TIME = (NumberToString(Tm->tm_mday)+NumberToString(Tm->tm_mon+1)+NumberToString(Tm->tm_year+1900)+"_"+NumberToString(Tm->tm_hour)+NumberToString(Tm->tm_min)+NumberToString(Tm->tm_sec)).c_str();
     return TIME;
+}
+
+//Check if a file exists or not!
+bool file_exist(const char *fileName){
+    std::ifstream infile(fileName);
+    return infile.good();
 }
 
 int main (int argc, char *argv[])
@@ -91,6 +99,31 @@ int main (int argc, char *argv[])
   bool savePDF = false;
   bool bTagChoiceMade = true;  
   bool getMassFits = false;
+  bool bTagPlotsMade = false;
+
+  std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root";
+  int stop = 0;
+  if( file_exist(bTagPlotsOutput.c_str()) ){
+    if(!bTagPlotsMade){
+      std::cout << " \n According to the bTagPlotsMade boolean the plots are not yet made but the output file has been found ... " << std::endl;
+      std::cout << "  --> Maybe the output file needs to be updated: " << bTagPlotsOutput << std::endl;
+      std::cout << "  ==> Will stop the script until this issue is fixed ! \n" << std::endl;
+      stop = 1;
+    }
+    else
+      std::cout << " - Will apply the b-tag efficiencies from file : " << bTagPlotsOutput << std::endl;
+  }
+  else{
+    if(bTagPlotsMade){
+      std::cout << "\n According to the bTagPlotsMade boolean the plots should be created but the output file cannot be found ... " << std::endl;
+      std::cout << " --> Maybe the wrong output file has been given : " << bTagPlotsOutput << std::endl;
+      std::cout << " ==> Will stop the script until this issue is fixed ! \n" << std::endl;
+      stop = 1;
+    }
+    else
+      std::cout << " - Will create the b-tag efficiencies and store them in : " << bTagPlotsOutput << std::endl;
+  }
+  if(stop == 1) return 0;
 
   //-- Specific b-tag stuff!
   int ChosenBTag = 3;  //-->Corresponds to two T b-tags and no light veto!
@@ -102,9 +135,26 @@ int main (int argc, char *argv[])
   //-------------------------//
   //   Which systematics ?   //
   //-------------------------//
-  std::string doLeptonSFShift = "Nominal";  //Other options are "Minus" and "Plus" (Capital letters are needed!)
-  std::string doLumiWeightShift = "Nominal";  //Other options are "Minus" and "Plus"
+  std::string doLeptonSFShift = "Nominal";   //Other options are "Minus" and "Plus" (Capital letters are needed!)
+  std::string doLumiWeightShift = "Nominal"; //Other options are "Minus" and "Plus"
+  std::string systematic = "Nominal";
 
+  //b-tag systematics
+  int syst_btag = 0; //+1 for SF up, -1 for SF down
+  if(systematic == "bTagMinus") syst_btag = -1;
+  else if(systematic == "bTagPlus") syst_btag = 1;
+  int syst_mistag = 0; //+1 for SF up, -1 for SF down
+  if(systematic == "misTagMinus") syst_mistag = -1;
+  else if(systematic == "misTagPlus") syst_mistag = 1;
+        
+/*  //lepton SF systematics
+  string syst_muonSF = "Nominal";
+  if(systematic == "MuonSFMinus") syst_muonSF = "Minus";
+  else if(systematic == "MuonSFPlus") syst_muonSF = "Plus";
+  string syst_electronSF = "Nominal";
+  if(systematic == "ElectronSFMinus") syst_electronSF = "Minus";
+  else if(systematic == "ElectronSFPlus") syst_electronSF = "Plus";
+*/
   //----------------------------//
   // Input & output information //
   //----------------------------//
@@ -116,10 +166,10 @@ int main (int argc, char *argv[])
   vector<string> inputFiles;
   vector<Dataset*> datasets;
   //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-  std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_08112015_200540/";
-  inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                    //Summer13_v4
-  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_10112015_144641/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root"); //Winter14_v5
-  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_10112015_210750/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root"); //Winter14_v8
+  std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_12112015_111243/";  ///user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_08112015_200540/";
+  inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                     //Summer13_v4
+  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_10112015_144641/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
+  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_10112015_210750/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v8
   inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_Nominal.root").c_str());
   inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_Nominal.root").c_str());
   inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_Nominal.root").c_str());
@@ -192,15 +242,23 @@ int main (int argc, char *argv[])
     MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
 
     MSPlot["LeptonPt"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
+    MSPlot["LeptonPt_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_AllCutsApplied"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
     MSPlot["LeptonPt_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_BeforePU"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
     MSPlot["LeptonPt_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_BeforeBTag"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
     MSPlot["LeptonEta"+leptFlav] = new MultiSamplePlot(datasets, "LeptonEta"+leptFlav, 100, -2.6, 2.6,"Lepton #eta");
+    MSPlot["LeptonEta_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonEta_AllCutsApplied"+leptFlav, 100, -2.6, 2.6,"Lepton #eta");
     MSPlot["LeptonCharge"+leptFlav] = new MultiSamplePlot(datasets, "LeptonCharge"+leptFlav, 150, 0, 200,"Lepton charge");
+    MSPlot["LeptonCharge_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonCharge_AllCutsApplied"+leptFlav, 150, 0, 200,"Lepton charge");
+
     MSPlot["JetPt_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_LeadingJet_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_AllCutsApplied"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_BeforePU"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_BeforeBTag"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
     MSPlot["JetEta_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet"+leptFlav, 150, 0, 200,"Jet #eta");
+    MSPlot["JetEta_LeadingJet_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet_AllCutsApplied"+leptFlav, 150, 0, 200,"Jet #eta");
+
     MSPlot["nPV"+leptFlav] = new MultiSamplePlot(datasets, "nPV"+leptFlav, 50, 0, 50,"Number of primary vertices");
+    MSPlot["nPV_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "nPV_AllCutsApplied"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "nPV_BeforePU"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nPV_BeforeBTag"+leptFlav, 50, 0, 50,"Number of primary vertices");
   }
@@ -245,13 +303,29 @@ int main (int argc, char *argv[])
   leptonTools->readMuonSF("PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_ISO_Run_2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/SingleMuonTriggerEfficiencies_eta2p1_Run2012ABCD_v5trees.root");
   leptonTools->readElectronSF();
 
+  //------------------------//
+  // B-tagging scale factor //
+  //------------------------//
+  //Method 1a of https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods will be used!
+
+//  BTagWeightTools *bTagTool = new BTagWeightTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_NOttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
+  //BTagWeightTools *bTagTool = new BTagWeightsTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_WITHttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
+
+  //During a first run the plots need to be created!
+//  if(!bTagPlotsMade){
+//    bTagTool->InitializeMCEfficiencyHistos(15,30.,340.,2);  //How to get these histo-values?
+//  }
+//  else{
+//    bTagTool->ReadMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
+//  }
+
   //-----------------------//
   // Load personal classes //
   //-----------------------//
   float Mlb  = 108.1841, S_Mlb  = 31.4213;
   float Mqqb = 174.6736, S_Mqqb = 17.5757;
   float MW = 83.8037, S_MW = 10.2385;
-//  ExtraEvtSelCuts extraEvtSelCuts(Mqqb, S_Mqqb, MW, S_MW, bTagChoiceMade, 3, 2);
+  ExtraEvtSelCuts extraEvtSelCuts(Mqqb, S_Mqqb, MW, S_MW, bTagChoiceMade, 3, 2);
   BTagStudy bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag, Mlb, S_Mlb, Mqqb, S_Mqqb);
 
   //--------------------------------------//
@@ -259,13 +333,13 @@ int main (int argc, char *argv[])
   //--------------------------------------//
   for(unsigned int iDataSet = 0; iDataSet < inputFiles.size(); iDataSet++){
 
-    TFile* inputFile = new TFile(inputFiles[iDataSet].c_str(),"READ");
+    TFile* inputFile = new TFile(inputFiles[iDataSet].c_str(),"READ");  
 
     TTree* inLightTree = (TTree*) inputFile->Get("LightTree");
     TBranch* light_br = (TBranch*) inLightTree->GetBranch("TheAnomCoupLight");
     AnomCoupLight* light = 0;
     light_br->SetAddress(&light);
-  
+
     //Number of events that will be used in the "loop on events"
     int nrEvts = 0;
     if(nrEvtsComLine == -1) nrEvts = inLightTree->GetEntries();
@@ -273,14 +347,27 @@ int main (int argc, char *argv[])
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
     string dataSetName = dataSet->Name();
-    if(verbosity > 0) std::cout << "   *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nrEvts << " events (total = " << inLightTree->GetEntries() << ") ! " << std::endl;
+    if(verbosity > 0) std::cout << "\n   *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nrEvts << " events (total = " << inLightTree->GetEntries() << ") ! " << std::endl;
+
+    TFLight* tfLight_mu = 0;
+    //TFLight* tfLight_el = 0;
+    TTree* TFLightTree;
+    TFile* TFLightFile = 0;
+    if(dataSetName.find("TTbarJets_SemiLept") == 0){
+      std::cout << " --> Going into this loop for dataset : " << dataSetName  << std::endl;
+      //Initialize LightTuple (TFTree) specific stuff:
+      TFLightFile = new TFile(("TFTree/TFLight_"+dataSetName+"_"+systematic+".root").c_str(),"RECREATE");  
+      TFLightTree = new TTree("TFLightTree",("Tree containing the TFLight information for "+dataSetName+" at "+timestamp()).c_str());
+      TFLightTree->Branch("TheTFLight_muCh","TFLight",&tfLight_mu);
+      //TFLightTree->Branch("TheTFLight_elCh","TFLight",&tfLight_el);
+    }
 
     //-----------------------//
     // Load personal classes //
     //-----------------------//
     bTagStudy.InitializeDataSet(dataSetName);
     LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
-//    extraEvtSelCuts.Initialize(bTitle[0], dataSetName);
+    extraEvtSelCuts.Initialize(bTitle[0], dataSetName);
     lhcoOutput.Initialize("Reco", dataSetName);
 
     ofstream EvtNrMatching;
@@ -296,7 +383,7 @@ int main (int argc, char *argv[])
     for(unsigned int iEvt = 0; iEvt < nrEvts; iEvt++){
       inLightTree->GetEvent(iEvt);
       if(iEvt%5000 == 0)
-	std::cout<<"    Processing the "<<iEvt<<"th event ("<< ((double)iEvt/(double)nrEvts)*100<<"%)"<<" -> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
+	std::cout<<"    Processing the "<<iEvt<<"th event ("<<((double)iEvt/(double)nrEvts)*100<<"%)"<<" -> # selected: "<<nSelectedMu<<" (mu+jets) "<<nSelectedEl<<" (e+jets)"<< flush<<"\r";
 
       //*** Start with corrections ***//
       // Beam scraping and PU reweighting
@@ -315,6 +402,7 @@ int main (int argc, char *argv[])
 
       vector<float> bTagCSV = light->CSVbTag();
       vector<TLorentzVector> selJets = light->selectedJets();
+      vector<int> partFlavour = light->selectedJetsPartonFlavour();
       TLorentzVector selLepton = light->selectedLepton();
       TLorentzVector MET = light->met();
       int decayCh = light->decayChannel();  //0 = semiMu and 1 = semiEl
@@ -328,6 +416,10 @@ int main (int argc, char *argv[])
       MSPlot["nPV_BeforePU"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["JetPt_LeadingJet_BeforePU"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["LeptonPt_BeforePU"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+
+      //Fill the b-tag histo's in case they do not yet exist
+//      if(!bTagPlotsMade)
+//        bTagTool->FillMCEfficiencyHistos(selJets, partFlavour, bTagCSV);
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
       //ooOOooOOoo      Reading out nTuples done           ooOOooOOoo
@@ -373,10 +465,17 @@ int main (int argc, char *argv[])
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
 
-        //Apply the event selection
+        //*****************//  
+        // Apply the b-tag //
+        //*****************//  
         if( bTagStudy.getNrBTaggedJets(ibTag) < 2 || bTagStudy.getNrLightJets(ibTag) < 2 ) continue;
+
         if(decayCh == 0) nSelectedMu += 1;
         else if(decayCh == 1) nSelectedEl += 1;
+
+        //Get the bTag scaleFactor!
+//        if(bTagPlotsMade)
+//          bTagTool->getMCEventWeight(selJets, partFlavour, bTagCSV, syst_btag, syst_mistag);
 
         MSPlot["nPV"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
         MSPlot["JetPt_LeadingJet"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
@@ -400,8 +499,64 @@ int main (int argc, char *argv[])
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);      
 
-//        bool CutsSurvived = extraEvtSelCuts.KeepEvent(correctJetCombi, selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag), CWUIndex, decayCh);
-        bool CutsSurvived = true;
+        bool CutsSurvived = extraEvtSelCuts.KeepEvent(selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag), CWUIndex, decayCh);
+
+        //Now get the MSPlots after this additional cuts
+        if( CutsSurvived ){
+          MSPlot["nPV_AllCutsApplied"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+          MSPlot["JetPt_LeadingJet_AllCutsApplied"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+          MSPlot["LeptonPt_AllCutsApplied"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+          MSPlot["JetEta_LeadingJet_AllCutsApplied"+leptChannel]->Fill( selJets[0].Eta(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+          MSPlot["LeptonEta_AllCutsApplied"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+          MSPlot["LeptonCharge_AllCutsApplied"+leptChannel]->Fill( leptCharge, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+
+          if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 0){
+            tfLight_mu = new TFLight();
+            
+            double fullScaleFactor = scaleFactor*lumiWeight;   //Still need to add bTag and lepton SF!
+            tfLight_mu->setFullScaleFactor(fullScaleFactor);
+            tfLight_mu->setSelectedJets(selJets);
+            tfLight_mu->setSelectedLepton(selLepton);
+            tfLight_mu->setDecayChannel(decayCh);
+            tfLight_mu->setLeptonCharge(leptCharge);
+            tfLight_mu->setCorrectJetCombi(correctJetCombi);
+            tfLight_mu->setMET(MET);
+	
+            //Store the information needed for the TF (but only has value when dataset is ttbar)
+            tfLight_mu->setGenVectorLight1( light->genVectorLight1() );
+            tfLight_mu->setGenVectorLight2( light->genVectorLight2() );
+            tfLight_mu->setGenVectorHadrB(  light->genVectorHadrB()  );
+            tfLight_mu->setGenVectorLeptB(  light->genVectorLeptB()  );
+            tfLight_mu->setGenVectorLepton( light->genVectorLepton() );
+
+            TFLightTree->Fill();
+            delete tfLight_mu;
+            //----  End of Tree file filling (for TF's after evtSel)  ----//
+          }
+          /*else if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 1){
+           tfLight_el = new TFLight();
+            
+            double fullScaleFactor = scaleFactor*lumiWeight;   //Still need to add bTag and lepton SF!
+            tfLight_el->setFullScaleFactor(fullScaleFactor);
+            tfLight_el->setSelectedJets(selJets);
+            tfLight_el->setSelectedLepton(selLepton);
+            tfLight_el->setDecayChannel(decayCh);
+            tfLight_el->setLeptonCharge(leptCharge);
+            tfLight_el->setCorrectJetCombi(correctJetCombi);
+            tfLight_el->setMET(MET);
+	
+            //Store the information needed for the TF (but only has value when dataset is ttbar)
+            tfLight_el->setGenVectorLight1( light->genVectorLight1() );
+            tfLight_el->setGenVectorLight2( light->genVectorLight2() );
+            tfLight_el->setGenVectorHadrB(  light->genVectorHadrB()  );
+            tfLight_el->setGenVectorLeptB(  light->genVectorLeptB()  );
+            tfLight_el->setGenVectorLepton( light->genVectorLepton() );
+
+            TFLightTree->Fill();
+            delete tfLight_el;
+            //----  End of Tree file filling (for TF's after evtSel)  ----//
+          }*/
+        }
  
         //Write out the LHCO output!
         if( getLHCOOutput && bTagChoiceMade){
@@ -433,43 +588,41 @@ int main (int argc, char *argv[])
     //------------------------------//
     if(dataSetName.find("TTbarJets_SemiLept") == 0 && getMassFits){
       std::cout << " -----------------     Fitting the different mass distributions    --------------------- \n" << endl;   
-      histo1D["Mlb_CorrectTTEvts"]->Fit("gaus","Q");     
-      histo1D["TopMass_Hadr_CorrectTTEvts"]->Fit("gaus","Q");
-      histo1D["WMass_Hadr_CorrectTTEvts"]->Fit("gaus","Q");
-      histo1D["Mlb_CorrectTTEvts"]->Fit("gaus","Q","", histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) - histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2),
-                                                       histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) + histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2));
-      histo1D["TopMass_Hadr_CorrectTTEvts"]->Fit("gaus","Q","",
-                                                 histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) - histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2),
-                                                 histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) + histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2));
-      histo1D["WMass_Hadr_CorrectTTEvts"]->Fit("gaus","Q","",
-                                               histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) - histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2),
-                                               histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) + histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2));
+      histo1D["Mlb_CorrTT"]->Fit("gaus","Q");     
+      histo1D["HadrMTop_CorrTT"]->Fit("gaus","Q");
+      histo1D["HadrMW_CorrTT"]->Fit("gaus","Q");
+      histo1D["Mlb_CorrTT"]->Fit("gaus","Q","", histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(1)-histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(2),
+                                                histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(1)+histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(2));
+      histo1D["HadrMTop_CorrTT"]->Fit("gaus","Q","", histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(2),
+                                                     histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(2));
+      histo1D["HadrMW_CorrTT"]->Fit("gaus","Q","",histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(2),
+                                                  histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(2));
       
       //Write out the mass values!
-      std::cout << "   ** Mlb  = " << histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1)          << " +- " << histo1D["Mlb_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2) << endl;
-      std::cout << "   ** Mqqb = " << histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["TopMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2) << endl;
-      std::cout << "   ** MW   = " << histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["WMass_Hadr_CorrectTTEvts"]->GetFunction("gaus")->GetParameter(2) << std::endl;
+      std::cout << "   ** Mlb  = " << histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(1)      << " +- " << histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(2) << endl;
+      std::cout << "   ** Mqqb = " << histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(2) << endl;
+      std::cout << "   ** MW   = " << histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(2) << std::endl;
     
       //Output for the different b-tags
       for(int ibTag = 0; ibTag < NrBTags; ibTag++){
-        histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->Fit("gaus","Q");
-        histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->Fit("gaus","Q","", 
-                                                         histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) - histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
-                                                         histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) + histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
-        histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->Fit("gaus","Q","",
-                                          histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) - histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
-                                          histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) + histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
-        histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->Fit("gaus","Q","",
-                                               histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) - histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
-                                               histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) + histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
+        histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q");
+        histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q","", 
+                                                         histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
+                                                         histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
+        histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q","",
+                                          histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
+                                          histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
+        histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q","",
+                                               histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
+                                               histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
       
         //Write out the mass values!
-        cout << "\n   ** Mlb  -- " << bTitle[ibTag] << " = " << histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)          << " +- " << histo1D["Mlb_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
-        cout << "   ** Mqqb -- " << bTitle[ibTag] << " = " << histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["TopMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
-        cout << "   ** MW   -- " << bTitle[ibTag] << " = " << histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["WMass_Hadr_CorrectTTEvts_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << std::endl;
+        cout << "\n   ** Mlb  -- " << bTitle[ibTag] << " = " << histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)    << " +- " << histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
+        cout << "   ** Mqqb -- " << bTitle[ibTag] << " = " << histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
+        cout << "   ** MW   -- " << bTitle[ibTag] << " = " << histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << std::endl;
       }
     }
- 
+
     //--- Get output from bTagStudy class ---//
     if(dataSetName.find("TTbarJets_SemiLept") == 0) bTagStudy.ReturnBTagTable();
     bTagStudy.CreateHistograms(outputFile, savePDF, pathPNG, iDataSet);  //Security is added inside class such that MSPlots are only written when all datasets are considered!
@@ -478,14 +631,38 @@ int main (int argc, char *argv[])
     if(getLHCOOutput && bTagChoiceMade) lhcoOutput.WriteLHCOPlots(outputFile);
 
     //--- Get output form the ExtraEvtSel class ---//
-//    if(dataSetName.find("TTbarJets_SemiLept") == 0) extraEvtSelCuts.StoreCutInfluence(outputFile);
+    extraEvtSelCuts.StoreCutInfluence(outputFile);
 
     //---- Close the EventNrMatching output file for the considered dataset
     if(bTagChoiceMade && getLHCOOutput) EvtNrMatching.close();
 
+    //------ Store the TF tree ------//
+    if(dataSetName.find("TTbarJets_SemiLept") == 0){
+      //std::cout << " Storing the TFLightTree! " << std::endl;
+      TFLightFile->cd();
+      TTree* configTreeTFLightFile = new TTree("configTreeTFLightFile","configuration Tree in TFLight File");
+      TClonesArray* tcdatasettflightfile = new TClonesArray("Dataset",1);
+      configTreeTFLightFile->Branch("Dataset","TClonesArray",&tcdatasettflightfile);
+      new ((*tcdatasettflightfile)[0]) Dataset(*datasets[iDataSet]);
+      //TClonesArray* tcanaenvlightfile = new TClonesArray("AnalysisEnvironment",1);   --> Needed?
+      //configTreeLightFile->Branch("AnaEnv","TClonesArray",&tcanaenvlightfile);
+      //new ((*tcanaenvlightfile)[0]) AnalysisEnvironment(anaEnv);
+
+      configTreeTFLightFile->Fill();
+      configTreeTFLightFile->Write();
+      TFLightTree->Write();
+      TFLightFile->Close();
+      //----  End of storing Tree  ----//
+    }
+    delete TFLightFile;  //Will need to delete this for each dataset since it is initialized for each of them!
+
     inputFile->Close();
     delete inputFile;
   }//End of loop on datasets
+
+  //Store the b-tag histograms:
+//  if(!bTagPlotsMade)
+//    bTagTool->WriteMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
 
   /////////////////////////
   // Write out the plots //
@@ -530,41 +707,3 @@ int main (int argc, char *argv[])
   
   return 0;
 }
-
-/*
-	if(jetCombi[0]!=9999 && jetCombi[1]!=9999 && jetCombi[2]!=9999 && jetCombi[3]!=9999){    
-	  histo1D["MlbMass"]->Fill((*selJets[jetCombi[0]]+*selLepton).M());
-	  histo1D["MqqbMass"]->Fill((*selJets[jetCombi[2]]+*selJets[jetCombi[3]]+*selJets[jetCombi[1]]).M());
-        }
-
-        ////////////////////////////////
-        //  Mlb and Mqqb information  //
-        ////////////////////////////////
-        float MlbCorrect = 0, MqqbCorrect = 0;
-        if(jetCombi[0] != 9999 && jetCombi[1] != 9999 && jetCombi[2] != 9999 && jetCombi[3] != 9999){
-	  MlbCorrect = (*selLepton+*selJets[jetCombi[0]]).M();
-	  MqqbCorrect = (*selJets[jetCombi[1]] + *selJets[jetCombi[2]] + *selJets[jetCombi[3]]).M();
-	  histo2D["MlbMqqbCorrectAll"]->Fill(MqqbCorrect,MlbCorrect);
-        }
-
-      // Count the number of events:
-      if(decayCh == 0) nSelectedMu++;
-      if(decayCh == 1) nSelectedEl++;
-      
-      ////////////////////////////////   
-      //  Produce Reco LHCO Output  //
-      //  --> Last integer = mode   //
-      //       * 0 ~ all events     //
-      //       * 1 ~ good combi's   //
-      //       * 2 ~ bad combi's    //
-      ////////////////////////////////
-      if( RecoLHCOOutput == true)
-        lhcoOutput.StoreRecoInfo(selLepton, selJets, bTagStudy.getBLeptIndex(ChosenBTag), bTagStudy.getBHadrIndex(ChosenBTag), bTagStudy.getLight1Index5Jets(ChosenBTag), bTagStudy.getLight2Index5Jets(ChosenBTag), decayCh, LeptonRecoCharge, jetCombi);
-
-    //---  Mlb and Mqqb fit result ---//
-    histo1D["MlbMass"]->Fit("gaus","Q");
-    histo1D["MqqbMass"]->Fit("gaus","Q");
-    cout <<"\n values for Mlb :"<< histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MlbMass"]->GetFunction("gaus")->GetParameter(2) << endl;
-    cout <<" values for Mqqb :" << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["MqqbMass"]->GetFunction("gaus")->GetParameter(2) << endl;
-
-*/
