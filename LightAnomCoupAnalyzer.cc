@@ -99,7 +99,7 @@ int main (int argc, char *argv[])
   bool savePDF = false;
   bool bTagChoiceMade = true;  
   bool getMassFits = false;
-  bool bTagPlotsMade = false;
+  bool bTagPlotsMade = true; 
 
   std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root";
   int stop = 0;
@@ -166,10 +166,9 @@ int main (int argc, char *argv[])
   vector<string> inputFiles;
   vector<Dataset*> datasets;
   //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-  std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_12112015_111243/";  ///user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_08112015_200540/";
-  inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                     //Summer13_v4
-  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_10112015_144641/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
-  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_10112015_210750/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v8
+  std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_100848/";
+  inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                     //Winter14_v8
+  //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
   inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_Nominal.root").c_str());
   inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_Nominal.root").c_str());
   inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_Nominal.root").c_str());
@@ -241,26 +240,32 @@ int main (int argc, char *argv[])
       
     MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
 
-    MSPlot["LeptonPt"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
-    MSPlot["LeptonPt_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_AllCutsApplied"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
     MSPlot["LeptonPt_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_BeforePU"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
     MSPlot["LeptonPt_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_BeforeBTag"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
+    MSPlot["LeptonPt"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
+    MSPlot["LeptonPt_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_AllCutsApplied"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
+    MSPlot["LeptonPt_AllCuts_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "LeptonPt_AllCuts_BTagSF"+leptFlav, 150, 0, 200,"Lepton p_{T} (GeV)");
     MSPlot["LeptonEta"+leptFlav] = new MultiSamplePlot(datasets, "LeptonEta"+leptFlav, 100, -2.6, 2.6,"Lepton #eta");
     MSPlot["LeptonEta_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonEta_AllCutsApplied"+leptFlav, 100, -2.6, 2.6,"Lepton #eta");
+    MSPlot["LeptonEta_AllCuts_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "LeptonEta_AllCuts_BTagSF"+leptFlav, 100, -2.6, 2.6,"Lepton #eta");
     MSPlot["LeptonCharge"+leptFlav] = new MultiSamplePlot(datasets, "LeptonCharge"+leptFlav, 150, 0, 200,"Lepton charge");
     MSPlot["LeptonCharge_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "LeptonCharge_AllCutsApplied"+leptFlav, 150, 0, 200,"Lepton charge");
+    MSPlot["LeptonCharge_AllCuts_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "LeptonCharge_AllCuts_BTagSF"+leptFlav, 150, 0, 200,"Lepton charge");
 
-    MSPlot["JetPt_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
-    MSPlot["JetPt_LeadingJet_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_AllCutsApplied"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_BeforePU"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_BeforeBTag"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_LeadingJet_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_AllCutsApplied"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_LeadingJet_AllCuts_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_AllCuts_BTagSF"+leptFlav, 150, 0, 250,"Jet p_{T} (GeV)");
     MSPlot["JetEta_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet"+leptFlav, 150, 0, 200,"Jet #eta");
     MSPlot["JetEta_LeadingJet_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet_AllCutsApplied"+leptFlav, 150, 0, 200,"Jet #eta");
+    MSPlot["JetEta_LeadingJet_AllCuts_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet_AllCuts_BTagSF"+leptFlav, 150, 0, 200,"Jet #eta");
 
-    MSPlot["nPV"+leptFlav] = new MultiSamplePlot(datasets, "nPV"+leptFlav, 50, 0, 50,"Number of primary vertices");
-    MSPlot["nPV_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "nPV_AllCutsApplied"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "nPV_BeforePU"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nPV_BeforeBTag"+leptFlav, 50, 0, 50,"Number of primary vertices");
+    MSPlot["nPV"+leptFlav] = new MultiSamplePlot(datasets, "nPV"+leptFlav, 50, 0, 50,"Number of primary vertices");
+    MSPlot["nPV_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "nPV_AllCutsApplied"+leptFlav, 50, 0, 50,"Number of primary vertices");
+    MSPlot["nPV_AllCuts_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "nPV_AllCuts_BTagSF"+leptFlav, 50, 0, 50,"Number of primary vertices");
   }
 
   //-----------------------//
@@ -308,16 +313,16 @@ int main (int argc, char *argv[])
   //------------------------//
   //Method 1a of https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods will be used!
 
-//  BTagWeightTools *bTagTool = new BTagWeightTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_NOttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
+  BTagWeightTools *bTagTool = new BTagWeightTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_NOttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
   //BTagWeightTools *bTagTool = new BTagWeightsTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_WITHttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
 
   //During a first run the plots need to be created!
-//  if(!bTagPlotsMade){
-//    bTagTool->InitializeMCEfficiencyHistos(15,30.,340.,2);  //How to get these histo-values?
-//  }
-//  else{
-//    bTagTool->ReadMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
-//  }
+  if(!bTagPlotsMade){
+    bTagTool->InitializeMCEfficiencyHistos(15,30.,340.,2);  //How to get these histo-values?
+  }
+  else{
+    bTagTool->ReadMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
+  }
 
   //-----------------------//
   // Load personal classes //
@@ -418,8 +423,8 @@ int main (int argc, char *argv[])
       MSPlot["LeptonPt_BeforePU"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
 
       //Fill the b-tag histo's in case they do not yet exist
-//      if(!bTagPlotsMade)
-//        bTagTool->FillMCEfficiencyHistos(selJets, partFlavour, bTagCSV);
+      if(!bTagPlotsMade)
+        bTagTool->FillMCEfficiencyHistos(selJets, partFlavour, bTagCSV);
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
       //ooOOooOOoo      Reading out nTuples done           ooOOooOOoo
@@ -474,8 +479,9 @@ int main (int argc, char *argv[])
         else if(decayCh == 1) nSelectedEl += 1;
 
         //Get the bTag scaleFactor!
-//        if(bTagPlotsMade)
-//          bTagTool->getMCEventWeight(selJets, partFlavour, bTagCSV, syst_btag, syst_mistag);
+        double BTagWeight = 1;
+        if(bTagPlotsMade && !(dataSetName.find("Data") == 0 || dataSetName.find("DATA") == 0))
+          BTagWeight = bTagTool->getMCEventWeight(selJets, partFlavour, bTagCSV, syst_btag, syst_mistag);
 
         MSPlot["nPV"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
         MSPlot["JetPt_LeadingJet"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
@@ -509,6 +515,13 @@ int main (int argc, char *argv[])
           MSPlot["JetEta_LeadingJet_AllCutsApplied"+leptChannel]->Fill( selJets[0].Eta(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
           MSPlot["LeptonEta_AllCutsApplied"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
           MSPlot["LeptonCharge_AllCutsApplied"+leptChannel]->Fill( leptCharge, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight);
+
+          MSPlot["nPV_AllCuts_BTagSF"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight*BTagWeight);
+          MSPlot["JetPt_LeadingJet_AllCuts_BTagSF"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight*BTagWeight);
+          MSPlot["LeptonPt_AllCuts_BTagSF"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight*BTagWeight);
+          MSPlot["JetEta_LeadingJet_AllCuts_BTagSF"+leptChannel]->Fill( selJets[0].Eta(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight*BTagWeight);
+          MSPlot["LeptonEta_AllCuts_BTagSF"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight*BTagWeight);
+          MSPlot["LeptonCharge_AllCuts_BTagSF"+leptChannel]->Fill( leptCharge, datasets[iDataSet], true, Luminosity*scaleFactor*lumiWeight*BTagWeight);
 
           if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 0){
             tfLight_mu = new TFLight();
@@ -638,7 +651,6 @@ int main (int argc, char *argv[])
 
     //------ Store the TF tree ------//
     if(dataSetName.find("TTbarJets_SemiLept") == 0){
-      //std::cout << " Storing the TFLightTree! " << std::endl;
       TFLightFile->cd();
       TTree* configTreeTFLightFile = new TTree("configTreeTFLightFile","configuration Tree in TFLight File");
       TClonesArray* tcdatasettflightfile = new TClonesArray("Dataset",1);
@@ -661,8 +673,8 @@ int main (int argc, char *argv[])
   }//End of loop on datasets
 
   //Store the b-tag histograms:
-//  if(!bTagPlotsMade)
-//    bTagTool->WriteMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
+  if(!bTagPlotsMade)
+    bTagTool->WriteMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
 
   /////////////////////////
   // Write out the plots //
