@@ -99,7 +99,11 @@ int main (int argc, char *argv[])
   bool savePDF = false;
   bool bTagChoiceMade = true;  
   bool getMassFits = false;
-  bool bTagPlotsMade = true; 
+  bool bTagPlotsMade = true;
+  bool fillTFAfterCuts = false; 
+
+  std::string tfFill = "";
+  if(fillTFAfterCuts) tfFill = "_AfterExtraCuts";
 
   std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root";
   int stop = 0;
@@ -364,7 +368,7 @@ int main (int argc, char *argv[])
     if(dataSetName.find("TTbarJets_SemiLept") == 0){
       std::cout << " --> Going into this loop for dataset : " << dataSetName  << std::endl;
       //Initialize LightTuple (TFTree) specific stuff:
-      TFLightFile = new TFile(("TFTree/TFLight_"+dataSetName+"_"+systematic+".root").c_str(),"RECREATE");  
+      TFLightFile = new TFile(("TFTree/TFLight_"+dataSetName+"_"+systematic+""+tfFill+".root").c_str(),"RECREATE");  
       TFLightTree = new TTree("TFLightTree",("Tree containing the TFLight information for "+dataSetName+" at "+timestamp()).c_str());
       TFLightTree->Branch("TheTFLight_muCh","TFLight",&tfLight_mu);
       //TFLightTree->Branch("TheTFLight_elCh","TFLight",&tfLight_el);
@@ -486,6 +490,30 @@ int main (int argc, char *argv[])
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);
 
+        if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 0 && !fillTFAfterCuts){
+          tfLight_mu = new TFLight();
+            
+          double fullScaleFactor = scaleFactor;   
+          tfLight_mu->setFullScaleFactor(fullScaleFactor);
+          tfLight_mu->setSelectedJets(selJets);
+          tfLight_mu->setSelectedLepton(selLepton);
+          tfLight_mu->setDecayChannel(decayCh);
+          tfLight_mu->setLeptonCharge(leptCharge);
+          tfLight_mu->setCorrectJetCombi(correctJetCombi);
+          tfLight_mu->setMET(MET);
+	
+          //Store the information needed for the TF (but only has value when dataset is ttbar)
+          tfLight_mu->setGenVectorLight1( light->genVectorLight1() );
+          tfLight_mu->setGenVectorLight2( light->genVectorLight2() );
+          tfLight_mu->setGenVectorHadrB(  light->genVectorHadrB()  );
+          tfLight_mu->setGenVectorLeptB(  light->genVectorLeptB()  );
+          tfLight_mu->setGenVectorLepton( light->genVectorLepton() );
+
+          TFLightTree->Fill();
+          delete tfLight_mu;
+          //----  End of Tree file filling (for TF's after evtSel)  ----//
+        }
+
         //*****************//  
         // Apply the b-tag //
         //*****************//  
@@ -540,7 +568,7 @@ int main (int argc, char *argv[])
           MSPlot["LeptonEta_AllCutsApplied"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["LeptonCharge_AllCutsApplied"+leptChannel]->Fill( leptCharge, datasets[iDataSet], true, Luminosity*scaleFactor);
 
-          if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 0){
+          if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 0 && fillTFAfterCuts){
             tfLight_mu = new TFLight();
             
             double fullScaleFactor = scaleFactor;   
