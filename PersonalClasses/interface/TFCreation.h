@@ -29,7 +29,7 @@ class TFCreation{
         TFCreation(int, std::string, bool);
         ~TFCreation();
 	void InitializeVariables();
-	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel);
+	void FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrWJet2, TLorentzVector* hadrBJet, TLorentzVector* leptBJet, TLorentzVector* lepton, TLorentzVector* selHadrWJet1, TLorentzVector* selHadrWJet2, TLorentzVector* selHadrBJet, TLorentzVector* selLeptBJet, TLorentzVector* selLepton, int enumDecayChannel, float scaleFactor);
         void CalculateTFFromFile(string, bool, int, bool, bool, float[], bool, TFile*, int, TFile*);
 	void FitSliceClassCode(TH2F*, bool, int);
         std::vector<double> SetFitRange(std::string, unsigned int, double[]);
@@ -46,6 +46,7 @@ class TFCreation{
 	TF1 *doubleGaussianFit, *caloEnergyFit;
         float* startValuesArray;
         TF1 AllCaloEnergyFits[30];
+        bool doFits_;
 
         double EtaValues[6], ;
         std::string EtaValue[6], EtaBin[5], EtaTitle[5];

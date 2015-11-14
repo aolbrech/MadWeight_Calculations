@@ -48,9 +48,10 @@ int main (int argc, char **argv)
   //  Choose whether created plots are used or Tree information !!  //
   ////////////////////////////////////////////////////////////////////
   bool useTFTree = true;
+  bool useTFAfterCuts = false; 
 
   bool CreateTFFromTree = true; 
-  bool RunFitForTF = false;
+  bool RunFitForTF = true; 
   int nEtaBins = 1;
   bool TFForPhi = false;
   bool TFForTheta = false;
@@ -61,6 +62,9 @@ int main (int argc, char **argv)
   std::string EtaConsidered = "";
   if(nEtaBins == 4) EtaConsidered = "_etaBins";
 
+  std::string tfFill = "";
+  if( useTFAfterCuts) tfFill = "_AfterExtraCuts";
+
   //Used classes
   TFCreation tfCreation(nEtaBins, EtaConsidered, RunFitForTF);
 
@@ -68,9 +72,9 @@ int main (int argc, char **argv)
     //Load the TFTree information
     vector<string> inputTFRoot;
     if(useTFTree)
-      inputTFRoot.push_back("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/TFTree/TFLight_TTbarJets_SemiLept_Nominal.root");         //All corrections applied!
+      inputTFRoot.push_back(("/user/aolbrech/GitTopTree_Feb2014/TopBrussels/AnomalousCouplings/TFTree/TFLight_TTbarJets_SemiLept_Nominal"+tfFill+".root").c_str());   //All corrections applied!
     else
-      inputTFRoot.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_08112015_200540/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
+      inputTFRoot.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_100848/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
   
     //--------------------------------//
     // Lumi reweighting and lepton SF //
@@ -84,9 +88,9 @@ int main (int argc, char **argv)
     cout << " - LumiReWeighting instantiated ... " << endl;
   
     // initialize lepton SF (ROOT files taken from: IsoMu24_eta2p1)
-    LeptonTools* leptonTools = new LeptonTools(false);
-    leptonTools->readMuonSF("PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_ISO_Run_2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/SingleMuonTriggerEfficiencies_eta2p1_Run2012ABCD_v5trees.root");
-    leptonTools->readElectronSF();
+    //LeptonTools* leptonTools = new LeptonTools(false);
+    //leptonTools->readMuonSF("PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_Run2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/MuonEfficiencies_ISO_Run_2012ReReco_53X.root","PersonalClasses/Calibrations/LeptonSF/SingleMuonTriggerEfficiencies_eta2p1_Run2012ABCD_v5trees.root");
+    //leptonTools->readElectronSF();
 
     for(unsigned int iDataSet = 0; iDataSet <inputTFRoot.size(); iDataSet++){
       TFile* inputTFFile = new TFile(inputTFRoot[iDataSet].c_str(),"READ");
@@ -177,7 +181,7 @@ int main (int argc, char **argv)
 	  else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
 
 	  //Fill the histograms of the TFCreation class!
-	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel);
+	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, scaleFactor);
 
         }//Only for matched particles reconstructed!
       }//Loop on events
