@@ -50,7 +50,7 @@ int main (int argc, char **argv)
   bool useTFTree = true;
   bool useTFAfterCuts = false; 
 
-  bool CreateTFFromTree = true; 
+  bool CreateTFFromTree = false;
   bool RunFitForTF = true; 
   int nEtaBins = 1;
   bool TFForPhi = false;
@@ -181,7 +181,8 @@ int main (int argc, char **argv)
 	  else                       decayChannel = isSemiMu; //Muon     channel --> decayChannel == 0
 
 	  //Fill the histograms of the TFCreation class!
-	  tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, scaleFactor);
+          if(genPart[0].E() < 260 && genPart[1].E() < 260 && genPart[2].E() < 260 && genPart[3].E() < 260 && genPart[4].E() < 180)
+	    tfCreation.FillHistograms( &genPart[0], &genPart[1], &genPart[2], &genPart[3], &genPart[4], &recoPart[0], &recoPart[1], &recoPart[2], &recoPart[3], &recoPart[4], decayChannel, scaleFactor);
 
         }//Only for matched particles reconstructed!
       }//Loop on events

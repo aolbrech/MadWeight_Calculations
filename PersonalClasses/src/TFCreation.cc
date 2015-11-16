@@ -26,7 +26,7 @@ TFCreation::TFCreation(int nEtaBins, std::string etaCons, bool doFits){
   }
  
   //2) Calorimeter Energy formula (ai = ai0 + ai1*Ep + ai2*sqrt(Ep)) --> its range depends on the part energy range (hence, the X-axis)
-  caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");
+  caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x+[3]*x*x");
   if(doFits){ caloFitFile = new TFile(("TFInformation/CaloEnergyFitFunctions"+etaCons+".root").c_str(),"RECREATE");}
 
   //Store the EtaBin Title and Name for the histograms!
@@ -190,7 +190,7 @@ void TFCreation::FillHistograms(TLorentzVector* hadrWJet1, TLorentzVector* hadrW
   //Should use Pt information in stead of E!   ... BUT ... doesn't work in MadWeight as expected ....
   // --> Both concepts are identical in the case of CaloJets, but not in the case of PF
   // --> PF uses massive objects to construct particles!
-
+  
   histo1D["DeltaR_TFClass_Light1"]->Fill( hadrWJet1->DeltaR(*selHadrWJet1) ,scaleFactor);
   histo1D["DeltaR_TFClass_Light2"]->Fill( hadrWJet2->DeltaR(*selHadrWJet2) ,scaleFactor);
   histo1D["DeltaR_TFClass_HadrB"]->Fill( hadrBJet->DeltaR(*selHadrBJet) ,scaleFactor);
@@ -397,13 +397,11 @@ void TFCreation::CalculateTFFromFile(string fitHistoName, bool useStartValues, i
   for( int ipar = 0; ipar < nParsFit_; ipar++ ){
     
     //Set the name and function formula of this parameter fit correctly!
-    caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x");          //Only expect the calorimeter behavior for the sigma's of the gaussians! 
-    if(ipar == 2){
-      if(fitHistName.find("Light") < fitHistSize) caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x"); 
-      if(fitHistName.find("BJet") < fitHistSize)  caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x+[5]*x*x*x*x*x");
-    }
+    caloEnergyFit = new TF1("caloEnergyFit", "[0]+[1]*sqrt(x)+[2]*x+[3]*x*x");
+    if( ( (ipar == 0 || ipar == 2) && fitHistName.find("BJet") < fitHistSize) || (ipar == 0 && fitHistName.find("Light") < fitHistSize) )
+      caloEnergyFit = new TF1("caloEnergyFit","[0]+[1]*sqrt(x)+[2]*x+[3]*x*x+[4]*x*x*x");
+    
     for(int ii = 0; ii < caloEnergyFit->GetNpar(); ii++) caloEnergyFit->SetParName(ii, ( parnames_[ipar]+tostr(ii)).c_str() );
-
     FitMin_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[0];                            
     FitMax_[nParsFit_*whichEtaBin+ipar] = grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetX()[grE_ParamFit[nParsFit_*whichEtaBin+ipar]->GetN()-1]; //-1 is because bins go from 0 to N (Keep overflow when it is well determined!!)
 
@@ -464,13 +462,13 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   int binEnd[10] = {50};
   int nCombBins = 0;
   if(     histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){ 
-    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 14; binEnd[0] = 15; binStart[1] = 16; binEnd[1] = 17; binStart[2] = 18; binEnd[2] = 19;}
+    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 10; binEnd[0] = 11; binStart[1] = 12; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 19; lastBin = 15;}
     else if(histoName.find("Eta_0_")    <= histoName.size()){ binStart[0] = 12; binEnd[0] = 14;}
     else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 14; binEnd[0] = 15; binStart[1] = 16; binEnd[1] = 18;}
     else if(histoName.find("1p45") <= histoName.size()     ){ binStart[0] = 13; binEnd[0] = 14; binStart[1] = 15; binEnd[1] = 16; binStart[2] = 17; binEnd[2] = 18;}
   }
   else if(histoName.find("Light_DiffEVsGenE") <= histoName.size()){
-    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 1; binEnd[0] = 2;}
+    if(histoName.find("Eta") > histoName.size() ){            binStart[0] = 2; binEnd[0] = 3; binStart[1] = 12; binEnd[1] = 13; binStart[2] = 14; binEnd[2] = 15; binStart[3] = 16; binEnd[3] = 17; lastBin = 16;}
     if(histoName.find("Eta_0_")         <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 17; lastBin = 15;}
     else if(histoName.find("Eta_0p375") <= histoName.size()){ binStart[0] = 1; binEnd[0] = 2; binStart[1] = 13; binEnd[1] = 14; binStart[2] = 15; binEnd[2] = 17; lastBin = 15;}
     else if(histoName.find("Eta_0p75")  <= histoName.size()){ binStart[0] = 2; binEnd[0] = 3; binStart[1] = 15; binEnd[1] = 17; lastBin = 15;}
@@ -492,13 +490,14 @@ void TFCreation::FitSliceClassCode(TH2F* histoFit, bool ChangeFitRange, int etaB
   int binToSkip[10] = {50};
   int nSkippedBins = 0;
   if( histoName.find("BJet_DiffEVsGenE") <= histoName.size() ){
-    if(histoName.find("Eta") > histoName.size() ){ binToSkip[0] = 1; lastBin = 18;}
+    if(histoName.find("Eta") > histoName.size() ){ binToSkip[0] = 1; }
     if(histoName.find("Eta_0_")    <= histoName.size() ){ binToSkip[0] = 15; binToSkip[1] = 16; binToSkip[2] = 17; binToSkip[3] = 18; binToSkip[4] = 19; lastBin = 12;}
     else if(histoName.find("Eta_0p75")  <= histoName.size() )  binToSkip[0] = 1;
     else if(histoName.find("Eta_1p45")  <= histoName.size() ){ binToSkip[0] = 1;  binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
   }
   else if(histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
-    if(histoName.find("Eta_0p75") <= histoName.size() ){ binToSkip[0] = 1;}
+    if(histoName.find("Eta") > histoName.size() )            binToSkip[0] = 1;
+    else if(histoName.find("Eta_0p75") <= histoName.size() ){binToSkip[0] = 1;}
     else if(histoName.find("Eta_1p45") <= histoName.size() ){binToSkip[0] = 1; binToSkip[1] = 2; binToSkip[2] = 3; binToSkip[3] = 4; binToSkip[4] = 5;}
   }
   else if(histoName == "El_DiffEVsGenE_Eta_0_0p375"){binToSkip[0] = 18; binToSkip[1] = 19; binToSkip[2] = 20; binToSkip[3] = 21; binToSkip[4] = 22; binToSkip[5] = 23; binToSkip[6] = 24; binToSkip[7] = 25; binToSkip[8] = 26; lastBin = 15;}
@@ -713,8 +712,8 @@ std::vector<double> TFCreation::SetFitRange(std::string histoName, unsigned int 
 
   if(histoName.find("Light_DiffEVsGenE") <= histoName.size() ){
     if(histoName.find("Eta") > histoName.size() ){
-      double FitRangeNeg[7] = {-49, -50, -45, -50, -53, -61, -70}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
-      double FitRangePos[7] = {  9,  11,  17,  22,  28,  35,  41}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
+      double FitRangeNeg[10] = {-41, -40, -45, -50, -53, -56, -63, -70, -75, -75}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
+      double FitRangePos[10] = { 14,  14,  17,  22,  28,  33,  39,  44,  52,  56}; if(iBin <= sizeof(FitRangePos)/sizeof(FitRangePos[0])) FitRangeBinPos = FitRangePos[iBin-1];
     }
     else if(histoName.find("Eta_0_") <= histoName.size()){
       double FitRangeNeg[8] = {-16, -10, -21, -23, -25, -30, -32, -35}; if(iBin <= sizeof(FitRangeNeg)/sizeof(FitRangeNeg[0])) FitRangeBinNeg = FitRangeNeg[iBin-1];
@@ -817,9 +816,9 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   //Is Pt or E dependent considered
   int whichDep = TFDep;
 
-  string TFDependency[3]  =     {"","*dsqrt("+pVar[whichDep]+")",   "*"+pVar[whichDep]   };
-  string TFDependencyConst[6] = {"","*"+pVar[whichDep],             "*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4","*"+pVar[whichDep]+"**5"};
-  string WidthDependency[3] =   {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep]};
+  //string TFDependency[3]  =     {"","*dsqrt("+pVar[whichDep]+")",   "*"+pVar[whichDep]   };
+  string TFDependencyConst[7] = {"","*dsqrt("+pVar[whichDep]+")",   "*"+pVar[whichDep],   "*"+pVar[whichDep]+"**2","*"+pVar[whichDep]+"**3","*"+pVar[whichDep]+"**4","*"+pVar[whichDep]+"**5"};
+  string WidthDependency[4] =   {"","*dsqrt("+pexpVar[whichDep]+")","*"+pexpVar[whichDep],"*"+pexpVar[whichDep]+"**2"};
   //if(partName == "muon" && whichDep == 1){
   //  TFDependencyWidth[1] = "*dsqrt(1d0/"+pVar[whichDep]+")"; TFDependencyWidth[2] = "*1d0/"+pVar[whichDep]+")";
   //  TFDependency[1] = "*1d0/"+pVar[whichDep]; TFDependency[2] = "*1d0/"+pVar[whichDep]+"**2"; TFDependency[3] = "*1d0/"+pVar[whichDep]+"**3"; TFDependency[4] = "*1d0/"+pVar[whichDep]+"**4)";
@@ -859,6 +858,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
       grE_ParamFit[iEta*nParsFit_+ipar]->GetXaxis()->SetTitle(("Generator parton energy (GeV) -- Fit between "+tostr(FitMin_[iEta*nParsFit_+ipar])+" and "+tostr(FitMax_[iEta*nParsFit_+ipar])).c_str());
       AllCaloEnergyFits[iEta*nParsFit_+ipar].SetRange(FitMin_[iEta*nParsFit_+ipar], FitMax_[iEta*nParsFit_+ipar]);
       AllCaloEnergyFits[iEta*nParsFit_+ipar].Draw("same");
+      std::cout << " Experimental formula for " << ipar << " is : " << AllCaloEnergyFits[iEta*nParsFit_+ipar].GetExpFormula() << std::endl;
       canv->SaveAs(("TFInformation/Plots/"+string(AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName())+".pdf").c_str());
       delete canv;
       *LaTeX << "  \\includegraphics[width = 0.45 \\textwidth]{Plots/" << AllCaloEnergyFits[iEta*nParsFit_+ipar].GetName() << ".pdf}";
@@ -881,11 +881,11 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
           }
         }
 
-	if(icalpar != 0 && ipar == 2){ provFormula += "+#"+tostr(dummyCounter)+TFDependencyConst[icalpar];}
-	else if(icalpar != 0){         provFormula += "+#"+tostr(dummyCounter)+TFDependency[icalpar];     
+	if(icalpar != 0){ 
+          provFormula += "+#"+tostr(dummyCounter)+TFDependencyConst[icalpar];
           if(ipar == 1 || ipar == 4) WidthText.push_back("+#"+tostr(dummyCounter)+WidthDependency[icalpar]);
         }
-        if( icalpar == NrConsideredCaloPars-1){ provFormula += " )"; if(ipar == 1 || ipar == 4) WidthText.push_back(" )");}
+        if( icalpar == NrConsideredCaloPars-1){ provFormula += " )"; if(ipar == 1 || ipar == 4) WidthText.push_back(" )"); std::cout << " provFormula is : " << provFormula << std::endl;}
 
         //Now add the cut-off!
         if(     NrConsideredCaloPars == 3 && icalpar == 1){
@@ -962,7 +962,7 @@ void TFCreation::WriteTF(ostream &myTFTable, ostream &myTransferCard, ostream &m
   else               *LaTeX << " \\caption{Fit distributions for " << EtaValues[nEtaBins_] << " $<$ $\\vert \\eta \\vert$ $<$ " << EtaValues[nEtaBins_+1] << "}\n";
   *LaTeX << "\\end{figure} " << endl;
 
-  for(int ii = 0; ii < indivFitHistos.size(); ii++)
+  for(unsigned int ii = 0; ii < indivFitHistos.size(); ii++)
     *LaTeX << indivFitHistos[ii];
   *LaTeX << " " << endl;
 
