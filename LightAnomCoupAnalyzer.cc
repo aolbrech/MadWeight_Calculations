@@ -99,8 +99,9 @@ int main (int argc, char *argv[])
   bool savePDF = false;
   bool bTagChoiceMade = true;  
   bool getMassFits = false;
-  bool bTagPlotsMade = true;
-  bool fillTFAfterCuts = false; 
+  bool bTagPlotsMade = true;         //Decide whether the bTag distributions for the efficiencies should be created or read from file
+  bool createTFTree = false;         //Decide whether the TFTree should be made or just skipped during this run! 
+  bool fillTFAfterCuts = false;      //Decide whether the TFTree is filled before or after the additional event selection cuts (b-tag, chi-sq and Mw-Mt)
 
   std::string tfFill = "";
   if(fillTFAfterCuts) tfFill = "_AfterExtraCuts";
@@ -214,7 +215,7 @@ int main (int argc, char *argv[])
        dataSet->Name().find("SingleTop") == 0)       color = kMagenta;
     if(dataSet->Name().find("WJets") == 0){          color = kGreen-3; dataSet->SetTitle("W#rightarrowl#nu");}      
     if(dataSet->Name().find("ZJets") == 0){          color = kAzure-2; dataSet->SetTitle("Z/#gamma*#rightarrowl^{+}l^{-}");}
-    if(dataSet->Name().find("Data_Mu") == 0){        color = kBlack; dataSet->SetTitle("Data"); dataSet->SetEquivalentLuminosity(Luminosity);}
+    if(dataSet->Name().find("Data_Mu") == 0){        color = kBlack; dataSet->SetTitle("Data"); dataSet->SetName("Data_Mu_Merged"); dataSet->SetEquivalentLuminosity(Luminosity);}
 
     Dataset* tmpDS = new Dataset(dataSet->Name(), dataSet->Title(), dataSet->DoIt(), color, dataSet->LineStyle(), dataSet->LineWidth(), dataSet->NormFactor(), dataSet->Xsection());
     tmpDS->SetEquivalentLuminosity( dataSet->EquivalentLumi() );
@@ -273,6 +274,9 @@ int main (int argc, char *argv[])
     MSPlot["nPV"+leptFlav] = new MultiSamplePlot(datasets, "nPV"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "nPV_BTagSF"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_AllCutsApplied"+leptFlav] = new MultiSamplePlot(datasets, "nPV_AllCutsApplied"+leptFlav, 50, 0, 50,"Number of primary vertices");
+
+    MSPlot["CSVDistr_BJets"+leptFlav] = new MultiSamplePlot(datasets, "CSVDistr_BJets"+leptFlav,50,-1,2,"CSV discriminant");
+    MSPlot["CSVDistr_LightJets"+leptFlav] = new MultiSamplePlot(datasets, "CSVDistr_LightJets"+leptFlav,50,-1,2,"CSV discriminant");
   }
 
   //-----------------------//
@@ -281,22 +285,6 @@ int main (int argc, char *argv[])
   map<string,TH1F*> histo1D;
   map<string,TH2F*> histo2D;  
 
-  histo1D["Mlb_CorrTT"] = new TH1F("Mlb_CorrTT", "mass_{l,b} for the actual semi-leptonic ttbar events", 200, 0, 250);
-  histo1D["HadrMTop_CorrTT"] = new TH1F("HadrMTop_CorrTT", "Hadronic m_{t} for the actual semi-leptonic ttbar events", 200, 50, 350);
-  histo1D["HadrMW_CorrTT"] = new TH1F("HadrMW_CorrTT", "Hadronic m_{W} for the actual semi-leptonic ttbar events", 200, 0, 250);
-  histo2D["MW_vs_MTop_CorrTT"] = new TH2F("MW_vs_MTop_CorrTT","Hadronic m_{W} versus m_{t} for the actual semi-leptonic ttbar jet combinations",200,50,350,200,0,250);
-
-  //histo1D["CosTheta_SelEvts"] = new TH1F("CosTheta_SelectedEvents","Cos #theta^{*} distribution for selected RECO events",200, -1, 1);
-  histo1D["CosTheta_Gen_SelEvts_Mu"] = new TH1F("CosTheta_Gen_SelEvts_Mu","Cos #theta^{*}_{gen} distribution for the selected events (muon channel)",200,-1,1);
-  histo1D["CosTheta_Gen_SelEvts_El"] = new TH1F("CosTheta_Gen_SelEvts_El","Cos #theta^{*}_{gen} distribution for the selected events (elec channel)",200,-1,1);
-  histo1D["CosTheta_Gen_SelEvts"] = new TH1F("CosTheta_Gen_SelEvts","Cos #theta^{*}_{gen} distribution for the selected events",200,-1,1);
-
-  for(int ibTag = 0; ibTag < NrBTags; ibTag++){
-    histo1D["Mlb_CorrTT_"+bTitle[ibTag]]        = new TH1F(("Mlb_CorrTT_"+bTitle[ibTag]).c_str(),  ("mass_{l,b} for the actual semi-leptonic ttbar events -- "+bTitle[ibTag]).c_str(), 200, 0, 250);
-    histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]   = new TH1F(("HadrMTop_CorrTT_"+bTitle[ibTag]).c_str(), ("Hadronic m_{t} for the actual semi-leptonic ttbar events -- "+bTitle[ibTag]).c_str(), 200, 50, 350);
-    histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]     = new TH1F(("HadrMW_CorrTT_"+bTitle[ibTag]).c_str(),   ("Hadronic m_{W} for the actual semi-leptonic ttbar events -- "+bTitle[ibTag]).c_str(), 200, 0, 250);
-    histo2D["MW_vs_MTop_CorrTT_"+bTitle[ibTag]] = new TH2F(("MW_vs_MTop_CorrTT_"+bTitle[ibTag]).c_str(), ("Hadronic m_{W} versus m_{t} for actual semi-lept ttbar events -- "+bTitle[ibTag]).c_str(), 200, 50, 350, 200, 0,250);
-  }
 
   //--------------------------------//
   // Lumi reweighting and lepton SF //
@@ -325,7 +313,7 @@ int main (int argc, char *argv[])
 
   //During a first run the plots need to be created!
   if(!bTagPlotsMade){
-    bTagTool->InitializeMCEfficiencyHistos(15,30.,340.,2);  //How to get these histo-values?
+    bTagTool->InitializeMCEfficiencyHistos(50,30.,340.,2);  //How to get these histo-values?
   }
   else{
     bTagTool->ReadMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
@@ -358,18 +346,58 @@ int main (int argc, char *argv[])
     else                    nrEvts = nrEvtsComLine;
   
     Dataset* dataSet = datasets[iDataSet];//(Dataset*) tc_dataset->At(0);
-    string dataSetName = dataSet->Name();
-    if(verbosity > 0) std::cout << "\n   *** Looking at dataset "<< dataSetName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nrEvts << " events (total = " << inLightTree->GetEntries() << ") ! " << std::endl;
+    string dsName = dataSet->Name();
+    string dsTitle = dataSet->Title();
+    if(verbosity > 0) std::cout << "\n   *** Looking at dataset "<< dsName << " (" << iDataSet+1 << "/" << inputFiles.size() << ") with " << nrEvts << " events (total = " << inLightTree->GetEntries() << ") !" << std::endl;
+
+    //**** Create the 1D and 2D histograms for each dataset specific! ****//
+    histo1D["BTagEfficiency_"+dsName] = new TH1F(("BTagEfficiency_"+dsName).c_str(),("b-tag scale factor for "+dsTitle).c_str(),200, 0,2);
+    histo1D["lumiWeight_"+dsName] = new TH1F(("lumiWeight_"+dsName).c_str(),("lumi reweighting distribution for "+dsTitle).c_str(),200,0,2);
+    histo1D["leptonSF_"+dsName] = new TH1F(("leptonSF_"+dsName).c_str(), ("lepton scale factor for "+dsTitle).c_str(),200,0,2);
+
+    histo2D["bTagEff_vs_BJetPt_"+dsName] = new TH2F(("bTagEff_vs_BJetPt_"+dsName).c_str(),("btag SF versus b-jet PT for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_BJetPt_partFlavB_"+dsName] = new TH2F(("bTagEff_vs_BJetPt_partFlavB_"+dsName).c_str(),("btag SF versus b-jet PT (partFlav = b-jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_BJetPt_partFlavC_"+dsName] = new TH2F(("bTagEff_vs_BJetPt_partFlavC_"+dsName).c_str(),("btag SF versus b-jet PT (partFlav = c-jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_BJetPt_partFlavLight_"+dsName] = new TH2F(("bTagEff_vs_BJetPt_partFlavLight_"+dsName).c_str(),("btag SF versus b-jet PT (partFlav = light jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_LightJetPt_"+dsName] = new TH2F(("bTagEff_vs_LightJetPt_"+dsName).c_str(),("btag SF versus light jet PT for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_LightJetPt_partFlavB_"+dsName] = new TH2F(("bTagEff_vs_LightJetPt_partFlavB_"+dsName).c_str(),("btag SF versus light jet PT (partFlav = b-jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_LightJetPt_partFlavC_"+dsName] = new TH2F(("bTagEff_vs_LightJetPt_partFlavC_"+dsName).c_str(),("btag SF versus light jet PT (partFlav = c-jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_LightJetPt_partFlavLight_"+dsName] = new TH2F(("bTagEff_vs_LightJetPt_partFlavLight_"+dsName).c_str(),("btag SF versus light jet PT (partFlav = light jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo2D["bTagEff_vs_JetPt_partFlavLight_"+dsName] = new TH2F(("bTagEff_vs_JetPt_partFlavLight_"+dsName).c_str(),("btag SF versus jet PT (partFlav = light jet) for "+dsTitle).c_str(),800,0,800,150,0,1);
+    histo1D["partonFlav_BJets_"+dsName] = new TH1F(("partonFlav_BJets_"+dsName).c_str(),("parton flavour for b-jets ("+dsTitle+")").c_str(),101,-0.5,100.5);
+    histo1D["partonFlav_LightJets_"+dsName] = new TH1F(("partonFlav_LightJets_"+dsName).c_str(),("parton flavour for light jets ("+dsTitle+")").c_str(),101,-0.5,100.5);
+    
+
+    //Only want these to be filled for TTbarJets_SemiMu!  (what about FullLept and FullHadr ??)
+    if(dsName.find("TTbarJets_SemiLept") == 0){ 
+      histo1D["Mlb_CorrTT_"+dsName]        = new TH1F(("Mlb_CorrTT_"+dsName).c_str(),       ("mass_{l,b} for the actual "+dsTitle+" events").c_str(),     200,  0, 250);
+      histo1D["HadrMTop_CorrTT_"+dsName]   = new TH1F(("HadrMTop_CorrTT_"+dsName).c_str(),  ("Hadronic m_{t} for the actual "+dsTitle+" events").c_str(), 200, 50, 350);
+      histo1D["HadrMW_CorrTT_"+dsName]     = new TH1F(("HadrMW_CorrTT_"+dsName).c_str(),    ("Hadronic m_{W} for the actual "+dsTitle+" events").c_str(), 200,  0, 250);
+      histo2D["MW_vs_MTop_CorrTT_"+dsName] = new TH2F(("MW_vs_MTop_CorrTT_"+dsName).c_str(),("Hadronic m_{W} versus m_{t} for the actual "+dsTitle+" jet combinations").c_str(),200,50,350,200,0,250);
+
+      for(int ibTag = 0; ibTag < NrBTags; ibTag++){
+        histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]        = new TH1F(("Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]).c_str(),  ("mass_{l,b} for the actual "+dsTitle+" events -- "+bTitle[ibTag]).c_str(), 200, 0, 250);
+        histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]   = new TH1F(("HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]).c_str(), ("Hadronic m_{t} for the actual "+dsTitle+" events -- "+bTitle[ibTag]).c_str(), 200, 50, 350);
+        histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]     = new TH1F(("HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]).c_str(),   ("Hadronic m_{W} for the actual "+dsTitle+" events -- "+bTitle[ibTag]).c_str(), 200, 0, 250);
+        histo2D["MW_vs_MTop_CorrTT_"+dsName+"_"+bTitle[ibTag]] = new TH2F(("MW_vs_MTop_CorrTT_"+dsName+"_"+bTitle[ibTag]).c_str(), ("Hadronic m_{W} versus m_{t} for actual "+dsTitle+" events -- "+bTitle[ibTag]).c_str(), 200, 50, 350, 200, 0,250);
+      }
+    }
+    
+    for(int ii = 0; ii < 2; ii++){
+      string leptFlav = leptFlavs[ii];
+      histo1D["CosTheta_Gen_SelEvts_"+dsName+""+leptFlav] = new TH1F(("CosTheta_Gen_SelEvts_"+dsName+""+leptFlav).c_str(),("Cos #theta^{*}_{gen} distribution for the selected "+dsTitle+" events").c_str(),200,-1,1);
+    }
+    histo1D["CosTheta_Gen_SelEvts_"+dsName] = new TH1F(("CosTheta_Gen_SelEvts_"+dsName).c_str(),("Cos #theta^{*}_{gen} distribution for the selected "+dsTitle+" events").c_str(),200,-1,1);
 
     TFLight* tfLight_mu = 0;
     //TFLight* tfLight_el = 0;
     TTree* TFLightTree;
     TFile* TFLightFile = 0;
-    if(dataSetName.find("TTbarJets_SemiLept") == 0){
-      std::cout << " --> Going into this loop for dataset : " << dataSetName  << std::endl;
+    if(dsName.find("TTbarJets_SemiLept") == 0 && createTFTree){
+      std::cout << " --> Going into this loop for dataset : " << dsName  << std::endl;
       //Initialize LightTuple (TFTree) specific stuff:
-      TFLightFile = new TFile(("TFTree/TFLight_"+dataSetName+"_"+systematic+""+tfFill+".root").c_str(),"RECREATE");  
-      TFLightTree = new TTree("TFLightTree",("Tree containing the TFLight information for "+dataSetName+" at "+timestamp()).c_str());
+      TFLightFile = new TFile(("TFTree/TFLight_"+dsName+"_"+systematic+""+tfFill+".root").c_str(),"RECREATE");  
+      TFLightTree = new TTree("TFLightTree",("Tree containing the TFLight information for "+dsName+" at "+timestamp()).c_str());
       TFLightTree->Branch("TheTFLight_muCh","TFLight",&tfLight_mu);
       //TFLightTree->Branch("TheTFLight_elCh","TFLight",&tfLight_el);
     }
@@ -377,15 +405,15 @@ int main (int argc, char *argv[])
     //-----------------------//
     // Load personal classes //
     //-----------------------//
-    bTagStudy.InitializeDataSet(dataSetName);
+    bTagStudy.InitializeDataSet(dsName);
     LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
-    extraEvtSelCuts.Initialize(bTitle[0], dataSetName);
-    lhcoOutput.Initialize("Reco", dataSetName);
+    extraEvtSelCuts.Initialize(bTitle[0], dsName);
+    lhcoOutput.Initialize("Reco", dsName);
 
     ofstream EvtNrMatching;
     if(bTagChoiceMade && getLHCOOutput){
-      EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/EventNrMatching_"+dataSetName+".txt").c_str());
-      EvtNrMatching << "  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)   " << endl;
+      EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/EventNrMatching_"+dsName+".txt").c_str());
+      EvtNrMatching << "  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)    MC scale factor" << endl;
     }
 
     // --------------------------- //
@@ -400,7 +428,7 @@ int main (int argc, char *argv[])
       //*** Start with corrections ***//
       // Beam scraping and PU reweighting
       double lumiWeight = 1;  
-      if(! (dataSetName.find("Data") == 0 || dataSetName.find("data") == 0 || dataSetName.find("DATA") == 0) ){   
+      if(! (dsName.find("Data") == 0 || dsName.find("data") == 0 || dsName.find("DATA") == 0) ){   
         if(doLumiWeightShift == "Nominal")    lumiWeight = LumiWeights.ITweight( (int)light->nTruePU() );
         else if(doLumiWeightShift == "Plus")  lumiWeight = LumiWeightsUp.ITweight( (int)light->nTruePU() );
         else if(doLumiWeightShift == "Minus") lumiWeight = LumiWeightsDown.ITweight( (int)light->nTruePU() );
@@ -430,17 +458,19 @@ int main (int argc, char *argv[])
       MSPlot["JetPt_LeadingJet_BeforePU"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["LeptonPt_BeforePU"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       scaleFactor = scaleFactor * lumiWeight;
+      histo1D["lumiWeight_"+dsName]->Fill(lumiWeight);
 
       MSPlot["nPV_PU_NoLeptonSF"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["JetPt_LeadingJet_PU_NoLeptonSF"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["LeptonPt_PU_NoLeptonSF"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       //Get the correct lepton scalefactor!
       double leptonSF = 1;
-      if(decayCh == 0 && !(dataSetName.find("Data") == 0 || dataSetName.find("DATA") == 0 || dataSetName.find("data") == 0) )
+      if(decayCh == 0 && !(dsName.find("Data") == 0 || dsName.find("DATA") == 0 || dsName.find("data") == 0) )
         leptonSF = leptonTools->getMuonSF(selLepton.Eta(), selLepton.Pt(), systematic);
-      else if(decayCh == 1 && !(dataSetName.find("Data") == 0 || dataSetName.find("DATA") == 0 || dataSetName.find("data") == 0) )
+      else if(decayCh == 1 && !(dsName.find("Data") == 0 || dsName.find("DATA") == 0 || dsName.find("data") == 0) )
         leptonSF = leptonTools->getElectronSF(selLepton.Eta(), selLepton.Pt(), systematic);
-      scaleFactor = scaleFactor * leptonSF;  
+      scaleFactor = scaleFactor * leptonSF;
+      histo1D["leptonSF_"+dsName]->Fill(leptonSF); 
 
       //Fill the b-tag histo's in case they do not yet exist
       if(!bTagPlotsMade)
@@ -461,12 +491,12 @@ int main (int argc, char *argv[])
       MSPlot["LeptonPt_BeforeBTag"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
 
       //Store the expected Mlb, Mqqb, Mt and MW distributions
-      if(dataSetName.find("TTbarJets_SemiLept") == 0){
+      if(dsName.find("TTbarJets_SemiLept") == 0){
         if(correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999 && correctJetCombi[2] != 9999 && correctJetCombi[3] != 9999){
-          histo1D["Mlb_CorrTT"]->Fill( (selLepton+selJets[correctJetCombi[0]]).M());
-          histo1D["HadrMTop_CorrTT"]->Fill( (selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M() );
-          histo1D["HadrMW_CorrTT"]->Fill( (selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M());
-          histo2D["MW_vs_MTop_CorrTT"]->Fill( (selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M(), (selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M() );
+          histo1D["Mlb_CorrTT_"+dsName]->Fill( (selLepton+selJets[correctJetCombi[0]]).M());
+          histo1D["HadrMTop_CorrTT_"+dsName]->Fill( (selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M() );
+          histo1D["HadrMW_CorrTT_"+dsName]->Fill( (selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M());
+          histo2D["MW_vs_MTop_CorrTT_"+dsName]->Fill( (selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M(), (selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M() );
         }
       }
  
@@ -490,7 +520,7 @@ int main (int argc, char *argv[])
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);
 
-        if(dataSetName.find("TTbarJets_SemiLept") == 0 && !fillTFAfterCuts){  //Combine both muon and electron events!
+        if(dsName.find("TTbarJets_SemiLept") == 0 && !fillTFAfterCuts && createTFTree){  //Combine both muon and electron events!
           tfLight_mu = new TFLight();
             
           double fullScaleFactor = scaleFactor;   
@@ -515,6 +545,13 @@ int main (int argc, char *argv[])
         // Apply the b-tag //
         //*****************//  
         if( bTagStudy.getNrBTaggedJets(ibTag) < 2 || bTagStudy.getNrLightJets(ibTag) < 2 ) continue;
+        vector<TLorentzVector> selJetsAfterBTag;
+        vector<int> partFlavAfterBTag;
+        vector<float> bTagCSVAfterBTag;
+        selJetsAfterBTag.push_back(selJets[bTagStudy.getBLeptIndex(ibTag)]); partFlavAfterBTag.push_back(partFlavour[bTagStudy.getBLeptIndex(ibTag)]); bTagCSVAfterBTag.push_back(bTagCSV[bTagStudy.getBLeptIndex(ibTag)]);
+        selJetsAfterBTag.push_back(selJets[bTagStudy.getBHadrIndex(ibTag)]); partFlavAfterBTag.push_back(partFlavour[bTagStudy.getBHadrIndex(ibTag)]); bTagCSVAfterBTag.push_back(bTagCSV[bTagStudy.getBHadrIndex(ibTag)]);
+        selJetsAfterBTag.push_back(selJets[bTagStudy.getLight1Index(ibTag)]); partFlavAfterBTag.push_back(partFlavour[bTagStudy.getLight1Index(ibTag)]); bTagCSVAfterBTag.push_back(bTagCSV[bTagStudy.getLight1Index(ibTag)]);
+        selJetsAfterBTag.push_back(selJets[bTagStudy.getLight2Index(ibTag)]); partFlavAfterBTag.push_back(partFlavour[bTagStudy.getLight2Index(ibTag)]); bTagCSVAfterBTag.push_back(bTagCSV[bTagStudy.getLight2Index(ibTag)]);
 
         if(decayCh == 0) nSelectedMu += 1;
         else if(decayCh == 1) nSelectedEl += 1;
@@ -528,8 +565,26 @@ int main (int argc, char *argv[])
 
         //Get the bTag scaleFactor!
         double BTagWeight = 1;
-        if(bTagPlotsMade && !(dataSetName.find("Data") == 0 || dataSetName.find("DATA") == 0))
-          BTagWeight = bTagTool->getMCEventWeight(selJets, partFlavour, bTagCSV, syst_btag, syst_mistag);
+        if(bTagPlotsMade && !(dsName.find("Data") == 0 || dsName.find("DATA") == 0))
+          BTagWeight = bTagTool->getMCEventWeight(selJetsAfterBTag, partFlavAfterBTag, bTagCSVAfterBTag, syst_btag, syst_mistag);
+        if(bTagStudy.getBHadrIndex(ibTag) == 0 || bTagStudy.getBLeptIndex(ibTag) == 0){
+          histo2D["bTagEff_vs_BJetPt_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+          if(abs(partFlavour[0]) == 5)      histo2D["bTagEff_vs_BJetPt_partFlavB_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+          else if(abs(partFlavour[0]) == 4) histo2D["bTagEff_vs_BJetPt_partFlavC_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+          else                         histo2D["bTagEff_vs_BJetPt_partFlavLight_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+        }
+        if(bTagStudy.getLight1Index(ibTag) == 0 || bTagStudy.getLight2Index(ibTag) == 0){
+          histo2D["bTagEff_vs_LightJetPt_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+          if(abs(partFlavour[0]) == 5)      histo2D["bTagEff_vs_LightJetPt_partFlavB_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+          else if(abs(partFlavour[0]) == 4) histo2D["bTagEff_vs_LightJetPt_partFlavC_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+          else                         histo2D["bTagEff_vs_LightJetPt_partFlavLight_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+        }
+        if(abs(partFlavour[0]) != 4 && abs(partFlavour[0]) != 5) histo2D["bTagEff_vs_JetPt_partFlavLight_"+dsName]->Fill(selJets[0].Pt(),BTagWeight);
+        histo1D["BTagEfficiency_"+dsName]->Fill(BTagWeight);
+        histo1D["partonFlav_BJets_"+dsName]->Fill(abs(partFlavour[bTagStudy.getBLeptIndex(ibTag)]));
+        histo1D["partonFlav_BJets_"+dsName]->Fill(abs(partFlavour[bTagStudy.getBLeptIndex(ibTag)]));
+        histo1D["partonFlav_LightJets_"+dsName]->Fill(abs(partFlavour[bTagStudy.getLight1Index(ibTag)]));
+        histo1D["partonFlav_LightJets_"+dsName]->Fill(abs(partFlavour[bTagStudy.getLight2Index(ibTag)]));
         scaleFactor = scaleFactor * BTagWeight;
 
         MSPlot["nPV_BTagSF"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -539,13 +594,18 @@ int main (int argc, char *argv[])
         MSPlot["LeptonEta_BTagSF"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["LeptonCharge_BTagSF"+leptChannel]->Fill( leptCharge, datasets[iDataSet], true, Luminosity*scaleFactor);
 
+        MSPlot["CSVDistr_BJets"+leptChannel]->Fill(bTagCSV[bTagStudy.getBHadrIndex(ibTag)], datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["CSVDistr_BJets"+leptChannel]->Fill(bTagCSV[bTagStudy.getBLeptIndex(ibTag)], datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["CSVDistr_LightJets"+leptChannel]->Fill(bTagCSV[bTagStudy.getLight1Index(ibTag)], datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["CSVDistr_LightJets"+leptChannel]->Fill(bTagCSV[bTagStudy.getLight2Index(ibTag)], datasets[iDataSet], true, Luminosity*scaleFactor);
+
         //Check whether the Mlb, Mqqb, Mt and MW depends a lot on the considered b-tag and on the fact whether it is applied!
-        if(dataSetName.find("TTbarJets_SemiLept") == 0){
+        if(dsName.find("TTbarJets_SemiLept") == 0){
           if(correctJetCombi[0] != 9999 && correctJetCombi[1] != 9999 && correctJetCombi[2] != 9999 && correctJetCombi[3] != 9999){
-            histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->Fill( (selLepton+selJets[correctJetCombi[0]]).M());
-            histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->Fill( (selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M() );
-            histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->Fill( (selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M());
-            histo2D["MW_vs_MTop_CorrTT_"+bTitle[ibTag]]->Fill((selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M(),(selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M());
+            histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fill( (selLepton+selJets[correctJetCombi[0]]).M());
+            histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fill( (selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M() );
+            histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fill( (selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M());
+            histo2D["MW_vs_MTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fill((selJets[correctJetCombi[1]]+selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M(),(selJets[correctJetCombi[2]]+selJets[correctJetCombi[3]]).M());
           }
         }
 
@@ -565,7 +625,7 @@ int main (int argc, char *argv[])
           MSPlot["LeptonEta_AllCutsApplied"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["LeptonCharge_AllCutsApplied"+leptChannel]->Fill( leptCharge, datasets[iDataSet], true, Luminosity*scaleFactor);
 
-          if(dataSetName.find("TTbarJets_SemiLept") == 0 && fillTFAfterCuts){  //Combine muon and electron channel!
+          if(dsName.find("TTbarJets_SemiLept") == 0 && fillTFAfterCuts && createTFTree){  //Combine muon and electron channel!
             tfLight_mu = new TFLight();
             
             double fullScaleFactor = scaleFactor;   
@@ -585,7 +645,7 @@ int main (int argc, char *argv[])
             delete tfLight_mu;
             //----  End of Tree file filling (for TF's after evtSel)  ----//
           }
-          /*else if(dataSetName.find("TTbarJets_SemiLept") == 0 && decayCh == 1){
+          /*else if(dsName.find("TTbarJets_SemiLept") == 0 && decayCh == 1 && createTFTree){
            tfLight_el = new TFLight();
             
             double fullScaleFactor = scaleFactor;   
@@ -621,10 +681,14 @@ int main (int argc, char *argv[])
 
           //if(CutsSurvived) histo1D["CosTheta_SelEvts"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
           // --> Cannot add this since the neutrino is not completely reconstructed and thus the leptonic top is not known ...
-          if(CutsSurvived) lhcoOutput.StoreRecoInfo(selLepton, selJets, selJetCombi, decayCh, leptCharge, EvtNrMatching, CWUIndex);
-          if(CutsSurvived && genCosTheta != 2.0 && decayCh == 0) histo1D["CosTheta_Gen_SelEvts_Mu"]->Fill(genCosTheta);
-          if(CutsSurvived && genCosTheta != 2.0 && decayCh == 1) histo1D["CosTheta_Gen_SelEvts_El"]->Fill(genCosTheta);
-          if(CutsSurvived && genCosTheta != 2.0) histo1D["CosTheta_Gen_SelEvts"]->Fill(genCosTheta);
+          if(CutsSurvived){
+            lhcoOutput.StoreRecoInfo(selLepton, selJets, selJetCombi, decayCh, leptCharge, EvtNrMatching, CWUIndex);
+            EvtNrMatching << "                 " << scaleFactor << std::endl;
+          }
+          
+          if(CutsSurvived && genCosTheta != 2.0 && decayCh == 0) histo1D["CosTheta_Gen_SelEvts_"+dsName+"_mu"]->Fill(genCosTheta);
+          if(CutsSurvived && genCosTheta != 2.0 && decayCh == 1) histo1D["CosTheta_Gen_SelEvts_"+dsName+"_el"]->Fill(genCosTheta);
+          if(CutsSurvived && genCosTheta != 2.0) histo1D["CosTheta_Gen_SelEvts_"+dsName]->Fill(genCosTheta);
         }
         else if(getLHCOOutput && !bTagChoiceMade){
           cout << " ERROR : Not possible to write the lhco file when all b-tag options are still being considered!!  ==> Setting boolean to FALSE !" << endl;
@@ -638,45 +702,45 @@ int main (int argc, char *argv[])
     //------------------------------//
     //  Calculate the ChiSq values  //
     //------------------------------//
-    if(dataSetName.find("TTbarJets_SemiLept") == 0 && getMassFits){
+    if(dsName.find("TTbarJets_SemiLept") == 0 && getMassFits){
       std::cout << " -----------------     Fitting the different mass distributions    --------------------- \n" << endl;   
-      histo1D["Mlb_CorrTT"]->Fit("gaus","Q");     
-      histo1D["HadrMTop_CorrTT"]->Fit("gaus","Q");
-      histo1D["HadrMW_CorrTT"]->Fit("gaus","Q");
-      histo1D["Mlb_CorrTT"]->Fit("gaus","Q","", histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(1)-histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(2),
-                                                histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(1)+histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(2));
-      histo1D["HadrMTop_CorrTT"]->Fit("gaus","Q","", histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(2),
-                                                     histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(2));
-      histo1D["HadrMW_CorrTT"]->Fit("gaus","Q","",histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(2),
-                                                  histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(2));
+      histo1D["Mlb_CorrTT_"+dsName]->Fit("gaus","Q");     
+      histo1D["HadrMTop_CorrTT_"+dsName]->Fit("gaus","Q");
+      histo1D["HadrMW_CorrTT_"+dsName]->Fit("gaus","Q");
+      histo1D["Mlb_CorrTT_"+dsName]->Fit("gaus","Q","", histo1D["Mlb_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)-histo1D["Mlb_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2),
+                                                        histo1D["Mlb_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)+histo1D["Mlb_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2));
+      histo1D["HadrMTop_CorrTT_"+dsName]->Fit("gaus","Q","", histo1D["HadrMTop_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMTop_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2),
+                                                             histo1D["HadrMTop_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMTop_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2));
+      histo1D["HadrMW_CorrTT_"+dsName]->Fit("gaus","Q","",histo1D["HadrMW_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMW_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2),
+                                                          histo1D["HadrMW_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMW_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2));
       
       //Write out the mass values!
-      std::cout << "   ** Mlb  = " << histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(1)      << " +- " << histo1D["Mlb_CorrTT"]->GetFunction("gaus")->GetParameter(2) << endl;
-      std::cout << "   ** Mqqb = " << histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["HadrMTop_CorrTT"]->GetFunction("gaus")->GetParameter(2) << endl;
-      std::cout << "   ** MW   = " << histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT"]->GetFunction("gaus")->GetParameter(2) << std::endl;
+      std::cout << "   ** Mlb  = " << histo1D["Mlb_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)      << " +- " << histo1D["Mlb_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2) << endl;
+      std::cout << "   ** Mqqb = " << histo1D["HadrMTop_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["HadrMTop_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2) << endl;
+      std::cout << "   ** MW   = " << histo1D["HadrMW_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT_"+dsName]->GetFunction("gaus")->GetParameter(2) << std::endl;
     
       //Output for the different b-tags
       for(int ibTag = 0; ibTag < NrBTags; ibTag++){
-        histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q");
-        histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q","", 
-                                                         histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
-                                                         histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
-        histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q","",
-                                          histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
-                                          histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
+        histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fit("gaus","Q"); histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fit("gaus","Q");
+        histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fit("gaus","Q","", 
+                                                      histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
+                                                      histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
+        histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->Fit("gaus","Q","",
+                                          histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
+                                          histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
         histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->Fit("gaus","Q","",
-                                               histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
-                                               histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
+                                               histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)-histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2),
+                                               histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)+histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2));
       
         //Write out the mass values!
-        cout << "\n   ** Mlb  -- " << bTitle[ibTag] << " = " << histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)    << " +- " << histo1D["Mlb_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
-        cout << "   ** Mqqb -- " << bTitle[ibTag] << " = " << histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["HadrMTop_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
-        cout << "   ** MW   -- " << bTitle[ibTag] << " = " << histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << std::endl;
+        cout << "\n   ** Mlb  -- " << bTitle[ibTag] << " = " << histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)    << " +- " << histo1D["Mlb_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
+        cout << "   ** Mqqb -- " << bTitle[ibTag] << " = " << histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1) << " +- " << histo1D["HadrMTop_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << endl;
+        cout << "   ** MW   -- " << bTitle[ibTag] << " = " << histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << std::endl;
       }
     }
 
     //--- Get output from bTagStudy class ---//
-    if(dataSetName.find("TTbarJets_SemiLept") == 0) bTagStudy.ReturnBTagTable();
+    if(dsName.find("TTbarJets_SemiLept") == 0) bTagStudy.ReturnBTagTable();
     bTagStudy.CreateHistograms(outputFile, savePDF, pathPNG, iDataSet);  //Security is added inside class such that MSPlots are only written when all datasets are considered!
 
     //--- Get output from LHCOOutput class ---//
@@ -685,11 +749,42 @@ int main (int argc, char *argv[])
     //--- Get output form the ExtraEvtSel class ---//
     extraEvtSelCuts.StoreCutInfluence(outputFile);
 
-    //---- Close the EventNrMatching output file for the considered dataset
+    //---- Close the EventNrMatching output file for the considered dataset  ----//
     if(bTagChoiceMade && getLHCOOutput) EvtNrMatching.close();
 
+    //---- Store the dataset specific 1D and 2D histograms ----//
+    if(histo1D.size() > 0){
+      TDirectory* th1dir = outputFile->GetDirectory("1D_histograms");   //Check whether directory already exists ..
+      if(!th1dir) th1dir = outputFile->mkdir("1D_histograms");          // .. and otherwise create it!
+      th1dir->cd();
+      TDirectory* ds1Dir = th1dir->mkdir(dsName.c_str());
+      ds1Dir->cd();
+      for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
+        TH1F *temp = it->second;
+        int N = temp->GetNbinsX();
+        temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
+        temp->SetBinContent(N+1,0);
+        temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
+        temp->Write();
+      }
+    }
+
+    if(histo2D.size() > 0){
+      TDirectory* th2dir = outputFile->GetDirectory("2D_histograms_graphs");
+      if(!th2dir) th2dir = outputFile->mkdir("2D_histograms_graphs");
+      th2dir->cd();
+      TDirectory* ds2Dir = th2dir->mkdir(dsName.c_str());
+      ds2Dir->cd();
+      for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){
+        TH2F *temp = it->second;
+        temp->Write();
+      }
+    }
+    histo1D.clear();
+    histo2D.clear();
+
     //------ Store the TF tree ------//
-    if(dataSetName.find("TTbarJets_SemiLept") == 0){
+    if(dsName.find("TTbarJets_SemiLept") == 0 && createTFTree){
       TFLightFile->cd();
       TTree* configTreeTFLightFile = new TTree("configTreeTFLightFile","configuration Tree in TFLight File");
       TClonesArray* tcdatasettflightfile = new TClonesArray("Dataset",1);
@@ -729,23 +824,6 @@ int main (int argc, char *argv[])
     string name = it->first;
     temp->Draw(name, 1, false, false, false, 1);
     temp->Write(outputFile, name, savePDF, (pathPNG+"/MSPlots/").c_str(), "pdf");
-  }
-
-  TDirectory* th1dir = outputFile->mkdir("1D_histograms");
-  th1dir->cd();
-  for(std::map<std::string,TH1F*>::const_iterator it = histo1D.begin(); it != histo1D.end(); it++){
-    TH1F *temp = it->second;
-    int N = temp->GetNbinsX();
-    temp->SetBinContent(N,temp->GetBinContent(N)+temp->GetBinContent(N+1));
-    temp->SetBinContent(N+1,0);
-    temp->SetEntries(temp->GetEntries()-2); // necessary since each SetBinContent adds +1 to the number of entries...
-    temp->Write();
-  }
-  TDirectory* th2dir = outputFile->mkdir("2D_histograms_graphs");
-  th2dir->cd();
-  for(std::map<std::string,TH2F*>::const_iterator it = histo2D.begin(); it != histo2D.end(); it++){
-    TH2F *temp = it->second;
-    temp->Write();
   }
 
   delete leptonTools;
