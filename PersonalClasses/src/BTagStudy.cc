@@ -83,8 +83,11 @@ void BTagStudy::CalculateJets(vector<TLorentzVector> Jets, vector<float> CSVbTag
   for (int bTagOption = 0; bTagOption < nrBTags_; bTagOption++){
 
     for(unsigned int iJet = 0; iJet<Jets.size();iJet++){
-      if(CSVbTagValues[iJet] >= BJetWP[bTagOption])
-        bTagJetNr[bTagOption].push_back(iJet);            
+      if(CSVbTagValues[iJet] >= BJetWP[bTagOption]){
+        bTagJetNr[bTagOption].push_back(iJet);
+        if(bTagJetNr[bTagOption].size() >= 2)
+          NonbTagJetNr[bTagOption].push_back(iJet);
+      }
       else
         NonbTagJetNr[bTagOption].push_back(iJet);            
 
