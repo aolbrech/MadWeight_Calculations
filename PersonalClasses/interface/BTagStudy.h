@@ -53,16 +53,16 @@ class BTagStudy{
     void ResetEventArrays();
     int getLowestMlbMqqbChiSquared( int bTagNr, vector<TLorentzVector> Jets, TLorentzVector lepton);
 
-    int bHadrIndex[6], bLeptIndex[6], light1Index[6], light2Index[6];
-    vector<int> jetIndices[6];
-    int NotReconstructedEvent[2][6], CorrectlyMatched[2][3][6], atLeastOneWrongMatch[2][3][6];
-    float LowestChiSq[6];
+    int bHadrIndex[9], bLeptIndex[9], light1Index[9], light2Index[9];
+    vector<int> jetIndices[9];
+    int NotReconstructedEvent[2][9], CorrectlyMatched[2][3][9], atLeastOneWrongMatch[2][3][9];
+    float LowestChiSq[9];
 
     int verbose;
-    float BJetWP[6], LightJetWP[6];  
-    std::string OptionName[6], BTitle[6], BName[6];
+    float BJetWP[9], LightJetWP[9];  
+    std::string OptionName[9], BTitle[9], BName[9];
     ofstream evtSelOutput[2];
-    vector<int> bTagJetNr[6], NonbTagJetNr[6], LightJetNr[6];
+    vector<int> bTagJetNr[9], NonbTagJetNr[9], LightJetNr[9];
 
     float Mlb, Mqqb, S_Mlb, S_Mqqb;
     int chosenBTag_, nrBTags_, nrDatasets_;

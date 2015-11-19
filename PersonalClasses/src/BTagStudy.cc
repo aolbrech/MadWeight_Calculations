@@ -10,7 +10,7 @@ BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, i
 
   //Start to initialize all variables!!
   for(int ii = 0; ii < 2; ii++){
-    for(int jj = 0; jj < 6; jj++){
+    for(int jj = 0; jj < 9; jj++){
       NotReconstructedEvent[ii][jj]=0;
       for(int kk = 0; kk < 3; kk++){
         CorrectlyMatched[ii][kk][jj]=0;
@@ -20,14 +20,14 @@ BTagStudy::BTagStudy(int outputVerbose, vector<Dataset*> datasets, bool oneWP, i
   }
 
   //Try to include this in a more cleaner way ....
-  float bjetWP[6]      = {   0.244,                      0.679,                      0.679,                       0.898,                      0.898,                       0.898                    };
-  float lightjetWP[6]  = {   0.244,                      0.679,                                  0.244,           0.898,                                  0.679,                       0.244        };
-  string optionName[6] = {"  2 L b-tags             ","  2 M b-tags             ","  2 M b-tags, light L-veto","  2 T b-tags             ","  2 T b-tags, light M-veto","  2 T b-tags, light L-veto"};
-  string bName[6] = {"(2 L b-tags)","(2 M b-tags)","(2 M b-tags, light L-veto)","(2 T b-tags)","(2 T b-tags, light M-veto)","(2 T b-tags, light L-veto)"};
-  string bTitle[6] = {"LooseTags","MediumTags","MediumTagsLVeto","TightTags","TightTagsMVeto","TightTagsLVeto"};
+  float bjetWP[9]      = { 0.244, 0.244, 0.679, 0.679, 0.679, 0.898, 0.898, 0.898, 0.898};
+  float lightjetWP[9]  = {     1, 0.244,     1, 0.679, 0.244,     1, 0.898, 0.679, 0.244};
+  string optionName[9] = {"  2 L b-tags             ","  2 L b-tags, light L-veto","  2 M b-tags             ","  2 M b-tags, light M-veto","  2 M b-tags, light L-veto","  2 T b-tags             ","  2 T b-tags, light T-veto","  2 T b-tags, light M-veto","  2 T b-tags, light L-veto"};
+  string bName[9] = {"(2 L b-tags)","(2L b-tags, light L veto)","(2 M b-tags)","(2 M b-tags, light M-veto)","(2M b-tags, light L-veto)","(2 T b-tags)","(2 T b-tags, light T-veto)","(2 T b-tags, light M-veto)","(2 T b-tags, light L-veto)"};
+  string bTitle[9] = {"LooseTags","LooseTagsLVeto","MediumTags","MediumTagsMVeto","MediumTagsLVeto","TightTags","TightTagsTVeto","TightTagsMVeto","TightTagsLVeto"};
 
   if(singleWP_) nrBTags_ = 1;
-  else          nrBTags_ = 6;
+  else          nrBTags_ = 9;
   for(int itBTag = 0; itBTag < nrBTags_; itBTag++){
 
     //In case only one b-tag option should be considered, only the first element should be filled!
@@ -68,7 +68,7 @@ void BTagStudy::InitializeDataSet(std::string datasetName){
 
 void BTagStudy::ResetEventArrays(){
 
-  for(int ii = 0; ii < 6; ii++){
+  for(int ii = 0; ii < 9; ii++){
     bTagJetNr[ii].clear();
     NonbTagJetNr[ii].clear();
     LightJetNr[ii].clear();
@@ -83,22 +83,19 @@ void BTagStudy::CalculateJets(vector<TLorentzVector> Jets, vector<float> CSVbTag
   for (int bTagOption = 0; bTagOption < nrBTags_; bTagOption++){
 
     for(unsigned int iJet = 0; iJet<Jets.size();iJet++){
+      
+      //Get the b-tagged and light jets:
       if(CSVbTagValues[iJet] >= BJetWP[bTagOption]){
         bTagJetNr[bTagOption].push_back(iJet);
-        //if(bTagJetNr[bTagOption].size() >= 2)
-        //  NonbTagJetNr[bTagOption].push_back(iJet);
+        if(bTagJetNr[bTagOption].size() > 2 && CSVbTagValues[iJet] < LightJetWP[bTagOption]) LightJetNr[bTagOption].push_back(iJet);
       }
-      else
-        NonbTagJetNr[bTagOption].push_back(iJet);            
-
-      //Calculate the light jets when an additional working point is required for these:
-      if(BJetWP[bTagOption] != LightJetWP[bTagOption] && CSVbTagValues[iJet] < LightJetWP[bTagOption])
-	LightJetNr[bTagOption].push_back(iJet);
+      else if(CSVbTagValues[iJet] < LightJetWP[bTagOption])
+        LightJetNr[bTagOption].push_back(iJet);
     }
   
     //Copy the Nonbtagged vector into the light one in case the two b-tags are the same!	
-    if(BJetWP[bTagOption] == LightJetWP[bTagOption])
-      LightJetNr[bTagOption] = NonbTagJetNr[bTagOption];     
+    //if(BJetWP[bTagOption] == LightJetWP[bTagOption])
+    //  LightJetNr[bTagOption] = NonbTagJetNr[bTagOption];     
 
     /*//Count how often an event has three or two light jets (for comparison of 4- and 5-jet case)    --> Maybe move this 4/5 jet comparison to a separate function!
     if(LightJetNr[bTagOption].size() >1 ){
@@ -156,15 +153,15 @@ int BTagStudy::getLowestMlbMqqbChiSquared(int bTagNr, vector<TLorentzVector> Jet
   std::vector< std::pair<int,double> > ChiSq;
   ChiSq.clear();
 
-  ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[0]]).M())/S_Mlb,2) + pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[1]]).M())/S_Mqqb,2)));
-  ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[1]]).M())/S_Mlb,2) + pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[1]]).M())/S_Mqqb,2)));
+  ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[0]]).M())/S_Mlb,2)+pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[1]]).M())/S_Mqqb,2)));
+  ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[1]]).M())/S_Mlb,2)+pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[1]]).M())/S_Mqqb,2)));
 
   //Continue adding elements in the case more than 4 jets should be considered (and they are actually present!)
   if(use5Jets_ && LightJetNr[bTagNr].size() > 2){
-    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[0]]).M())/S_Mlb,2) + pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
-    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[1]]).M())/S_Mlb,2) + pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
-    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[0]]).M())/S_Mlb,2) + pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
-    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[1]]).M())/S_Mlb,2) + pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
+    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[0]]).M())/S_Mlb,2)+pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
+    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[1]]).M())/S_Mlb,2)+pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
+    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[0]]).M())/S_Mlb,2)+pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
+    ChiSq.push_back(std::make_pair(ChiSq.size(), pow((Mlb-(lept+Jets[(bTagJetNr[bTagNr])[1]]).M())/S_Mlb,2)+pow((Mqqb-(Jets[(bTagJetNr[bTagNr])[0]]+Jets[(LightJetNr[bTagNr])[1]]+Jets[(LightJetNr[bTagNr])[2]]).M())/S_Mqqb,2)));
   }
      
   //Sort the elements of the pair on ascending order (using the second value)!
