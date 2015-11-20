@@ -102,12 +102,15 @@ int main (int argc, char *argv[])
   bool bTagPlotsMade = true;         //Decide whether the bTag distributions for the efficiencies should be created or read from file
   bool createTFTree = false;         //Decide whether the TFTree should be made or just skipped during this run! 
   bool fillTFAfterCuts = false;      //Decide whether the TFTree is filled before or after the additional event selection cuts (b-tag, chi-sq and Mw-Mt)
-  bool onlyTTbar = true;
+  bool onlyTTbar = false;
+  bool onlyMuonChannel = true;       //Set this to true in order to reject all electron channel events!
 
   std::string tfFill = "";
   if(fillTFAfterCuts) tfFill = "_AfterExtraCuts";
 
-  std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root";
+  std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_WithTTbar_OnlyTTbarSemiLept_12Bins.root";
+  //std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_NoTTbar_OnlyTTbarSemiLept_12Bins.root";
+  //std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_NoTTbar_AllDataSets_12Bins.root";
   int stop = 0;
   if( file_exist(bTagPlotsOutput.c_str()) ){
     if(!bTagPlotsMade){
@@ -240,6 +243,7 @@ int main (int argc, char *argv[])
   //-- Histograms which should be made separately for the two possible decay channels
   for(int ii = 0; ii < 2; ii++){
     string leptFlav = leptFlavs[ii];
+    if(onlyMuonChannel && leptFlav == "_el") continue;
 
     //-- Histograms which should contain the considered btag name!
     for(int ibTag = 0; ibTag < NrBTags; ibTag++){
@@ -250,14 +254,26 @@ int main (int argc, char *argv[])
       MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+ leptFlav] = new MultiSamplePlot(datasets, "nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+ leptFlav,10, -0.5, 9.5, "# light jets");
     }
       
+    MSPlot["HadrTopMass"+leptFlav] = new MultiSamplePlot(datasets,"HadrTopMass"+leptFlav, 120, 50, 250,"Top mass (GeV)");
+    MSPlot["HadrTopMass_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"HadrTopMass_AllCuts"+leptFlav, 120, 50, 250,"Top mass (GeV)");
+    MSPlot["HadrWMass"+leptFlav] = new MultiSamplePlot(datasets,"HadrWMass"+leptFlav, 75, 30, 150,"Top mass (GeV)");
+    MSPlot["HadrWMass_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"HadrWMass_AllCuts"+leptFlav, 75, 30, 150,"W mass (GeV)");
+    MSPlot["MlbMqqbChiSq"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq"+leptFlav, 50, 0, 20,"Mlb-Mqqb chi-sq");
+    MSPlot["MlbMqqbChiSq_OnlyChiSq"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_OnlyChiSq"+leptFlav, 50, 0, 20,"Mlb-Mqqb chi-sq");
+    MSPlot["MlbMqqbChiSq_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_AllCuts"+leptFlav, 50, 0, 20,"Mlb-Mqqb chi-sq");
+
     MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
 
-    MSPlot["nBJets_BeforeBTag"+leptFlav]   = new MultiSamplePlot(datasets, "nBJets_BeforeBTag"+leptFlav,  10, -0.5, 9.5, "# b-jets");
     MSPlot["partFlav_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets,"partFlav_BeforeBTag"+leptFlav, 5, -0.5, 4.5, "Parton flavour of selected jets");
 
-    MSPlot["nBJets_BTag"+leptFlav]    = new MultiSamplePlot(datasets, "nBJets_BTag"+leptFlav,    10, -0.5, 9.5, "# b-jets");
-    MSPlot["nBJets_BTagSF"+leptFlav]  = new MultiSamplePlot(datasets, "nBJets_BTagSF"+leptFlav,  10, -0.5, 9.5, "# b-jets");
-    MSPlot["nBJets_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "nBJets_AllCuts"+leptFlav, 10, -0.5, 9.5, "# b-jets");
+    MSPlot["nBJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBJets_BeforeBTag"+leptFlav, 10, -0.5, 9.5, "# b-jets");
+    MSPlot["nBJets_BTag"+leptFlav]       = new MultiSamplePlot(datasets, "nBJets_BTag"+leptFlav,       10, -0.5, 9.5, "# b-jets");
+    MSPlot["nBJets_BTagSF"+leptFlav]     = new MultiSamplePlot(datasets, "nBJets_BTagSF"+leptFlav,     10, -0.5, 9.5, "# b-jets");
+    MSPlot["nBJets_AllCuts"+leptFlav]    = new MultiSamplePlot(datasets, "nBJets_AllCuts"+leptFlav,    10, -0.5, 9.5, "# b-jets");
+    MSPlot["nLightJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nLightJets_BeforeBTag"+leptFlav, 10, -0.5, 9.5, "# light jets");
+    MSPlot["nLightJets_BTag"+leptFlav]       = new MultiSamplePlot(datasets, "nLightJets_BTag"+leptFlav,       10, -0.5, 9.5, "# light jets");
+    MSPlot["nLightJets_BTagSF"+leptFlav]     = new MultiSamplePlot(datasets, "nLightJets_BTagSF"+leptFlav,     10, -0.5, 9.5, "# light jets");
+    MSPlot["nLightJets_AllCuts"+leptFlav]    = new MultiSamplePlot(datasets, "nLightJets_AllCuts"+leptFlav,    10, -0.5, 9.5, "# light jets");
 
     MSPlot["JetsPt_partFlavGluon_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetsPt_partFlavGluon_BeforeBTag"+leptFlav, 120, 0, 350, "Jet p_T for all jets with gluon parton flavour");
     MSPlot["JetsPt_partFlavLight_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetsPt_partFlavLight_BeforeBTag"+leptFlav, 120, 0, 350, "Jet p_T for all jets with light parton flavour");
@@ -337,15 +353,15 @@ int main (int argc, char *argv[])
   //------------------------//
   //Method 1a of https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods will be used!
 
-  BTagWeightTools *bTagTool = new BTagWeightTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_NOttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
-  //BTagWeightTools *bTagTool = new BTagWeightsTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_WITHttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
+  //BTagWeightTools *bTagTool = new BTagWeightTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_NOttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
+  BTagWeightTools *bTagTool = new BTagWeightTools("PersonalClasses/Calibrations/BTagSF/SFb-pt_WITHttbar_payload_EPS13.txt","CSVT");   //Standard EPS2013 is used!
 
   //During a first run the plots need to be created!
   if(!bTagPlotsMade){
-    bTagTool->InitializeMCEfficiencyHistos(50,30.,340.,2);  //How to get these histo-values?
+    bTagTool->InitializeMCEfficiencyHistos(12,30.,360.,2);  //How to get these histo-values?
   }
   else{
-    bTagTool->ReadMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
+    bTagTool->ReadMCEfficiencyHistos(bTagPlotsOutput); //"PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
   }
 
   //-----------------------//
@@ -438,9 +454,9 @@ int main (int argc, char *argv[])
       histo2D["PartFlavGluon_BTagEffvsPt"] = new TH2F("PartFlavGluon_BTagEffvsPt","B-tag efficiency versus pT for jets with parton flavour of gluon",    120,0,400,75,0,1);
       histo2D["PartFlavUndef_BTagEffvsPt"] = new TH2F("PartFlavUndef_BTagEffvsPt","B-tag efficiency versus pT for jets with parton flavour of undefined",120,0,400,75,0,1);
 
-      histo1D["BTagWeight_SelJetsOnly"] = new TH1F("BTagWeight_SelJetsOnly","B-tag weight for the four selected jets only",100,0,2);
-      histo1D["BTagWeight_NonSelJetsOnly"] = new TH1F("BTagWeight_NonSelJetsOnly","B-tag weight for the non selected jets only",100,0,2);
-      histo1D["BTagWeight_AllJets"] = new TH1F("BTagWeight_AllJets","B-tag weight for all jets in the event",100,0,2);
+      histo1D["BTagWeight_SelJetsOnly"] = new TH1F("BTagWeight_SelJetsOnly","B-tag weight for the four selected jets only",200,0,2);
+      histo1D["BTagWeight_NonSelJetsOnly"] = new TH1F("BTagWeight_NonSelJetsOnly","B-tag weight for the non selected jets only",200,0,2);
+      histo1D["BTagWeight_AllJets"] = new TH1F("BTagWeight_AllJets","B-tag weight for all jets in the event",200,0,2);
 
       histo1D["CSVDiscr_LightJets_PartFlavNob"] = new TH1F("CSVDiscr_LightJets_PartFlavNob", ("CSV discriminant of light jets for "+dsTitle+" events with parton flavour not 5").c_str(), 75, -1, 2);
       histo1D["CSVDiscr_LightJets_PartFlavb"]   = new TH1F("CSVDiscr_LightJets_PartFlavb",   ("CSV discriminant of light jets for "+dsTitle+" events with parton flavour 5").c_str(),     75, -1, 2);
@@ -530,6 +546,8 @@ int main (int argc, char *argv[])
       vector<int> correctJetCombi = light->correctJetCombi();    //0 = LeptB, 1 = HadrB, 2 = Quark1 & 3 = Quark2
       float genCosTheta = light->genCosTh();
 
+      if(onlyMuonChannel && decayCh == 1) continue;
+
       //Distributions before PU reweighting is taken into account!
       MSPlot["nPV_BeforePU"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["JetPt_LeadingJet_BeforePU"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -550,8 +568,10 @@ int main (int argc, char *argv[])
       histo1D["leptonSF_"+dsName]->Fill(leptonSF); 
 
       //Fill the b-tag histo's in case they do not yet exist
-      if(!bTagPlotsMade)
+      if(!bTagPlotsMade){
         bTagTool->FillMCEfficiencyHistos(selJets, partFlavour, bTagCSV);
+        continue;
+      }
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
       //ooOOooOOoo      Reading out nTuples done           ooOOooOOoo
@@ -598,6 +618,7 @@ int main (int argc, char *argv[])
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);
 
         MSPlot["nBJets_BeforeBTag"+leptChannel]->Fill(bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nLightJets_BeforeBTag"+leptChannel]->Fill(bTagStudy.getNrLightJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         for(int ii = 0; ii < selJets.size(); ii++){
           if(dsName.find("Data") != 0 && (partFlavour[ii] == 1 || partFlavour[ii] == 2 || partFlavour[ii] == 3) ){
             MSPlot["partFlav_BeforeBTag"+leptChannel]->Fill(1, datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -658,6 +679,7 @@ int main (int argc, char *argv[])
         }
 
         MSPlot["nBJets_BTag"+leptChannel]->Fill(bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nLightJets_BTag"+leptChannel]->Fill(bTagStudy.getNrLightJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         //vector<TLorentzVector> selJetsAfterBTag;
         //vector<int> partFlavAfterBTag;
         //vector<float> bTagCSVAfterBTag;
@@ -666,8 +688,8 @@ int main (int argc, char *argv[])
         //selJetsAfterBTag.push_back(selJets[Light1Index]); partFlavAfterBTag.push_back(partFlavour[Light1Index]); bTagCSVAfterBTag.push_back(bTagCSV[Light1Index]);
         //selJetsAfterBTag.push_back(selJets[Light2Index]); partFlavAfterBTag.push_back(partFlavour[Light2Index]); bTagCSVAfterBTag.push_back(bTagCSV[Light2Index]);
 
-        if(decayCh == 0) nSelectedMu += 1;
-        else if(decayCh == 1) nSelectedEl += 1;
+//        if(decayCh == 0) nSelectedMu += 1;
+//        else if(decayCh == 1) nSelectedEl += 1;
 
         MSPlot["nPV"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["JetPt_LeadingJet"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -682,7 +704,7 @@ int main (int argc, char *argv[])
         if(bTagPlotsMade && !(dsName.find("Data") == 0 || dsName.find("DATA") == 0)){
           BTagWeight = bTagTool->getMCEventWeight(selJets, partFlavour, bTagCSV, syst_btag, syst_mistag);
 
-          //Take into account the two b-tags (following 1b this time ...)
+ /*         //Take into account the two b-tags (following 1b this time ...)
           vector<float> bTagSFs, bTagEffs;
           bTagSFs.clear(); bTagEffs.clear();
           double w0TagsMC = 1;
@@ -729,11 +751,12 @@ int main (int argc, char *argv[])
           histo1D["BTagEfficiency_BJets"+dsName]->Fill(bTagEffs[BHadrIndex]);
           histo1D["BTagEfficiency_LightJets"+dsName]->Fill(bTagEffs[Light1Index]);
           histo1D["BTagEfficiency_LightJets"+dsName]->Fill(bTagEffs[Light2Index]);
+          */
         }
         histo1D["BTagWeight_AltMethod_"+dsName]->Fill(BTagWeight2b);
         histo1D["BTagWeight_"+dsName]->Fill(BTagWeight);
 
-        if(dsName.find("TTbarJets_SemiLept") == 0){
+        if(dsName.find("TTbarJets_SemiLept") == 0 && bTagPlotsMade){
           if      (partFlavAbs[BLeptIndex] == 5 && partFlavAbs[BHadrIndex] == 5){                                                                     histo1D["PartFlavBJets_BTag"+dsName]->Fill(0); BothB++;}
           else if((partFlavAbs[BLeptIndex] == 5 && partFlavAbs[BHadrIndex] == 1) || (partFlavAbs[BLeptIndex] == 1 && partFlavAbs[BHadrIndex] == 5))   histo1D["PartFlavBJets_BTag"+dsName]->Fill(1);
           else if((partFlavAbs[BLeptIndex] == 5 && partFlavAbs[BHadrIndex] == 2) || (partFlavAbs[BLeptIndex] == 2 && partFlavAbs[BHadrIndex] == 5))   histo1D["PartFlavBJets_BTag"+dsName]->Fill(2);
@@ -778,38 +801,49 @@ int main (int argc, char *argv[])
           float BTagWeightMCAllJets = 1,    BTagWeightDataAllJets = 1;
           for(int i = 0; i < selJets.size(); i++){
 
+            //std::cout << i << ") In analyzer: tagEff = " << bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]) << " and SF = " << bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag) << " ... with CSV value of " << bTagCSV[i] << std::endl;
+            if(bTagCSV[i] >= 0.898){
+              BTagWeightMCAllJets =  BTagWeightMCAllJets*bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]);
+              BTagWeightDataAllJets = BTagWeightDataAllJets*bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag);
+            }
+            else{
+              BTagWeightMCAllJets = BTagWeightMCAllJets*(1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]));
+              BTagWeightDataAllJets = BTagWeightDataAllJets*(1.0-(bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag)));
+            }
+            //std::cout << "  ==> BTagWeightMCAllJets = " << BTagWeightMCAllJets << " and BTagWeightDataAllJets = " << BTagWeightDataAllJets << std::endl;
+
             if(i == BLeptIndex || i == BHadrIndex || i == Light1Index || i == Light2Index){
               if(bTagCSV[i] >= 0.898){
                 BTagWeightMCSelJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]); 
                 BTagWeightDataSelJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag); 
-                BTagWeightMCAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]);
-                BTagWeightDataAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag);
+                //BTagWeightMCAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]);
+                //BTagWeightDataAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag);
               }
               else{
                 BTagWeightMCSelJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])); 
                 BTagWeightDataSelJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag)); 
-                BTagWeightMCAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]));
-                BTagWeightDataAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag));
+                //BTagWeightMCAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]));
+                //BTagWeightDataAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag));
               }
             }
             else{
               if(bTagCSV[i] >= 0.898){
                 BTagWeightMCNonSelJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]); 
                 BTagWeightDataNonSelJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag); 
-                BTagWeightMCAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]);
-                BTagWeightDataAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag);
+                //BTagWeightMCAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]);
+                //BTagWeightDataAllJets *= bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag);
               }
               else{
                 BTagWeightMCNonSelJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])); 
                 BTagWeightDataNonSelJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag)); 
-                BTagWeightMCAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]));
-                BTagWeightDataAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag));
+                //BTagWeightMCAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i]));
+                //BTagWeightDataAllJets *= (1.0-bTagTool->getTagEff(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i])*bTagTool->getSF(selJets[i].Pt(), selJets[i].Eta(), partFlavour[i], "CSVT", syst_btag, syst_mistag));
               }
             }
           }
           histo1D["BTagWeight_SelJetsOnly"]->Fill(BTagWeightDataSelJets/BTagWeightMCSelJets);
           histo1D["BTagWeight_NonSelJetsOnly"]->Fill(BTagWeightDataNonSelJets/BTagWeightMCNonSelJets);
-          histo1D["BTagWeight_AllJets"]->Fill(BTagWeightDataSelJets/BTagWeightMCAllJets);
+          histo1D["BTagWeight_AllJets"]->Fill(BTagWeightDataAllJets/BTagWeightMCAllJets);
         }
 
         if(BHadrIndex == 0 || BLeptIndex == 0){
@@ -838,6 +872,7 @@ int main (int argc, char *argv[])
           if(partFlavour[ii] == 21) MSPlot["JetsPt_partFlavGluon_BTagSF"+leptChannel]->Fill(selJets[ii].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
         }
         MSPlot["nBJets_BTagSF"+leptChannel]->Fill(bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["nLightJets_BTagSF"+leptChannel]->Fill(bTagStudy.getNrLightJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nPV_BTagSF"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["JetPt_LeadingJet_BTagSF"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["LeptonPt_BTagSF"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -866,9 +901,21 @@ int main (int argc, char *argv[])
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);      
 
         bool CutsSurvived = extraEvtSelCuts.KeepEvent(selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag), CWUIndex, decayCh);
+        MSPlot["MlbMqqbChiSq"+leptChannel]->Fill( bTagStudy.getMlbMqqbChiSq(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        if(bTagStudy.getMlbMqqbChiSq(ibTag) < 10) MSPlot["MlbMqqbChiSq_OnlyChiSq"+leptChannel]->Fill( bTagStudy.getMlbMqqbChiSq(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["HadrTopMass"+leptChannel]->Fill( (selJets[1]+selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["HadrWMass"+leptChannel]->Fill( (selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
 
         //Now get the MSPlots after this additional cuts
         if( CutsSurvived ){
+          if(decayCh == 0) nSelectedMu += 1;
+          else if(decayCh == 1) nSelectedEl += 1;
+
+          MSPlot["MlbMqqbChiSq_AllCuts"+leptChannel]->Fill( bTagStudy.getMlbMqqbChiSq(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["HadrTopMass_AllCuts"+leptChannel]->Fill( (selJets[1]+selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["HadrWMass_AllCuts"+leptChannel]->Fill( (selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+
+          MSPlot["nLightJets_AllCuts"+leptChannel]->Fill(bTagStudy.getNrLightJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["nBJets_AllCuts"+leptChannel]->Fill(bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["nPV_AllCuts"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["JetPt_LeadingJet_AllCuts"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -1070,7 +1117,7 @@ int main (int argc, char *argv[])
 
   //Store the b-tag histograms:
   if(!bTagPlotsMade)
-    bTagTool->WriteMCEfficiencyHistos("PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
+    bTagTool->WriteMCEfficiencyHistos(bTagPlotsOutput); //"PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_noTTbar.root");
 
   /////////////////////////
   // Write out the plots //
