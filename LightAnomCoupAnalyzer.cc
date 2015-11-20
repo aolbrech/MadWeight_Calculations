@@ -254,13 +254,13 @@ int main (int argc, char *argv[])
       MSPlot["nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+ leptFlav] = new MultiSamplePlot(datasets, "nLightJets_"+   bTitle[ibTag]+"_AfterBTag"+ leptFlav,10, -0.5, 9.5, "# light jets");
     }
       
-    MSPlot["HadrTopMass"+leptFlav] = new MultiSamplePlot(datasets,"HadrTopMass"+leptFlav, 120, 50, 250,"Top mass (GeV)");
-    MSPlot["HadrTopMass_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"HadrTopMass_AllCuts"+leptFlav, 120, 50, 250,"Top mass (GeV)");
-    MSPlot["HadrWMass"+leptFlav] = new MultiSamplePlot(datasets,"HadrWMass"+leptFlav, 75, 30, 150,"Top mass (GeV)");
-    MSPlot["HadrWMass_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"HadrWMass_AllCuts"+leptFlav, 75, 30, 150,"W mass (GeV)");
-    MSPlot["MlbMqqbChiSq"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq"+leptFlav, 50, 0, 20,"Mlb-Mqqb chi-sq");
-    MSPlot["MlbMqqbChiSq_OnlyChiSq"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_OnlyChiSq"+leptFlav, 50, 0, 20,"Mlb-Mqqb chi-sq");
-    MSPlot["MlbMqqbChiSq_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_AllCuts"+leptFlav, 50, 0, 20,"Mlb-Mqqb chi-sq");
+    MSPlot["HadrTopMass"+leptFlav] = new MultiSamplePlot(datasets,"HadrTopMass"+leptFlav, 175, 30, 320,"Top mass (GeV)");
+    MSPlot["HadrTopMass_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"HadrTopMass_AllCuts"+leptFlav, 175, 30, 320,"Top mass (GeV)");
+    MSPlot["HadrWMass"+leptFlav] = new MultiSamplePlot(datasets,"HadrWMass"+leptFlav, 90, 10, 180,"W mass (GeV)");
+    MSPlot["HadrWMass_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"HadrWMass_AllCuts"+leptFlav, 90, 10, 180,"W mass (GeV)");
+    MSPlot["MlbMqqbChiSq"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq"+leptFlav, 50, 0, 35,"Mlb-Mqqb chi-sq");
+    MSPlot["MlbMqqbChiSq_OnlyChiSq"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_OnlyChiSq"+leptFlav, 50, 0, 35,"Mlb-Mqqb chi-sq");
+    MSPlot["MlbMqqbChiSq_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_AllCuts"+leptFlav, 50, 0, 35,"Mlb-Mqqb chi-sq");
 
     MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
 
@@ -416,6 +416,19 @@ int main (int argc, char *argv[])
     histo1D["partonFlav_BJets_"+dsName] = new TH1F(("partonFlav_BJets_"+dsName).c_str(),("parton flavour for b-jets ("+dsTitle+")").c_str(),101,-0.5,100.5);
     histo1D["partonFlav_LightJets_"+dsName] = new TH1F(("partonFlav_LightJets_"+dsName).c_str(),("parton flavour for light jets ("+dsTitle+")").c_str(),101,-0.5,100.5);
     
+    histo2D["MlbMqqbChiSq_vs_nPv_"+dsName] = new TH2F(("MlbMqqbChiSq_vs_nPv_"+dsName).c_str(), ("Mlb-Mqqb #chi^{2} versus nr of primary vertices for "+dsTitle).c_str(), 40, 0, 40, 50,0, 10); 
+    histo2D["HadrTopMass_vs_nPv_"+dsName] = new TH2F(("HadrTopMass_vs_nPv_"+dsName).c_str(), ("Hadronic top mass versus nr of primary vertices for "+dsTitle).c_str(), 40, 0, 40, 175, 30, 320);
+    histo2D["HadrWMass_vs_nPv_"+dsName] = new TH2F(("HadrWMass_vs_nPv_"+dsName).c_str(), ("Hadronic w-boson mass versus nr of primary vertices for "+dsTitle).c_str(), 40, 0, 40, 120, 15, 175);
+    histo2D["MlbMqqbChiSq_vs_LeptPt_"+dsName] = new TH2F(("MlbMqqbChiSq_vs_LeptPt_"+dsName).c_str(), ("Mlb-Mqqb #chi^{2} versus lepton pT for "+dsTitle).c_str(), 75, 0, 200, 50, 0, 10);
+    histo2D["HadrTopMass_vs_LeptPt_"+dsName] = new TH2F(("HadrTopMass_vs_LeptPt_"+dsName).c_str(), ("Hadronic top mass versus lepton pt for "+dsTitle).c_str(), 75, 0, 200, 175, 30, 320);
+    histo2D["HadrWMass_vs_LeptPt_"+dsName] = new TH2F(("HadrWMass_vs_LeptPt_"+dsName).c_str(), ("Hadronic w-boson mass versus lepton pt for "+dsTitle).c_str(), 75, 0, 200, 120, 15, 175);
+    histo2D["MlbMqqbChiSq_vs_JetPt_"+dsName] = new TH2F(("MlbMqqbChiSq_vs_JetPt_"+dsName).c_str(), ("Mlb-Mqqb #chi^{2} versus jet pT for "+dsTitle).c_str(), 150, 0, 350, 50, 0, 10);
+    histo2D["HadrTopMass_vs_JetPt_"+dsName] = new TH2F(("HadrTopMass_vs_JetPt_"+dsName).c_str(), ("Hadronic top mass versus jet pT for "+dsTitle).c_str(), 150, 0, 350, 175, 30, 320);
+    histo2D["HadrWMass_vs_JetPt_"+dsName] = new TH2F(("HadrWMass_vs_JetPt_"+dsName).c_str(), ("Hadronic w-boson mass versus jet pT for "+dsTitle).c_str(), 150, 0, 350, 120, 15, 175);
+    
+    histo2D["MlbMqqbChiSq_vs_HadrTopMass_"+dsName] = new TH2F(("MlbMqqbChiSq_vs_HadrTopMass_"+dsName).c_str(), ("Mlb-Mqqb #chi^{2} versus hadronic top mass for "+dsTitle).c_str(), 175, 30, 320, 50, 0, 10);
+    histo2D["MlbMqqbChiSq_vs_HadrWMass_"+dsName] = new TH2F(("MlbMqqbChiSq_vs_HadrWMass_"+dsName).c_str(), ("Mlb-Mqqb #chi^{2} versus hadronic w-boson mass for "+dsTitle).c_str(), 120, 15, 175, 50, 0, 10);
+    histo2D["HadrTopMass_vs_HadrWMass_"+dsName] = new TH2F(("HadrTopMass_vs_HadrWMass_"+dsName).c_str(), ("Hadronic top mass versus hadronic w-boson mass for "+dsTitle).c_str(), 120, 15, 175, 175, 30, 320);
 
     //Only want these to be filled for TTbarJets_SemiMu!  (what about FullLept and FullHadr ??)
     int BothB = 0;
@@ -903,8 +916,26 @@ int main (int argc, char *argv[])
         bool CutsSurvived = extraEvtSelCuts.KeepEvent(selLepton, selJets, selJetCombi, bTagStudy.getMlbMqqbChiSq(ibTag), CWUIndex, decayCh);
         MSPlot["MlbMqqbChiSq"+leptChannel]->Fill( bTagStudy.getMlbMqqbChiSq(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         if(bTagStudy.getMlbMqqbChiSq(ibTag) < 10) MSPlot["MlbMqqbChiSq_OnlyChiSq"+leptChannel]->Fill( bTagStudy.getMlbMqqbChiSq(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
-        MSPlot["HadrTopMass"+leptChannel]->Fill( (selJets[1]+selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
-        MSPlot["HadrWMass"+leptChannel]->Fill( (selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["HadrTopMass"+leptChannel]->Fill( (selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["HadrWMass"+leptChannel]->Fill( (selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+
+        //2D plots in order to understand whether there is a correlation between the cut-values and nPV, lepton and jet Pt!
+        histo2D["MlbMqqbChiSq_vs_nPv_"+dsName]->Fill(nPrimVertices, bTagStudy.getMlbMqqbChiSq(ibTag));
+        histo2D["HadrTopMass_vs_nPv_"+dsName]->Fill(nPrimVertices, (selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M());
+        histo2D["HadrWMass_vs_nPv_"+dsName]->Fill(nPrimVertices, (selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M());
+        histo2D["MlbMqqbChiSq_vs_LeptPt_"+dsName]->Fill(selLepton.Pt(), bTagStudy.getMlbMqqbChiSq(ibTag));
+        histo2D["HadrTopMass_vs_LeptPt_"+dsName]->Fill(selLepton.Pt(), (selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M());
+        histo2D["HadrWMass_vs_LeptPt_"+dsName]->Fill(selLepton.Pt(), (selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M());
+        for(int ii = 0; ii < 4; ii++){
+          histo2D["MlbMqqbChiSq_vs_JetPt_"+dsName]->Fill(selJets[selJetCombi[ii]].Pt(), bTagStudy.getMlbMqqbChiSq(ibTag));
+          histo2D["HadrTopMass_vs_JetPt_"+dsName]->Fill(selJets[selJetCombi[ii]].Pt(), (selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M());
+          histo2D["HadrWMass_vs_JetPt_"+dsName]->Fill(selJets[selJetCombi[ii]].Pt(), (selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M());
+        }
+    
+        //Also understand the correlation between the three cut variables
+        histo2D["MlbMqqbChiSq_vs_HadrTopMass_"+dsName]->Fill((selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), bTagStudy.getMlbMqqbChiSq(ibTag) );
+        histo2D["MlbMqqbChiSq_vs_HadrWMass_"+dsName]->Fill((selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), bTagStudy.getMlbMqqbChiSq(ibTag) );
+        histo2D["HadrTopMass_vs_HadrWMass_"+dsName]->Fill((selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), (selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M() );
 
         //Now get the MSPlots after this additional cuts
         if( CutsSurvived ){
@@ -912,8 +943,8 @@ int main (int argc, char *argv[])
           else if(decayCh == 1) nSelectedEl += 1;
 
           MSPlot["MlbMqqbChiSq_AllCuts"+leptChannel]->Fill( bTagStudy.getMlbMqqbChiSq(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
-          MSPlot["HadrTopMass_AllCuts"+leptChannel]->Fill( (selJets[1]+selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
-          MSPlot["HadrWMass_AllCuts"+leptChannel]->Fill( (selJets[2]+selJets[3]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["HadrTopMass_AllCuts"+leptChannel]->Fill( (selJets[selJetCombi[1]]+selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["HadrWMass_AllCuts"+leptChannel]->Fill( (selJets[selJetCombi[2]]+selJets[selJetCombi[3]]).M(), datasets[iDataSet], true, Luminosity*scaleFactor);
 
           MSPlot["nLightJets_AllCuts"+leptChannel]->Fill(bTagStudy.getNrLightJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["nBJets_AllCuts"+leptChannel]->Fill(bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);

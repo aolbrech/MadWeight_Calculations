@@ -68,6 +68,8 @@ bool ExtraEvtSelCuts::KeepEvent(TLorentzVector lepton, vector<TLorentzVector> Je
       if((Jets[selJetComb[2]]+Jets[selJetComb[3]]).M() > MW_Down_[iCut] && (Jets[selJetComb[2]]+Jets[selJetComb[3]]).M() < MW_Up_[iCut] ) MWSurv[iCut] = true;
     }
     if(ChiSqSurv[chosenChiSq_] && MTSurv[chosenMassWindow_] && MWSurv[chosenMassWindow_]) keepEvt = true;
+    //if(MTSurv[chosenMassWindow_] && MWSurv[chosenMassWindow_]) keepEvt = true;
+    //if(MTSurv[chosenMassWindow_]) keepEvt = true;
 
     //Now get the numbers for the correct/wrong/unmatched categories!
     if(dataSetName_.find("TTbarJets") == 0){
