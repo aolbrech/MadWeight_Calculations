@@ -105,12 +105,18 @@ int main (int argc, char *argv[])
   bool onlyTTbar = false;
   bool onlyMuonChannel = true;       //Set this to true in order to reject all electron channel events!
 
+  //Give correct name to TF light ntuples!
   std::string tfFill = "";
   if(fillTFAfterCuts) tfFill = "_AfterExtraCuts";
 
+  //In case the bTagPlots still need to be made, only ttbarSemiLept sample should be considered!
+  if(!bTagPlotsMade) onlyTTbar = true;
+
+  //Set the correct bTagPlots ROOT file!
   std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_WithTTbar_OnlyTTbarSemiLept_12Bins.root";
   //std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_NoTTbar_OnlyTTbarSemiLept_12Bins.root";
   //std::string bTagPlotsOutput = "PersonalClasses/Calibrations/BTagSF/BTagWeightPlots_CSVT_NoTTbar_AllDataSets_12Bins.root";
+
   int stop = 0;
   if( file_exist(bTagPlotsOutput.c_str()) ){
     if(!bTagPlotsMade){
@@ -135,11 +141,11 @@ int main (int argc, char *argv[])
   if(stop == 1) return 0;
 
   //-- Specific b-tag stuff!
-  int ChosenBTag = 6;  //-->Corresponds to two T b-tags and a Tight light veto!
+  int ChosenBTag = 5;  //-->Corresponds to two T b-tags and no light veto!
   int NrBTags = 9;
   string bTitle[9] = {"LooseTags","LooseTagsLVeto","MediumTags","MediumTagsMVeto","MediumTagsLVeto","TightTags","TightTagsTVeto","TightTagsMVeto","TightTagsLVeto"};
-  string numberBTags = "AllBTags";
-  if(bTagChoiceMade){ NrBTags = 1; bTitle[0] = bTitle[ChosenBTag]; numberBTags = bTitle[ChosenBTag];}
+  string whichBTags = "AllBTags";
+  if(bTagChoiceMade){ NrBTags = 1; bTitle[0] = bTitle[ChosenBTag]; whichBTags = bTitle[ChosenBTag];}
 
   //-------------------------//
   //   Which systematics ?   //
@@ -147,30 +153,36 @@ int main (int argc, char *argv[])
   std::string doLeptonSFShift = "Nominal";   //Other options are "Minus" and "Plus" (Capital letters are needed!)
   std::string doLumiWeightShift = "Nominal"; //Other options are "Minus" and "Plus"
   std::string systematic = "Nominal";
+  if(argc >= 3) systematic = string(argv[2]);
+  std::cout << " - Will be using systematic " << systematic << " ! " << std::endl;
+  if(systematic != "Nominal" && systematic != "bTagMinus" && systematic != "bTagPlus" && systematic != "MuonSFMinus" && systematic != "MuonSFPlus" && systematic != "ElecSFMinus" && systematic != "ElecSFPlus"){
+    std::cout << "   *****  Given systematic is not allowed! " << std::endl;
+    std::cout << "   *****  Possibilities are : Nominal, bTagMinus, bTagPlus, MuonSFMinus, MuonSFPlus, ElecSFMinus and ElecSFPlus " << std::endl;
+    exit(-1);
+  }
 
   //b-tag systematics
   int syst_btag = 0; //+1 for SF up, -1 for SF down
-  if(systematic == "bTagMinus") syst_btag = -1;
+  if(systematic == "bTagMinus")     syst_btag = -1;
   else if(systematic == "bTagPlus") syst_btag = 1;
   int syst_mistag = 0; //+1 for SF up, -1 for SF down
-  if(systematic == "misTagMinus") syst_mistag = -1;
+  if(systematic == "misTagMinus")     syst_mistag = -1;
   else if(systematic == "misTagPlus") syst_mistag = 1;
-  //syst_btag = 1; syst_mistag = 1;
         
-/*  //lepton SF systematics
+  //lepton SF systematics
   string syst_muonSF = "Nominal";
-  if(systematic == "MuonSFMinus") syst_muonSF = "Minus";
+  if(systematic == "MuonSFMinus")     syst_muonSF = "Minus";
   else if(systematic == "MuonSFPlus") syst_muonSF = "Plus";
-  string syst_electronSF = "Nominal";
-  if(systematic == "ElectronSFMinus") syst_electronSF = "Minus";
-  else if(systematic == "ElectronSFPlus") syst_electronSF = "Plus";
-*/
+  string syst_elecSF = "Nominal";
+  if(systematic == "ElecSFMinus")     syst_elecSF = "Minus";
+  else if(systematic == "ElecSFPlus") syst_elecSF = "Plus";
+
   //----------------------------//
   // Input & output information //
   //----------------------------//
   //ROOT file for storing plots
   string pathPNG = "PlotsMacro_Light";
-  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis_"+numberBTags+"_"+time+".root").c_str(),"RECREATE");
+  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis_"+systematic+"_"+whichBTags+"_"+time+".root").c_str(),"RECREATE");
 
   //Which datasets should be considered
   vector<string> inputFiles;
@@ -181,7 +193,7 @@ int main (int argc, char *argv[])
   }
   else{ 
     //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                     //Winter14_v8
+    inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
     //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
     inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_Nominal.root").c_str());
     inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_Nominal.root").c_str());
@@ -263,7 +275,6 @@ int main (int argc, char *argv[])
     MSPlot["MlbMqqbChiSq_AllCuts"+leptFlav] = new MultiSamplePlot(datasets,"MlbMqqbChiSq_AllCuts"+leptFlav, 50, 0, 35,"Mlb-Mqqb chi-sq");
 
     MSPlot["nSelectedJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nSelectedJets_BeforeBTag"+leptFlav,10, -0.5, 9.5, "# selected jets");
-
     MSPlot["partFlav_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets,"partFlav_BeforeBTag"+leptFlav, 5, -0.5, 4.5, "Parton flavour of selected jets");
 
     MSPlot["nBJets_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "nBJets_BeforeBTag"+leptFlav, 10, -0.5, 9.5, "# b-jets");
@@ -307,8 +318,37 @@ int main (int argc, char *argv[])
     MSPlot["JetPt_LeadingJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_BeforeBTag"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_AllCuts"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
-    MSPlot["JetMass_LeadingJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetMass_LeadingJet_AllCuts"+leptFlav, 75, 0, 50,"Jet p_{T} (GeV)");
     MSPlot["JetPt_LeadingJet_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_LeadingJet_BTagSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+
+    MSPlot["JetPt_SecondJet_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_SecondJet_BeforePU"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_SecondJet_PU_NoLeptonSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_SecondJet_PU_NoLeptonSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_SecondJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_SecondJet_BeforeBTag"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_SecondJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_SecondJet"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_SecondJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_SecondJet_AllCuts"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_SecondJet_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_SecondJet_BTagSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+
+    MSPlot["JetPt_ThirdJet_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_ThirdJet_BeforePU"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_ThirdJet_PU_NoLeptonSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_ThirdJet_PU_NoLeptonSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_ThirdJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_ThirdJet_BeforeBTag"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_ThirdJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_ThirdJet"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_ThirdJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_ThirdJet_AllCuts"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_ThirdJet_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_ThirdJet_BTagSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+
+    MSPlot["JetPt_FourthJet_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FourthJet_BeforePU"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FourthJet_PU_NoLeptonSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FourthJet_PU_NoLeptonSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FourthJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FourthJet_BeforeBTag"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FourthJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FourthJet"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FourthJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FourthJet_AllCuts"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FourthJet_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FourthJet_BTagSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+
+    MSPlot["JetPt_FifthJet_BeforePU"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FifthJet_BeforePU"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FifthJet_PU_NoLeptonSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FifthJet_PU_NoLeptonSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FifthJet_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FifthJet_BeforeBTag"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FifthJet"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FifthJet"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FifthJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FifthJet_AllCuts"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+    MSPlot["JetPt_FifthJet_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetPt_FifthJet_BTagSF"+leptFlav, 120, 0, 350,"Jet p_{T} (GeV)");
+
+    MSPlot["JetMass_LeadingJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetMass_LeadingJet_AllCuts"+leptFlav, 75, 0, 50,"Jet p_{T} (GeV)");
     MSPlot["JetEta_LeadingJet"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet"+leptFlav, 50, -2.6, 2.6,"Jet #eta");
     MSPlot["JetEta_LeadingJet_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet_BTagSF"+leptFlav, 50, -2.6, 2.6,"Jet #eta");
     MSPlot["JetEta_LeadingJet_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "JetEta_LeadingJet_AllCuts"+leptFlav, 50, -2.6, 2.6,"Jet #eta");
@@ -320,6 +360,7 @@ int main (int argc, char *argv[])
     MSPlot["nPV_BTagSF"+leptFlav] = new MultiSamplePlot(datasets, "nPV_BTagSF"+leptFlav, 50, 0, 50,"Number of primary vertices");
     MSPlot["nPV_AllCuts"+leptFlav] = new MultiSamplePlot(datasets, "nPV_AllCuts"+leptFlav, 50, 0, 50,"Number of primary vertices");
 
+    MSPlot["CSVDistr_BeforeBTag"+leptFlav] = new MultiSamplePlot(datasets, "CSVDistribution_BeforeBTag"+leptFlav, 100, -1, 2, "CSV discriminant");
     MSPlot["CSVDistr_BJets"+leptFlav] = new MultiSamplePlot(datasets, "CSVDistr_BJets"+leptFlav,50,-1,2,"CSV discriminant");
     MSPlot["CSVDistr_LightJets"+leptFlav] = new MultiSamplePlot(datasets, "CSVDistr_LightJets"+leptFlav,50,-1,2,"CSV discriminant");
   }
@@ -329,7 +370,6 @@ int main (int argc, char *argv[])
   //-----------------------//
   map<string,TH1F*> histo1D;
   map<string,TH2F*> histo2D;  
-
 
   //--------------------------------//
   // Lumi reweighting and lepton SF //
@@ -564,26 +604,34 @@ int main (int argc, char *argv[])
       //Distributions before PU reweighting is taken into account!
       MSPlot["nPV_BeforePU"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["JetPt_LeadingJet_BeforePU"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_SecondJet_BeforePU"+leptChannel]->Fill( selJets[1].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_ThirdJet_BeforePU"+leptChannel]->Fill( selJets[2].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_FourthJet_BeforePU"+leptChannel]->Fill( selJets[3].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      if(selJets.size() > 4) MSPlot["JetPt_FifthJet_BeforePU"+leptChannel]->Fill( selJets[4].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["LeptonPt_BeforePU"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       scaleFactor = scaleFactor * lumiWeight;
       histo1D["lumiWeight_"+dsName]->Fill(lumiWeight);
 
       MSPlot["nPV_PU_NoLeptonSF"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["JetPt_LeadingJet_PU_NoLeptonSF"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_SecondJet_PU_NoLeptonSF"+leptChannel]->Fill( selJets[1].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_ThirdJet_PU_NoLeptonSF"+leptChannel]->Fill( selJets[2].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_FourthJet_PU_NoLeptonSF"+leptChannel]->Fill( selJets[3].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      if(selJets.size() > 4) MSPlot["JetPt_FifthJet_PU_NoLeptonSF"+leptChannel]->Fill( selJets[4].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["LeptonPt_PU_NoLeptonSF"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       //Get the correct lepton scalefactor!
       double leptonSF = 1;
-      if(decayCh == 0 && !(dsName.find("Data") == 0 || dsName.find("DATA") == 0 || dsName.find("data") == 0) )
-        leptonSF = leptonTools->getMuonSF(selLepton.Eta(), selLepton.Pt(), systematic);
-      else if(decayCh == 1 && !(dsName.find("Data") == 0 || dsName.find("DATA") == 0 || dsName.find("data") == 0) )
-        leptonSF = leptonTools->getElectronSF(selLepton.Eta(), selLepton.Pt(), systematic);
+      if( !(dsName.find("Data") == 0 || dsName.find("DATA") == 0 || dsName.find("data") == 0) ){
+        if(decayCh == 0 ) leptonSF = leptonTools->getMuonSF(selLepton.Eta(), selLepton.Pt(), syst_muonSF);
+        else              leptonSF = leptonTools->getElectronSF(selLepton.Eta(), selLepton.Pt(), syst_elecSF);
+      }
       scaleFactor = scaleFactor * leptonSF;
       histo1D["leptonSF_"+dsName]->Fill(leptonSF); 
 
       //Fill the b-tag histo's in case they do not yet exist
       if(!bTagPlotsMade){
         bTagTool->FillMCEfficiencyHistos(selJets, partFlavour, bTagCSV);
-        continue;
+        continue;  //In case the histo's still need to be filled, do not continue with the analysis!
       }
 
       //ooooooooOOOOOOOOOOOOooooooooooooOOOOOOOOOOOOooooooooooooOOOOO
@@ -598,6 +646,10 @@ int main (int argc, char *argv[])
 
       MSPlot["nPV_BeforeBTag"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["JetPt_LeadingJet_BeforeBTag"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_SecondJet_BeforeBTag"+leptChannel]->Fill( selJets[1].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_ThirdJet_BeforeBTag"+leptChannel]->Fill( selJets[2].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      MSPlot["JetPt_FourthJet_BeforeBTag"+leptChannel]->Fill( selJets[3].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+      if(selJets.size() > 4) MSPlot["JetPt_FifthJet_BeforeBTag"+leptChannel]->Fill( selJets[4].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
       MSPlot["LeptonPt_BeforeBTag"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
 
       //Store the expected Mlb, Mqqb, Mt and MW distributions
@@ -626,6 +678,9 @@ int main (int argc, char *argv[])
         }
         else
           CWUIndex = 2;
+
+        for(int iJet = 0; iJet < selJets.size(); iJet++)
+          MSPlot["CSVDistr_BeforeBTag"+leptChannel]->Fill(bTagCSV[iJet], datasets[iDataSet], true, Luminosity*scaleFactor);
 
         MSPlot["nBTaggedJets_"+ bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nLightJets_"+   bTitle[ibTag]+"_BeforeBTag"+leptChannel]->Fill( bTagStudy.getNrLightJets(ibTag),   datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -706,6 +761,10 @@ int main (int argc, char *argv[])
 
         MSPlot["nPV"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["JetPt_LeadingJet"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["JetPt_SecondJet"+leptChannel]->Fill( selJets[1].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["JetPt_ThirdJet"+leptChannel]->Fill( selJets[2].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["JetPt_FourthJet"+leptChannel]->Fill( selJets[3].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        if(selJets.size() > 4) MSPlot["JetPt_FifthJet"+leptChannel]->Fill( selJets[4].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["LeptonPt"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["JetEta_LeadingJet"+leptChannel]->Fill( selJets[0].Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["LeptonEta"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -888,6 +947,10 @@ int main (int argc, char *argv[])
         MSPlot["nLightJets_BTagSF"+leptChannel]->Fill(bTagStudy.getNrLightJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["nPV_BTagSF"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["JetPt_LeadingJet_BTagSF"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["JetPt_SecondJet_BTagSF"+leptChannel]->Fill( selJets[1].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["JetPt_ThirdJet_BTagSF"+leptChannel]->Fill( selJets[2].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        MSPlot["JetPt_FourthJet_BTagSF"+leptChannel]->Fill( selJets[3].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+        if(selJets.size() > 4) MSPlot["JetPt_FifthJet_BTagSF"+leptChannel]->Fill( selJets[4].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["LeptonPt_BTagSF"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["JetEta_LeadingJet_BTagSF"+leptChannel]->Fill( selJets[0].Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
         MSPlot["LeptonEta_BTagSF"+leptChannel]->Fill( selLepton.Eta(), datasets[iDataSet], true, Luminosity*scaleFactor);
@@ -950,6 +1013,10 @@ int main (int argc, char *argv[])
           MSPlot["nBJets_AllCuts"+leptChannel]->Fill(bTagStudy.getNrBTaggedJets(ibTag), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["nPV_AllCuts"+leptChannel]->Fill( nPrimVertices, datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["JetPt_LeadingJet_AllCuts"+leptChannel]->Fill( selJets[0].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["JetPt_SecondJet_AllCuts"+leptChannel]->Fill( selJets[1].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["JetPt_ThirdJet_AllCuts"+leptChannel]->Fill( selJets[2].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          MSPlot["JetPt_FourthJet_AllCuts"+leptChannel]->Fill( selJets[3].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
+          if(selJets.size() > 4) MSPlot["JetPt_FifthJet_AllCuts"+leptChannel]->Fill( selJets[4].Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["JetMass_LeadingJet_AllCuts"+leptChannel]->Fill( selJets[0].M(), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["LeptonPt_AllCuts"+leptChannel]->Fill( selLepton.Pt(), datasets[iDataSet], true, Luminosity*scaleFactor);
           MSPlot["LeptonMass_AllCuts"+leptChannel]->Fill( selLepton.M(), datasets[iDataSet], true, Luminosity*scaleFactor);
