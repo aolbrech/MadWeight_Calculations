@@ -104,6 +104,7 @@ int main (int argc, char *argv[])
   bool fillTFAfterCuts = false;      //Decide whether the TFTree is filled before or after the additional event selection cuts (b-tag, chi-sq and Mw-Mt)
   bool onlyTTbar = false;
   bool onlyMuonChannel = true;       //Set this to true in order to reject all electron channel events!
+  bool runLocally = true;            //Differentiate between local and m-machines running for the location of the input samples
 
   //Give correct name to TF light ntuples!
   std::string tfFill = "";
@@ -198,29 +199,52 @@ int main (int argc, char *argv[])
   vector<Dataset*> datasets;
   std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_100848/";
   if(onlyTTbar){
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
+    if(!runLocally) inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
+    else            inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
   }
   else{ 
-    //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
-    //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_4jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_1jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_2jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_3jets_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_4jets_Nominal.root").c_str());
-    inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_t_Nominal.root");
-    inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_tbar_Nominal.root");
-    inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_t_Nominal.root");
-    inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_tbar_Nominal.root");
-    inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_t_Nominal.root");
-    inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_tbar_Nominal.root");
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullLept_Nominal.root").c_str());
-    inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullHadr_Nominal.root").c_str());
+    if(!runLocally){
+      //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
+      //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_1jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_2jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_3jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_4jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_4jets_Nominal.root").c_str());
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_t_Nominal.root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_tbar_Nominal.root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_t_Nominal.root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_tbar_Nominal.root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_t_Nominal.root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_tbar_Nominal.root");
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullLept_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullHadr_Nominal.root").c_str());
+    }
+    else{
+      inputFiles.push_back("LightTree/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");    //Winter14_v8
+      inputFiles.push_back("LightTree/AnomCoupLight_ZJets_1jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_ZJets_2jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_ZJets_3jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_ZJets_4jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_WJets_1jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_WJets_2jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_WJets_3jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_WJets_4jets_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_SingleTop_sChannel_t_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_SingleTop_sChannel_tbar_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_SingleTop_tWChannel_t_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_SingleTop_tWChannel_tbar_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_SingleTop_tChannel_t_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_SingleTop_tChannel_tbar_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_FullLept_Nominal.root");
+      inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_FullHadr_Nominal.root");
+    }
   }
   if(verbosity > 0) std::cout << " - All ROOT files loaded " << std::endl;
 	
