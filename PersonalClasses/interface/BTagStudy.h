@@ -46,6 +46,8 @@ class BTagStudy{
     int getNrNonbTaggedJets(int OptionNr){return NonbTagJetNr[OptionNr].size();};
     int getNrLightJets(int OptionNr)     {return LightJetNr[OptionNr].size();};
 
+    vector<int> getLightJets(int OptionNr) {return LightJetNr[OptionNr];};
+
     float getMlbMqqbChiSq(int bTagNr) {return LowestChiSq[bTagNr];};
 
   private:
