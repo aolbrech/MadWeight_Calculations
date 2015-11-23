@@ -422,9 +422,9 @@ int main (int argc, char *argv[])
   //-----------------------//
   // Load personal classes //
   //-----------------------//
-  float Mlb  = 108.1841, S_Mlb  = 31.4213;
-  float Mqqb = 174.6736, S_Mqqb = 17.5757;
-  float MW   = 83.8037,  S_MW   = 10.2385;
+  float Mlb  = 107.7945, S_Mlb  = 32.4255;
+  float Mqqb = 175.0311, S_Mqqb = 17.0589;
+  float MW   = 83.6161,  S_MW   = 10.2171;
   ExtraEvtSelCuts extraEvtSelCuts(Mqqb, S_Mqqb, MW, S_MW, bTagChoiceMade, 3, 2);
   BTagStudy bTagStudy(verbosity, datasets, bTagChoiceMade, ChosenBTag, Mlb, S_Mlb, Mqqb, S_Mqqb);
 
