@@ -102,9 +102,9 @@ int main (int argc, char *argv[]){
   if(argc >= 4)
     systematic = string(argv[3]);
   std::cout << " ** Will be using systematic : " << systematic << std::endl;
-  if(systematic != "Nominal" && systematic != "JESPlus" && systematic != "JESMinus" && systematic != "JERPlus" && systematic != "JERMinus" && systematic != "bTagPlus" && systematic != "bTagMinus"){
+  if(systematic != "Nominal" && systematic != "JESPlus" && systematic != "JESMinus" && systematic != "JERPlus" && systematic != "JERMinus"){
     std::cout << " *****  Given systematic is not allowed! " << std::endl;
-    std::cout << " *****  Possibilities are : Nominal, JESPlus, JESMinus, JERPlus, JERMinus, bTagPlus, bTagMinus " << std::endl;
+    std::cout << " *****  Possibilities are : Nominal, JESPlus, JESMinus, JERPlus, JERMinus " << std::endl;
     exit(-1);
   }
  
