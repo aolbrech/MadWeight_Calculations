@@ -1,0 +1,92 @@
+\documentclass{article} 
+\usepackage[margin=0.5in]{geometry} 
+\begin{document} 
+
+ \begin{abstract} 
+ 
+   The tables in this document represent the influence of the additional event selection cuts that were applied in order to reduce the number of selected events for CPU reasons. \\ 
+   The considered cuts are rather basic and are merely developed to reduce the number of so-called wrong events \\ 
+   \begin{itemize} 
+     \item Cut on Mlb-Mqqb $\chi^{2}$ distribution 
+     \item Cut on top and W-mass window 
+   \end{itemize} 
+ 
+   \textbf{Created on :} \today 
+ \end{abstract} 
+ 
+ \begin{table}[h!t] 
+  \caption{Original number of events, before any additional event selection cuts are applied} 
+  \centering 
+   \begin{tabular}{c|c} 
+     Number of events    & s/b ($\%$)     \\ 
+     \hline
+     1425  & 0 
+ 
+   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the Mlb-Mqqb $\chi^{2}$.} 
+  \centering 
+   \begin{tabular}{c|c|c|} 
+     $\chi^{2}$ cut-value    & Number of events  & Evt reduction ($\%$)    \\ 
+     \hline
+     50  &   926  &  35.0175 \\ 
+     30  &   808  &  43.2982 \\ 
+     20  &   700  &  50.8772 \\ 
+     10  &   545  &  61.7544 \\ 
+     5  &   409  &  71.2982 \\ 
+   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the $M_{top}$ mass-window.} 
+  \centering 
+   \begin{tabular}{c|c|c|c|}
+     Nr $\sigma$'s & Mass-window ($m_{top}$)   & Number of events   & Evt reduction ($\%$)     \\
+     \hline
+     5 & 89.7366 - 260.326  &   856 &  39.9298 \\ 
+     3 & 123.854 - 226.208  &   650 &  54.386 \\ 
+     2 & 140.913 - 209.149  &   511 &  64.1404 \\ 
+     1.5 & 149.443 - 200.619  &   418 &  70.6667 \\ 
+     1 & 157.972 - 192.09  &   296 &  79.2281 \\ 
+   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the $M_{W}$ mass-window.} 
+  \centering 
+   \begin{tabular}{c|c|c|c|}
+     Nr $\sigma$'s & Mass-window ($m_{top}$)    & Number of events   & Evt reduction ($\%$)    \\
+     \hline
+     5 & 32.5306 - 134.702  &   753 & 47.1579 \\ 
+     3 & 52.9648 - 114.267  &   493 & 65.4035 \\ 
+     2 & 63.1819 - 104.05  &   332 & 76.7018 \\ 
+     1.5 & 68.2904 - 98.9417  &   256 & 82.0351 \\ 
+     1 & 73.399 - 93.8332  &   181 & 87.2982 \\ 
+   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the combined $M_{top}-M_{W}$ mass-window.} 
+  \centering 
+   \begin{tabular}{c|c|c|} 
+     Mass-window $\sigma$'s & Total number of events    & Evt reduction ($\%$)     \\ 
+     \hline
+     5 & 648 & 54.5263 \\ 
+     3 & 360 & 74.7368 \\ 
+     2 & 206 & 85.5439 \\ 
+     1.5 & 131 & 90.807 \\ 
+     1 & 65 & 95.4386 \\ 
+   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on both the Mlb-Mqqb $\chi^{2}$ and the combined $M_{top}-M_{W}$ mass-window.} 
+  \centering 
+
+   \begin{tabular}{c|c|c|c|}
+    Mass-window $\sigma$'s & $\chi^{2}$ cut-value   & Number of events & Evt reduction ($\%$)  \\
+     \hline
+   2 & 10 & 179 & 87.4386 \\ 
+\end{document} 

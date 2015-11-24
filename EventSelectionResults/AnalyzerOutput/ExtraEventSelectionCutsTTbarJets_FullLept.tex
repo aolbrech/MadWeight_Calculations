@@ -1,0 +1,91 @@
+\documentclass{article} 
+\usepackage[margin=0.5in]{geometry} 
+\begin{document} 
+
+ \begin{abstract} 
+ 
+   The tables in this document represent the influence of the additional event selection cuts that were applied in order to reduce the number of selected events for CPU reasons. \\ 
+   The considered cuts are rather basic and are merely developed to reduce the number of so-called wrong events \\ 
+   \begin{itemize} 
+     \item Cut on Mlb-Mqqb $\chi^{2}$ distribution 
+     \item Cut on top and W-mass window 
+   \end{itemize} 
+ 
+   \textbf{Created on :} \today 
+ \end{abstract} 
+ 
+ \begin{table}[h!t] 
+  \caption{Original number of events, before any additional event selection cuts are applied} 
+  \centering 
+   \begin{tabular}{c|c|c|c|c} 
+     Correct evts    & Wrong evts     & Unmatched evts      &  Total evts & s/b ($\%$)     \\ 
+     \hline
+     0   &   0  & 50987 & 50987  & 0 
+ 
+   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the Mlb-Mqqb $\chi^{2}$.} 
+  \centering 
+   \begin{tabular}{c|c|c|c|c|c} 
+     $\chi^{2}$ cut-value    & Correct evts    & Wrong evts     & Unmatched evts  & Evt reduction ($\%$)    & s/b ($\%$)     \\ 
+     \hline
+     50  &   0  &  0  &  39440  &  22.6469 & 0 \\ 
+     30  &   0  &  0  &  36029  &  29.3369 & 0 \\ 
+     20  &   0  &  0  &  33082  &  35.1168 & 0 \\ 
+     10  &   0  &  0  &  27577  &  45.9137 & 0 \\ 
+     5  &   0  &  0  &  21384  &  58.0599 & 0   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the $M_{top}$ mass-window.} 
+  \centering 
+   \begin{tabular}{c|c|c|c|c|c|c}
+     Nr $\sigma$'s & Mass-window ($m_{top}$)    & Correct evts    & Wrong evts     & Unmatched evts   & Evt reduction ($\%$)    & s/b ($\%$)     \\
+     \hline
+     5 & 89.7366 - 260.326  &   0  &  0  &  36060  &  29.2761 &  0 \\ 
+     3 & 123.854 - 226.208  &   0  &  0  &  29080  &  42.9659 &  0 \\ 
+     2 & 140.913 - 209.149  &   0  &  0  &  23065  &  54.763 &  0 \\ 
+     1.5 & 149.443 - 200.619  &   0  &  0  &  19122  &  62.4963 &  0 \\ 
+     1 & 157.972 - 192.09  &   0  &  0  &  13951  &  72.6381 &  0   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the $M_{W}$ mass-window.} 
+  \centering 
+   \begin{tabular}{c|c|c|c|c|c|c}
+     Nr $\sigma$'s & Mass-window ($m_{top}$)    & Correct evts    & Wrong evts     & Unmatched evts   & Evt reduction ($\%$)    & s/b ($\%$)     \\
+     \hline
+     5 & 32.5306 - 134.702  &   0  &  0  &  30902  &  39.3924 &  0 \\ 
+     3 & 52.9648 - 114.267  &   0  &  0  &  21146  &  58.5267 &  0 \\ 
+     2 & 63.1819 - 104.05  &   0  &  0  &  14723  &  71.124 &  0 \\ 
+     1.5 & 68.2904 - 98.9417  &   0  &  0  &  11262  &  77.912 &  0 \\ 
+     1 & 73.399 - 93.8332  &   0  &  0  &  7635  &  85.0256 &  0   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on the combined $M_{top}-M_{W}$ mass-window.} 
+  \centering 
+   \begin{tabular}{c|c|c|c|c|c} 
+     Mass-window $\sigma$'s & Correct evts    & Wrong evts     & Unmatched evts  & Evt reduction ($\%$)   & s/b ($\%$)     \\ 
+     \hline
+     5 & 0  &  0  &  28445  &  44.2113 &  0 \\ 
+     3 & 0  &  0  &  17464  &  65.7481 &  0 \\ 
+     2 & 0  &  0  &  10208  &  79.9792 &  0 \\ 
+     1.5 & 0  &  0  &  6633  &  86.9908 &  0 \\ 
+     1 & 0  &  0  &  3305  &  93.518 &  0   \end{tabular} 
+ \end{table} 
+ 
+ \begin{table}[h!t] 
+  \caption{Remaining number of events, after applying cuts on both the Mlb-Mqqb $\chi^{2}$ and the combined $M_{top}-M_{W}$ mass-window.} 
+  \centering 
+
+   \begin{tabular}{c|c|c|c|c|c|c}
+    Mass-window $\sigma$'s & $\chi^{2}$ cut-value   & Correct evts   & Wrong evts    & Unmatched evts & Evt reduction ($\%$)   & s/b ($\%$)    \\
+     \hline
+     2 & 10 & 0 & 0 & 9865 & 80.6519 & 0
+   \end{tabular} 
+ \end{table} 
+ 
+\end{document} 

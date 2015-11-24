@@ -48,7 +48,7 @@ class TFCreation{
         TF1 AllCaloEnergyFits[30];
         bool doFits_;
 
-        double EtaValues[6], ;
+        double EtaValues[6];
         std::string EtaValue[6], EtaBin[5], EtaTitle[5];
 
         int nParsFit_, nEtaBins_;
