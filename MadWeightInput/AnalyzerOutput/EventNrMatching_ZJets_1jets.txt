@@ -1,0 +1,1 @@
+  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)    MC scale factor

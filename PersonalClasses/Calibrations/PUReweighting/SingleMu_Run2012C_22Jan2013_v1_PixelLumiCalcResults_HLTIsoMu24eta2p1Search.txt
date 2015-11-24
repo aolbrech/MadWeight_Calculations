@@ -1,0 +1,1029 @@
+Command used: lumiCalc2.py -i merged1438682327.json -hltpath HLT_IsoMu24_eta2p1_* recorded
+[INFO] No qualified hlt data found for run  204800
+[INFO] No qualified hlt data found for run  204803
+[INFO] No qualified hlt data found for run  165206
+[INFO] No qualified hlt data found for run  204809
+[INFO] No qualified hlt data found for run  204812
+[INFO] No qualified trg data found for run  167943
+[INFO] No qualified hlt data found for run  167943
+[INFO] No qualified hlt data found for run  165214
+[INFO] No qualified hlt data found for run  165220
+[INFO] No qualified hlt data found for run  202090
+[INFO] No qualified trg data found for run  167967
+[INFO] No qualified hlt data found for run  167967
+[INFO] No qualified trg data found for run  167969
+[INFO] No qualified hlt data found for run  167969
+[INFO] No qualified hlt data found for run  165254
+[INFO] No qualified hlt data found for run  165272
+[INFO] No qualified hlt data found for run  172444
+[INFO] No qualified hlt data found for run  172448
+[INFO] No qualified hlt data found for run  172451
+[INFO] No qualified hlt data found for run  172457
+[INFO] No qualified hlt data found for run  172561
+[INFO] No qualified hlt data found for run  172567
+[INFO] No qualified hlt data found for run  172573
+[INFO] No qualified hlt data found for run  172590
+[INFO] No qualified hlt data found for run  172592
+[INFO] No qualified hlt data found for run  172596
+[INFO] No qualified hlt data found for run  172599
+[INFO] No qualified hlt data found for run  172601
+[INFO] No qualified hlt data found for run  172609
+[INFO] No qualified hlt data found for run  172610
+[INFO] No qualified trg data found for run  172632
+[INFO] No qualified hlt data found for run  172632
+[INFO] No qualified trg data found for run  172820
+[INFO] No qualified hlt data found for run  172820
+[INFO] No qualified trg data found for run  172823
+[INFO] No qualified hlt data found for run  172823
+[INFO] No qualified trg data found for run  172866
+[INFO] No qualified hlt data found for run  172866
+[INFO] No qualified hlt data found for run  205924
+[INFO] No qualified hlt data found for run  205941
+[INFO] No qualified hlt data found for run  205943
+[INFO] No qualified hlt data found for run  205945
+[INFO] No qualified hlt data found for run  205948
+[INFO] No qualified hlt data found for run  205950
+[INFO] No qualified hlt data found for run  205956
+[INFO] No qualified hlt data found for run  205994
+[INFO] No qualified hlt data found for run  206003
+[INFO] No qualified hlt data found for run  206005
+[INFO] No qualified hlt data found for run  206007
+[INFO] No qualified hlt data found for run  206027
+[INFO] No qualified hlt data found for run  206029
+[INFO] No qualified hlt data found for run  206030
+[INFO] No qualified hlt data found for run  165137
+[INFO] No qualified hlt data found for run  165139
+[INFO] No qualified hlt data found for run  165144
+[INFO] No qualified hlt data found for run  165150
+[INFO] No qualified hlt data found for run  197919
+[INFO] No qualified hlt data found for run  165152
+[INFO] No qualified hlt data found for run  165154
+[INFO] No qualified hlt data found for run  197923
+[INFO] No qualified hlt data found for run  197924
+[INFO] No qualified hlt data found for run  197925
+[INFO] No qualified hlt data found for run  165158
+[INFO] No qualified hlt data found for run  197929
+[INFO] No qualified hlt data found for run  165163
+[INFO] No qualified hlt data found for run  165165
+[INFO] No qualified hlt data found for run  165168
+[INFO] No qualified hlt data found for run  165225
+[INFO] No qualified hlt data found for run  165229
+[INFO] No qualified hlt data found for run  165233
+[INFO] No qualified hlt data found for run  165238
+[INFO] No qualified hlt data found for run  165241
+[INFO] No qualified hlt data found for run  165262
+[INFO] No qualified hlt data found for run  165268
+[INFO] No qualified hlt data found for run  165269
+[INFO] No qualified hlt data found for run  165271
+[INFO] No qualified hlt data found for run  198040
+[INFO] No qualified hlt data found for run  198046
+[INFO] No qualified hlt data found for run  189922
+[INFO] No qualified hlt data found for run  189924
+[INFO] No qualified hlt data found for run  189926
+[INFO] No qualified hlt data found for run  189928
+[INFO] No qualified hlt data found for run  189931
+[INFO] No qualified hlt data found for run  189932
+[INFO] No qualified hlt data found for run  189934
+[INFO] No qualified trg data found for run  165401
+[INFO] No qualified hlt data found for run  165401
+[INFO] No qualified hlt data found for run  206004
+[INFO] No qualified hlt data found for run  206008
+[INFO] No qualified hlt data found for run  198405
+[INFO] No qualified hlt data found for run  198409
+[INFO] No qualified hlt data found for run  198412
+[INFO] No qualified hlt data found for run  198421
+[INFO] No qualified hlt data found for run  198425
+[INFO] No qualified hlt data found for run  198442
+[INFO] No qualified hlt data found for run  198443
+[INFO] No qualified hlt data found for run  198445
+[INFO] No qualified hlt data found for run  198448
+[INFO] No qualified hlt data found for run  198449
+[INFO] No qualified hlt data found for run  198451
+[INFO] No qualified hlt data found for run  198453
+[INFO] No qualified hlt data found for run  198455
+[INFO] No qualified hlt data found for run  198457
+[INFO] No qualified hlt data found for run  198460
+[INFO] No qualified hlt data found for run  198461
+[INFO] No qualified hlt data found for run  198462
+[INFO] No qualified hlt data found for run  198466
+[INFO] No qualified hlt data found for run  198468
+[INFO] No qualified hlt data found for run  198471
+[INFO] No qualified hlt data found for run  198523
+[INFO] No qualified trg data found for run  179193
+[INFO] No qualified hlt data found for run  179193
+[INFO] No qualified trg data found for run  179196
+[INFO] No qualified hlt data found for run  179196
+[INFO] No qualified trg data found for run  179202
+[INFO] No qualified hlt data found for run  179202
+[INFO] No qualified trg data found for run  190487
+[INFO] No qualified hlt data found for run  190487
+[INFO] No qualified hlt data found for run  190488
+[INFO] No qualified trg data found for run  179212
+[INFO] No qualified hlt data found for run  179212
+[INFO] No qualified trg data found for run  179242
+[INFO] No qualified hlt data found for run  179242
+[INFO] No qualified hlt data found for run  166143
+[INFO] No qualified hlt data found for run  166144
+[INFO] No qualified hlt data found for run  166145
+[INFO] No qualified hlt data found for run  190734
+[INFO] No qualified hlt data found for run  190735
+[INFO] No qualified trg data found for run  171084
+[INFO] No qualified hlt data found for run  171084
+[INFO] No qualified hlt data found for run  166375
+[INFO] No qualified hlt data found for run  171090
+[INFO] No qualified hlt data found for run  191242
+[INFO] No qualified hlt data found for run  191244
+[INFO] No qualified hlt data found for run  198446
+[INFO] No qualified hlt data found for run  199563
+[INFO] No qualified hlt data found for run  199565
+[INFO] No qualified hlt data found for run  166840
+[INFO] No qualified hlt data found for run  166862
+[INFO] No qualified hlt data found for run  199701
+[INFO] No qualified hlt data found for run  199863
+[INFO] No qualified hlt data found for run  191693
+[INFO] No qualified hlt data found for run  191697
+[INFO] No qualified hlt data found for run  191723
+[INFO] No qualified hlt data found for run  191808
+[INFO] No qualified trg data found for run  191831
+[INFO] No qualified hlt data found for run  191831
+[INFO] No qualified hlt data found for run  191832
+[INFO] No qualified hlt data found for run  165148
+[INFO] No qualified hlt data found for run  200187
+[INFO] No qualified trg data found for run  193114
+[INFO] No qualified hlt data found for run  193114
+[INFO] No qualified hlt data found for run  175907
+[INFO] No qualified trg data found for run  175908
+[INFO] No qualified hlt data found for run  175908
+[INFO] No qualified hlt data found for run  200518
+[INFO] No qualified trg data found for run  167960
+[INFO] No qualified hlt data found for run  167960
+[INFO] No qualified trg data found for run  167961
+[INFO] No qualified hlt data found for run  167961
+[INFO] No qualified trg data found for run  167964
+[INFO] No qualified hlt data found for run  167964
+[INFO] No qualified trg data found for run  167965
+[INFO] No qualified hlt data found for run  167965
+[INFO] No qualified hlt data found for run  176158
+[INFO] No qualified hlt data found for run  176159
+[INFO] No qualified hlt data found for run  176160
+[INFO] No qualified trg data found for run  176203
+[INFO] No qualified hlt data found for run  176203
+[INFO] No qualified trg data found for run  201417
+[INFO] No qualified hlt data found for run  201417
+[INFO] No qualified hlt data found for run  201113
+[INFO] No qualified hlt data found for run  201176
+[INFO] No qualified hlt data found for run  201195
+[INFO] No qualified trg data found for run  193113
+[INFO] No qualified hlt data found for run  193113
+[INFO] No qualified hlt data found for run  193115
+[INFO] No qualified hlt data found for run  160403
+[INFO] No qualified trg data found for run  176866
+[INFO] No qualified hlt data found for run  176866
+[INFO] No qualified hlt data found for run  201455
+[INFO] No qualified hlt data found for run  201463
+[INFO] No qualified hlt data found for run  176927
+[INFO] No qualified trg data found for run  176980
+[INFO] No qualified hlt data found for run  176980
+[INFO] No qualified hlt data found for run  201612
+[INFO] No qualified hlt data found for run  201676
+[INFO] No qualified hlt data found for run  196095
+[INFO] No qualified hlt data found for run  177182
+[INFO] No qualified hlt data found for run  201806
+[INFO] No qualified trg data found for run  177314
+[INFO] No qualified hlt data found for run  177314
+[INFO] No qualified trg data found for run  177315
+[INFO] No qualified hlt data found for run  177315
+[INFO] No qualified hlt data found for run  202050
+[INFO] No qualified hlt data found for run  202051
+[INFO] No qualified hlt data found for run  202086
+[INFO] No qualified hlt data found for run  202092
+[INFO] No qualified hlt data found for run  202207
+[INFO] No qualified hlt data found for run  202208
+[INFO] No qualified hlt data found for run  194116
+[INFO] No qualified hlt data found for run  202331
+[INFO] No qualified hlt data found for run  202332
+[INFO] No qualified hlt data found for run  161397
+[INFO] No qualified hlt data found for run  202471
+[INFO] No qualified hlt data found for run  202476
+[INFO] No qualified hlt data found for run  204792
+[INFO] No qualified hlt data found for run  178202
+[INFO] No qualified trg data found for run  178206
+[INFO] No qualified hlt data found for run  178206
+[INFO] No qualified hlt data found for run  202868
+[INFO] No qualified hlt data found for run  202869
+[INFO] No qualified hlt data found for run  202873
+[INFO] No qualified hlt data found for run  202876
+[INFO] No qualified hlt data found for run  202880
+[INFO] No qualified hlt data found for run  202909
+[INFO] No qualified hlt data found for run  205937
+[INFO] No qualified hlt data found for run  194786
+[INFO] No qualified hlt data found for run  194787
+[INFO] No qualified hlt data found for run  165248
+[INFO] No qualified hlt data found for run  170396
+[INFO] No qualified trg data found for run  178672
+[INFO] No qualified hlt data found for run  178672
+[INFO] No qualified hlt data found for run  165255
+[INFO] No qualified trg data found for run  178704
+[INFO] No qualified hlt data found for run  178704
+[INFO] No qualified trg data found for run  178707
+[INFO] No qualified hlt data found for run  178707
+[INFO] No qualified hlt data found for run  211691
+[INFO] No qualified hlt data found for run  211693
+[INFO] No qualified hlt data found for run  196361
+[INFO] No qualified hlt data found for run  178671
+[INFO] No qualified hlt data found for run  196094
+[INFO] No qualified trg data found for run  179186
+[INFO] No qualified hlt data found for run  179186
+[INFO] No qualified hlt data found for run  162810
+[INFO] No qualified trg data found for run  179200
+[INFO] No qualified hlt data found for run  179200
+[INFO] No qualified trg data found for run  179203
+[INFO] No qualified hlt data found for run  179203
+[INFO] No qualified trg data found for run  179218
+[INFO] No qualified hlt data found for run  179218
+[INFO] No qualified trg data found for run  179220
+[INFO] No qualified hlt data found for run  179220
+[INFO] No qualified trg data found for run  179227
+[INFO] No qualified hlt data found for run  179227
+[INFO] No qualified trg data found for run  179234
+[INFO] No qualified hlt data found for run  179234
+[INFO] No qualified trg data found for run  179237
+[INFO] No qualified hlt data found for run  179237
+[INFO] No qualified trg data found for run  179245
+[INFO] No qualified hlt data found for run  179245
+[INFO] No qualified trg data found for run  179246
+[INFO] No qualified hlt data found for run  179246
+[INFO] No qualified hlt data found for run  171088
+[INFO] No qualified hlt data found for run  171116
+[INFO] No qualified hlt data found for run  195747
+[INFO] No qualified hlt data found for run  195748
+[INFO] No qualified trg data found for run  179451
+[INFO] No qualified hlt data found for run  179451
+[INFO] No qualified hlt data found for run  195936
+[INFO] No qualified hlt data found for run  163236
+[INFO] No qualified hlt data found for run  196201
+[INFO] No qualified hlt data found for run  197920
+[INFO] No qualified hlt data found for run  197922
+[INFO] No qualified hlt data found for run  197926
+[INFO] No qualified hlt data found for run  165161
+[INFO] No qualified trg data found for run  180075
+[INFO] No qualified hlt data found for run  180075
+[INFO] No qualified hlt data found for run  163752
+[INFO] No qualified hlt data found for run  163754
+[INFO] No qualified hlt data found for run  163756
+[INFO] No qualified hlt data found for run  163793
+[INFO] No qualified hlt data found for run  204795
+[INFO] No qualified hlt data found for run  172011
+[INFO] No qualified hlt data found for run  204798
+[INFO] No qualified hlt data found for run  204797
+[INFO] No qualified hlt data found for run  204799
+********************************************************************************
+* Tue Aug  4 10:04:29 2015 UTC
+* lumitype: HF , datatag: v12 , normtag: HFV2f , worktag: n/a
+*
+* by:
+* /var/www/TopDB/app/scripts/CMSSW_5_3_9/bin/slc5_amd64_gcc462/lumiCalc2.py
+*
+* update: NONE
+********************************************************************************
+ ==  =
+|    Run:Fill |             SelectedLS |     Recorded |         HLTpath(Presc) |       L1bit(Presc) |    Effective |
+--------------------------------------------------------------------------------------------------------------------
+| 198049:2797 |        [1-11], [14-57] |   1.716(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   1.716(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198050:2797 |                [2-155] |   4.610(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   4.610(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198063:2797 |       [1-37], [40-72], |   7.884(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   7.884(/pb) |
+|             |    [74-124], [127-294] |              |                    (1) |                    |              |
+| 198116:2798 |      [36-52], [54-55], |   5.722(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   5.722(/pb) |
+|             |      [58-96], [98-112] |              |                    (1) |                    |              |
+| 198207:2805 |                 [1-97] |   6.746(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   6.746(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198208:2805 |      [1-92], [94-134], |  12.627(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  12.627(/pb) |
+|             |   [137-147], [150-209] |              |                    (1) |                    |              |
+| 198210:2805 |                [1-221] |  11.990(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  11.990(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198212:2805 |                [1-574] |  25.223(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  25.223(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198213:2805 |                [1-107] |   3.960(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   3.960(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198215:2805 |                 [1-12] | 430.333(/nb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 430.333(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 198230:2806 |       [1-33], [36-57], |  99.382(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  99.382(/pb) |
+|             |   [60-235], [237-324], |              |                    (1) |                    |              |
+|             |  [326-388], [390-459], |              |                        |                    |              |
+|             |  [462-625], [627-651], |              |                        |                    |              |
+|             |  [653-805], [808-811], |              |                        |                    |              |
+|             | [814-948], [950-1090], |              |                        |                    |              |
+|             |           [1093-1103], |              |                        |                    |              |
+|             |           [1106-1332], |              |                        |                    |              |
+|             |            [1335-1380] |              |                        |                    |              |
+| 198249:2806 |                  [1-7] | 356.304(/nb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 356.304(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 198269:2807 |                [4-198] |  24.966(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  24.966(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198271:2807 |      [1-91], [93-170], |  74.557(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  74.557(/pb) |
+|             |  [173-299], [301-450], |              |                    (1) |                    |              |
+|             |  [453-513], [516-616], |              |                        |                    |              |
+|             |  [619-628], [631-791], |              |                        |                    |              |
+|             |              [793-797] |              |                        |                    |              |
+| 198272:2807 |    [1-185], [188-245], |  40.697(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  40.697(/pb) |
+|             |  [248-314], [317-433], |              |                    (1) |                    |              |
+|             |   [436-444], [454-620] |              |                        |                    |              |
+| 198346:2810 |                [44-47] | 390.961(/nb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 390.961(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 198372:2812 |               [57-110] |   6.711(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   6.711(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198485:2816 |   [68-109], [112-134], |  21.098(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  21.098(/pb) |
+|             |   [136-181], [184-239] |              |                    (1) |                    |              |
+| 198487:2816 |    [1-145], [147-493], | 127.195(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 127.195(/pb) |
+|             |  [495-497], [499-512], |              |                    (1) |                    |              |
+|             |  [514-514], [517-531], |              |                        |                    |              |
+|             |  [533-548], [550-668], |              |                        |                    |              |
+|             |  [671-695], [697-733], |              |                        |                    |              |
+|             |  [736-757], [760-852], |              |                        |                    |              |
+|             |  [854-921], [923-933], |              |                        |                    |              |
+|             | [935-994], [997-1434], |              |                        |                    |              |
+|             |           [1437-1590], |              |                        |                    |              |
+|             |           [1593-1602], |              |                        |                    |              |
+|             |            [1605-1610] |              |                        |                    |              |
+| 198522:2819 |   [65-139], [141-144], |  17.332(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  17.332(/pb) |
+|             |  [147-161], [163-185], |              |                    (1) |                    |              |
+|             |              [187-208] |              |                        |                    |              |
+| 198941:2840 |  [102-189], [191-194], |  22.102(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  22.102(/pb) |
+|             |  [196-220], [222-241], |              |                    (1) |                    |              |
+|             |   [243-249], [252-284] |              |                        |                    |              |
+| 198954:2842 |   [108-156], [159-277] |  19.893(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  19.893(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 198955:2842 |       [1-29], [31-45], | 116.660(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 116.660(/pb) |
+|             |      [47-50], [53-69], |              |                    (1) |                    |              |
+|             |   [71-116], [118-220], |              |                        |                    |              |
+|             |  [223-269], [271-284], |              |                        |                    |              |
+|             |  [286-338], [340-352], |              |                        |                    |              |
+|             |  [354-354], [356-363], |              |                        |                    |              |
+|             |  [365-374], [376-381], |              |                        |                    |              |
+|             |  [383-384], [386-390], |              |                        |                    |              |
+|             |  [392-450], [452-461], |              |                        |                    |              |
+|             |  [463-464], [466-487], |              |                        |                    |              |
+|             |  [489-491], [493-494], |              |                        |                    |              |
+|             |  [496-498], [500-507], |              |                        |                    |              |
+|             |  [509-515], [517-580], |              |                        |                    |              |
+|             |  [583-742], [744-910], |              |                        |                    |              |
+|             | [913-946], [949-1162], |              |                        |                    |              |
+|             |           [1165-1169], |              |                        |                    |              |
+|             |           [1172-1182], |              |                        |                    |              |
+|             |           [1185-1188], |              |                        |                    |              |
+|             |           [1190-1246], |              |                        |                    |              |
+|             |           [1249-1304], |              |                        |                    |              |
+|             |           [1306-1467], |              |                        |                    |              |
+|             |           [1470-1485], |              |                        |                    |              |
+|             |            [1487-1552] |              |                        |                    |              |
+| 198969:2843 |     [58-81], [84-247], | 109.507(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 109.507(/pb) |
+|             |  [249-323], [325-365], |              |                    (1) |                    |              |
+|             |  [367-413], [416-466], |              |                        |                    |              |
+|             |  [468-643], [646-918], |              |                        |                    |              |
+|             |            [920-1011], |              |                        |                    |              |
+|             |           [1013-1175], |              |                        |                    |              |
+|             |           [1178-1236], |              |                        |                    |              |
+|             |            [1239-1253] |              |                        |                    |              |
+| 199008:2847 |     [75-93], [95-121], |  61.150(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  61.150(/pb) |
+|             |  [124-208], [211-331], |              |                    (1) |                    |              |
+|             |  [333-334], [336-373], |              |                        |                    |              |
+|             |  [376-410], [412-482], |              |                        |                    |              |
+|             |   [485-605], [608-644] |              |                        |                    |              |
+| 199011:2847 |        [1-11], [13-24] |   2.118(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   2.118(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199021:2848 |     [59-88], [91-128], | 127.425(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 127.425(/pb) |
+|             |  [130-133], [136-309], |              |                    (1) |                    |              |
+|             |  [311-333], [335-410], |              |                        |                    |              |
+|             |  [414-469], [471-533], |              |                        |                    |              |
+|             | [535-563], [565-1223], |              |                        |                    |              |
+|             |           [1226-1479], |              |                        |                    |              |
+|             |            [1481-1494] |              |                        |                    |              |
+| 199318:2858 |   [65-129], [131-132], |   9.908(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   9.908(/pb) |
+|             |              [134-138] |              |                    (1) |                    |              |
+| 199319:2858 |        [1-7], [9-215], |  98.017(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  98.017(/pb) |
+|             |  [217-217], [219-223], |              |                    (1) |                    |              |
+|             |  [226-268], [270-277], |              |                        |                    |              |
+|             |  [280-348], [351-358], |              |                        |                    |              |
+|             |  [360-402], [404-422], |              |                        |                    |              |
+|             |  [424-467], [469-470], |              |                        |                    |              |
+|             |  [472-490], [492-493], |              |                        |                    |              |
+|             |  [496-612], [615-642], |              |                        |                    |              |
+|             |  [645-720], [723-728], |              |                        |                    |              |
+|             |  [730-731], [734-741], |              |                        |                    |              |
+|             |  [744-752], [754-943], |              |                        |                    |              |
+|             |              [945-997] |              |                        |                    |              |
+| 199336:2858 |      [1-33], [36-122], |  62.220(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  62.220(/pb) |
+|             |  [125-231], [234-614], |              |                    (1) |                    |              |
+|             |   [617-789], [791-977] |              |                        |                    |              |
+| 199356:2861 |   [95-121], [123-168], |  17.324(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  17.324(/pb) |
+|             |   [171-205], [208-231] |              |                    (1) |                    |              |
+| 199409:2870 |      [25-54], [56-89], | 111.667(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 111.667(/pb) |
+|             |   [91-204], [206-290], |              |                    (1) |                    |              |
+|             |  [293-583], [586-602], |              |                        |                    |              |
+|             |            [604-1014], |              |                        |                    |              |
+|             |            [1016-1300] |              |                        |                    |              |
+| 199428:2871 |   [61-197], [200-210], |  61.178(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  61.178(/pb) |
+|             |  [212-382], [387-414], |              |                    (1) |                    |              |
+|             |  [417-436], [439-530], |              |                        |                    |              |
+|             |              [533-648] |              |                        |                    |              |
+| 199429:2871 |       [1-28], [30-36], |  12.224(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  12.224(/pb) |
+|             |      [39-55], [58-66], |              |                    (1) |                    |              |
+|             |   [68-101], [103-148], |              |                        |                    |              |
+|             |              [151-154] |              |                        |                    |              |
+| 199435:2872 |   [63-106], [109-261], | 128.103(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 128.103(/pb) |
+|             |  [263-579], [582-654], |              |                    (1) |                    |              |
+|             | [656-696], [699-1034], |              |                        |                    |              |
+|             |           [1037-1144], |              |                        |                    |              |
+|             |           [1147-1327], |              |                        |                    |              |
+|             |           [1330-1411], |              |                        |                    |              |
+|             |           [1414-1431], |              |                        |                    |              |
+|             |           [1434-1441], |              |                        |                    |              |
+|             |           [1444-1487], |              |                        |                    |              |
+|             |            [1489-1610] |              |                        |                    |              |
+| 199436:2872 |    [1-113], [116-254], |  37.076(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  37.076(/pb) |
+|             |   [257-675], [678-748] |              |                    (1) |                    |              |
+| 199564:2873 |                  [1-3] | 391.102(/nb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 391.102(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 199569:2873 |        [1-2], [5-136], |  36.206(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  36.206(/pb) |
+|             |              [139-367] |              |                    (1) |                    |              |
+| 199570:2873 |                 [1-17] |   1.466(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   1.466(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199571:2873 |    [1-184], [186-360], |  43.485(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  43.485(/pb) |
+|             |              [363-561] |              |                    (1) |                    |              |
+| 199572:2873 |                [1-317] |  20.441(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  20.441(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199573:2873 |                 [1-22] |   1.314(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |   1.314(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199574:2873 |      [1-53], [56-153], |  13.858(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) |  13.858(/pb) |
+|             |              [156-246] |              |                    (1) |                    |              |
+| 199608:2875 |   [60-157], [159-209], | 169.434(/pb) | HLT_IsoMu24_eta2p1_v14 | L1_SingleMu16er(1) | 169.434(/pb) |
+|             |  [211-341], [344-390], |              |                    (1) |                    |              |
+|             |  [392-461], [464-800], |              |                        |                    |              |
+|             |  [802-861], [863-901], |              |                        |                    |              |
+|             | [903-912], [914-1064], |              |                        |                    |              |
+|             |           [1067-1392], |              |                        |                    |              |
+|             |           [1395-1564], |              |                        |                    |              |
+|             |           [1567-1592], |              |                        |                    |              |
+|             |           [1595-1608], |              |                        |                    |              |
+|             |           [1611-1630], |              |                        |                    |              |
+|             |           [1633-1634], |              |                        |                    |              |
+|             |           [1637-1654], |              |                        |                    |              |
+|             |           [1657-1672], |              |                        |                    |              |
+|             |           [1677-1680], |              |                        |                    |              |
+|             |           [1683-1698], |              |                        |                    |              |
+|             |           [1701-1750], |              |                        |                    |              |
+|             |           [1753-1796], |              |                        |                    |              |
+|             |           [1799-1904], |              |                        |                    |              |
+|             |           [1907-1962], |              |                        |                    |              |
+|             |           [1965-1974], |              |                        |                    |              |
+|             |           [1977-2252], |              |                        |                    |              |
+|             |            [2255-2422] |              |                        |                    |              |
+| 199698:2880 |      [72-94], [96-127] |   6.544(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   6.544(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199699:2880 |    [1-154], [157-169], |  69.415(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  69.415(/pb) |
+|             |   [172-410], [412-756] |              |                    (1) |                    |              |
+| 199703:2880 |      [1-94], [97-212], |  33.737(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  33.737(/pb) |
+|             |   [215-482], [485-529] |              |                    (1) |                    |              |
+| 199739:2882 |               [66-133] |   8.363(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   8.363(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199751:2884 |   [103-119], [121-127] |   2.858(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.858(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199752:2884 |    [1-141], [144-164], |  32.937(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  32.937(/pb) |
+|             |  [166-180], [182-186], |              |                    (1) |                    |              |
+|             |   [188-211], [214-322] |              |                        |                    |              |
+| 199753:2884 |                 [1-58] |   5.462(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   5.462(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199754:2884 |    [1-203], [205-325], |  70.129(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  70.129(/pb) |
+|             |  [328-457], [459-607], |              |                    (1) |                    |              |
+|             |  [610-613], [615-806], |              |                        |                    |              |
+|             |              [808-998] |              |                        |                    |              |
+| 199804:2886 |     [78-88], [90-181], |  57.906(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  57.906(/pb) |
+|             |  [183-235], [238-278], |              |                    (1) |                    |              |
+|             |  [281-290], [292-519], |              |                        |                    |              |
+|             |  [522-575], [577-628], |              |                        |                    |              |
+|             |              [631-632] |              |                        |                    |              |
+| 199812:2887 |   [70-141], [144-163], |  70.829(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  70.829(/pb) |
+|             |  [182-211], [214-244], |              |                    (1) |                    |              |
+|             |  [246-268], [270-326], |              |                        |                    |              |
+|             |  [328-358], [360-461], |              |                        |                    |              |
+|             |  [463-471], [474-505], |              |                        |                    |              |
+|             |  [508-557], [560-571], |              |                        |                    |              |
+|             |  [574-604], [606-620], |              |                        |                    |              |
+|             |  [622-623], [626-653], |              |                        |                    |              |
+|             |   [655-751], [754-796] |              |                        |                    |              |
+| 199832:2888 |     [58-62], [65-118], |  26.614(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  26.614(/pb) |
+|             |   [121-139], [142-286] |              |                    (1) |                    |              |
+| 199833:2888 |      [1-13], [16-103], | 103.248(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 103.248(/pb) |
+|             |  [105-250], [253-493], |              |                    (1) |                    |              |
+|             |  [496-722], [724-728], |              |                        |                    |              |
+|             | [730-794], [797-1032], |              |                        |                    |              |
+|             |           [1034-1185], |              |                        |                    |              |
+|             |            [1188-1239] |              |                        |                    |              |
+| 199834:2888 |        [1-9], [11-11], |  47.019(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  47.019(/pb) |
+|             |      [14-18], [21-54], |              |                    (1) |                    |              |
+|             |      [56-57], [62-65], |              |                        |                    |              |
+|             |   [69-284], [286-503], |              |                        |                    |              |
+|             |              [505-942] |              |                        |                    |              |
+| 199862:2891 |               [59-141] |  10.852(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  10.852(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199864:2891 |       [1-87], [89-89], |  51.605(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  51.605(/pb) |
+|             |   [92-103], [106-372], |              |                    (1) |                    |              |
+|             |   [374-385], [388-486] |              |                        |                    |              |
+| 199867:2891 |    [1-134], [136-172], |  27.131(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  27.131(/pb) |
+|             |   [174-218], [221-320] |              |                    (1) |                    |              |
+| 199868:2891 |                 [1-21] |   1.579(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   1.579(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 199875:2892 |     [70-79], [82-150], |  31.746(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  31.746(/pb) |
+|             |              [152-334] |              |                    (1) |                    |              |
+| 199876:2892 |       [1-19], [22-95], |  36.479(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  36.479(/pb) |
+|             |   [97-249], [252-272], |              |                    (1) |                    |              |
+|             |  [274-340], [343-362], |              |                        |                    |              |
+|             |              [365-376] |              |                        |                    |              |
+| 199877:2892 |    [1-173], [175-605], |  62.995(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  62.995(/pb) |
+|             |   [607-701], [703-871] |              |                    (1) |                    |              |
+| 199960:2893 |   [72-139], [141-197], |  46.037(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  46.037(/pb) |
+|             |  [204-232], [235-363], |              |                    (1) |                    |              |
+|             |  [365-367], [370-380], |              |                        |                    |              |
+|             |  [383-459], [461-466], |              |                        |                    |              |
+|             |              [469-484] |              |                        |                    |              |
+| 199961:2893 |    [1-178], [180-180], |  25.509(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  25.509(/pb) |
+|             |  [182-200], [202-206], |              |                    (1) |                    |              |
+|             |  [208-209], [211-211], |              |                        |                    |              |
+|             |  [213-227], [230-230], |              |                        |                    |              |
+|             |  [232-263], [265-267], |              |                        |                    |              |
+|             |   [269-278], [280-287] |              |                        |                    |              |
+| 199967:2894 |   [60-120], [122-170], |  16.989(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  16.989(/pb) |
+|             |              [172-198] |              |                    (1) |                    |              |
+| 199973:2896 |                [73-89] |   2.190(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.190(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200041:2898 |     [62-83], [85-157], |  98.864(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  98.864(/pb) |
+|             |  [162-274], [277-318], |              |                    (1) |                    |              |
+|             |  [321-335], [337-386], |              |                        |                    |              |
+|             |  [388-389], [392-400], |              |                        |                    |              |
+|             |  [402-568], [571-593], |              |                        |                    |              |
+|             |  [595-646], [649-728], |              |                        |                    |              |
+|             |  [731-860], [862-930], |              |                        |                    |              |
+|             |             [932-1096] |              |                        |                    |              |
+| 200042:2898 |     [1-110], [112-536] |  32.364(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  32.364(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200049:2898 |                [1-177] |   8.690(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   8.690(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200075:2900 |   [76-139], [142-232], |  55.470(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  55.470(/pb) |
+|             |  [256-326], [329-422], |              |                    (1) |                    |              |
+|             |  [425-431], [434-500], |              |                        |                    |              |
+|             |              [502-605] |              |                        |                    |              |
+| 200091:2902 |      [67-67], [70-97], | 139.795(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 139.795(/pb) |
+|             |   [99-115], [117-124], |              |                    (1) |                    |              |
+|             |  [126-150], [154-172], |              |                        |                    |              |
+|             |  [174-187], [190-196], |              |                        |                    |              |
+|             |  [199-201], [204-425], |              |                        |                    |              |
+|             |  [428-535], [537-607], |              |                        |                    |              |
+|             |  [610-879], [881-943], |              |                        |                    |              |
+|             |             [946-999], |              |                        |                    |              |
+|             |           [1001-1025], |              |                        |                    |              |
+|             |           [1027-1132], |              |                        |                    |              |
+|             |           [1135-1339], |              |                        |                    |              |
+|             |           [1341-1433], |              |                        |                    |              |
+|             |           [1435-1450], |              |                        |                    |              |
+|             |           [1453-1523], |              |                        |                    |              |
+|             |           [1526-1664], |              |                        |                    |              |
+|             |           [1667-1680], |              |                        |                    |              |
+|             |            [1683-1710] |              |                        |                    |              |
+| 200152:2905 |      [74-91], [93-94], |   4.995(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   4.995(/pb) |
+|             |    [96-112], [114-115] |              |                    (1) |                    |              |
+| 200160:2906 |                [52-68] |   2.272(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.272(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200161:2906 |      [1-97], [100-112] |  12.854(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  12.854(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200174:2908 |                [81-84] | 395.418(/nb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 395.418(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 200177:2908 |                 [1-56] |   7.012(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   7.012(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200178:2908 |                 [1-38] |   4.679(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   4.679(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200180:2908 |                 [1-18] |   2.177(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.177(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200186:2908 |          [1-3], [6-24] |   2.418(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.418(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200188:2908 |       [1-24], [27-28], |  34.805(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  34.805(/pb) |
+|             |     [31-76], [79-271], |              |                    (1) |                    |              |
+|             |              [274-352] |              |                        |                    |              |
+| 200190:2908 |         [1-4], [6-76], |  62.907(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  62.907(/pb) |
+|             |   [79-143], [146-159], |              |                    (1) |                    |              |
+|             |  [162-256], [258-321], |              |                        |                    |              |
+|             |  [324-401], [403-453], |              |                        |                    |              |
+|             |  [456-457], [460-565], |              |                        |                    |              |
+|             |  [567-588], [591-591], |              |                        |                    |              |
+|             |  [593-595], [597-646], |              |                        |                    |              |
+|             |              [649-878] |              |                        |                    |              |
+| 200229:2911 |      [1-33], [41-219], |  49.393(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  49.393(/pb) |
+|             |  [222-244], [247-290], |              |                    (1) |                    |              |
+|             |   [293-624], [627-629] |              |                        |                    |              |
+| 200243:2912 |   [69-103], [106-133], |   9.355(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   9.355(/pb) |
+|             |              [135-139] |              |                    (1) |                    |              |
+| 200244:2912 |      [3-96], [98-125], |  66.981(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  66.981(/pb) |
+|             |  [127-304], [307-442], |              |                    (1) |                    |              |
+|             |   [445-507], [510-619] |              |                        |                    |              |
+| 200245:2912 |    [1-103], [105-128], |  28.887(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  28.887(/pb) |
+|             |   [131-248], [251-357] |              |                    (1) |                    |              |
+| 200368:2918 |   [72-106], [108-168], |  10.062(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  10.062(/pb) |
+|             |              [170-180] |              |                    (1) |                    |              |
+| 200369:2918 |         [1-5], [8-61], |  52.280(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  52.280(/pb) |
+|             |   [64-360], [363-439], |              |                    (1) |                    |              |
+|             |  [441-578], [580-603], |              |                        |                    |              |
+|             |   [606-684], [686-686] |              |                        |                    |              |
+| 200381:2920 |       [8-15], [18-36], |  24.594(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  24.594(/pb) |
+|             |      [38-89], [91-195] |              |                    (1) |                    |              |
+| 200466:2926 |              [134-274] |   5.922(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   5.922(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200473:2927 |   [96-157], [159-224], |  99.730(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  99.730(/pb) |
+|             |  [226-304], [306-469], |              |                    (1) |                    |              |
+|             |  [472-524], [527-542], |              |                        |                    |              |
+|             |  [545-619], [622-688], |              |                        |                    |              |
+|             |  [691-730], [733-738], |              |                        |                    |              |
+|             |             [740-1324] |              |                        |                    |              |
+| 200491:2928 |   [87-107], [110-149], |  39.498(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  39.498(/pb) |
+|             |  [152-157], [160-197], |              |                    (1) |                    |              |
+|             |  [199-237], [240-270], |              |                        |                    |              |
+|             |  [273-273], [276-334], |              |                        |                    |              |
+|             |   [336-360], [363-419] |              |                        |                    |              |
+| 200515:2929 |    [97-169], [171-183] |  11.907(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  11.907(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200519:2929 |    [1-111], [114-126], |  75.552(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  75.552(/pb) |
+|             |  [129-136], [138-224], |              |                    (1) |                    |              |
+|             |  [227-258], [261-350], |              |                        |                    |              |
+|             |   [353-611], [613-747] |              |                        |                    |              |
+| 200525:2932 |   [77-149], [151-164], |  95.458(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  95.458(/pb) |
+|             |  [166-190], [193-276], |              |                    (1) |                    |              |
+|             |  [278-311], [314-464], |              |                        |                    |              |
+|             |  [467-488], [491-674], |              |                        |                    |              |
+|             |  [676-704], [707-755], |              |                        |                    |              |
+|             |  [757-895], [898-937], |              |                        |                    |              |
+|             |              [939-990] |              |                        |                    |              |
+| 200532:2932 |                 [1-37] |   2.897(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.897(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200599:2934 |    [75-129], [132-137] |   8.548(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   8.548(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200600:2934 |       [1-22], [24-72], | 107.518(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 107.518(/pb) |
+|             |   [74-183], [186-246], |              |                    (1) |                    |              |
+|             |  [248-299], [302-313], |              |                        |                    |              |
+|             |  [316-321], [323-324], |              |                        |                    |              |
+|             |  [327-327], [329-334], |              |                        |                    |              |
+|             |  [336-348], [350-351], |              |                        |                    |              |
+|             |  [353-355], [357-358], |              |                        |                    |              |
+|             |  [360-363], [365-369], |              |                        |                    |              |
+|             |  [371-374], [377-397], |              |                        |                    |              |
+|             |  [399-400], [402-408], |              |                        |                    |              |
+|             |  [410-417], [420-424], |              |                        |                    |              |
+|             |  [426-444], [446-456], |              |                        |                    |              |
+|             |  [458-526], [529-591], |              |                        |                    |              |
+|             |  [594-596], [598-609], |              |                        |                    |              |
+|             |  [611-660], [663-772], |              |                        |                    |              |
+|             |  [774-823], [826-888], |              |                        |                    |              |
+|             |  [890-900], [902-943], |              |                        |                    |              |
+|             |             [945-1139] |              |                        |                    |              |
+| 200961:2974 |                [1-115] | 803.796(/nb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 803.796(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 200976:2975 |               [94-164] |   3.268(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   3.268(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200990:2976 |    [75-103], [105-143] |   8.812(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   8.812(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 200991:2976 |       [1-42], [44-44], |  97.295(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  97.295(/pb) |
+|             |     [47-80], [83-175], |              |                    (1) |                    |              |
+|             |  [178-181], [184-252], |              |                        |                    |              |
+|             |  [255-632], [635-916], |              |                        |                    |              |
+|             |            [918-1017], |              |                        |                    |              |
+|             |            [1019-1048] |              |                        |                    |              |
+| 200992:2976 |    [1-405], [408-434], |  35.731(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  35.731(/pb) |
+|             |              [436-581] |              |                    (1) |                    |              |
+| 201062:2978 |               [78-268] |  26.197(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  26.197(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201097:2980 |   [83-136], [138-245], |  50.517(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  50.517(/pb) |
+|             |  [248-300], [303-370], |              |                    (1) |                    |              |
+|             |   [372-429], [432-497] |              |                        |                    |              |
+| 201114:2981 |                 [1-14] |   1.954(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   1.954(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201115:2981 |                 [1-73] |  10.172(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  10.172(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201159:2983 |               [70-211] |  19.708(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  19.708(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201164:2983 |        [1-8], [10-94], |  47.854(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  47.854(/pb) |
+|             |   [96-125], [128-178], |              |                    (1) |                    |              |
+|             |  [180-198], [200-271], |              |                        |                    |              |
+|             |   [274-416], [418-418] |              |                        |                    |              |
+| 201168:2983 |      [1-37], [39-275], |  60.968(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  60.968(/pb) |
+|             |  [278-481], [483-558], |              |                    (1) |                    |              |
+|             |              [560-730] |              |                        |                    |              |
+| 201173:2983 |     [1-194], [197-586] |  35.386(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  35.386(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201174:2983 |    [1-214], [216-263], |  21.395(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  21.395(/pb) |
+|             |   [265-339], [342-451] |              |                    (1) |                    |              |
+| 201191:2984 |    [75-98], [100-216], | 133.657(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 133.657(/pb) |
+|             |  [218-386], [388-389], |              |                    (1) |                    |              |
+|             |  [392-450], [452-452], |              |                        |                    |              |
+|             |  [454-492], [494-501], |              |                        |                    |              |
+|             |  [503-506], [509-585], |              |                        |                    |              |
+|             |  [587-594], [597-607], |              |                        |                    |              |
+|             |  [609-645], [647-794], |              |                        |                    |              |
+|             |  [796-838], [841-974], |              |                        |                    |              |
+|             |            [977-1105], |              |                        |                    |              |
+|             |           [1108-1117], |              |                        |                    |              |
+|             |           [1120-1382], |              |                        |                    |              |
+|             |            [1385-1386] |              |                        |                    |              |
+| 201193:2984 |                 [1-19] |   1.289(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   1.289(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201196:2984 |    [1-238], [241-278], |  46.833(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  46.833(/pb) |
+|             |  [286-299], [302-338], |              |                    (1) |                    |              |
+|             |  [341-515], [518-720], |              |                        |                    |              |
+|             |   [723-789], [803-841] |              |                        |                    |              |
+| 201197:2984 |                 [1-23] |   1.061(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   1.061(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201202:2984 |                [1-437] |  17.211(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  17.211(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201229:2987 | [1-5], [8-26], [29-73] |  10.324(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  10.324(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201278:2991 |   [62-103], [105-127], | 167.995(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 167.995(/pb) |
+|             |  [129-143], [145-149], |              |                    (1) |                    |              |
+|             |  [151-163], [166-167], |              |                        |                    |              |
+|             |  [169-176], [178-200], |              |                        |                    |              |
+|             |  [202-212], [214-229], |              |                        |                    |              |
+|             |  [232-256], [259-316], |              |                        |                    |              |
+|             |  [318-375], [377-490], |              |                        |                    |              |
+|             |  [492-534], [536-595], |              |                        |                    |              |
+|             |  [598-643], [645-938], |              |                        |                    |              |
+|             | [942-974], [976-1160], |              |                        |                    |              |
+|             |           [1163-1304], |              |                        |                    |              |
+|             |           [1306-1530], |              |                        |                    |              |
+|             |           [1533-1793], |              |                        |                    |              |
+|             |           [1796-1802], |              |                        |                    |              |
+|             |           [1805-1906], |              |                        |                    |              |
+|             |           [1909-1929], |              |                        |                    |              |
+|             |            [1932-2174] |              |                        |                    |              |
+| 201554:2995 |     [70-86], [88-114], |   8.009(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   8.009(/pb) |
+|             |              [116-126] |              |                    (1) |                    |              |
+| 201602:2996 |     [76-81], [83-157], |  67.697(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  67.697(/pb) |
+|             |  [159-194], [196-252], |              |                    (1) |                    |              |
+|             |  [254-494], [496-614], |              |                        |                    |              |
+|             |              [617-635] |              |                        |                    |              |
+| 201611:2997 |   [87-145], [149-171], |  13.572(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  13.572(/pb) |
+|             |  [173-175], [177-181], |              |                    (1) |                    |              |
+|             |              [184-186] |              |                        |                    |              |
+| 201613:2997 |         [1-3], [5-10], |  73.462(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  73.462(/pb) |
+|             |      [12-42], [44-49], |              |                    (1) |                    |              |
+|             |   [53-210], [213-215], |              |                        |                    |              |
+|             |  [218-225], [228-335], |              |                        |                    |              |
+|             |  [337-350], [352-367], |              |                        |                    |              |
+|             |  [369-400], [402-407], |              |                        |                    |              |
+|             |  [409-423], [425-454], |              |                        |                    |              |
+|             |              [456-646] |              |                        |                    |              |
+| 201624:2998 |     [83-92], [95-208], |  23.359(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  23.359(/pb) |
+|             |  [210-212], [214-227], |              |                    (1) |                    |              |
+|             |              [229-240] |              |                        |                    |              |
+| 201625:2998 |  [211-227], [229-238], |  70.505(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  70.505(/pb) |
+|             |  [240-245], [247-312], |              |                    (1) |                    |              |
+|             |  [315-348], [351-416], |              |                        |                    |              |
+|             |  [418-429], [431-431], |              |                        |                    |              |
+|             |  [433-486], [488-562], |              |                        |                    |              |
+|             |  [564-588], [591-671], |              |                        |                    |              |
+|             |  [673-703], [705-715], |              |                        |                    |              |
+|             |  [717-721], [723-752], |              |                        |                    |              |
+|             |  [754-758], [760-770], |              |                        |                    |              |
+|             |   [772-791], [793-944] |              |                        |                    |              |
+| 201657:3000 |     [77-93], [95-108], |   5.910(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   5.910(/pb) |
+|             |              [110-118] |              |                    (1) |                    |              |
+| 201658:3000 |      [1-19], [21-118], |  37.863(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  37.863(/pb) |
+|             |   [121-136], [139-288] |              |                    (1) |                    |              |
+| 201668:3002 |   [78-123], [125-155], |  11.601(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  11.601(/pb) |
+|             |              [157-157] |              |                    (1) |                    |              |
+| 201669:3002 |       [1-9], [12-136], |  21.908(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  21.908(/pb) |
+|             |   [139-141], [143-164] |              |                    (1) |                    |              |
+| 201671:3002 |    [1-120], [122-143], |  92.472(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  92.472(/pb) |
+|             |  [145-145], [147-161], |              |                    (1) |                    |              |
+|             |  [163-166], [168-174], |              |                        |                    |              |
+|             |  [177-194], [196-223], |              |                        |                    |              |
+|             |  [226-243], [246-251], |              |                        |                    |              |
+|             |  [253-255], [257-268], |              |                        |                    |              |
+|             |  [270-312], [314-327], |              |                        |                    |              |
+|             |  [329-462], [464-482], |              |                        |                    |              |
+|             |  [485-499], [501-545], |              |                        |                    |              |
+|             |  [547-571], [574-614], |              |                        |                    |              |
+|             |  [617-766], [768-896], |              |                        |                    |              |
+|             |  [899-911], [914-1007] |              |                        |                    |              |
+| 201678:3002 |                [1-120] |   8.275(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   8.275(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201679:3002 |    [1-110], [112-241], |  28.480(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  28.480(/pb) |
+|             |  [244-298], [302-321], |              |                    (1) |                    |              |
+|             |   [324-461], [463-483] |              |                        |                    |              |
+| 201692:3003 |      [78-81], [83-179] |  15.111(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  15.111(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201705:3005 |     [65-73], [75-109], |  17.163(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  17.163(/pb) |
+|             |   [111-184], [186-187] |              |                    (1) |                    |              |
+| 201706:3005 |        [1-57], [59-62] |   7.943(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   7.943(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201707:3005 |       [1-23], [26-42], |  91.212(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  91.212(/pb) |
+|             |   [45-115], [118-130], |              |                    (1) |                    |              |
+|             |  [133-160], [163-276], |              |                        |                    |              |
+|             |  [279-471], [473-511], |              |                        |                    |              |
+|             |  [514-545], [547-570], |              |                        |                    |              |
+|             |  [572-622], [625-735], |              |                        |                    |              |
+|             |  [738-806], [809-876], |              |                        |                    |              |
+|             |              [879-964] |              |                        |                    |              |
+| 201708:3005 |                 [1-79] |   5.713(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   5.713(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201718:3006 |               [58-108] |   7.410(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   7.410(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201727:3007 |               [67-185] |  16.941(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  16.941(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201729:3007 |       [6-20], [22-60], |  28.428(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  28.428(/pb) |
+|             |     [62-74], [77-126], |              |                    (1) |                    |              |
+|             |  [129-154], [156-216], |              |                        |                    |              |
+|             |              [219-244] |              |                        |                    |              |
+| 201794:3009 |                [58-94] |   5.651(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   5.651(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201802:3011 |   [68-209], [211-214], |  31.534(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  31.534(/pb) |
+|             |  [216-220], [223-288], |              |                    (1) |                    |              |
+|             |              [290-296] |              |                        |                    |              |
+| 201816:3011 |      [1-72], [74-105], |  15.588(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  15.588(/pb) |
+|             |              [107-157] |              |                    (1) |                    |              |
+| 201817:3011 |                [1-274] |  24.137(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  24.137(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201818:3011 |                  [1-1] |  80.225(/nb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  80.225(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 201819:3011 |       [1-94], [96-241] |  18.272(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  18.272(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 201824:3011 |    [1-139], [141-176], |  31.019(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  31.019(/pb) |
+|             |   [179-286], [289-492] |              |                    (1) |                    |              |
+| 202012:3016 |    [98-121], [126-131] |   3.307(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   3.307(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202013:3016 | [1-2], [5-35], [38-57] |   6.204(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   6.204(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202014:3016 |         [1-5], [8-14], |  19.784(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  19.784(/pb) |
+|             |      [16-18], [20-77], |              |                    (1) |                    |              |
+|             |   [79-102], [104-174], |              |                        |                    |              |
+|             |   [177-190], [192-196] |              |                        |                    |              |
+| 202016:3016 |      [1-48], [51-134], |  77.981(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  77.981(/pb) |
+|             |  [137-177], [179-743], |              |                    (1) |                    |              |
+|             |  [745-831], [834-890], |              |                        |                    |              |
+|             |  [893-896], [898-932], |              |                        |                    |              |
+|             |             [934-1010] |              |                        |                    |              |
+| 202044:3018 |   [84-101], [104-110], |  46.270(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  46.270(/pb) |
+|             |  [112-266], [268-367], |              |                    (1) |                    |              |
+|             |  [369-372], [374-389], |              |                        |                    |              |
+|             |  [391-442], [444-446], |              |                        |                    |              |
+|             |  [448-450], [452-456], |              |                        |                    |              |
+|             |  [458-458], [460-461], |              |                        |                    |              |
+|             |              [463-466] |              |                        |                    |              |
+| 202045:3018 |       [1-30], [33-72], |  70.099(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  70.099(/pb) |
+|             |   [75-528], [531-601], |              |                    (1) |                    |              |
+|             |  [603-785], [788-809], |              |                        |                    |              |
+|             |              [822-823] |              |                        |                    |              |
+| 202054:3018 |    [6-266], [268-489], |  36.625(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  36.625(/pb) |
+|             |   [492-605], [608-631] |              |                    (1) |                    |              |
+| 202060:3019 |   [76-142], [144-154], |  89.190(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  89.190(/pb) |
+|             |  [156-244], [246-497], |              |                    (1) |                    |              |
+|             |  [499-642], [644-682], |              |                        |                    |              |
+|             |  [684-707], [709-743], |              |                        |                    |              |
+|             |  [746-746], [748-760], |              |                        |                    |              |
+|             |  [762-762], [764-770], |              |                        |                    |              |
+|             |  [772-789], [791-804], |              |                        |                    |              |
+|             |              [806-936] |              |                        |                    |              |
+| 202074:3020 |               [66-174] |  15.509(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  15.509(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202075:3020 |      [1-18], [21-187], |  66.328(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  66.328(/pb) |
+|             |  [189-214], [217-247], |              |                    (1) |                    |              |
+|             |  [250-342], [345-406], |              |                        |                    |              |
+|             |  [409-497], [500-537], |              |                        |                    |              |
+|             |  [539-539], [542-560], |              |                        |                    |              |
+|             |   [562-615], [618-628] |              |                        |                    |              |
+| 202084:3021 |   [83-138], [140-156], |  20.387(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  20.387(/pb) |
+|             |  [159-177], [180-180], |              |                    (1) |                    |              |
+|             |              [182-239] |              |                        |                    |              |
+| 202087:3021 |      [1-25], [28-208], |  98.752(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  98.752(/pb) |
+|             |  [210-357], [359-652], |              |                    (1) |                    |              |
+|             |  [655-853], [856-1093] |              |                        |                    |              |
+| 202088:3021 |                [1-286] |  17.750(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  17.750(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202093:3021 |    [1-104], [107-320], |  18.378(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  18.378(/pb) |
+|             |              [322-360] |              |                    (1) |                    |              |
+| 202116:3023 |                [59-60] | 292.288(/nb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 292.288(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 202178:3025 |      [67-78], [80-88], | 128.286(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 128.286(/pb) |
+|             |   [91-177], [180-186], |              |                    (1) |                    |              |
+|             |  [188-337], [340-377], |              |                        |                    |              |
+|             |  [379-425], [428-475], |              |                        |                    |              |
+|             |  [478-548], [551-717], |              |                        |                    |              |
+|             | [720-965], [967-1444], |              |                        |                    |              |
+|             |           [1447-1505], |              |                        |                    |              |
+|             |           [1508-1519], |              |                        |                    |              |
+|             |            [1522-1555] |              |                        |                    |              |
+| 202205:3027 |               [94-114] |   2.816(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |   2.816(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202209:3027 |       [1-48], [51-142] |  17.375(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  17.375(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202237:3029 |   [39-128], [131-131], | 114.785(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 114.785(/pb) |
+|             |  [134-219], [222-235], |              |                    (1) |                    |              |
+|             |  [238-275], [277-289], |              |                        |                    |              |
+|             |  [291-316], [319-419], |              |                        |                    |              |
+|             |  [422-538], [540-936], |              |                        |                    |              |
+|             |  [939-950], [952-976], |              |                        |                    |              |
+|             |             [979-1079] |              |                        |                    |              |
+| 202272:3032 |   [76-112], [115-141], | 109.235(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 109.235(/pb) |
+|             |  [144-185], [188-205], |              |                    (1) |                    |              |
+|             |  [208-305], [307-313], |              |                        |                    |              |
+|             |  [315-371], [436-480], |              |                        |                    |              |
+|             |  [483-555], [558-577], |              |                        |                    |              |
+|             |  [579-683], [686-705], |              |                        |                    |              |
+|             |  [707-740], [742-890], |              |                        |                    |              |
+|             |            [937-1295], |              |                        |                    |              |
+|             |            [1299-1481] |              |                        |                    |              |
+| 202299:3033 |     [68-84], [87-141], |  60.586(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  60.586(/pb) |
+|             |  [143-193], [196-358], |              |                    (1) |                    |              |
+|             |  [361-379], [382-414], |              |                        |                    |              |
+|             |   [416-452], [455-555] |              |                        |                    |              |
+| 202305:3033 |      [1-89], [92-130], |  22.107(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  22.107(/pb) |
+|             |              [133-323] |              |                    (1) |                    |              |
+| 202314:3034 |   [67-104], [107-209], |  30.836(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  30.836(/pb) |
+|             |  [211-236], [238-245], |              |                    (1) |                    |              |
+|             |   [247-265], [268-278] |              |                        |                    |              |
+| 202328:3036 |      [46-47], [50-89], |  70.497(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  70.497(/pb) |
+|             |   [92-156], [158-230], |              |                    (1) |                    |              |
+|             |  [232-276], [278-291], |              |                        |                    |              |
+|             |  [294-434], [437-460], |              |                        |                    |              |
+|             |  [463-586], [588-610], |              |                        |                    |              |
+|             |              [612-614] |              |                        |                    |              |
+| 202333:3036 |                [1-235] |  23.036(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  23.036(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202389:3039 |   [81-101], [103-182], |  17.149(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  17.149(/pb) |
+|             |   [185-190], [192-199] |              |                    (1) |                    |              |
+| 202469:3045 |     [87-95], [97-128], |  37.086(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  37.086(/pb) |
+|             |  [130-158], [160-174], |              |                    (1) |                    |              |
+|             |              [177-352] |              |                        |                    |              |
+| 202472:3045 |       [1-96], [99-112] |  13.086(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  13.086(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202477:3045 |     [1-129], [131-150] |  15.872(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  15.872(/pb) |
+|             |                        |              |                    (1) |                    |              |
+| 202478:3045 |    [1-177], [180-183], |  94.365(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  94.365(/pb) |
+|             |  [186-219], [222-360], |              |                    (1) |                    |              |
+|             |  [362-506], [509-531], |              |                        |                    |              |
+|             |  [534-718], [720-927], |              |                        |                    |              |
+|             | [929-973], [975-1029], |              |                        |                    |              |
+|             |           [1031-1186], |              |                        |                    |              |
+|             |           [1189-1212], |              |                        |                    |              |
+|             |            [1215-1248] |              |                        |                    |              |
+| 202504:3047 |      [77-77], [79-79], | 137.390(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 137.390(/pb) |
+|             |      [81-82], [84-96], |              |                    (1) |                    |              |
+|             |   [99-133], [135-182], |              |                        |                    |              |
+|             |  [184-211], [213-219], |              |                        |                    |              |
+|             |  [221-223], [225-226], |              |                        |                    |              |
+|             |  [228-229], [231-240], |              |                        |                    |              |
+|             |  [243-245], [247-256], |              |                        |                    |              |
+|             |  [258-262], [264-265], |              |                        |                    |              |
+|             |  [268-268], [271-281], |              |                        |                    |              |
+|             |  [284-315], [317-362], |              |                        |                    |              |
+|             |  [364-385], [387-392], |              |                        |                    |              |
+|             |  [395-399], [401-416], |              |                        |                    |              |
+|             |  [418-443], [445-469], |              |                        |                    |              |
+|             |  [471-487], [489-493], |              |                        |                    |              |
+|             |  [495-522], [524-527], |              |                        |                    |              |
+|             |  [529-538], [541-614], |              |                        |                    |              |
+|             |  [616-617], [620-651], |              |                        |                    |              |
+|             |  [653-715], [718-763], |              |                        |                    |              |
+|             |            [766-1172], |              |                        |                    |              |
+|             |           [1174-1247], |              |                        |                    |              |
+|             |           [1250-1471], |              |                        |                    |              |
+|             |           [1474-1679], |              |                        |                    |              |
+|             |            [1682-1704] |              |                        |                    |              |
+| 202972:3067 |      [1-30], [33-184], |  56.826(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  56.826(/pb) |
+|             |  [186-290], [292-295], |              |                    (1) |                    |              |
+|             |  [298-371], [374-429], |              |                        |                    |              |
+|             |              [431-544] |              |                        |                    |              |
+| 202973:3067 |    [1-234], [237-305], |  87.168(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) |  87.168(/pb) |
+|             |  [308-437], [439-530], |              |                    (1) |                    |              |
+|             |  [532-541], [544-552], |              |                        |                    |              |
+|             |  [555-851], [853-1408] |              |                        |                    |              |
+| 203002:3071 |      [77-79], [81-90], | 137.043(/pb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 137.043(/pb) |
+|             |   [92-128], [130-141], |              |                    (1) |                    |              |
+|             |  [144-207], [209-267], |              |                        |                    |              |
+|             |  [270-360], [362-501], |              |                        |                    |              |
+|             |  [504-641], [643-669], |              |                        |                    |              |
+|             |  [671-671], [674-717], |              |                        |                    |              |
+|             |            [720-1034], |              |                        |                    |              |
+|             |           [1037-1070], |              |                        |                    |              |
+|             |           [1073-1370], |              |                        |                    |              |
+|             |           [1372-1392], |              |                        |                    |              |
+|             |           [1395-1410], |              |                        |                    |              |
+|             |            [1413-1596] |              |                        |                    |              |
+| 203709:3087 |                [1-121] | 730.715(/nb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 730.715(/nb) |
+|             |                        |              |                    (1) |                    |              |
+| 203742:3102 |                 [1-29] | 639.086(/nb) | HLT_IsoMu24_eta2p1_v15 | L1_SingleMu16er(1) | 639.086(/nb) |
+|             |                        |              |                    (1) |                    |              |
+
+ ==  =  Total :
+|                HLTPath | SelectedLS |   Recorded |  Effective |
+-----------------------------------------------------------------
+| HLT_IsoMu24_eta2p1_v14 |      21942 | 1.777(/fb) | 1.777(/fb) |
+| HLT_IsoMu24_eta2p1_v15 |      58377 | 5.348(/fb) | 5.348(/fb) |
+
+

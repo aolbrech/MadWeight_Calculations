@@ -1,0 +1,13 @@
+  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)    MC scale factor
+
+    492                 1                2.000000000             SemiMu                1                     Unmatched                     1                      0.871668041
+
+    504                 0                2.000000000 
+    812                 0                2.000000000 
+    882                 1                2.000000000             SemiMu                2                     Unmatched                     2                      2.184041739
+
+    1036                0                2.000000000 
+    1184                0                2.000000000 
+    2134                0                2.000000000 
+    2600                0                2.000000000 
+    2847                0                2.000000000 
