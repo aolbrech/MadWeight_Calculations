@@ -513,6 +513,8 @@ int main (int argc, char *argv[])
 
     //Only want these to be filled for TTbarJets_SemiMu!  (what about FullLept and FullHadr ??)
     int BothB = 0;
+    double tagEffPartFlavB = 0, tagEffPartFlavNotB = 0, tagEffPartFlavC = 0, tagEffPartFlavL = 0;
+    int nrPartFlavBJets = 0, nrPartFlavNotBJets = 0, nrPartFlavCJets = 0, nrPartFlavLJets = 0;
     if(isTTbarSemiLept){
       histo1D["PartFlavBJets_BTag"+dsName] = new TH1F(("PartFlavourBJets_BTag"+dsName).c_str(), ("Parton flavour of b-jets for "+dsTitle+" events after 2T CSV tags").c_str(), 10, -0.5, 9.5);
       histo1D["PartFlavBJets_BTag"+dsName]->GetXaxis()->SetBinLabel(1,"Both b");
@@ -557,15 +559,11 @@ int main (int argc, char *argv[])
 
       histo1D["CSVDiscr_CorrectBJets"]     = new TH1F("CSVDiscr_CorrectBJets",    "CSV discriminant for the two correct b-jets in the event",    100,-0.005,1.005);
       histo1D["CSVDiscr_CorrectLightJets"] = new TH1F("CSVDiscr_CorrectLightJets","CSV discriminant for the two correct light jets in the event",100,-0.005,1.005);
-      histo1D["BTagEff_CorrectBJets"]               = new TH1F("BTagEfficiency_CorrectBJets",              "b-tag efficiency for the correct b-jets",                                   50, 0, 1);
-      histo1D["BTagEff_CorrectBJets_partFlavB"]     = new TH1F("BTagEfficiency_CorrectBJets_partFlavB",    "b-tag efficiency for the correct b-jets (with parton flavour of b)",        50, 0, 0.6);
-      histo1D["BTagEff_CorrectBJets_partFlavC"]     = new TH1F("BTagEfficiency_CorrectBJets_partFlavC",    "b-tag efficiency for the correct b-jets (with parton flavour of c)",        50, 0, 0.1);
-      histo1D["BTagEff_CorrectBJets_partFlavL"]     = new TH1F("BTagEfficiency_CorrectBJets_partFlavL",    "b-tag efficiency for the correct b-jets (with parton flavour of udsg)",     50, 0, 0.1);
-      histo1D["BTagEff_CorrectLightJets"]           = new TH1F("BTagEfficiency_CorrectLightJets",          "b-tag efficiency for the correct light jets",                               50, 0, 1);
-      histo1D["BTagEff_CorrectLightJets_partFlavB"] = new TH1F("BTagEfficiency_CorrectLightJets_partFlavB","b-tag efficiency for the correct light jets (with parton flavour of b)",    50, 0, 0.6);
-      histo1D["BTagEff_CorrectLightJets_partFlavC"] = new TH1F("BTagEfficiency_CorrectLightJets_partFlavC","b-tag efficiency for the correct light jets (with parton flavour of c)",    50, 0, 0.1);
-      histo1D["BTagEff_CorrectLightJets_partFlavL"] = new TH1F("BTagEfficiency_CorrectLightJets_partFlavL","b-tag efficiency for the correct light jets (with parton flavour of udsg)", 50, 0, 0.1);
- 
+      histo1D["BTagEff_partFlavB"]    = new TH1F("BTagEff_partFlavB",   "b-tag efficiency for jets with parton flavour of b",     100, 0, 0.6);
+      histo1D["BTagEff_partFlavC"]    = new TH1F("BTagEff_partFlavC",   "b-tag efficiency for jets with parton flavour of c",     100, 0, 0.1);
+      histo1D["BTagEff_partFlavL"]    = new TH1F("BTagEff_partFlavL",   "b-tag efficiency for jets with parton flavour of udsg",  100, 0, 0.01);
+      histo1D["BTagEff_partFlavNotB"] = new TH1F("BTagEff_partFlavNotB","b-tag efficiency for jets with parton flavour of udscg", 100, 0, 0.1);
+
       histo1D["Mlb_CorrTT_"+dsName]        = new TH1F(("Mlb_CorrTT_"+dsName).c_str(),       ("mass_{l,b} for the actual "+dsTitle+" events").c_str(),     200,  0, 250);
       histo1D["HadrMTop_CorrTT_"+dsName]   = new TH1F(("HadrMTop_CorrTT_"+dsName).c_str(),  ("Hadronic m_{t} for the actual "+dsTitle+" events").c_str(), 200, 50, 350);
       histo1D["HadrMW_CorrTT_"+dsName]     = new TH1F(("HadrMW_CorrTT_"+dsName).c_str(),    ("Hadronic m_{W} for the actual "+dsTitle+" events").c_str(), 200,  0, 250);
@@ -919,30 +917,29 @@ int main (int argc, char *argv[])
           //std::cout << " Full formula (1btag) 'Data' is " << DataBTag1 << " and 'MC' is " << MCBTag1 << " ==> Ratio is : " << DataBTag1/MCBTag1 << std::endl; 
           BTagWeight2b = DataBTag/MCBTag;
          */
-          if(isTTbarSemiLept){ 
-            if(corrJetCombi[0] != 9999){
-              histo1D["BTagEff_CorrectBJets"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[0]].Pt(), selJets[corrJetCombi[0]].Eta(), partFlavour[corrJetCombi[0]]));
-              if(partFlavAbs[corrJetCombi[0]] == 5)      histo1D["BTagEff_CorrectBJets_partFlavB"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[0]].Pt(),selJets[corrJetCombi[0]].Eta(),partFlavour[corrJetCombi[0]]));
-              else if(partFlavAbs[corrJetCombi[0]] == 4) histo1D["BTagEff_CorrectBJets_partFlavC"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[0]].Pt(),selJets[corrJetCombi[0]].Eta(),partFlavour[corrJetCombi[0]]));
-              else                                       histo1D["BTagEff_CorrectBJets_partFlavL"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[0]].Pt(),selJets[corrJetCombi[0]].Eta(),partFlavour[corrJetCombi[0]]));
-            }
-            if(corrJetCombi[1] != 9999){
-              histo1D["BTagEff_CorrectBJets"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[1]].Pt(), selJets[corrJetCombi[1]].Eta(), partFlavour[corrJetCombi[1]]));
-              if(partFlavAbs[corrJetCombi[1]] == 5)      histo1D["BTagEff_CorrectBJets_partFlavB"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[1]].Pt(),selJets[corrJetCombi[1]].Eta(),partFlavour[corrJetCombi[1]]));
-              else if(partFlavAbs[corrJetCombi[1]] == 4) histo1D["BTagEff_CorrectBJets_partFlavC"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[1]].Pt(),selJets[corrJetCombi[1]].Eta(),partFlavour[corrJetCombi[1]]));
-              else                                       histo1D["BTagEff_CorrectBJets_partFlavL"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[1]].Pt(),selJets[corrJetCombi[1]].Eta(),partFlavour[corrJetCombi[1]]));
-            }
-            if(corrJetCombi[2] != 9999){
-              histo1D["BTagEff_CorrectLightJets"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[2]].Pt(), selJets[corrJetCombi[2]].Eta(), partFlavour[corrJetCombi[2]]));
-              if(partFlavAbs[corrJetCombi[2]] == 5)      histo1D["BTagEff_CorrectLightJets_partFlavB"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[2]].Pt(),selJets[corrJetCombi[2]].Eta(),partFlavour[corrJetCombi[2]]));
-              else if(partFlavAbs[corrJetCombi[2]] == 4) histo1D["BTagEff_CorrectLightJets_partFlavC"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[2]].Pt(),selJets[corrJetCombi[2]].Eta(),partFlavour[corrJetCombi[2]]));
-              else                                       histo1D["BTagEff_CorrectLightJets_partFlavL"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[2]].Pt(),selJets[corrJetCombi[2]].Eta(),partFlavour[corrJetCombi[2]]));
-            }
-            if(corrJetCombi[3] != 9999){
-              histo1D["BTagEff_CorrectLightJets"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[3]].Pt(), selJets[corrJetCombi[3]].Eta(), partFlavour[corrJetCombi[3]]));
-              if(partFlavAbs[corrJetCombi[3]] == 5)      histo1D["BTagEff_CorrectLightJets_partFlavB"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[3]].Pt(),selJets[corrJetCombi[3]].Eta(),partFlavour[corrJetCombi[3]]));
-              else if(partFlavAbs[corrJetCombi[3]] == 4) histo1D["BTagEff_CorrectLightJets_partFlavC"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[3]].Pt(),selJets[corrJetCombi[3]].Eta(),partFlavour[corrJetCombi[3]]));
-              else                                       histo1D["BTagEff_CorrectLightJets_partFlavL"]->Fill(bTagTool->getTagEff(selJets[corrJetCombi[3]].Pt(),selJets[corrJetCombi[3]].Eta(),partFlavour[corrJetCombi[3]]));
+          if(isTTbarSemiLept){
+
+            for(int iJet = 0; iJet < selJets.size(); iJet++){
+              if(partFlavAbs[iJet] == 5){ 
+                histo1D["BTagEff_partFlavB"]->Fill(bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet])); 
+                tagEffPartFlavB += bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]); 
+                nrPartFlavBJets++;
+              }
+              else{
+                histo1D["BTagEff_partFlavNotB"]->Fill(bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]));
+                tagEffPartFlavNotB += bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]); 
+                nrPartFlavNotBJets++;
+                if(partFlavAbs[iJet] == 4){
+                  histo1D["BTagEff_partFlavC"]->Fill(bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]));
+                  tagEffPartFlavC += bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]); 
+                  nrPartFlavCJets++;
+                }
+                else{
+                  histo1D["BTagEff_partFlavL"]->Fill(bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]));
+                  tagEffPartFlavL += bTagTool->getTagEff(selJets[iJet].Pt(), selJets[iJet].Eta(), partFlavour[iJet]); 
+                  nrPartFlavLJets++;
+                }
+              } 
             }
           }
         }
@@ -958,7 +955,7 @@ int main (int argc, char *argv[])
           else if((partFlavAbs[BLeptIndex] == 5 && partFlavAbs[BHadrIndex] == 0) || (partFlavAbs[BLeptIndex] == 0 && partFlavAbs[BHadrIndex] == 5))   histo1D["PartFlavBJets_BTag"+dsName]->Fill(6);
           else if((partFlavAbs[BLeptIndex] > 0 && partFlavAbs[BLeptIndex] <= 21) && (partFlavAbs[BHadrIndex] > 0 && partFlavAbs[BHadrIndex] <= 21 ))  histo1D["PartFlavBJets_BTag"+dsName]->Fill(7);
           else if(partFlavAbs[BLeptIndex] == 0 && partFlavAbs[BHadrIndex] == 0)                                                                       histo1D["PartFlavBJets_BTag"+dsName]->Fill(8);
-          else{std::cout << " Indices in else (b's) are : " << partFlavAbs[BHadrIndex] << " and " << partFlavAbs[BLeptIndex] << std::endl;            histo1D["PartFlavBJets_BTag"+dsName]->Fill(9);}
+          else{            histo1D["PartFlavBJets_BTag"+dsName]->Fill(9);}
 
           if      (partFlavAbs[Light1Index] == 0 || partFlavAbs[Light2Index] == 0)                                                                        histo1D["PartFlavLightJets_BTag"+dsName]->Fill(7);
           else if (partFlavAbs[Light1Index] < 4 && partFlavAbs[Light2Index] < 4)                                                                          histo1D["PartFlavLightJets_BTag"+dsName]->Fill(0);
@@ -971,7 +968,7 @@ int main (int argc, char *argv[])
           else if(partFlavAbs[Light1Index] == 5 && partFlavAbs[Light2Index] == 5)                                                                         histo1D["PartFlavLightJets_BTag"+dsName]->Fill(8);
           else if(partFlavAbs[Light1Index] == 4 && partFlavAbs[Light2Index] == 4)                                                                         histo1D["PartFlavLightJets_BTag"+dsName]->Fill(9);
           else if((partFlavAbs[Light1Index] == 5 && partFlavAbs[Light2Index] == 4) || (partFlavAbs[Light1Index] == 4 && partFlavAbs[Light2Index] == 5))   histo1D["PartFlavLightJets_BTag"+dsName]->Fill(10);
-          else{std::cout << " Indices in else (light) are : " << partFlavAbs[BHadrIndex] << " and " << partFlavAbs[BLeptIndex] << std::endl;              histo1D["PartFlavLightJets_BTag"+dsName]->Fill(11);}
+          else{              histo1D["PartFlavLightJets_BTag"+dsName]->Fill(11);}
 
           //Draw the CSV discriminant for some type of light jets:
           if(partFlavAbs[Light1Index] != 5 && partFlavAbs[Light2Index] != 5){histo1D["CSVDiscr_LightJets_PartFlavNob"]->Fill(bTagCSV[Light1Index]); histo1D["CSVDiscr_LightJets_PartFlavNob"]->Fill(bTagCSV[Light2Index]);}
@@ -1263,6 +1260,12 @@ int main (int argc, char *argv[])
         cout << "   ** MW   -- " << bTitle[ibTag] << " = " << histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(1)   << " +- " << histo1D["HadrMW_CorrTT_"+dsName+"_"+bTitle[ibTag]]->GetFunction("gaus")->GetParameter(2) << std::endl;
       }
     }
+
+    //Some output on the b-tag efficiencies
+    if(isTTbarSemiLept) std::cout << " Mean value obtained for the b-tag efficiency for jets with parton flavour b is : " << (double)(tagEffPartFlavB/nrPartFlavBJets) << " ("<< tagEffPartFlavB << "/" << nrPartFlavBJets << ")" << std::endl;
+    if(isTTbarSemiLept) std::cout << " Mean value obtained for the b-tag efficiency for jets with parton flavour udscg is : " << (double)(tagEffPartFlavNotB/nrPartFlavNotBJets) << " ("<< tagEffPartFlavNotB << "/" << nrPartFlavNotBJets << ")" << std::endl;
+    if(isTTbarSemiLept) std::cout << " Mean value obtained for the b-tag efficiency for jets with parton flavour c is : " << (double)(tagEffPartFlavC/nrPartFlavCJets) << " ("<< tagEffPartFlavC << "/" << nrPartFlavCJets << ")" << std::endl;
+    if(isTTbarSemiLept) std::cout << " Mean value obtained for the b-tag efficiency for jets with parton flavour udsg is : " << (double)(tagEffPartFlavL/nrPartFlavLJets) << " ("<< tagEffPartFlavL << "/" << nrPartFlavLJets << ")" << std::endl;
 
     //--- Get output from bTagStudy class ---//
     if(isTTbarSemiLept) bTagStudy.ReturnBTagTable();
