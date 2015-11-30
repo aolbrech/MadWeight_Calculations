@@ -381,7 +381,7 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
   }//End of positive lepton
 
   LHCOEventOutput(leptonCharge, MWOutFile[fileIndex], MWEvtNr, LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
-  EvtNrInfo << "            " << MainFile[fileIndex] << "                " << MWEvtNr;
+  EvtNrInfo << "          " << MainFile[fileIndex] << "              " << MWEvtNr;
   if( MWEvtNr < 10) EvtNrInfo << " "; if( MWEvtNr < 100) EvtNrInfo << " "; if( MWEvtNr < 1000) EvtNrInfo << " "; if( MWEvtNr < 10000) EvtNrInfo << " "; if( MWEvtNr < 100000) EvtNrInfo << " ";
  
   //In case the Correct/Wrong/Unmatched lhco files should be created, do this now!
@@ -393,7 +393,7 @@ void LHCOOutput::StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jet
       CWUEvtNr[CWUIndex]++; 
       LHCOEventOutput(leptonCharge, CWURecoFile[CWUIndex], CWUEvtNr[CWUIndex], LHCORecoVector, MadGraphRecoId, MGRecoBtagId);
 
-      EvtNrInfo << "                " << CWUFile[CWUIndex] << "                     " << CWUEvtNr[CWUIndex];
+      EvtNrInfo << "        " << CWUFile[CWUIndex] << "              " << CWUEvtNr[CWUIndex];
       if( CWUEvtNr[CWUIndex] < 10) EvtNrInfo << " "; if( CWUEvtNr[CWUIndex] < 100) EvtNrInfo << " "; if( CWUEvtNr[CWUIndex] < 1000) EvtNrInfo << " "; if( CWUEvtNr[CWUIndex] < 10000) EvtNrInfo << " "; if( CWUEvtNr[CWUIndex] < 100000) EvtNrInfo << " ";
     }
   } 

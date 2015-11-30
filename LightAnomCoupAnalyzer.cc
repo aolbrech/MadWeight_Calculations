@@ -101,9 +101,9 @@ int main (int argc, char *argv[])
   bool bTagPlotsMade = true;         //Decide whether the bTag distributions for the efficiencies should be created or read from file
   bool createTFTree = false;         //Decide whether the TFTree should be made or just skipped during this run! 
   bool fillTFAfterCuts = false;      //Decide whether the TFTree is filled before or after the additional event selection cuts (b-tag, chi-sq and Mw-Mt)
-  bool onlyTTbar = true; 
+  bool onlyTTbar = false;
   bool onlyMuonChannel = true;       //Set this to true in order to reject all electron channel events!
-  bool runLocally = true;            //Differentiate between local and m-machines running for the location of the input samples
+  bool runLocally = false;           //Differentiate between local and m-machines running for the location of the input samples
 
   //Give correct name to TF light ntuples!
   std::string tfFill = "";
@@ -621,8 +621,10 @@ int main (int argc, char *argv[])
 
     ofstream EvtNrMatching;
     if(bTagChoiceMade && getLHCOOutput){
-      EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/EventNrMatching_"+dsName+".txt").c_str());
-      EvtNrMatching << "  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)    MC scale factor" << endl;
+      EvtNrMatching.open(("MadWeightInput/AnalyzerOutput/MWEventNrMatching_"+dsName+".txt").c_str());
+      EvtNrMatching << "  Event Nr     Extra cuts     Decay channel      MW Number     TTbar splitting file      MW Nr (split)    MC scale factor " << endl;
+      EvtNrMatching << "   * Lumi = " << Luminosity << endl;
+      EvtNrMatching << "   * NormFactor = " << datasets[iDataSet]->NormFactor() << endl;
     }
 
     // --------------------------- //
@@ -1198,14 +1200,13 @@ int main (int argc, char *argv[])
           //Keep track of the original event number and the madweight numbers:
           EvtNrMatching << "\n    " << iEvt;
           if( iEvt < 10) EvtNrMatching << " "; if( iEvt < 100) EvtNrMatching << " "; if( iEvt < 1000) EvtNrMatching << " "; if( iEvt < 10000) EvtNrMatching << " "; if( iEvt < 100000) EvtNrMatching << " ";
-          EvtNrMatching << "              " << CutsSurvived << "                " << fixed << setprecision(9)<< genCosTheta << "";
-          if(genCosTheta > 0) EvtNrMatching << " ";
+          EvtNrMatching << "        " << CutsSurvived << "     ";
 
           //if(CutsSurvived) histo1D["CosTheta_SelEvts"]->Fill(kinFunctions.CosTheta(lhcoOutput.getGenLeptTop(), lhcoOutput.getGenLeptW(), lhcoOutput.getGenLepton()));
           // --> Cannot add this since the neutrino is not completely reconstructed and thus the leptonic top is not known ...
           if(CutsSurvived){
             lhcoOutput.StoreRecoInfo(selLepton, selJets, selJetCombi, decayCh, leptCharge, EvtNrMatching, CWUIndex);
-            EvtNrMatching << "                 " << scaleFactor << std::endl;
+            EvtNrMatching << "            " << scaleFactor;
           }
           
           if(CutsSurvived && genCosTheta != 2.0 && decayCh == 0) histo1D["CosTheta_Gen_SelEvts_"+dsName+"_mu"]->Fill(genCosTheta);

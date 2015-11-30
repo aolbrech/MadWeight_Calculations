@@ -1,21 +1,22 @@
-  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)    MC scale factor
+  Event Nr     Extra cuts     Decay channel      MW Number     TTbar splitting file      MW Nr (split)    MC scale factor   Lumi    NormFactor 
+   * Lumi = 19646.8
+   * NormFactor = 4.67619e-05
 
-    363                 1                2.000000000             SemiMu                1                     Unmatched                     1                      0.003681746
-
-    395                 0                2.000000000 
-    779                 0                2.000000000 
-    1325                0                2.000000000 
-    1626                0                2.000000000 
-    2193                0                2.000000000 
-    3737                0                2.000000000 
-    4108                0                2.000000000 
-    4760                0                2.000000000 
-    5785                0                2.000000000 
-    6335                0                2.000000000 
-    6760                0                2.000000000 
-    6899                0                2.000000000 
-    7636                0                2.000000000 
-    8075                0                2.000000000 
-    8305                0                2.000000000 
-    9377                0                2.000000000 
-    9914                0                2.000000000 
+    363           1               SemiMu              1             Unmatched              1                 0.00368175
+    395           0     
+    779           0     
+    1325          0     
+    1626          0     
+    2193          0     
+    3737          0     
+    4108          0     
+    4760          0     
+    5785          0     
+    6335          0     
+    6760          0     
+    6899          0     
+    7636          0     
+    8075          0     
+    8305          0     
+    9377          0     
+    9914          0     

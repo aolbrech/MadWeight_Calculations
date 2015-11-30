@@ -1,4 +1,6 @@
-  Event Nr     Extra cuts survived      Gen cos theta*        Main lhco file      MW Number (main)      TTbar splitting lhco file      MW Number (splitting)    MC scale factor
+  Event Nr     Extra cuts     Decay channel      MW Number     TTbar splitting file      MW Nr (split)    MC scale factor   Lumi    NormFactor 
+   * Lumi = 19646.8
+   * NormFactor = 0.000297425
 
-    86                  0                2.000000000 
-    169                 0                2.000000000 
+    86            0     
+    169           0     
