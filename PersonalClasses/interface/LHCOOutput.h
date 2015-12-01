@@ -20,7 +20,7 @@ public:
   LHCOOutput(int, bool, bool, bool);
   ~LHCOOutput();
 
-  void Initialize(std::string, std::string dataSetName = "");
+  void Initialize(std::string, std::string dataSetName = "", bool);
   void StoreGenInfo(vector<TRootMCParticle*> mcParticles);
   void StoreRecoInfo(TLorentzVector lepton, vector<TLorentzVector> Jets, vector<int> selJetCombi, int decayChannelEnum, float leptonCharge, ofstream &EvtNrInfo, int CWUIndex); 
   void WriteLHCOPlots(TFile*);

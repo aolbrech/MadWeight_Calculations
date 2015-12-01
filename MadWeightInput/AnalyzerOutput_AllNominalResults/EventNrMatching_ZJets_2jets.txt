@@ -1,0 +1,6 @@
+  Event Nr     Extra cuts     Decay channel      MW Number     TTbar splitting file      MW Nr (split)    MC scale factor   Lumi    NormFactor 
+   * Lumi = 19646.8
+   * NormFactor = 9.38986e-05
+
+    154           0     
+    156           1               SemiMu              1             Unmatched              1                 1.02432

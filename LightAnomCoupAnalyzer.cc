@@ -105,6 +105,9 @@ int main (int argc, char *argv[])
   bool onlyMuonChannel = true;       //Set this to true in order to reject all electron channel events!
   bool runLocally = false;           //Differentiate between local and m-machines running for the location of the input samples
 
+  //Systematics
+  std::string nTupleSyst = "JESMinus";    //Change this to get it from the command line
+
   //Give correct name to TF light ntuples!
   std::string tfFill = "";
   if(fillTFAfterCuts) tfFill = "_AfterExtraCuts";
@@ -197,6 +200,7 @@ int main (int argc, char *argv[])
   vector<string> inputFiles;
   vector<Dataset*> datasets;
   std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_100848/";
+  if(nTupleSyst == "JESMinus") inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_27112015_184831/";
   if(onlyTTbar){
     if(!runLocally) inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
     else            inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
@@ -206,23 +210,23 @@ int main (int argc, char *argv[])
       //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
       inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
       //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_1jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_2jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_3jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_4jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_4jets_Nominal.root").c_str());
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_t_Nominal.root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_tbar_Nominal.root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_t_Nominal.root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_tbar_Nominal.root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_t_Nominal.root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_tbar_Nominal.root");
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullLept_Nominal.root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullHadr_Nominal.root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_1jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_2jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_3jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_4jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_4jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_t_"+nTupleSyst+".root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_tbar_"+nTupleSyst+".root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_t_"+nTupleSyst+".root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_tbar_"+nTupleSyst+".root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_t_"+nTupleSyst+".root");
+      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_tbar_"+nTupleSyst+".root");
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullLept_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullHadr_"+nTupleSyst+".root").c_str());
     }
     else{
       inputFiles.push_back("LightTree/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");    //Winter14_v8
@@ -480,6 +484,8 @@ int main (int argc, char *argv[])
     if( dsName.find("TTbarJets_SemiLept") == 0 )
       isTTbarSemiLept = true;
 
+    dsName += "_"+nTupleSyst;
+
     //**** Create the 1D and 2D histograms for each dataset specific! ****//
     histo1D["BTagWeight_"+dsName] = new TH1F(("BTagWeight_"+dsName).c_str(),("b-tag reweighting distribution for "+dsTitle).c_str(),200,0,2);
     histo1D["lumiWeight_"+dsName] = new TH1F(("lumiWeight_"+dsName).c_str(),("lumi reweighting distribution for "+dsTitle).c_str(),200,0,2);
@@ -617,7 +623,7 @@ int main (int argc, char *argv[])
     bTagStudy.InitializeDataSet(dsName);
     LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
     extraEvtSelCuts.Initialize(bTitle[0], dsName);
-    lhcoOutput.Initialize("Reco", dsName);
+    lhcoOutput.Initialize("Reco", dsName, onlyMuonChannel);
 
     ofstream EvtNrMatching;
     if(bTagChoiceMade && getLHCOOutput){

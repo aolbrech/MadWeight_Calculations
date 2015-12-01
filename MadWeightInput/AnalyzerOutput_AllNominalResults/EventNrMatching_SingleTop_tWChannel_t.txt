@@ -1,0 +1,1111 @@
+  Event Nr     Extra cuts     Decay channel      MW Number     TTbar splitting file      MW Nr (split)    MC scale factor   Lumi    NormFactor 
+   * Lumi = 19646.8
+   * NormFactor = 2.26841e-05
+
+    19            0     
+    29            0     
+    41            0     
+    65            0     
+    70            0     
+    71            0     
+    72            0     
+    100           0     
+    130           1               SemiMu              1             Unmatched              1                 0.885319
+    169           0     
+    174           0     
+    199           0     
+    204           0     
+    209           0     
+    212           1               SemiMu              2             Unmatched              2                 0.970639
+    235           1               SemiMu              3             Unmatched              3                 0.53407
+    249           1               SemiMu              4             Unmatched              4                 0.171973
+    252           1               SemiMu              5             Unmatched              5                 0.904581
+    271           0     
+    278           1               SemiMu              6             Unmatched              6                 0.232289
+    285           0     
+    298           1               SemiMu              7             Unmatched              7                 1.11526
+    308           0     
+    335           0     
+    344           0     
+    345           0     
+    389           0     
+    390           0     
+    395           0     
+    403           1               SemiMu              8             Unmatched              8                 0.881627
+    415           0     
+    429           0     
+    440           0     
+    447           0     
+    463           1               SemiMu              9             Unmatched              9                 1.48543
+    465           0     
+    489           0     
+    497           0     
+    530           1               SemiMu              10            Unmatched              10                0.157212
+    544           0     
+    579           0     
+    600           1               SemiMu              11            Unmatched              11                0.411213
+    618           0     
+    623           0     
+    629           0     
+    632           1               SemiMu              12            Unmatched              12                0.983636
+    636           0     
+    659           0     
+    687           0     
+    693           0     
+    694           1               SemiMu              13            Unmatched              13                0.506953
+    710           0     
+    715           0     
+    717           1               SemiMu              14            Unmatched              14                1.32624
+    761           0     
+    765           0     
+    778           1               SemiMu              15            Unmatched              15                0.498407
+    781           1               SemiMu              16            Unmatched              16                0.401942
+    787           0     
+    789           1               SemiMu              17            Unmatched              17                0.990222
+    799           1               SemiMu              18            Unmatched              18                0.792599
+    842           0     
+    848           0     
+    854           0     
+    879           0     
+    884           1               SemiMu              19            Unmatched              19                0.961619
+    923           1               SemiMu              20            Unmatched              20                0.88832
+    924           1               SemiMu              21            Unmatched              21                1.46557
+    943           1               SemiMu              22            Unmatched              22                0.0747098
+    962           1               SemiMu              23            Unmatched              23                0.995401
+    976           1               SemiMu              24            Unmatched              24                0.875694
+    1034          0     
+    1039          1               SemiMu              25            Unmatched              25                0.991602
+    1047          0     
+    1049          1               SemiMu              26            Unmatched              26                0.170187
+    1071          0     
+    1095          0     
+    1099          1               SemiMu              27            Unmatched              27                1.0558
+    1101          1               SemiMu              28            Unmatched              28                1.0211
+    1102          1               SemiMu              29            Unmatched              29                0.984207
+    1167          0     
+    1181          0     
+    1188          1               SemiMu              30            Unmatched              30                0.168031
+    1203          1               SemiMu              31            Unmatched              31                0.367217
+    1212          0     
+    1224          0     
+    1235          0     
+    1239          1               SemiMu              32            Unmatched              32                0.983326
+    1255          1               SemiMu              33            Unmatched              33                0.0022288
+    1271          0     
+    1274          0     
+    1307          0     
+    1332          0     
+    1337          1               SemiMu              34            Unmatched              34                0.983071
+    1338          0     
+    1342          0     
+    1347          1               SemiMu              35            Unmatched              35                0.0749135
+    1397          0     
+    1422          1               SemiMu              36            Unmatched              36                0.961219
+    1424          0     
+    1454          1               SemiMu              37            Unmatched              37                0.983387
+    1465          0     
+    1466          0     
+    1489          1               SemiMu              38            Unmatched              38                0.706759
+    1491          0     
+    1496          0     
+    1501          1               SemiMu              39            Unmatched              39                0.928013
+    1507          0     
+    1519          1               SemiMu              40            Unmatched              40                0.925223
+    1532          0     
+    1552          0     
+    1559          0     
+    1570          0     
+    1575          0     
+    1591          1               SemiMu              41            Unmatched              41                0.948964
+    1602          0     
+    1614          0     
+    1631          0     
+    1641          1               SemiMu              42            Unmatched              42                0.402609
+    1649          0     
+    1657          0     
+    1699          1               SemiMu              43            Unmatched              43                0.987443
+    1707          0     
+    1710          1               SemiMu              44            Unmatched              44                0.312071
+    1723          1               SemiMu              45            Unmatched              45                1.11932
+    1761          0     
+    1777          1               SemiMu              46            Unmatched              46                0.904832
+    1806          0     
+    1807          1               SemiMu              47            Unmatched              47                1.40856
+    1815          1               SemiMu              48            Unmatched              48                0.917099
+    1838          0     
+    1839          0     
+    1867          0     
+    1870          1               SemiMu              49            Unmatched              49                0.934059
+    1874          0     
+    1876          0     
+    1895          0     
+    1903          0     
+    1925          1               SemiMu              50            Unmatched              50                0.79563
+    1927          0     
+    1939          0     
+    1962          0     
+    1968          0     
+    1973          0     
+    2002          0     
+    2004          1               SemiMu              51            Unmatched              51                0.926867
+    2065          1               SemiMu              52            Unmatched              52                1.40718
+    2068          0     
+    2069          1               SemiMu              53            Unmatched              53                0.0765512
+    2070          0     
+    2071          1               SemiMu              54            Unmatched              54                0.895893
+    2097          0     
+    2109          1               SemiMu              55            Unmatched              55                1.00674
+    2114          0     
+    2129          0     
+    2133          1               SemiMu              56            Unmatched              56                0.982268
+    2136          0     
+    2147          0     
+    2159          0     
+    2164          1               SemiMu              57            Unmatched              57                0.888181
+    2170          1               SemiMu              58            Unmatched              58                0.936665
+    2179          1               SemiMu              59            Unmatched              59                1.00534
+    2191          0     
+    2220          1               SemiMu              60            Unmatched              60                0.970536
+    2248          1               SemiMu              61            Unmatched              61                0.990239
+    2270          0     
+    2273          0     
+    2307          1               SemiMu              62            Unmatched              62                0.916555
+    2318          0     
+    2361          0     
+    2372          1               SemiMu              63            Unmatched              63                0.0300179
+    2388          1               SemiMu              64            Unmatched              64                0.934389
+    2399          0     
+    2411          0     
+    2416          0     
+    2417          1               SemiMu              65            Unmatched              65                0.945014
+    2418          1               SemiMu              66            Unmatched              66                0.976717
+    2460          0     
+    2541          1               SemiMu              67            Unmatched              67                0.231853
+    2548          0     
+    2554          0     
+    2564          0     
+    2565          0     
+    2582          0     
+    2626          1               SemiMu              68            Unmatched              68                0.969206
+    2650          0     
+    2670          0     
+    2671          1               SemiMu              69            Unmatched              69                0.973662
+    2673          1               SemiMu              70            Unmatched              70                1.27078
+    2714          0     
+    2718          0     
+    2748          1               SemiMu              71            Unmatched              71                0.498266
+    2750          0     
+    2795          0     
+    2803          0     
+    2820          0     
+    2854          0     
+    2864          1               SemiMu              72            Unmatched              72                0.875632
+    2868          0     
+    2889          0     
+    2900          0     
+    2910          1               SemiMu              73            Unmatched              73                0.879001
+    2915          0     
+    2919          1               SemiMu              74            Unmatched              74                0.167242
+    2935          1               SemiMu              75            Unmatched              75                0.312383
+    2942          0     
+    2957          1               SemiMu              76            Unmatched              76                1.43186
+    3011          0     
+    3017          0     
+    3026          1               SemiMu              77            Unmatched              77                0.947385
+    3037          0     
+    3039          0     
+    3058          1               SemiMu              78            Unmatched              78                0.0183124
+    3077          1               SemiMu              79            Unmatched              79                1.01005
+    3078          0     
+    3092          0     
+    3107          1               SemiMu              80            Unmatched              80                0.988134
+    3126          0     
+    3139          0     
+    3142          0     
+    3149          0     
+    3164          1               SemiMu              81            Unmatched              81                0.995835
+    3167          0     
+    3178          0     
+    3207          1               SemiMu              82            Unmatched              82                0.99821
+    3236          1               SemiMu              83            Unmatched              83                0.882108
+    3241          1               SemiMu              84            Unmatched              84                0.89499
+    3275          0     
+    3277          0     
+    3281          1               SemiMu              85            Unmatched              85                1.01212
+    3311          1               SemiMu              86            Unmatched              86                1.44424
+    3355          1               SemiMu              87            Unmatched              87                0.995623
+    3365          0     
+    3374          0     
+    3388          0     
+    3415          0     
+    3458          0     
+    3460          0     
+    3474          0     
+    3490          0     
+    3525          1               SemiMu              88            Unmatched              88                0.167327
+    3567          0     
+    3591          0     
+    3616          1               SemiMu              89            Unmatched              89                0.877505
+    3627          0     
+    3634          1               SemiMu              90            Unmatched              90                0.876951
+    3642          0     
+    3649          0     
+    3657          1               SemiMu              91            Unmatched              91                0.893227
+    3670          0     
+    3710          0     
+    3737          0     
+    3747          1               SemiMu              92            Unmatched              92                0.0014944
+    3748          0     
+    3762          0     
+    3763          0     
+    3781          1               SemiMu              93            Unmatched              93                0.934783
+    3785          0     
+    3789          0     
+    3798          0     
+    3837          0     
+    3849          0     
+    3910          0     
+    3912          1               SemiMu              94            Unmatched              94                0.895352
+    3973          0     
+    3983          0     
+    3995          1               SemiMu              95            Unmatched              95                0.697493
+    4000          0     
+    4017          0     
+    4037          0     
+    4049          0     
+    4058          0     
+    4081          0     
+    4093          0     
+    4101          0     
+    4107          0     
+    4122          1               SemiMu              96            Unmatched              96                0.888475
+    4180          1               SemiMu              97            Unmatched              97                0.983614
+    4182          0     
+    4200          0     
+    4201          0     
+    4231          1               SemiMu              98            Unmatched              98                0.947447
+    4267          0     
+    4270          0     
+    4291          0     
+    4304          0     
+    4311          0     
+    4315          0     
+    4317          0     
+    4323          0     
+    4328          1               SemiMu              99            Unmatched              99                0.891357
+    4336          0     
+    4368          0     
+    4371          1               SemiMu              100           Unmatched              100               0.879653
+    4373          1               SemiMu              101           Unmatched              101               0.969071
+    4378          1               SemiMu              102           Unmatched              102               0.898007
+    4390          1               SemiMu              103           Unmatched              103               0.996394
+    4409          0     
+    4440          0     
+    4458          1               SemiMu              104           Unmatched              104               0.170264
+    4485          1               SemiMu              105           Unmatched              105               1.31842
+    4491          1               SemiMu              106           Unmatched              106               0.991885
+    4501          1               SemiMu              107           Unmatched              107               0.712685
+    4510          1               SemiMu              108           Unmatched              108               1.12309
+    4519          1               SemiMu              109           Unmatched              109               0.876662
+    4541          1               SemiMu              110           Unmatched              110               0.892267
+    4552          1               SemiMu              111           Unmatched              111               0.951253
+    4571          0     
+    4583          0     
+    4587          1               SemiMu              112           Unmatched              112               0.969008
+    4607          1               SemiMu              113           Unmatched              113               0.926011
+    4618          0     
+    4642          0     
+    4646          0     
+    4647          0     
+    4659          1               SemiMu              114           Unmatched              114               0.711908
+    4663          0     
+    4671          1               SemiMu              115           Unmatched              115               0.90208
+    4712          1               SemiMu              116           Unmatched              116               0.985049
+    4726          0     
+    4732          0     
+    4747          1               SemiMu              117           Unmatched              117               0.962383
+    4748          0     
+    4758          0     
+    4763          0     
+    4772          0     
+    4773          0     
+    4785          0     
+    4786          1               SemiMu              118           Unmatched              118               0.968367
+    4861          0     
+    4868          0     
+    4911          0     
+    4938          0     
+    4978          1               SemiMu              119           Unmatched              119               0.619798
+    4984          0     
+    4988          1               SemiMu              120           Unmatched              120               1.08657
+    5016          0     
+    5034          0     
+    5044          0     
+    5068          1               SemiMu              121           Unmatched              121               0.878613
+    5089          0     
+    5095          1               SemiMu              122           Unmatched              122               0.793042
+    5115          0     
+    5162          1               SemiMu              123           Unmatched              123               0.723693
+    5170          1               SemiMu              124           Unmatched              124               0.994276
+    5171          1               SemiMu              125           Unmatched              125               0.600285
+    5179          0     
+    5185          0     
+    5238          0     
+    5253          1               SemiMu              126           Unmatched              126               0.982778
+    5287          1               SemiMu              127           Unmatched              127               0.890555
+    5307          1               SemiMu              128           Unmatched              128               0.809597
+    5329          0     
+    5353          1               SemiMu              129           Unmatched              129               0.997806
+    5355          0     
+    5374          1               SemiMu              130           Unmatched              130               1.65324
+    5377          0     
+    5405          1               SemiMu              131           Unmatched              131               1.02796
+    5409          1               SemiMu              132           Unmatched              132               0.974177
+    5421          0     
+    5451          1               SemiMu              133           Unmatched              133               1.00214
+    5456          1               SemiMu              134           Unmatched              134               0.601827
+    5469          0     
+    5491          1               SemiMu              135           Unmatched              135               0.88744
+    5509          0     
+    5528          0     
+    5560          0     
+    5571          0     
+    5578          0     
+    5579          0     
+    5586          0     
+    5588          0     
+    5616          0     
+    5653          1               SemiMu              136           Unmatched              136               0.000508976
+    5656          1               SemiMu              137           Unmatched              137               0.88856
+    5678          0     
+    5701          1               SemiMu              138           Unmatched              138               0.978815
+    5703          0     
+    5707          0     
+    5713          0     
+    5718          0     
+    5729          0     
+    5739          0     
+    5749          0     
+    5768          0     
+    5778          0     
+    5805          0     
+    5806          1               SemiMu              139           Unmatched              139               0.914192
+    5822          0     
+    5826          0     
+    5833          1               SemiMu              140           Unmatched              140               0.96338
+    5858          0     
+    5864          0     
+    5869          1               SemiMu              141           Unmatched              141               1.45823
+    5904          0     
+    5911          0     
+    5912          0     
+    5919          0     
+    5946          0     
+    5993          1               SemiMu              142           Unmatched              142               0.960582
+    6007          1               SemiMu              143           Unmatched              143               0.871558
+    6017          1               SemiMu              144           Unmatched              144               0.381111
+    6018          1               SemiMu              145           Unmatched              145               0.8952
+    6028          0     
+    6031          0     
+    6048          0     
+    6100          0     
+    6110          1               SemiMu              146           Unmatched              146               0.963642
+    6131          0     
+    6138          0     
+    6165          1               SemiMu              147           Unmatched              147               1.12466
+    6170          1               SemiMu              148           Unmatched              148               0.813591
+    6186          0     
+    6219          1               SemiMu              149           Unmatched              149               0.906483
+    6222          0     
+    6225          0     
+    6233          0     
+    6249          0     
+    6257          0     
+    6258          1               SemiMu              150           Unmatched              150               1.30379
+    6265          0     
+    6277          0     
+    6285          1               SemiMu              151           Unmatched              151               0.850961
+    6289          1               SemiMu              152           Unmatched              152               0.533468
+    6303          0     
+    6318          1               SemiMu              153           Unmatched              153               0.878077
+    6332          0     
+    6350          0     
+    6351          0     
+    6352          1               SemiMu              154           Unmatched              154               0.954556
+    6364          0     
+    6388          1               SemiMu              155           Unmatched              155               1.00296
+    6396          1               SemiMu              156           Unmatched              156               0.907729
+    6410          0     
+    6417          0     
+    6431          0     
+    6453          1               SemiMu              157           Unmatched              157               0.881694
+    6472          1               SemiMu              158           Unmatched              158               0.231829
+    6482          0     
+    6512          1               SemiMu              159           Unmatched              159               0.888326
+    6514          0     
+    6522          1               SemiMu              160           Unmatched              160               0.886752
+    6533          0     
+    6534          0     
+    6544          0     
+    6561          0     
+    6593          0     
+    6607          1               SemiMu              161           Unmatched              161               1.29983
+    6642          0     
+    6675          1               SemiMu              162           Unmatched              162               0.872653
+    6702          0     
+    6718          0     
+    6725          0     
+    6769          1               SemiMu              163           Unmatched              163               0.268057
+    6773          0     
+    6783          0     
+    6839          0     
+    6841          1               SemiMu              164           Unmatched              164               0.930697
+    6856          0     
+    6862          0     
+    6869          0     
+    6870          0     
+    6876          1               SemiMu              165           Unmatched              165               0.986142
+    6891          0     
+    6900          1               SemiMu              166           Unmatched              166               0.90587
+    6915          1               SemiMu              167           Unmatched              167               0.995426
+    6944          0     
+    6970          0     
+    6986          0     
+    6991          1               SemiMu              168           Unmatched              168               0.976384
+    6993          0     
+    7008          0     
+    7009          1               SemiMu              169           Unmatched              169               0.914171
+    7010          0     
+    7024          0     
+    7035          1               SemiMu              170           Unmatched              170               0.96712
+    7040          0     
+    7054          1               SemiMu              171           Unmatched              171               0.993365
+    7086          0     
+    7087          0     
+    7119          1               SemiMu              172           Unmatched              172               0.924068
+    7126          1               SemiMu              173           Unmatched              173               1.13265
+    7135          1               SemiMu              174           Unmatched              174               1.4802
+    7137          1               SemiMu              175           Unmatched              175               0.310843
+    7144          0     
+    7146          0     
+    7151          1               SemiMu              176           Unmatched              176               0.975199
+    7166          0     
+    7182          0     
+    7206          0     
+    7226          0     
+    7227          0     
+    7282          1               SemiMu              177           Unmatched              177               0.996799
+    7287          0     
+    7311          1               SemiMu              178           Unmatched              178               0.900417
+    7330          0     
+    7341          1               SemiMu              179           Unmatched              179               0.960271
+    7344          1               SemiMu              180           Unmatched              180               0.930886
+    7360          0     
+    7372          0     
+    7396          0     
+    7398          0     
+    7409          0     
+    7414          0     
+    7422          1               SemiMu              181           Unmatched              181               0.115286
+    7426          0     
+    7447          1               SemiMu              182           Unmatched              182               0.0305553
+    7474          0     
+    7487          0     
+    7490          0     
+    7520          0     
+    7526          0     
+    7539          1               SemiMu              183           Unmatched              183               0.888777
+    7567          1               SemiMu              184           Unmatched              184               0.992063
+    7570          0     
+    7589          0     
+    7598          0     
+    7601          1               SemiMu              185           Unmatched              185               0.97403
+    7630          1               SemiMu              186           Unmatched              186               1.12752
+    7652          0     
+    7670          1               SemiMu              187           Unmatched              187               0.890142
+    7703          0     
+    7717          0     
+    7718          1               SemiMu              188           Unmatched              188               1.11327
+    7727          0     
+    7732          1               SemiMu              189           Unmatched              189               1.10886
+    7749          0     
+    7758          1               SemiMu              190           Unmatched              190               0.99456
+    7766          0     
+    7782          1               SemiMu              191           Unmatched              191               0.987411
+    7786          1               SemiMu              192           Unmatched              192               0.99751
+    7794          0     
+    7819          0     
+    7824          0     
+    7831          0     
+    7839          1               SemiMu              193           Unmatched              193               0.810084
+    7873          1               SemiMu              194           Unmatched              194               0.980786
+    7894          1               SemiMu              195           Unmatched              195               0.946401
+    7908          0     
+    7916          0     
+    7932          0     
+    7942          0     
+    7943          0     
+    7951          1               SemiMu              196           Unmatched              196               1.43035
+    7953          1               SemiMu              197           Unmatched              197               0.876733
+    7962          0     
+    7972          0     
+    7981          0     
+    8015          0     
+    8029          0     
+    8031          1               SemiMu              198           Unmatched              198               1.11746
+    8032          0     
+    8035          1               SemiMu              199           Unmatched              199               0.963355
+    8049          0     
+    8055          0     
+    8060          0     
+    8068          1               SemiMu              200           Unmatched              200               1.00521
+    8096          1               SemiMu              201           Unmatched              201               0.70272
+    8111          0     
+    8115          0     
+    8121          0     
+    8129          0     
+    8145          0     
+    8158          1               SemiMu              202           Unmatched              202               1.09882
+    8169          1               SemiMu              203           Unmatched              203               0.90387
+    8184          0     
+    8204          1               SemiMu              204           Unmatched              204               1.12042
+    8245          0     
+    8250          1               SemiMu              205           Unmatched              205               0.115261
+    8266          0     
+    8280          1               SemiMu              206           Unmatched              206               0.166896
+    8292          1               SemiMu              207           Unmatched              207               0.874515
+    8322          0     
+    8324          1               SemiMu              208           Unmatched              208               0.805112
+    8328          1               SemiMu              209           Unmatched              209               1.11762
+    8332          1               SemiMu              210           Unmatched              210               0.715922
+    8340          0     
+    8349          0     
+    8369          0     
+    8379          0     
+    8384          0     
+    8386          1               SemiMu              211           Unmatched              211               0.928215
+    8389          0     
+    8394          0     
+    8424          1               SemiMu              212           Unmatched              212               0.904359
+    8446          0     
+    8498          1               SemiMu              213           Unmatched              213               0.259056
+    8535          1               SemiMu              214           Unmatched              214               0.899494
+    8553          1               SemiMu              215           Unmatched              215               0.996382
+    8558          0     
+    8574          1               SemiMu              216           Unmatched              216               1.40913
+    8579          0     
+    8586          0     
+    8592          0     
+    8609          0     
+    8624          1               SemiMu              217           Unmatched              217               0.914452
+    8638          0     
+    8656          0     
+    8667          0     
+    8688          0     
+    8699          1               SemiMu              218           Unmatched              218               1.01996
+    8704          0     
+    8736          0     
+    8751          0     
+    8756          1               SemiMu              219           Unmatched              219               0.520522
+    8758          1               SemiMu              220           Unmatched              220               0.998258
+    8767          0     
+    8818          1               SemiMu              221           Unmatched              221               0.879727
+    8829          0     
+    8871          0     
+    8874          1               SemiMu              222           Unmatched              222               1.11172
+    8910          1               SemiMu              223           Unmatched              223               0.996809
+    8915          0     
+    8935          0     
+    8967          0     
+    8998          0     
+    9005          1               SemiMu              224           Unmatched              224               0.887782
+    9015          0     
+    9061          0     
+    9063          1               SemiMu              225           Unmatched              225               0.880152
+    9072          0     
+    9096          0     
+    9099          1               SemiMu              226           Unmatched              226               0.908504
+    9101          1               SemiMu              227           Unmatched              227               0.535714
+    9103          0     
+    9109          1               SemiMu              228           Unmatched              228               1.46482
+    9126          0     
+    9137          0     
+    9145          0     
+    9185          1               SemiMu              229           Unmatched              229               0.994101
+    9198          0     
+    9202          0     
+    9248          1               SemiMu              230           Unmatched              230               0.799659
+    9266          1               SemiMu              231           Unmatched              231               0.925524
+    9286          0     
+    9297          0     
+    9319          1               SemiMu              232           Unmatched              232               0.972038
+    9322          1               SemiMu              233           Unmatched              233               1.05196
+    9323          0     
+    9330          0     
+    9340          1               SemiMu              234           Unmatched              234               0.909011
+    9361          0     
+    9382          0     
+    9386          0     
+    9397          1               SemiMu              235           Unmatched              235               0.893703
+    9421          0     
+    9435          0     
+    9455          0     
+    9468          1               SemiMu              236           Unmatched              236               0.793766
+    9491          0     
+    9493          0     
+    9532          0     
+    9541          0     
+    9547          1               SemiMu              237           Unmatched              237               0.604745
+    9552          1               SemiMu              238           Unmatched              238               0.800089
+    9584          1               SemiMu              239           Unmatched              239               1.27959
+    9605          0     
+    9607          0     
+    9629          0     
+    9643          1               SemiMu              240           Unmatched              240               1.04041
+    9650          1               SemiMu              241           Unmatched              241               0.232264
+    9653          0     
+    9688          0     
+    9700          0     
+    9705          1               SemiMu              242           Unmatched              242               0.952168
+    9708          0     
+    9718          0     
+    9721          0     
+    9738          0     
+    9799          1               SemiMu              243           Unmatched              243               0.505611
+    9801          0     
+    9807          0     
+    9811          0     
+    9824          0     
+    9833          0     
+    9837          0     
+    9868          0     
+    9879          0     
+    9896          0     
+    9909          1               SemiMu              244           Unmatched              244               0.980684
+    9913          0     
+    9953          0     
+    10001         0     
+    10020         1               SemiMu              245           Unmatched              245               0.0761572
+    10024         1               SemiMu              246           Unmatched              246               0.940005
+    10034         0     
+    10071         0     
+    10095         0     
+    10097         0     
+    10107         0     
+    10109         0     
+    10113         0     
+    10118         0     
+    10136         1               SemiMu              247           Unmatched              247               1.12225
+    10149         0     
+    10174         0     
+    10175         0     
+    10180         0     
+    10201         0     
+    10268         0     
+    10272         1               SemiMu              248           Unmatched              248               1.01302
+    10317         1               SemiMu              249           Unmatched              249               0.793335
+    10319         0     
+    10329         1               SemiMu              250           Unmatched              250               0.945673
+    10334         0     
+    10343         0     
+    10354         0     
+    10355         0     
+    10371         0     
+    10376         1               SemiMu              251           Unmatched              251               0.700979
+    10438         0     
+    10448         0     
+    10452         0     
+    10460         1               SemiMu              252           Unmatched              252               0.978797
+    10466         1               SemiMu              253           Unmatched              253               0.16725
+    10488         0     
+    10494         0     
+    10521         0     
+    10528         0     
+    10553         0     
+    10578         0     
+    10590         0     
+    10591         0     
+    10597         0     
+    10609         0     
+    10629         0     
+    10647         0     
+    10650         0     
+    10653         1               SemiMu              254           Unmatched              254               0.924259
+    10660         0     
+    10697         1               SemiMu              255           Unmatched              255               0.957399
+    10742         0     
+    10769         0     
+    10776         0     
+    10790         1               SemiMu              256           Unmatched              256               0.115223
+    10799         0     
+    10814         1               SemiMu              257           Unmatched              257               1.10571
+    10834         0     
+    10837         0     
+    10838         0     
+    10844         0     
+    10848         0     
+    10868         1               SemiMu              258           Unmatched              258               0.968677
+    10873         1               SemiMu              259           Unmatched              259               0.993884
+    10878         0     
+    10894         0     
+    10913         1               SemiMu              260           Unmatched              260               1.48139
+    10916         0     
+    10932         1               SemiMu              261           Unmatched              261               1.00587
+    10952         1               SemiMu              262           Unmatched              262               1.1132
+    10955         0     
+    10957         0     
+    10962         0     
+    10973         0     
+    10978         1               SemiMu              263           Unmatched              263               0.935426
+    10994         0     
+    11031         0     
+    11039         0     
+    11044         1               SemiMu              264           Unmatched              264               1.43439
+    11077         0     
+    11105         1               SemiMu              265           Unmatched              265               0.876719
+    11144         0     
+    11148         0     
+    11157         0     
+    11161         1               SemiMu              266           Unmatched              266               0.890894
+    11183         0     
+    11190         0     
+    11207         0     
+    11209         0     
+    11223         0     
+    11239         0     
+    11285         1               SemiMu              267           Unmatched              267               0.89609
+    11287         0     
+    11308         0     
+    11309         1               SemiMu              268           Unmatched              268               1.11593
+    11319         0     
+    11324         1               SemiMu              269           Unmatched              269               0.997452
+    11333         0     
+    11334         0     
+    11335         1               SemiMu              270           Unmatched              270               0.979647
+    11359         0     
+    11368         0     
+    11372         0     
+    11398         1               SemiMu              271           Unmatched              271               0.967064
+    11434         1               SemiMu              272           Unmatched              272               0.859182
+    11439         0     
+    11468         0     
+    11492         0     
+    11499         1               SemiMu              273           Unmatched              273               0.962167
+    11513         0     
+    11539         0     
+    11561         0     
+    11616         0     
+    11622         0     
+    11640         1               SemiMu              274           Unmatched              274               0.927564
+    11654         0     
+    11684         0     
+    11724         1               SemiMu              275           Unmatched              275               0.922825
+    11727         1               SemiMu              276           Unmatched              276               0.0105131
+    11729         1               SemiMu              277           Unmatched              277               1.10228
+    11730         0     
+    11760         0     
+    11769         0     
+    11772         0     
+    11780         0     
+    11833         1               SemiMu              278           Unmatched              278               0.712689
+    11836         1               SemiMu              279           Unmatched              279               1.47234
+    11864         0     
+    11923         1               SemiMu              280           Unmatched              280               1.00149
+    11938         0     
+    11940         0     
+    11952         1               SemiMu              281           Unmatched              281               0.97245
+    11955         0     
+    11961         0     
+    11962         1               SemiMu              282           Unmatched              282               0.937009
+    11969         1               SemiMu              283           Unmatched              283               0.49758
+    11971         1               SemiMu              284           Unmatched              284               0.793007
+    11972         1               SemiMu              285           Unmatched              285               0.992885
+    11978         0     
+    11980         0     
+    11989         1               SemiMu              286           Unmatched              286               0.899493
+    12001         0     
+    12004         0     
+    12007         0     
+    12031         0     
+    12032         0     
+    12042         0     
+    12054         0     
+    12056         1               SemiMu              287           Unmatched              287               0.937665
+    12072         0     
+    12079         1               SemiMu              288           Unmatched              288               1.10346
+    12083         0     
+    12097         1               SemiMu              289           Unmatched              289               0.587479
+    12125         1               SemiMu              290           Unmatched              290               0.927968
+    12133         0     
+    12137         0     
+    12169         0     
+    12171         0     
+    12206         0     
+    12210         0     
+    12231         0     
+    12259         0     
+    12278         1               SemiMu              291           Unmatched              291               1.45466
+    12307         0     
+    12308         0     
+    12319         0     
+    12327         1               SemiMu              292           Unmatched              292               0.892043
+    12336         0     
+    12357         1               SemiMu              293           Unmatched              293               0.937903
+    12394         0     
+    12441         1               SemiMu              294           Unmatched              294               0.988518
+    12454         0     
+    12462         1               SemiMu              295           Unmatched              295               0.995175
+    12468         0     
+    12486         0     
+    12504         0     
+    12509         0     
+    12545         1               SemiMu              296           Unmatched              296               0.997881
+    12585         1               SemiMu              297           Unmatched              297               1.30176
+    12589         1               SemiMu              298           Unmatched              298               0.961105
+    12594         1               SemiMu              299           Unmatched              299               0.612715
+    12668         0     
+    12742         1               SemiMu              300           Unmatched              300               1.34847
+    12743         0     
+    12746         0     
+    12761         0     
+    12762         0     
+    12775         0     
+    12778         1               SemiMu              301           Unmatched              301               0.235244
+    12783         0     
+    12808         0     
+    12818         0     
+    12825         0     
+    12838         1               SemiMu              302           Unmatched              302               0.996963
+    12847         0     
+    12850         0     
+    12880         0     
+    12929         1               SemiMu              303           Unmatched              303               0.0061488
+    12956         0     
+    12958         1               SemiMu              304           Unmatched              304               0.970309
+    13030         0     
+    13037         1               SemiMu              305           Unmatched              305               0.873487
+    13060         0     
+    13070         1               SemiMu              306           Unmatched              306               1.11625
+    13085         1               SemiMu              307           Unmatched              307               0.698689
+    13114         0     
+    13132         0     
+    13135         0     
+    13139         1               SemiMu              308           Unmatched              308               1.29895
+    13143         0     
+    13154         1               SemiMu              309           Unmatched              309               1.29951
+    13191         0     
+    13196         1               SemiMu              310           Unmatched              310               0.909036
+    13221         0     
+    13248         0     
+    13294         0     
+    13296         0     
+    13316         0     
+    13319         0     
+    13324         1               SemiMu              311           Unmatched              311               1.30593
+    13328         0     
+    13342         1               SemiMu              312           Unmatched              312               0.875156
+    13375         1               SemiMu              313           Unmatched              313               0.963962
+    13384         0     
+    13418         0     
+    13449         0     
+    13450         1               SemiMu              314           Unmatched              314               0.590992
+    13463         0     
+    13466         0     
+    13468         0     
+    13475         0     
+    13495         0     
+    13505         0     
+    13541         0     
+    13553         0     
+    13559         0     
+    13587         0     
+    13589         0     
+    13599         0     
+    13628         0     
+    13633         0     
+    13652         1               SemiMu              315           Unmatched              315               0.994011
+    13659         0     
+    13671         0     
+    13673         0     
+    13684         0     
+    13706         1               SemiMu              316           Unmatched              316               0.877677
+    13711         0     
+    13730         0     
+    13735         1               SemiMu              317           Unmatched              317               0.996084
+    13739         0     
+    13745         1               SemiMu              318           Unmatched              318               0.973791
+    13746         0     
+    13771         0     
+    13775         1               SemiMu              319           Unmatched              319               0.715423
+    13782         0     
+    13784         0     
+    13786         0     
+    13814         0     
+    13820         0     
+    13827         0     
+    13836         0     
+    13840         1               SemiMu              320           Unmatched              320               0.017433
+    13846         1               SemiMu              321           Unmatched              321               0.870724
+    13879         0     
+    13884         0     
+    13887         0     
+    13895         0     
+    13912         0     
+    13925         0     
+    13955         0     
+    13966         1               SemiMu              322           Unmatched              322               0.950393
+    13969         1               SemiMu              323           Unmatched              323               0.873994
+    13984         0     
+    13986         0     
+    14011         0     
+    14014         0     
+    14019         1               SemiMu              324           Unmatched              324               0.6014
+    14022         1               SemiMu              325           Unmatched              325               0.951812
+    14032         0     
+    14034         0     
+    14068         0     
+    14135         1               SemiMu              326           Unmatched              326               1.43138
+    14153         0     
+    14154         1               SemiMu              327           Unmatched              327               0.959135
+    14173         0     
+    14174         0     
+    14178         0     
+    14182         1               SemiMu              328           Unmatched              328               0.689373
+    14186         0     
+    14205         1               SemiMu              329           Unmatched              329               0.886108
+    14207         0     
+    14211         0     
+    14225         1               SemiMu              330           Unmatched              330               0.97091
+    14242         1               SemiMu              331           Unmatched              331               0.972796
+    14244         1               SemiMu              332           Unmatched              332               0.971746
+    14252         1               SemiMu              333           Unmatched              333               0.712443
+    14262         1               SemiMu              334           Unmatched              334               0.873034
+    14263         1               SemiMu              335           Unmatched              335               0.954383
+    14322         0     
+    14336         0     
+    14347         0     
+    14350         0     
+    14352         1               SemiMu              336           Unmatched              336               0.308984
+    14412         1               SemiMu              337           Unmatched              337               0.875646
+    14416         1               SemiMu              338           Unmatched              338               0.963212
+    14423         0     
+    14444         1               SemiMu              339           Unmatched              339               0.997202
+    14455         0     
+    14463         0     
+    14473         0     
+    14512         0     
+    14535         0     
+    14539         0     
+    14549         1               SemiMu              340           Unmatched              340               0.977424
+    14565         0     
+    14573         0     
+    14595         1               SemiMu              341           Unmatched              341               1.29994
+    14598         1               SemiMu              342           Unmatched              342               0.744809
+    14602         0     
+    14632         0     
+    14640         0     
+    14645         1               SemiMu              343           Unmatched              343               1.30956
+    14649         0     
+    14669         1               SemiMu              344           Unmatched              344               0.982215
+    14673         1               SemiMu              345           Unmatched              345               0.985862
+    14686         0     
+    14698         1               SemiMu              346           Unmatched              346               0.988808
+    14709         1               SemiMu              347           Unmatched              347               0.961463
+    14732         1               SemiMu              348           Unmatched              348               0.988224
+    14736         0     
+    14769         1               SemiMu              349           Unmatched              349               1.02723
+    14785         1               SemiMu              350           Unmatched              350               0.879692
+    14792         0     
+    14794         1               SemiMu              351           Unmatched              351               0.9099
+    14796         1               SemiMu              352           Unmatched              352               0.796523
+    14803         1               SemiMu              353           Unmatched              353               1.11848
+    14818         0     
+    14820         0     
+    14824         1               SemiMu              354           Unmatched              354               0.958078
+    14826         0     
+    14827         1               SemiMu              355           Unmatched              355               0.983424
+    14846         0     
+    14865         1               SemiMu              356           Unmatched              356               1.12623
+    14885         0     
+    14903         1               SemiMu              357           Unmatched              357               1.11893
+    14978         1               SemiMu              358           Unmatched              358               0.115573
+    14981         1               SemiMu              359           Unmatched              359               0.969093
+    14984         1               SemiMu              360           Unmatched              360               0.964394
+    15064         0     
+    15070         0     
+    15072         0     
+    15094         1               SemiMu              361           Unmatched              361               0.955229
+    15096         0     
+    15107         1               SemiMu              362           Unmatched              362               0.929765
+    15115         0     
+    15141         0     
+    15164         0     
+    15169         1               SemiMu              363           Unmatched              363               0.511226
+    15172         1               SemiMu              364           Unmatched              364               0.90357
+    15182         0     
+    15186         1               SemiMu              365           Unmatched              365               0.468578
+    15190         0     
+    15195         1               SemiMu              366           Unmatched              366               0.92821
+    15201         1               SemiMu              367           Unmatched              367               0.235702
+    15223         0     
+    15233         0     
+    15234         0     
+    15237         0     
+    15248         1               SemiMu              368           Unmatched              368               0.986909
+    15282         0     
+    15332         0     
+    15349         1               SemiMu              369           Unmatched              369               1.45876
+    15395         1               SemiMu              370           Unmatched              370               0.114763
+    15399         0     
+    15405         0     
+    15409         0     
+    15413         1               SemiMu              371           Unmatched              371               0.498921
+    15428         0     
+    15429         1               SemiMu              372           Unmatched              372               0.712723
+    15430         0     
+    15433         0     
+    15452         0     
+    15466         1               SemiMu              373           Unmatched              373               0.877322
+    15474         0     
+    15512         0     
+    15560         1               SemiMu              374           Unmatched              374               0.871198
+    15566         0     
+    15582         0     
+    15604         0     
+    15629         1               SemiMu              375           Unmatched              375               1.01416
+    15632         0     
+    15639         0     
+    15683         0     
+    15702         0     
+    15721         0     
+    15740         1               SemiMu              376           Unmatched              376               1.02416
+    15753         0     
+    15770         1               SemiMu              377           Unmatched              377               0.519505
+    15773         0     
+    15796         1               SemiMu              378           Unmatched              378               0.94066
+    15804         1               SemiMu              379           Unmatched              379               0.799047
+    15808         1               SemiMu              380           Unmatched              380               0.881391
+    15821         0     
+    15827         1               SemiMu              381           Unmatched              381               0.898952
+    15833         0     
+    15834         0     
+    15855         0     
+    15907         1               SemiMu              382           Unmatched              382               1.45807
+    15944         0     
+    15950         1               SemiMu              383           Unmatched              383               0.91563
+    16002         0     
+    16056         0     
+    16077         0     
+    16088         0     
+    16091         1               SemiMu              384           Unmatched              384               0.912078
+    16098         0     
+    16114         0     
+    16139         0     
+    16140         1               SemiMu              385           Unmatched              385               0.937047
+    16142         0     
+    16167         1               SemiMu              386           Unmatched              386               1.00605
+    16177         1               SemiMu              387           Unmatched              387               0.897095
+    16189         0     
+    16221         0     
+    16229         1               SemiMu              388           Unmatched              388               0.878035
+    16242         0     

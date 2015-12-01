@@ -1,0 +1,68 @@
+  Event Nr     Extra cuts     Decay channel      MW Number     TTbar splitting file      MW Nr (split)    MC scale factor   Lumi    NormFactor 
+   * Lumi = 19646.8
+   * NormFactor = 1.40829e-05
+
+    21            0     
+    27            0     
+    30            0     
+    39            0     
+    43            0     
+    70            0     
+    72            0     
+    74            0     
+    86            1               SemiMu              1             Unmatched              1                 0.876233
+    96            0     
+    100           0     
+    103           0     
+    113           0     
+    139           0     
+    146           1               SemiMu              2             Unmatched              2                 0.529034
+    157           0     
+    160           0     
+    164           1               SemiMu              3             Unmatched              3                 0.997353
+    192           0     
+    193           0     
+    198           0     
+    200           0     
+    213           0     
+    215           1               SemiMu              4             Unmatched              4                 0.884768
+    221           0     
+    231           0     
+    235           0     
+    237           0     
+    239           1               SemiMu              5             Unmatched              5                 0.890512
+    241           0     
+    244           0     
+    245           0     
+    259           0     
+    274           0     
+    277           0     
+    286           0     
+    289           0     
+    290           1               SemiMu              6             Unmatched              6                 0.718055
+    292           0     
+    298           0     
+    306           0     
+    320           0     
+    321           0     
+    328           1               SemiMu              7             Unmatched              7                 0.968718
+    344           0     
+    345           0     
+    346           0     
+    353           0     
+    354           0     
+    361           0     
+    362           0     
+    392           0     
+    394           0     
+    401           0     
+    402           0     
+    409           0     
+    415           1               SemiMu              8             Unmatched              8                 0.878075
+    417           0     
+    418           0     
+    423           0     
+    425           0     
+    426           0     
+    428           0     
+    439           0     
