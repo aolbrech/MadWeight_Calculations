@@ -194,7 +194,7 @@ int main (int argc, char *argv[])
   //----------------------------//
   //ROOT file for storing plots
   string pathPNG = "PlotsMacro_Light";
-  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis"+onlyTTbarTitle+"_"+systematic+"_"+whichBTags+"_"+time+".root").c_str(),"RECREATE");
+  TFile* outputFile = new TFile((pathPNG+"/AnomCoup_Analysis"+nTupleSyst+""+onlyTTbarTitle+"_"+systematic+"_"+whichBTags+"_"+time+".root").c_str(),"RECREATE");
 
   //Which datasets should be considered
   vector<string> inputFiles;
@@ -208,7 +208,7 @@ int main (int argc, char *argv[])
   else{ 
     if(!runLocally){
       //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
+      if(nTupleSyst == "") inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
       //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
       inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_1jets_"+nTupleSyst+".root").c_str());
       inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_2jets_"+nTupleSyst+".root").c_str());
@@ -218,12 +218,14 @@ int main (int argc, char *argv[])
       inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_"+nTupleSyst+".root").c_str());
       inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_"+nTupleSyst+".root").c_str());
       inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_4jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_t_"+nTupleSyst+".root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_sChannel_tbar_"+nTupleSyst+".root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_t_"+nTupleSyst+".root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tWChannel_tbar_"+nTupleSyst+".root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_t_"+nTupleSyst+".root");
-      inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_23112015_110305/AnomCoupLight_SingleTop_tChannel_tbar_"+nTupleSyst+".root");
+      if(nTupleSyst != "Nominal"){
+        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_sChannel_t_"+nTupleSyst+".root").c_str());
+        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_sChannel_tbar_"+nTupleSyst+".root").c_str());
+        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tWChannel_t_"+nTupleSyst+".root").c_str());
+        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tWChannel_tbar_"+nTupleSyst+".root").c_str());
+        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tChannel_t_"+nTupleSyst+".root").c_str());
+        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tChannel_tbar_"+nTupleSyst+".root").c_str());
+      }
       inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_"+nTupleSyst+".root").c_str());
       inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullLept_"+nTupleSyst+".root").c_str());
       inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullHadr_"+nTupleSyst+".root").c_str());
@@ -623,7 +625,7 @@ int main (int argc, char *argv[])
     bTagStudy.InitializeDataSet(dsName);
     LHCOOutput lhcoOutput(verbosity, getLHCOOutput, splitLeptonChargeLHCO, getCorrectAndWrongLHCO);
     extraEvtSelCuts.Initialize(bTitle[0], dsName);
-    lhcoOutput.Initialize("Reco", dsName, onlyMuonChannel);
+    lhcoOutput.Initialize("Reco", onlyMuonChannel, dsName);
 
     ofstream EvtNrMatching;
     if(bTagChoiceMade && getLHCOOutput){

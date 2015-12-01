@@ -25,7 +25,7 @@ LHCOOutput::~LHCOOutput(){
   }
 }
 
-void LHCOOutput::Initialize(string GenOrReco, std::string dataSetName, bool onlyMuon){
+void LHCOOutput::Initialize(string GenOrReco, bool onlyMuon, std::string dataSetName){
   if(verbose_ > 3) std::cout << " In Initialize function of LHCOOutput ... " << std::endl;    
 
   GenOrReco_ = GenOrReco; //Will be updated if the sample is TTbarJets and then the destructor will actually do something (for all other samples nothing will be executed in destructor)
