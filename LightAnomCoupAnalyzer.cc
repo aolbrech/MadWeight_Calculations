@@ -78,6 +78,21 @@ int main (int argc, char *argv[])
   if(argc >= 2 && string(argv[1]) != "-1")
     nrEvtsComLine = atoi(argv[1]);
 
+  //------------------------------//
+  //  Get the systematic from CL  //
+  //------------------------------//
+  //1) Systematic applied in nTuple!
+  std::string nTupleSyst = "Nominal";
+  if(argc >= 3) nTupleSyst = string(argv[2]); 
+  std::cout << " - Will be using nTupleSyst " << nTupleSyst << " ! " << std::endl;
+
+  //2) Systematic applied locally
+  std::string systematic = "Nominal";
+  if(argc >= 4) systematic = string(argv[3]);
+  std::cout << " - Will be using systematic " << systematic << " ! " << std::endl;
+  
+  if(systematic != "Nominal" && nTupleSyst != "Nominal"){ std::cout << " ERROR: Cannot apply a local systematic on a nTuple systematic ....!! " << std::endl; exit(-1);}
+
   //------------------------//
   //  Verbosity for output  //
   //  -->Used in bTagStudy  //
@@ -104,9 +119,6 @@ int main (int argc, char *argv[])
   bool onlyTTbar = false;
   bool onlyMuonChannel = true;       //Set this to true in order to reject all electron channel events!
   bool runLocally = false;           //Differentiate between local and m-machines running for the location of the input samples
-
-  //Systematics
-  std::string nTupleSyst = "JESMinus";    //Change this to get it from the command line
 
   //Give correct name to TF light ntuples!
   std::string tfFill = "";
@@ -164,9 +176,6 @@ int main (int argc, char *argv[])
   //-------------------------//
   std::string doLeptonSFShift = "Nominal";   //Other options are "Minus" and "Plus" (Capital letters are needed!)
   std::string doLumiWeightShift = "Nominal"; //Other options are "Minus" and "Plus"
-  std::string systematic = "Nominal";
-  if(argc >= 3) systematic = string(argv[2]);
-  std::cout << " - Will be using systematic " << systematic << " ! " << std::endl;
   if(systematic != "Nominal" && systematic != "bTagMinus" && systematic != "bTagPlus" && systematic != "MuonSFMinus" && systematic != "MuonSFPlus" && systematic != "ElecSFMinus" && systematic != "ElecSFPlus"){
     std::cout << "   *****  Given systematic is not allowed! " << std::endl;
     std::cout << "   *****  Possibilities are : Nominal, bTagMinus, bTagPlus, MuonSFMinus, MuonSFPlus, ElecSFMinus and ElecSFPlus " << std::endl;
@@ -199,36 +208,34 @@ int main (int argc, char *argv[])
   //Which datasets should be considered
   vector<string> inputFiles;
   vector<Dataset*> datasets;
-  std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_100848/";
-  if(nTupleSyst == "JESMinus") inputFileDir = "/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_27112015_184831/";
+  std::string inputFileDir = "/user/aolbrech/PBS_ScriptRunning/";
   if(onlyTTbar){
     if(!runLocally) inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_Nominal.root").c_str());
     else            inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_Nominal.root");
   }
   else{ 
     if(!runLocally){
-      //inputFiles.push_back("LightTree/AnomCoupLight_TTbarJets_SemiLept_AllTTbarEvents_19Aug2015.root");
-      if(nTupleSyst == "") inputFiles.push_back((inputFileDir+"AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                       //Winter14_v8
-      //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_1jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_2jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_3jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_ZJets_4jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_1jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_2jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_3jets_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_WJets_4jets_"+nTupleSyst+".root").c_str());
-      if(nTupleSyst != "Nominal"){
-        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_sChannel_t_"+nTupleSyst+".root").c_str());
-        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_sChannel_tbar_"+nTupleSyst+".root").c_str());
-        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tWChannel_t_"+nTupleSyst+".root").c_str());
-        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tWChannel_tbar_"+nTupleSyst+".root").c_str());
-        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tChannel_t_"+nTupleSyst+".root").c_str());
-        inputFiles.push_back((inputFileDir+"AnomCoupLight_SingleTop_tChannel_tbar_"+nTupleSyst+".root").c_str());
+      if(nTupleSyst == "Nominal"){
+        inputFiles.push_back((inputFileDir+"DATA/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root").c_str());                                                  //Winter14_v8
+        //inputFiles.push_back("/user/aolbrech/PBS_ScriptRunning/Results/RESULTS_AnomCoup_13112015_121239/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");  //Winter14_v5
       }
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_SemiLept_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullLept_"+nTupleSyst+".root").c_str());
-      inputFiles.push_back((inputFileDir+"AnomCoupLight_TTbarJets_FullHadr_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_ZJets_1jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_ZJets_2jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_ZJets_3jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_ZJets_4jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_WJets_1jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_WJets_2jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_WJets_3jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_WJets_4jets_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_SingleTop_sChannel_t_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_SingleTop_sChannel_tbar_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_SingleTop_tWChannel_t_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_SingleTop_tWChannel_tbar_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_SingleTop_tChannel_t_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_SingleTop_tChannel_tbar_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_TTbarJets_SemiLept_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_TTbarJets_FullLept_"+nTupleSyst+".root").c_str());
+      inputFiles.push_back((inputFileDir+""+nTupleSyst+"/AnomCoupLight_TTbarJets_FullHadr_"+nTupleSyst+".root").c_str());
     }
     else{
       inputFiles.push_back("LightTree/AnomCoupLight_Data_Mu_Merged_22Jan2013_Nominal.root");    //Winter14_v8
